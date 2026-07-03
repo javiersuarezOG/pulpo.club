@@ -29,26 +29,30 @@ _WIDGET_PATH = _REPO_ROOT / "web" / "app" / "admin" / "widgets" / "newsletter" /
 
 
 def _template_ids_from_widget() -> set[str]:
-    """Pull every `template: "…"` literal out of NewsletterWidget.jsx.
+    """Pull every `templateId: "…"` literal out of NewsletterWidget.jsx.
 
-    The widget's NEWSLETTERS array is hand-edited (no JSON / no build
+    The widget's TEMPLATES array is hand-edited (no JSON / no build
     step), so a regex over the source is more reliable than a JS
     parser. If the widget ever switches to a different declaration
     shape, update this regex + the matching helper in the widget.
+
+    (Pre-2026-06-10 the field was `template:`; the console rewrite
+    renamed it to `templateId:` — `templateId: null` rows like the
+    Activation system email carry no quote and are correctly skipped.)
     """
     src = _WIDGET_PATH.read_text(encoding="utf-8")
-    # Match `template: "<id>"` inside the NEWSLETTERS literal.
+    # Match `templateId: "<id>"` inside the TEMPLATES literal.
     # Allows single OR double quotes; ids are kebab-case ASCII.
-    pattern = re.compile(r'template\s*:\s*[\'\"]([a-z0-9][a-z0-9\-]*)[\'\"]')
+    pattern = re.compile(r'templateId\s*:\s*[\'\"]([a-z0-9][a-z0-9\-]*)[\'\"]')
     return set(pattern.findall(src))
 
 
 def test_template_ids_align_widget_to_python():
-    """Every `template: "…"` in the widget must be a key in TEMPLATES."""
+    """Every `templateId: "…"` in the widget must be a key in TEMPLATES."""
     widget_ids = _template_ids_from_widget()
     assert widget_ids, (
-        "No `template:` field found in NewsletterWidget.jsx — the regex "
-        "may need updating after a refactor of the NEWSLETTERS array shape."
+        "No `templateId:` field found in NewsletterWidget.jsx — the regex "
+        "may need updating after a refactor of the TEMPLATES array shape."
     )
     python_ids = set(TEMPLATES.keys())
     missing_in_python = widget_ids - python_ids
@@ -149,6 +153,31 @@ def test_python_template_version_shape():
         f"form: {_common.WELCOME_BACK_TEMPLATE_VERSION!r}"
     )
 
+    # Free general (free-tier weekly) carries its own pair so the admin
+    # template-version API can chip the "Free · Weekly" card, and
+    # SHORT_VERSION_RE (`-vN.N-`) must pull the short form from the
+    # `free-general-vN.N-YYYY-MM-DD` line.
+    free_general_pattern = re.compile(r"^free-general-(v[\d.]+)-(\d{4}-\d{2}-\d{2})$")
+    m_free_general = free_general_pattern.match(_common.FREE_GENERAL_TEMPLATE_VERSION)
+    assert m_free_general, (
+        f"FREE_GENERAL_TEMPLATE_VERSION isn't in 'free-general-vN.N-YYYY-MM-DD' "
+        f"form: {_common.FREE_GENERAL_TEMPLATE_VERSION!r}"
+    )
+
+    # Free onboarding pair — own version lines, same shape contract.
+    free_welcome_pattern = re.compile(r"^free-welcome-(v[\d.]+)-(\d{4}-\d{2}-\d{2})$")
+    m_free_welcome = free_welcome_pattern.match(_common.FREE_WELCOME_TEMPLATE_VERSION)
+    assert m_free_welcome, (
+        f"FREE_WELCOME_TEMPLATE_VERSION isn't in 'free-welcome-vN.N-YYYY-MM-DD' "
+        f"form: {_common.FREE_WELCOME_TEMPLATE_VERSION!r}"
+    )
+    free_welcome_back_pattern = re.compile(r"^free-welcome-back-(v[\d.]+)-(\d{4}-\d{2}-\d{2})$")
+    m_free_welcome_back = free_welcome_back_pattern.match(_common.FREE_WELCOME_BACK_TEMPLATE_VERSION)
+    assert m_free_welcome_back, (
+        f"FREE_WELCOME_BACK_TEMPLATE_VERSION isn't in 'free-welcome-back-vN.N-YYYY-MM-DD' "
+        f"form: {_common.FREE_WELCOME_BACK_TEMPLATE_VERSION!r}"
+    )
+
     iso_date = re.compile(r"^\d{4}-\d{2}-\d{2}$")
     assert iso_date.match(_common.LAST_UPDATED), (
         f"LAST_UPDATED isn't ISO-8601 YYYY-MM-DD: {_common.LAST_UPDATED!r}"
@@ -160,6 +189,24 @@ def test_python_template_version_shape():
     assert iso_date.match(_common.WELCOME_BACK_LAST_UPDATED), (
         f"WELCOME_BACK_LAST_UPDATED isn't ISO-8601 YYYY-MM-DD: "
         f"{_common.WELCOME_BACK_LAST_UPDATED!r}"
+    )
+    assert iso_date.match(_common.FREE_GENERAL_LAST_UPDATED), (
+        f"FREE_GENERAL_LAST_UPDATED isn't ISO-8601 YYYY-MM-DD: "
+        f"{_common.FREE_GENERAL_LAST_UPDATED!r}"
+    )
+    assert m_free_general.group(2) == _common.FREE_GENERAL_LAST_UPDATED, (
+        f"FREE_GENERAL_TEMPLATE_VERSION date ({m_free_general.group(2)!r}) "
+        f"doesn't match FREE_GENERAL_LAST_UPDATED "
+        f"({_common.FREE_GENERAL_LAST_UPDATED!r}). Bump both — Python is "
+        f"the source of truth."
+    )
+    assert iso_date.match(_common.FREE_WELCOME_LAST_UPDATED)
+    assert iso_date.match(_common.FREE_WELCOME_BACK_LAST_UPDATED)
+    assert m_free_welcome.group(2) == _common.FREE_WELCOME_LAST_UPDATED, (
+        "FREE_WELCOME_TEMPLATE_VERSION date doesn't match FREE_WELCOME_LAST_UPDATED."
+    )
+    assert m_free_welcome_back.group(2) == _common.FREE_WELCOME_BACK_LAST_UPDATED, (
+        "FREE_WELCOME_BACK_TEMPLATE_VERSION date doesn't match FREE_WELCOME_BACK_LAST_UPDATED."
     )
 
     assert m_general.group(2) == _common.LAST_UPDATED, (

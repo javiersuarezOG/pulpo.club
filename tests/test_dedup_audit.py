@@ -31,6 +31,7 @@ def test_empty_dataset():
     assert audit["total_unique_fingerprints"] == 0
     assert audit["per_source"] == {}
     assert audit["overlap_matrix"] == {}
+    assert audit["duplicate_clusters"] == []
 
 
 def test_single_source_no_overlap():
@@ -68,6 +69,83 @@ def test_overlap_matrix_is_symmetric():
     # Self-pairs never appear.
     assert "encuentra24" not in matrix.get("encuentra24", {})
     assert "remax" not in matrix.get("remax", {})
+
+
+def test_duplicate_clusters_intra_source_grouping():
+    """Two listings with identical fingerprint cluster together. The
+    duplicate_clusters entry carries sources, count, cross_source flag,
+    and projection samples for operator inspection.
+
+    """
+    listings = [
+        _li(
+            source="remax",
+            url="https://remax.test/abc",
+            title="Casa Frente al Mar",
+            price_usd=300_000,
+            area_m2=500,
+            zone="el-zonte",
+        ),
+        _li(
+            source="remax",
+            url="https://remax.test/abc",
+            title="Casa Frente al Mar",
+            price_usd=300_000,
+            area_m2=500,
+            zone="el-zonte",
+        ),
+    ]
+    audit = compute_audit(listings)
+    assert audit["total_unique_fingerprints"] == 1
+    clusters = audit["duplicate_clusters"]
+    assert len(clusters) == 1
+    assert clusters[0]["count"] == 2
+    assert clusters[0]["sources"] == ["remax"]
+    assert clusters[0]["cross_source"] is False
+    # Sample projection: source + content fields exposed for operator
+    # inspection. The cap is 5 entries — only the first listing of the
+    # cluster surfaces here since the test passes two identical rows.
+    assert clusters[0]["samples"][0]["source"] == "remax"
+    assert clusters[0]["samples"][0]["title"] == "Casa Frente al Mar"
+
+
+def test_cross_domain_duplicate_ignores_url():
+    """Same physical property listed by two brokers on different domains
+    should collide via property_fingerprint.
+
+    URL was excluded from the fingerprint in #753; price is rounded to
+    the nearest $1k, area to the nearest 50 m² — all explicit guards
+    against broker-side variance on the same property. This test
+    exercises all three at once: different URLs, $100 price spread,
+    10 m² area spread, same title and zone.
+
+    Re-enabled here as the documented PR-D follow-up (see #772 PR body).
+    """
+    listings = [
+        _li(
+            source="encuentra24",
+            url="https://encuentra24.test/abc",
+            title="Casa Frente al Mar",
+            price_usd=300_000,
+            area_m2=500,
+            zone="el-zonte",
+        ),
+        _li(
+            source="remax",
+            url="https://remax.test/different-url",
+            title="Casa Frente al Mar",
+            price_usd=300_100,
+            area_m2=510,
+            zone="el-zonte",
+        ),
+    ]
+    audit = compute_audit(listings)
+    assert audit["total_unique_fingerprints"] == 1
+    assert audit["overlap_matrix"]["encuentra24"]["remax"] == 1
+    cluster = audit["duplicate_clusters"][0]
+    assert cluster["cross_source"] is True
+    assert cluster["count"] == 2
+    assert sorted(cluster["sources"]) == ["encuentra24", "remax"]
 
 
 def test_per_source_counts_shared_vs_unique():
@@ -171,7 +249,9 @@ def test_write_audit_emits_json_file(tmp_path):
     ]
     write_audit(listings, tmp_path)
     out = tmp_path / "dedup_audit.json"
+    clusters = tmp_path / "duplicate_clusters.json"
     assert out.exists()
+    assert clusters.exists()
     on_disk = json.loads(out.read_text())
     assert on_disk["total_in_dataset"] == 2
     assert sorted(on_disk["per_source"].keys()) == ["A", "B"]

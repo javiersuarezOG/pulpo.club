@@ -1,0 +1,123 @@
+name: pulpo newsletter (free)
+
+# Weekly Sunday send of the FREE edition (pulpo-free-general) to the FREE
+# audience (free Clerk + anonymous Resend subscribers; Pro excluded — they
+# get the Pro edition from pulpo-newsletter.yml).
+#
+# STAGED BY DESIGN. Unlike the Pro cron (which is LIVE on schedule), this
+# workflow runs DRY-RUN on its schedule until the operator flips the
+# go-live switch. Nothing reaches a real inbox from the cron until then:
+#
+#   • Scheduled run: DRY-RUN unless repo variable FREE_NEWSLETTER_LIVE
+#     == 'true' (Settings → Variables → Actions). Flip it to launch the
+#     recurring free Sunday send; unset/anything-else keeps it dry.
+#   • workflow_dispatch send_mode=yes: a one-off LIVE send (for the launch
+#     smoke / a manual blast). only_email scopes a LIVE send to one inbox.
+#   • workflow_dispatch default: dry-run for QA.
+#
+# The Pro weekly is a SEPARATE workflow (pulpo-newsletter.yml). This one is
+# offset by an hour so the two blasts never collide on Resend's rate limit.
+
+on:
+  schedule:
+    - cron: "0 17 * * 0"    # every Sunday 17:00 UTC (11:00 SV — 1h after Pro)
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "Issue number (LEAVE BLANK to auto-increment from PostHog)"
+        required: false
+        default: ""
+      send_mode:
+        description: "Switch from dry-run to a LIVE Resend send (one-off; the recurring switch is the FREE_NEWSLETTER_LIVE repo variable)"
+        required: false
+        type: choice
+        default: "no"
+        options: ["no", "yes"]
+      only_email:
+        description: "Smoke-test address — limit the LIVE send to this one email. Blank = whole free audience."
+        required: false
+        default: ""
+
+concurrency:
+  # Own group, separate from the Pro weekly, with cancel-in-progress so two
+  # free blasts can never overlap. (The Pro workflow has its own group.)
+  group: pulpo-newsletter-free-audience
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Deterministic copy from cron (never burn DeepSeek credits on a
+      # scheduled run); flip via workflow_dispatch use_llm if iterating.
+      PULPO_NEWSLETTER_USE_LLM: "0"
+
+      # Send gate — STAGED. LIVE (dry-run=0) ONLY when:
+      #   • scheduled AND repo var FREE_NEWSLETTER_LIVE == 'true' (the
+      #     deliberate recurring go-live switch), OR
+      #   • manual workflow_dispatch with send_mode=yes (one-off live).
+      # Everything else (default cron before launch, default dispatch)
+      # stays dry-run — the queue is built + logged, Resend is NOT called.
+      PULPO_NEWSLETTER_DRY_RUN: "${{ ((github.event_name == 'schedule' && vars.FREE_NEWSLETTER_LIVE == 'true') || (github.event_name == 'workflow_dispatch' && github.event.inputs.send_mode == 'yes')) && '0' || '1' }}"
+
+      POSTHOG_PROJECT_TOKEN: "${{ secrets.POSTHOG_PROJECT_TOKEN }}"
+      POSTHOG_HOST: "${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}"
+      DEEPSEEK_API_TOKEN: "${{ secrets.DEEPSEEK_API_TOKEN }}"
+      POSTHOG_PROJECT_ID: "${{ secrets.POSTHOG_PROJECT_ID }}"
+      POSTHOG_PERSONAL_API_KEY: "${{ secrets.POSTHOG_PERSONAL_API_KEY }}"
+
+      RESEND_API_KEY: "${{ secrets.RESEND_API_KEY }}"
+      RESEND_FROM_EMAIL: "${{ vars.RESEND_FROM_EMAIL }}"
+      RESEND_AUDIENCE_ID: "${{ secrets.RESEND_AUDIENCE_ID }}"
+      RESEND_REPLY_TO_EMAIL: "${{ vars.RESEND_REPLY_TO_EMAIL }}"
+      PULPO_UNSUBSCRIBE_SECRET: "${{ secrets.PULPO_UNSUBSCRIBE_SECRET }}"
+      PULPO_SITE_ROOT: "${{ vars.PULPO_SITE_ROOT || 'https://pulpo.club' }}"
+      CLERK_SECRET_KEY: "${{ secrets.CLERK_SECRET_KEY }}"
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: install runtime deps
+        run: pip install -q posthog openai
+
+      - name: assert ranked.json present
+        run: |
+          test -s web/data/ranked.json \
+            || (echo "::error::web/data/ranked.json missing — run nightly first" && exit 1)
+
+      - name: send free edition
+        # --free-audience builds the queue from the FREE cohort (free Clerk
+        # + anonymous; Pro excluded). --newsletter pulpo-free-general routes
+        # the free template. DRY_RUN (above) decides whether Resend is
+        # actually called. issue_number blank → auto-increment from PostHog.
+        run: |
+          ISSUE_NUMBER="${{ github.event.inputs.issue_number || '' }}"
+          ONLY_EMAIL="${{ github.event.inputs.only_email || '' }}"
+          ARGS=(--write-html-to newsletter-drafts/sent-free \
+                --newsletter pulpo-free-general --free-audience)
+          if [ -n "$ISSUE_NUMBER" ]; then
+            ARGS+=(--issue-number "$ISSUE_NUMBER")
+          fi
+          if [ -n "$ONLY_EMAIL" ]; then
+            ARGS+=(--only-email "$ONLY_EMAIL")
+          fi
+          echo "dry_run=${PULPO_NEWSLETTER_DRY_RUN} free_live_var=${{ vars.FREE_NEWSLETTER_LIVE }}"
+          python3 scripts/send_newsletter.py "${ARGS[@]}"
+
+      - name: upload sent artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: newsletter-free-sent-${{ github.run_id }}
+          path: newsletter-drafts/sent-free/*.html
+          retention-days: 30
+          if-no-files-found: ignore

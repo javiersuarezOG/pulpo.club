@@ -202,16 +202,32 @@ def _detect_zone_desc(text: str) -> tuple[Optional[str], Optional[str], Optional
 # a placeholder like "Contact us" (which the oceanside scraper produces ~26%
 # of the time), and even then we strip future-use phrases first.
 
-# Built-structure keywords: explicit "this is a building" vocabulary. Plurals
-# are required because broker headlines pluralize freely ("Cliffside apartments
-# in El Zonte", "Two Lofts in Tuscania") and missing the trailing `s` silently
+# Condo-specific keywords: apartment / condominium / penthouse / loft / studio
+# vocabulary. These describe shared-amenity built structures that the homepage
+# shelves treat as a distinct cohort (top_beach_condos, top_lake_condos) from
+# detached houses. Checked BEFORE _BUILT_RE because every condo keyword is also
+# matched by _BUILT_RE — if we let _BUILT_RE win, every condo collapses to
+# 'house' and the *_condos shelves never reach the 10-listing activation
+# threshold. ``departamento`` / ``depa`` are common in Central America;
+# ``apartamento`` covers Spain/Mexico-style copy.
+_CONDO_RE = re.compile(
+    r"\b("
+    r"condos?|condominiums?|condominios?|"
+    r"apartments?|apartamentos?|departamentos?|depas?|"
+    r"lofts?|penthouses?|pent[\s-]?house|studios?|studio[\s-]?apartments?"
+    r")\b",
+    re.IGNORECASE,
+)
+
+# Built-structure keywords: explicit "this is a building" vocabulary, minus the
+# condo-specific terms (those live in _CONDO_RE and are checked first). Plurals
+# are required because broker headlines pluralize freely ("Cliffside villas in
+# El Zonte", "Two Cabins in Tuscania") and missing the trailing `s` silently
 # drops them into the land pool.
 _BUILT_RE = re.compile(
     r"\b("
     r"houses?|homes?|villas?|mansions?|cabins?|cottages?|bungalows?|"
     r"casas?|chalets?|residencias?|"
-    r"apartments?|apartamentos?|condos?|condominiums?|condominios?|"
-    r"lofts?|penthouses?|studios?|"
     r"hotels?|b&b|"
     r"\d+[\s-]*bed(?:room)?s?|"
     r"\d+[\s-]*dormitorios?|"
@@ -257,12 +273,20 @@ _FUTURE_USE_RE = re.compile(
 _PLACEHOLDER_TITLES = {"", "contact us", "contact", "(untitled)", "untitled"}
 
 def _classify(text: str) -> Optional[str]:
-    """Return 'house' / 'land' / None for a single piece of text."""
+    """Return 'condo' / 'house' / 'land' / None for a single piece of text."""
     if not text:
         return None
-    # Quantity-of-land takes precedence over built keywords in the same string.
+    # Quantity-of-land takes precedence over every built-structure keyword in
+    # the same string — "30 manzanas beachfront El Cuco, suitable for boutique
+    # hotel" is a 30-manzana parcel, not a hotel.
     if _LAND_QTY_RE.search(text):
         return "land"
+    # Condo wins over generic built-structure: every condo keyword is also
+    # matched by _BUILT_RE, so if we checked _BUILT_RE first we'd never emit
+    # 'condo' and the *_condos shelves stay stranded below the 10-listing
+    # activation threshold.
+    if _CONDO_RE.search(text):
+        return "condo"
     if _BUILT_RE.search(text):
         return "house"
     if _LAND_RE.search(text):
@@ -270,7 +294,7 @@ def _classify(text: str) -> Optional[str]:
     return None
 
 def detect_property_type(title: str = "", description: str = "", location_text: str = "") -> str:
-    """Classify a listing as `house` (built structure) or `land` (lot/raw).
+    """Classify a listing as `condo` / `house` / `land`.
 
     Title-first: the title is a terse claim about what the listing IS.
     Description is consulted only when the title is empty / a placeholder,
@@ -552,7 +576,12 @@ def _attr(raw: dict, key: str, pattern: re.Pattern, *texts: str) -> bool:
     return bool(pattern.search(blob)) if blob else False
 
 
-def normalize(raw: dict, source: str) -> Optional[Listing]:
+def normalize(
+    raw: dict,
+    source: str,
+    *,
+    seen_keys: Optional[frozenset] = None,
+) -> Optional[Listing]:
     """
     Convert a raw scraper dict into a canonical Listing.
 
@@ -560,6 +589,12 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
     Optional raw keys: description, location_text, lat, lng, area_m2,
         raw_size_text, price_usd, raw_price_text, photos_count, days_listed,
         is_beachfront, has_paved_access, is_repriced, broker_name, broker_phone.
+
+    ``seen_keys`` (plan 012): the set of ``source|source_id`` keys the
+    existence ledger has tracked before this run. Drives the
+    transition-aware sold rule below. ``None`` (the default) preserves
+    the legacy drop-every-sold-listing behavior for callers that don't
+    thread it — fail-safe.
 
     Returns None if the record can't be salvaged (missing both price and area).
     """
@@ -570,17 +605,28 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
     if not sid or not url:
         return None
 
-    # Drop sold / under-contract listings before we spend any work normalizing
-    # them. Brokers commonly leave these indexed for SEO; they pollute the
-    # ranker because their advertised prices no longer reflect the market.
-    # Some sites (oceanside seen) keep the title clean and put the SOLD marker
-    # only in the body blob that ends up in raw_price_text/raw_size_text — so
-    # we check those too. Pulled forward of any parsing work.
+    # Sold / under-contract markers — transition-aware (plan 012).
+    # Brokers commonly leave sold pages indexed for SEO; their advertised
+    # prices no longer reflect the market. Old rule: drop them all. New
+    # rule: drop only if we've NEVER tracked the listing (never-seen +
+    # already sold → not inventory, just SEO residue); a listing we
+    # showed before that now carries a sold marker is exactly the event
+    # worth labeling — keep it with is_sold=True so the FE renders the
+    # sold banner while comps/sitemap/Browse exclude it.
+    # Some sites (oceanside seen) keep the title clean and put the SOLD
+    # marker only in the body blob that ends up in raw_price_text /
+    # raw_size_text — so we check those too. Pulled forward of any
+    # parsing work.
     description = str(raw.get("description") or "")
     raw_size_text = str(raw.get("raw_size_text") or "")
     raw_price_text = str(raw.get("raw_price_text") or "")
     if is_sold(title, description, raw_price_text, raw_size_text):
-        return None
+        key = f"{source}|{sid}"
+        if not seen_keys or key not in seen_keys:
+            return None          # never-seen + already sold → not inventory
+        sold_flag = True         # previously-live listing now sold → keep, label
+    else:
+        sold_flag = False
 
     # Phase 1: drop non-land listings by title pattern (bienesraices/remax/goodlife only)
     if is_non_land_title(title, source):
@@ -631,6 +677,12 @@ def normalize(raw: dict, source: str) -> Optional[Listing]:
         source=source,
         source_id=sid,
         url=url,
+        # Plan 012 — sold transition: only True when the listing was
+        # tracked before (seen_keys hit) AND now carries a sold marker.
+        is_sold=sold_flag,
+        sold_detected_at=(
+            datetime.now(timezone.utc).isoformat() if sold_flag else None
+        ),
         scraped_at=raw.get("scraped_at") or datetime.now(timezone.utc).isoformat(),
         title=title or "(untitled)",
         description=description,

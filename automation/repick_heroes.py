@@ -207,6 +207,14 @@ def _repick_one_listing(
             hero_meta["candidate_count"] = len(candidates)
             hero_meta["picker_excluded_count"] = n_excluded
             hero_meta["repicked_at"] = datetime.now(timezone.utc).isoformat()
+            # P5 — reject logo/placeholder winners (mirrors run.py). Override
+            # before the write so both the sidecar and the listing dict
+            # (read from hero_meta below) reflect card/hero ineligibility.
+            from automation.photo_quality import is_logo_or_placeholder_url
+            if is_logo_or_placeholder_url(winning_url):
+                hero_meta["card_eligible"] = False
+                hero_meta["hero_eligible"] = False
+                hero_meta["logo_placeholder_rejected"] = True
             hero_meta_path.write_text(
                 json.dumps(hero_meta, indent=2) + "\n", encoding="utf-8"
             )
@@ -232,6 +240,23 @@ def _repick_one_listing(
     # source_height) come from the sidecar's overwritten top-level
     # fields, which now reflect the SOURCE bytes per the fix above.
     listing["hero_photo_path"] = f"/photos/{fname}"
+    # P2 — persist the picker's winning broker URL so the FE reorders the
+    # detail gallery to match the card. Consumer: listings.ts::buildPhotos.
+    listing["selected_photo_url"] = winning_url
+    # Per-photo verdicts: every scored candidate the picker rejected —
+    # below the cheap-score floor (picker_excluded) or carrying a
+    # Tesseract text overlay. `candidates` dicts don't carry
+    # has_marketing_overlay (resolved only for the winner), so the verdict
+    # set is limited to those two signals. Winner never appears here.
+    # Consumers: listings.ts::buildPhotos + ig_photo_gate.py::
+    # order_photo_indices. None = nothing rejected.
+    rejected = [
+        c["url"] for c in candidates
+        if c.get("url") and c["url"] != winning_url
+        and (c.get("picker_excluded")
+             or c.get("has_text_overlay") is True)
+    ]
+    listing["photo_urls_rejected"] = rejected or None
     listing["hero_photo_quality_score"] = winning_score
     listing["has_text_overlay"] = winning_has_text
     listing["has_marketing_overlay"] = winning_has_marketing

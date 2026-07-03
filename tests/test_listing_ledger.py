@@ -350,3 +350,139 @@ def test_stale_keys_filters_correctly():
         "d|4": LedgerEntry("t", "t", 0, "t2", "stale"),
     }
     assert stale_keys(ledger) == {"c|3", "d|4"}
+
+
+# ---------- Plan 012: removal_reason / removal_detected_at ----------
+
+def test_known_removal_reasons_contract():
+    """Closed set per CLAUDE.md producer-consumer rule. Producer:
+    automation/sold_probe.py; consumers: the [sold_probe] nightly
+    summary, the sold_probe_completed PostHog event, run.py's is_sold
+    stamping."""
+    from automation.listing_ledger import KNOWN_REMOVAL_REASONS
+    assert KNOWN_REMOVAL_REASONS == frozenset({"sold", "delisted", "unknown"})
+
+
+def test_removal_reason_literals_in_sold_probe_are_in_closed_set():
+    """Grep-based producer contract (pytest port of the pattern in
+    tests/api/email_type_contract.test.js): every removal-reason string
+    literal the producer module can classify into must be a member of
+    KNOWN_REMOVAL_REASONS. A producer-only edit (new literal, no
+    allowlist entry) fails here — that is the guardrail working.
+    The forward-compat direction (allowlist entry with no producer yet)
+    is deliberately allowed."""
+    import re as _re
+    from automation.listing_ledger import KNOWN_REMOVAL_REASONS
+
+    producer = Path(__file__).resolve().parent.parent / "automation" / "sold_probe.py"
+    src = producer.read_text(encoding="utf-8")
+    # classify_page returns + LLM-state literals: quoted strings in
+    # `return "x"` statements and the documented state set. "active" is
+    # the non-removal sentinel and is exempt by definition.
+    returned = set(_re.findall(r'return\s+"([a-z_]+)"', src))
+    returned.discard("active")
+    unknown_literals = returned - KNOWN_REMOVAL_REASONS
+    assert not unknown_literals, (
+        f"automation/sold_probe.py returns removal reason(s) "
+        f"{sorted(unknown_literals)} not present in "
+        f"KNOWN_REMOVAL_REASONS — add them to the closed set in "
+        f"automation/listing_ledger.py in the SAME PR (see CLAUDE.md "
+        f"producer-consumer rule, precedent PR #522)."
+    )
+
+
+def test_ledger_round_trip_with_removal_reason(tmp_path: Path):
+    path = tmp_path / "ledger.json"
+    entry = LedgerEntry(
+        first_seen_at="2026-06-01T00:00:00+00:00",
+        last_seen_at="2026-06-05T00:00:00+00:00",
+        consecutive_seen_count=0,
+        missing_since="2026-06-06T00:00:00+00:00",
+        existence_status="missing_recently",
+        removal_reason="sold",
+        removal_detected_at="2026-06-08T00:00:00+00:00",
+    )
+    save_ledger({"src|1": entry}, path)
+    loaded = load_ledger(path)
+    assert loaded["src|1"] == entry
+
+
+def test_old_schema_entry_loads_with_none_removal_fields(tmp_path: Path):
+    """Pre-012 dict rows (no removal keys) and ancient string rows both
+    load with removal fields defaulted to None — the established
+    migration pattern."""
+    path = tmp_path / "ledger.json"
+    path.write_text(json.dumps({
+        "src|old-dict": {
+            "first_seen_at": "2026-06-01T00:00:00+00:00",
+            "last_seen_at": "2026-06-05T00:00:00+00:00",
+            "consecutive_seen_count": 3,
+            "missing_since": None,
+            "existence_status": "confirmed_current",
+        },
+        "src|old-string": "2026-05-01T00:00:00+00:00",
+    }), encoding="utf-8")
+    loaded = load_ledger(path)
+    assert loaded["src|old-dict"].removal_reason is None
+    assert loaded["src|old-dict"].removal_detected_at is None
+    assert loaded["src|old-string"].removal_reason is None
+
+
+def test_reappearing_listing_clears_removal_reason():
+    prior = LedgerEntry(
+        first_seen_at="2026-06-01T00:00:00+00:00",
+        last_seen_at="2026-06-05T00:00:00+00:00",
+        consecutive_seen_count=0,
+        missing_since="2026-06-06T00:00:00+00:00",
+        existence_status="missing_recently",
+        removal_reason="sold",
+        removal_detected_at="2026-06-08T00:00:00+00:00",
+    )
+    entry = compute_state(
+        prior=prior,
+        is_present=True,
+        source_succeeded=True,
+        tick_iso="2026-06-09T00:00:00+00:00",
+    )
+    assert entry.existence_status == "confirmed_current"
+    assert entry.removal_reason is None
+    assert entry.removal_detected_at is None
+
+
+def test_still_missing_listing_preserves_removal_reason():
+    prior = LedgerEntry(
+        first_seen_at="2026-06-01T00:00:00+00:00",
+        last_seen_at="2026-06-05T00:00:00+00:00",
+        consecutive_seen_count=0,
+        missing_since="2026-06-06T00:00:00+00:00",
+        existence_status="missing_recently",
+        removal_reason="delisted",
+        removal_detected_at="2026-06-07T00:00:00+00:00",
+    )
+    entry = compute_state(
+        prior=prior,
+        is_present=False,
+        source_succeeded=True,
+        tick_iso="2026-06-09T00:00:00+00:00",
+    )
+    assert entry.removal_reason == "delisted"
+    assert entry.removal_detected_at == "2026-06-07T00:00:00+00:00"
+
+
+def test_failed_source_carry_forward_preserves_removal_reason():
+    prior = LedgerEntry(
+        first_seen_at="2026-06-01T00:00:00+00:00",
+        last_seen_at="2026-06-05T00:00:00+00:00",
+        consecutive_seen_count=0,
+        missing_since="2026-06-06T00:00:00+00:00",
+        existence_status="missing_recently",
+        removal_reason="sold",
+        removal_detected_at="2026-06-07T00:00:00+00:00",
+    )
+    entry = compute_state(
+        prior=prior,
+        is_present=False,
+        source_succeeded=False,
+        tick_iso="2026-06-09T00:00:00+00:00",
+    )
+    assert entry == prior

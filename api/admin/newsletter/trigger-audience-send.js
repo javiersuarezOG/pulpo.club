@@ -25,13 +25,10 @@
 // how many. Returns { run_url_hint, dispatched_at } so the UI can
 // link the operator to the workflow run.
 //
-// Auth: deliberately none beyond rate-limiting + the SEND gate. The
-// real security perimeter is the GITHUB_DISPATCH_TOKEN (fine-grained,
-// scoped `actions:write` on this repo). An attacker who bypasses the
-// rate limit + types SEND can at worst trigger one extra audience
-// send per hour — bad, but bounded. If that turns out to matter, add
-// an admin bearer-token check here (the PULPO_ADMIN_DEBUG_TOKEN
-// pattern from earlier preview-endpoint versions).
+// Auth: none — the /admin surface is intentionally open (operator
+// decision 2026-06-10 — the PULPO_ADMIN_DEBUG_TOKEN gate was removed).
+// The type-to-confirm SEND gate and 1/hour rate-limit are the remaining
+// guardrails on this high-blast path. The GitHub PAT stays server-side.
 //
 // Dispatch verification: GitHub's workflow_dispatch POST returns 204
 // on accepted payload, but the run is created async and can be
@@ -46,6 +43,7 @@
 const { makeRateLimiter, send429, ipFromRequest } = require("../../_rate_limit");
 const posthog = require("../../_posthog");
 const { getLatestRunId, pollForNewerRun } = require("./_verify_dispatch");
+const { requireAdminAuth } = require("../../_admin_auth");
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DEFAULT_REPO = "javiersuarezOG/pulpo.club";
@@ -109,6 +107,17 @@ module.exports = async (req, res) => {
     res.setHeader("Allow", "POST");
     logApi({ status: 405, ms: Date.now() - t0, reason: "method", method: req.method });
     return res.status(405).json({ error: "method_not_allowed" });
+  }
+  // Bearer-gated: unlike the single-recipient test-send endpoints (which
+  // stay open per the 2026-06-10 operator decision), this path fires a
+  // LIVE blast to the ENTIRE Pro audience. The type-to-confirm "SEND"
+  // string is public knowledge and the per-IP rate-limit resets on cold
+  // start, so an unauthenticated full-audience send is an unbounded
+  // consent/reputation risk. requireAdminAuth sends 401/503 and returns
+  // false on failure.
+  if (!requireAdminAuth(req, res)) {
+    logApi({ status: 401, ms: Date.now() - t0, reason: "unauthorized" });
+    return;
   }
 
   // Validation FIRST, rate-limit AFTER. The rate-limiter exists to

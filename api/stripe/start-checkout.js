@@ -97,6 +97,13 @@ module.exports = async (req, res) => {
   // one PostHog person. Empty string if the client didn't send one
   // (cold load, declined consent) — webhook tolerates absence.
   const posthogAnonId = safeStr(body.posthog_anon_id).slice(0, 128);
+  // Acquisition channel (attribution). Whitelisted closed set so client
+  // input can't pollute the funnel dimension; unknown/absent → "start"
+  // (the historical default for this endpoint). "free_upgrade" marks an
+  // email-captured Free member converting to Pro.
+  const ALLOWED_SOURCES = new Set(["start", "free_upgrade", "account_upgrade"]);
+  const rawSource = safeStr(body.source).trim().toLowerCase();
+  const source = ALLOWED_SOURCES.has(rawSource) ? rawSource : "start";
   const promoCode = safeStr(body.promoCode).trim().toUpperCase();
   const locale = SUPPORTED_LOCALES.has(safeStr(body.locale))
     ? body.locale === "es" ? "es-419" : "en"
@@ -200,8 +207,20 @@ module.exports = async (req, res) => {
   const host = req.headers["x-forwarded-host"] || req.headers.host;
   const origin = `${proto}://${host}`;
 
+  // Cancel destination: return the visitor to where they started checkout
+  // (the listing / browse page they were on), not the generic /start. The
+  // client passes its current path; we accept ONLY a same-origin relative
+  // path — must start with a single "/" (not a scheme-relative "//host"),
+  // no scheme, no whitespace — else fall back to /start. This guards
+  // against an open-redirect via a forged cancel_path.
+  const rawCancelPath = safeStr(body.cancel_path);
+  const safeCancelPath =
+    /^\/(?!\/)\S*$/.test(rawCancelPath) && !rawCancelPath.includes("://")
+      ? rawCancelPath
+      : "/start?cancelled=1";
+
   const sessionMetadata = {
-    source: "start",
+    source,
     country: country || "",
     posthog_anon_id: posthogAnonId,
     // Stamp the user's UI locale so the webhook can pass it to
@@ -236,7 +255,7 @@ module.exports = async (req, res) => {
     // redirects back to the same /account?welcome=1 URL — the modal
     // re-renders in its signed-in variant.
     success_url: `${origin}/account?welcome=1&session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url:  `${origin}/start?cancelled=1`,
+    cancel_url:  `${origin}${safeCancelPath}`,
     // Audit P0-5 — Stripe Checkout must render a mandatory Terms of
     // Service checkbox before the Pay button when we collect any
     // subscription. Resolves against the Terms URL configured in

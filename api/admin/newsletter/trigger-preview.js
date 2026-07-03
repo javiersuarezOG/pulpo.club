@@ -27,15 +27,10 @@
 // workflow real subscribers receive guarantees the preview matches the
 // production cut byte-for-byte.
 //
-// Auth: deliberately none beyond rate-limiting. The real security
-// perimeter is the GitHub PAT (`GITHUB_DISPATCH_TOKEN`, fine-grained,
-// scoped `actions:write` on this repo only — cannot trigger arbitrary
-// workflows or read anything). The worst an attacker can do is spam
-// `[PULPO PREVIEW · <cohort>]`-subjected emails to the address they
-// supply, capped by the rate limit at 15 emails/hr/IP. The bearer-token
-// gate (PULPO_ADMIN_DEBUG_TOKEN) was removed after env-var-not-deployed
-// friction kept blocking the operator on every iteration; the security
-// trade was explicit and minor.
+// Auth: none. The /admin surface is intentionally open (operator
+// decision 2026-06-10 — the PULPO_ADMIN_DEBUG_TOKEN gate was removed).
+// The rate-limit below is the only throttle. The GitHub PAT stays
+// server-side and only dispatches this workflow.
 //
 // Rate limit: 5 dispatches per IP per hour (this triggers a paid CI run
 // AND a real Resend send — cheap insurance against a stuck-button loop).
@@ -70,8 +65,28 @@ const KNOWN_NEWSLETTER_IDS = new Set([
   "pro-welcome",     // coming soon — kept in the allowlist so the
   "free-welcome",    // future trigger doesn't need an API redeploy.
   "free-weekly",
+  "free-welcome-back",
 ]);
 const DEFAULT_NEWSLETTER_ID = "pro-weekly";
+
+// Newsletter id → Python template id (the `--newsletter` value routed
+// through automation/newsletter/templates::TEMPLATES). Passed to the
+// workflow as `newsletter_template` so the same preview pipeline renders
+// the right template — without this map every preview rendered as the Pro
+// General master regardless of which card the operator clicked. Any id
+// not listed falls back to the Pro General default in the workflow.
+const TEMPLATE_FOR_NEWSLETTER = {
+  "pro-weekly": "pulpo-pro-general",
+  "free-weekly": "pulpo-free-general",
+  // The free onboarding pair are render-only variants (welcome hero on the
+  // free body), so a test-send is just rendering that template to the test
+  // inbox via the same preview pipeline — no Clerk-coupled welcome dispatch
+  // needed. (Their REAL trigger — homepage subscribe / Stripe / Resend —
+  // is still a follow-up; this is the preview affordance only.)
+  "free-welcome": "pulpo-free-welcome",
+  "free-welcome-back": "pulpo-free-welcome-back",
+};
+const DEFAULT_TEMPLATE = "pulpo-pro-general";
 
 // Fire a PostHog event so /api/admin/newsletter/recent-triggers can
 // read the cross-device + cross-operator audit log back via HogQL.
@@ -137,6 +152,7 @@ module.exports = async (req, res) => {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "method_not_allowed" });
   }
+  // No auth gate — admin surface is open by design (see header).
 
   const rl = limiter.hit(ipFromRequest(req));
   if (!rl.allowed) {
@@ -238,6 +254,7 @@ module.exports = async (req, res) => {
           preview_cohorts: email,
           issue_number: issueNumberStr,
           preview_locale: locale,
+          newsletter_template: TEMPLATE_FOR_NEWSLETTER[newsletterId] || DEFAULT_TEMPLATE,
         },
       }),
     });

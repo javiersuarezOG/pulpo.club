@@ -1,0 +1,14 @@
+{
+  "_comment": "Plan 015: canonical truth table for the display-gate contract. Consumed by BOTH tests/test_display_gate_parity.py (Python: pulpo/display_gates.py::is_card_displayable) AND web/app/lib/card-image.parity.test.ts (TS: web/app/lib/card-image.ts::isCardImageDisplayable). Rule: expected===true ONLY when card_eligible===true AND has_text_overlay!==true. JSON null = Python None = TS null. Changing the rule means updating BOTH predicates AND this table in one PR.",
+  "rows": [
+    { "card_eligible": true,  "has_text_overlay": true,  "expected": false },
+    { "card_eligible": true,  "has_text_overlay": false, "expected": true  },
+    { "card_eligible": true,  "has_text_overlay": null,  "expected": true  },
+    { "card_eligible": false, "has_text_overlay": true,  "expected": false },
+    { "card_eligible": false, "has_text_overlay": false, "expected": false },
+    { "card_eligible": false, "has_text_overlay": null,  "expected": false },
+    { "card_eligible": null,  "has_text_overlay": true,  "expected": false },
+    { "card_eligible": null,  "has_text_overlay": false, "expected": false },
+    { "card_eligible": null,  "has_text_overlay": null,  "expected": false }
+  ]
+}

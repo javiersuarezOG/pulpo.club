@@ -18,76 +18,58 @@
       "pick_count": 3
     }
   },
-  "picked_at": "2026-06-06T20:21:57.391574+00:00",
-  "expires_at": "2026-06-07T00:00:00+00:00",
+  "picked_at": "2026-06-30T07:12:54.472983+00:00",
+  "expires_at": "2026-07-01T00:00:00+00:00",
   "tier": "elite",
-  "listing_id": "encuentra24|32426908",
-  "rank_score": 84.31,
-  "hero_photo_quality_score": null,
+  "listing_id": "citymax|156276",
+  "rank_score": 80.06,
+  "hero_photo_quality_score": 100,
   "fallback": false,
   "pool": [
     {
-      "listing_id": "encuentra24|32426908",
-      "rank_score": 84.31,
-      "hero_photo_quality_score": null,
-      "photos_count": 12
-    },
-    {
-      "listing_id": "bienesraices|1529",
-      "rank_score": 80.93,
+      "listing_id": "citymax|156276",
+      "rank_score": 80.06,
       "hero_photo_quality_score": 100,
-      "photos_count": 24
+      "photos_count": 16
     },
     {
       "listing_id": "bienesraices|1424",
-      "rank_score": 79.9,
+      "rank_score": 79.13,
       "hero_photo_quality_score": 90,
-      "photos_count": 8
-    },
-    {
-      "listing_id": "bienesraices|2059",
-      "rank_score": 79.86,
-      "hero_photo_quality_score": null,
-      "photos_count": 24
+      "photos_count": 9
     },
     {
       "listing_id": "bienesraices|1783",
-      "rank_score": 77.29,
+      "rank_score": 76.53,
       "hero_photo_quality_score": 100,
-      "photos_count": 20
-    },
-    {
-      "listing_id": "bienesraices|2191",
-      "rank_score": 76.42,
-      "hero_photo_quality_score": 100,
-      "photos_count": 18
+      "photos_count": 21
     },
     {
       "listing_id": "bienesraices|1875",
-      "rank_score": 76.17,
+      "rank_score": 76.07,
       "hero_photo_quality_score": 100,
-      "photos_count": 29
+      "photos_count": 30
     },
     {
-      "listing_id": "bienesraices|2258",
-      "rank_score": 75.35,
+      "listing_id": "bienesraices|2191",
+      "rank_score": 75.46,
       "hero_photo_quality_score": 100,
-      "photos_count": 18
+      "photos_count": 19
     }
   ],
   "picks_for_proof_row": [
     {
-      "listing_id": "xitios|venta-de-casa-playa-xanadu",
-      "rank_score": 83.78,
+      "listing_id": "oceanside|15561",
+      "rank_score": 85.06,
       "master_category": "beach",
       "subcategory": "homes",
-      "star_rating": 4.5,
+      "star_rating": 5.0,
       "hero_eligible": true,
       "card_eligible": true
     },
     {
       "listing_id": "citymax|152836",
-      "rank_score": 81.68,
+      "rank_score": 81.23,
       "master_category": null,
       "subcategory": "land",
       "star_rating": 4.5,
@@ -96,7 +78,7 @@
     },
     {
       "listing_id": "remax|002282623028",
-      "rank_score": 79.35,
+      "rank_score": 78.87,
       "master_category": "beach",
       "subcategory": "land",
       "star_rating": 4.5,

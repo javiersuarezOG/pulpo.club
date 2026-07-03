@@ -52,6 +52,7 @@ from automation.llm_enrichment_prompts import (
     SYSTEM_PROMPT,
     USER_PROMPT_TEMPLATE,
     LOCATION_HINTS_TEMPLATE,
+    PROPERTY_FACTS_TEMPLATE,
     render_user_prompt,
 )
 
@@ -123,6 +124,13 @@ def test_location_hints_template_has_no_user_identifiers():
     )
 
 
+def test_property_facts_template_has_no_user_identifiers():
+    """Same guard for the PROPERTY FACTS sub-template (prompt v4)."""
+    assert_no_user_identifiers(
+        PROPERTY_FACTS_TEMPLATE, where="PROPERTY_FACTS_TEMPLATE"
+    )
+
+
 # ── Layer 2: function signature enforces listing-level fields only ─────
 
 def test_render_user_prompt_accepts_only_listing_level_fields():
@@ -142,6 +150,19 @@ def test_render_user_prompt_accepts_only_listing_level_fields():
         "municipality",
         "department",
         "country",
+        # Prompt v4 (plan 008) — structured PROPERTY FACTS. All nine are
+        # listing-level attributes parsed by the pipeline from scraped
+        # public listing pages (and already published in ranked.json);
+        # none is Pulpo-user-identifying.
+        "property_type",
+        "area_m2",
+        "built_area_m2",
+        "bedrooms",
+        "bathrooms",
+        "year_built",
+        "parking_spaces",
+        "floor",
+        "price_usd",
     }
     actual = set(parameter_names)
 

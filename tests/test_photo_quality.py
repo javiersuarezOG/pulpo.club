@@ -273,3 +273,31 @@ def test_detect_text_overlay_marketing_keyword_flags_spanish_banner():
     languages."""
     raw = _make_short_banner_image("VENDIDO")
     assert detect_text_overlay(raw) is True
+
+
+# ── Logo / placeholder URL deny-list (P5) ───────────────────────────────
+
+def test_logo_url_denylist_flags_xitios_icon():
+    from automation.photo_quality import is_logo_or_placeholder_url
+    assert is_logo_or_placeholder_url("https://www.xitios.com.sv/img/icon.jpeg") is True
+
+
+def test_logo_url_denylist_flags_known_placeholders():
+    from automation.photo_quality import is_logo_or_placeholder_url
+    assert is_logo_or_placeholder_url(
+        "https://nexo.com.sv/images/propiedad-no-disponible.jpg") is True
+    assert is_logo_or_placeholder_url("https://x/sin-imagen.png") is True
+
+
+def test_logo_url_denylist_passes_real_photos():
+    from automation.photo_quality import is_logo_or_placeholder_url
+    assert is_logo_or_placeholder_url(
+        "https://photos.encuentra24.com/v1/sv/123.jpg") is False
+    # Conservative: a bare "icon" substring in a real path must NOT match.
+    assert is_logo_or_placeholder_url("https://broker.com/iconic-villa.jpg") is False
+
+
+def test_logo_url_denylist_handles_none_and_nonstring():
+    from automation.photo_quality import is_logo_or_placeholder_url
+    assert is_logo_or_placeholder_url(None) is False
+    assert is_logo_or_placeholder_url(123) is False  # type: ignore[arg-type]

@@ -75,6 +75,9 @@ _OVERRIDES: dict[str, dict[str, Any]] = {
     "parking_spaces":       {"minimum": 0},
     "floor":                {"minimum": 0},
     "year_built":           {"minimum": 1800, "maximum": 2100},
+    # Plan 009 — LLM-extracted; tighter floor than year_built because a
+    # renovation predating 1900 is an extraction error, not history.
+    "year_renovated":       {"minimum": 1900, "maximum": 2100},
     "rank":                 {"minimum": 1},
     "price_usd":            {"minimum": 0},
     "price_per_m2":         {"minimum": 0},
@@ -169,7 +172,11 @@ def _field_to_schema(name: str, annotation: Any) -> dict:
             # validation_warnings: list[?] which is empty in practice
         else:
             item_schema = {"type": item_json_t}
-        return {"type": "array", "items": item_schema}
+        # Optional[list[X]] (default None) serializes to JSON null, so the
+        # array type must permit null. Non-optional lists use a
+        # default_factory and never emit null, so they stay plain "array".
+        list_type = ["array", "null"] if is_opt else "array"
+        return {"type": list_type, "items": item_schema}
 
     primitive = _python_type_to_json_type(inner)
     if primitive is None:

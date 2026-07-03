@@ -10,14 +10,25 @@ name: pulpo nightly run
 on:
   schedule:
     - cron: "0 2 * * *"
-  workflow_dispatch: {}    # also allow manual runs
+  workflow_dispatch:
+    inputs:
+      # R1 of docs/RESILIENCE-AUDIT-PRD.md — durable candidate bundle before guards.
+      # Flag-ON by default ships the bundle on every nightly. Flip to "0" via a
+      # manual workflow_dispatch run for a one-toggle emergency revert that
+      # restores legacy behavior without a code change.
+      bundle_enabled:
+        description: "PULPO_R1_BUNDLE_ENABLED (R1 candidate-bundle write before guards)"
+        required: false
+        default: "1"
+        type: string
 
-# Single-flight: a manual trigger or a backed-up cron must not race a
-# still-running nightly — both would try to PR-merge dated data branches and
-# the second commit would lose. cancel-in-progress kills the older run.
+# Single-flight queue: a manual trigger or a backed-up cron must not race a
+# still-running nightly, but cancelling the older run can strand an otherwise
+# good candidate before canaries/commit run. Queue instead; the commit step is
+# still the single writer.
 concurrency:
   group: pulpo-nightly
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 # Count canaries — both fail the workflow without committing stale data.
 # FLOOR: raise if clean baseline grows. CEILING: raise if ceiling is hit
@@ -53,6 +64,21 @@ env:
   # listing_count_floor / listing_count_ceiling; the canary-check step
   # later in this workflow prefers those when set. Adding a country =
   # set country_count_floor / country_count_ceiling in its <cc>.json.
+  #
+  # PR-S4c — activate the ranker's stale-listing filter. Listings whose
+  # existence-ledger state (web/data/listings_ledger.json, populated
+  # by automation/run.py via PR-S4b) is "stale" are dropped before
+  # ranking. "Stale" requires missing for >=STALE_THRESHOLD_RUNS=3
+  # consecutive nightlies AND the source must have succeeded each of
+  # those nightlies (a scraper-failure absence is NOT counted as
+  # missing). So this flag is effectively a no-op for the first ~3
+  # nightlies after PR-S4b lands, then auto-activates as the ledger
+  # accumulates state. The OFF branch still emits a
+  # `[ranker_stale_filter] stale_candidates=N would_drop_if_flag_on`
+  # telemetry line, so flipping back is straightforward if N is ever
+  # larger than expected. To deactivate: comment this line out or
+  # set to "0".
+  PULPO_RANKER_DROP_STALE: "1"
 
 jobs:
   run:
@@ -136,6 +162,17 @@ jobs:
         env:
           PULPO_OFFLINE: "0"
           PULPO_LIMIT: "1000"
+          # Crawl the per-source scrapers concurrently (PR #817). Sources are
+          # independent and each keeps its OWN per-host RateLimiter, so this
+          # does NOT raise the request rate to any single site — wall-clock
+          # drops from the SUM of per-source durations toward the MAX. Output
+          # is bit-identical: outcomes merge back in source order before
+          # ranking (the ranker's stable sort lets input order break ties),
+          # proven by tests/test_scrape_concurrency.py.
+          # Repo-variable escape hatch: set PULPO_SCRAPE_CONCURRENCY=1 in
+          # Settings → Variables → Actions to instantly fall back to the old
+          # sequential path with NO code change / NO revert PR.
+          PULPO_SCRAPE_CONCURRENCY: ${{ vars.PULPO_SCRAPE_CONCURRENCY || '6' }}
           # Disabled sources (re-add when the blocker is resolved):
           #   kazu              — Nuxt SPA, panel API denylisted; needs headless browser
           #
@@ -174,7 +211,22 @@ jobs:
           # global cap) but never raises it. Set high enough that real
           # nightly yield is bounded by inventory + vacation-zone filter
           # rather than by this ceiling.
-          PULPO_E24_LIMIT: "2000"
+          # Lowered 2000->1000 (2026-06-13): the per-listing detail-crawl + photo
+          # cost roughly doubled after the #851/#855/#859 photo cascade, pushing
+          # the e24 Playwright crawl (~2-3s/listing) past the 240-min job cap
+          # (proven via local faulthandler repro — time sink is detail-page nav,
+          # NOT the now-bounded t_full network calls). 1000 fits with margin;
+          # raise back toward 2000 once e24 crawl/photo per-listing cost is
+          # reduced (photo workstream) or e24 moves to its own cadence.
+          # Lowered to 500 (2026-06-13, below e24's ~868 natural yield so it
+          # actually bites — #881's 1000 was above yield and changed nothing).
+          # The #851/#855/#859 photo cascade added ~70min/run; healthy was 126min,
+          # post-fix runs run >240min. Timeout bump is OFF the table per the
+          # job timeout-minutes comment ("per-source tuning, not another bump").
+          # Cutting the dominant slow source (e24 Playwright detail crawl, ~868
+          # listings) is that per-source tuning. Restore once the photo cascade
+          # per-photo/per-listing cost is reduced (photo workstream).
+          PULPO_E24_LIMIT: "500"
           # Hero-photo wall budget (Phase A download + Phase C derivative
           # write inside automation/run.py::_download_hero_photos). The
           # default 600s was too small for the post-encuentra24 baseline:
@@ -258,7 +310,29 @@ jobs:
           LLM_VISION_TOP_PCT: ${{ secrets.LLM_VISION_TOP_PCT }}
           QWEN_API_KEY: ${{ secrets.QWEN_API_KEY }}
           SEGMIND_API_KEY: ${{ secrets.SEGMIND_API_KEY }}
+          # R1 of docs/RESILIENCE-AUDIT-PRD.md — write a durable candidate
+          # bundle to web/data/.staging/<run_id>/ before the population guard
+          # fires. Set "0" via the workflow_dispatch input to fall back to
+          # legacy behavior (no bundle, guard-first ordering).
+          PULPO_R1_BUNDLE_ENABLED: ${{ inputs.bundle_enabled || '1' }}
         run: python automation/run.py
+
+      # R1 — upload the candidate bundle as a GH Actions artifact so it
+      # survives the runner. Runs `if: always()` so a guard-failed
+      # pipeline still leaves a recoverable bundle behind. The
+      # `web/data/.staging/<run_id>/` directory was written by
+      # `python automation/run.py` above (the bundle write happens
+      # BEFORE the population guard). Pair with
+      # `scripts/promote_candidate.py --run-id <run_id>` for manual
+      # recovery. See docs/RESILIENCE-AUDIT-PRD.md § R1.
+      - name: Upload candidate bundle (R1)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: candidate_bundle_${{ github.run_id }}
+          path: web/data/.staging/${{ github.run_id }}/
+          retention-days: 14
+          if-no-files-found: ignore
 
       # PR-MC-PA-3 — first non-SV nightly run. PA inventory is small
       # (~4-30 listings/run today; SV is ~900), so a separate pipeline
@@ -300,19 +374,124 @@ jobs:
           SEGMIND_API_KEY: ${{ secrets.SEGMIND_API_KEY }}
         run: |
           # Snapshot SV's legacy files; the PA run will dual-write them.
+          # Operator sidecars are included too: PA writes its own
+          # *.PA.* variants, but the legacy filenames must continue to
+          # describe the SV apex deployment.
           mkdir -p /tmp/sv-legacy
-          for f in ranked.json ranked.list.json last_updated.json featured.json; do
+          for f in ranked.json ranked.list.json last_updated.json featured.json \
+                   ranked.fresh.json \
+                   validation_log.jsonl dedup_audit.json duplicate_clusters.json \
+                   shelf_audit.json kpi_dashboard.json photo_contract.json; do
             [ -f "web/data/$f" ] && cp "web/data/$f" "/tmp/sv-legacy/$f"
           done
+
+          # Snapshot SV's SERVED photos (root level only; _archive is the
+          # 30-day backup and need not be copied). PA and SV share this
+          # un-scoped directory, so automation/run.py::_prune_orphan_photos
+          # in the PA context treats every SV photo as an orphan and moves
+          # it to _archive/. Without this snapshot+restore the SV apex
+          # serves HTTP 404 on every hero (root cause of the 1,037-file
+          # freeze fixed in #781). TODO: country-scoped web/photos/SV|PA
+          # per DEPLOY.md when PA gets its own deploy — then this can go.
+          rm -rf /tmp/sv-photos && mkdir -p /tmp/sv-photos
+          rsync -a --exclude='_archive/' web/photos/ /tmp/sv-photos/
+          SV_PHOTO_COUNT=$(find web/photos -maxdepth 1 -name '*.jpg' | wc -l | tr -d ' ')
 
           python automation/run.py || echo "PA pipeline exited non-zero (continue-on-error)"
 
           # Restore SV's legacy files so the apex (pulpo.club) keeps
           # serving SV data. PA-specific outputs (`ranked.PA.json` etc.)
           # are untouched by this restore.
-          for f in ranked.json ranked.list.json last_updated.json featured.json; do
+          for f in ranked.json ranked.list.json last_updated.json featured.json \
+                   ranked.fresh.json \
+                   validation_log.jsonl dedup_audit.json duplicate_clusters.json \
+                   shelf_audit.json kpi_dashboard.json photo_contract.json; do
             [ -f "/tmp/sv-legacy/$f" ] && cp "/tmp/sv-legacy/$f" "web/data/$f"
           done
+
+          # ADDITIVELY restore SV's served photos. No --delete: PA wrote its
+          # own *.jpg into web/photos/ this run and those must survive
+          # alongside the SV files we bring back. The PA prune's _archive/
+          # copies are harmless duplicates (30-day pruned later).
+          rsync -a /tmp/sv-photos/ web/photos/
+          POST_PHOTO_COUNT=$(find web/photos -maxdepth 1 -name '*.jpg' | wc -l | tr -d ' ')
+          echo "[photo-isolation] SV served photos: pre-PA=$SV_PHOTO_COUNT post-restore=$POST_PHOTO_COUNT"
+          if [ "$POST_PHOTO_COUNT" -lt "$SV_PHOTO_COUNT" ]; then
+            echo "::error::web/photos root jpg count dropped $SV_PHOTO_COUNT -> $POST_PHOTO_COUNT after PA run; SV photo restore failed. The photo-contract truth canary downstream will hard-fail the commit."
+          fi
+
+      - name: Refresh Weekly News Spotlight artifact
+        # Single writer of web/data/news_spotlight.json. Picks a fresh,
+        # cited article per locale; on a slow news week it carries forward
+        # the most recent real pick (no age cap) so EVERY Pro email — incl.
+        # the Vercel welcome emails that have no DeepSeek key — keeps citing
+        # a real outlet. Best-effort: a flaky fetch must never block the
+        # data PR (the script always exits 0; the freshness canary pages on
+        # a cold-start "no_seed"). Needs the token + network, so it runs
+        # after the pipeline scrape, before the commit.
+        continue-on-error: true
+        env:
+          DEEPSEEK_API_TOKEN: ${{ secrets.DEEPSEEK_API_TOKEN }}
+        run: |
+          python3 scripts/refresh_news_spotlight.py --locales en,es \
+            || echo "::warning::news-spotlight refresh failed (non-blocking; carry-forward holds)"
+
+      - name: News spotlight freshness canary (Slack)
+        # Carry-forward means this should never fire once the artifact is
+        # seeded. A locale with no real spotlight = cold start or a
+        # corrupted artifact — page so a Pro email never silently ships
+        # without its news block. Best-effort + never blocks the deploy.
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          python3 - <<'EOF'
+          import datetime, json, os, sys, urllib.request
+          REQUIRED = ("en", "es")
+          STALE_DAYS = 21  # carry-forward older than this = fresh news has stopped
+          path = "web/data/news_spotlight.json"
+          today = datetime.date.today()
+          missing, stale = [], []
+          try:
+              data = json.load(open(path, encoding="utf-8"))
+          except (FileNotFoundError, json.JSONDecodeError):
+              data = {}
+          for lc in REQUIRED:
+              e = data.get(lc) if isinstance(data, dict) else None
+              if not (isinstance(e, dict) and e.get("title") and e.get("paragraph") and e.get("source_url")):
+                  missing.append(lc)
+                  continue
+              # Staleness: how long since the nightly last wrote a FRESH pick.
+              picked = e.get("picked_at")
+              try:
+                  age = (today - datetime.date.fromisoformat(picked)).days
+              except (TypeError, ValueError):
+                  age = None
+              if age is not None and age > STALE_DAYS:
+                  stale.append(f"{lc} ({age}d old)")
+          if not missing and not stale:
+              print(f"news-spotlight canary OK — {', '.join(REQUIRED)} all carry a fresh cited article")
+              sys.exit(0)
+          parts = []
+          if missing:
+              parts.append(f"EMPTY for locale(s): {', '.join(missing)} (Pro emails will ship without a news block)")
+          if stale:
+              parts.append(f"STALE (no fresh pick in >{STALE_DAYS}d): {', '.join(stale)} — the nightly news fetch may have silently stopped")
+          msg = (":rotating_light: Pulpo news-spotlight " + "; ".join(parts) +
+                 ". Check DEEPSEEK_API_TOKEN + the refresh step in this run.")
+          print(f"::warning::{msg}")
+          hook = os.environ.get("SLACK_WEBHOOK_URL", "").strip()
+          if not hook:
+              print("SLACK_WEBHOOK_URL unset; skipping Slack page.")
+              sys.exit(0)
+          try:
+              req = urllib.request.Request(
+                  hook, data=json.dumps({"text": msg}).encode("utf-8"),
+                  headers={"Content-Type": "application/json"})
+              urllib.request.urlopen(req, timeout=10)
+          except Exception as exc:  # noqa: BLE001
+              print(f"Slack page failed (non-blocking): {exc!r}")
+          EOF
 
       - name: Source-health Slack alert (pre-canary)
         # Pulpo's scheduled watchdog (pulpo-watchdog.yml) reads
@@ -331,6 +510,28 @@ jobs:
             --data-dir web/data \
             --run-url "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
             || echo "::warning::source-health alert script failed (non-blocking)"
+
+      - name: Stranded-inventory alert (R6)
+        # R6 of docs/RESILIENCE-AUDIT-PRD.md. Reads R1's candidate
+        # bundle at web/data/.staging/<run_id>/ and fires Slack + opens
+        # a persistent GitHub Issue iff visible_count > 0 AND
+        # promotion did not happen this run (canonical last_updated.json
+        # is older than / missing relative to the candidate). Always
+        # exits 0 — alerting must not block the workflow. Runs at the
+        # same pre-canary point as the source-health alert so an
+        # operator paged at 02:30 UTC can correlate the two signals
+        # against a single Actions run.
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          python3 scripts/check_stranded_inventory.py \
+            --data-dir web/data \
+            --run-id "${{ github.run_id }}" \
+            --run-url "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --artifact-hint "candidate_bundle_${{ github.run_id }} (Artifacts tab on the Actions run)" \
+            || echo "::warning::stranded-inventory alert script failed (non-blocking)"
 
       - name: PA count canary (soft — logs only, never fails)
         continue-on-error: true
@@ -389,6 +590,50 @@ jobs:
               sys.exit(1)
           print(f"CANARY OK [{cc}]: {n} listings in [{floor}, {ceiling}]")
           EOF
+
+      - name: Delta decision (Slack runbook record)
+        # Runs BEFORE the gate so the operational decision posts whether
+        # or not the gate blocks the commit. Best-effort: classifies each
+        # per-source delta into a runbook bucket (source_failed /
+        # source_partial / validation_collapse / expected_change /
+        # unknown) and posts to Slack. Consumer of automation/delta_decision
+        # (CLAUDE.md producer/consumer rule). Never fails the job; logs the
+        # decision even when SLACK_WEBHOOK_URL is unset.
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python3 scripts/run_delta_decision.py \
+            --fresh-ranked web/data/ranked.fresh.SV.json \
+            --sv-ranked web/data/ranked.SV.json || \
+            echo "::warning::delta-decision step errored (non-blocking)"
+
+      - name: Per-source row-count delta gate
+        env:
+          ROW_COUNT_GATE_LOG_ONLY: ${{ vars.ROW_COUNT_GATE_LOG_ONLY || 'false' }}
+        run: |
+          ranked_arg="web/data/ranked.fresh.SV.json"
+          if [ ! -s "$ranked_arg" ]; then
+            echo "::error::missing $ranked_arg; refusing to run row-count gate on legacy ranked.json because carry-forward or PA output could mask a real SV delta."
+            exit 1
+          fi
+          echo "Row-count gate using $ranked_arg"
+          set +e
+          python3 scripts/run_row_count_sentinel.py \
+            --sv-ranked "$ranked_arg" \
+            --floor "${LISTING_COUNT_FLOOR:-1000}" \
+            --fail-on-crit \
+            --no-append
+          rc=$?
+          set -e
+          if [ "$rc" -ne 0 ]; then
+            if [ "${ROW_COUNT_GATE_LOG_ONLY,,}" = "true" ]; then
+              echo "::warning::row-count gate would fail, but ROW_COUNT_GATE_LOG_ONLY=true; continuing. Flip back the same day."
+              exit 0
+            fi
+            echo "::error::row-count gate failed. Candidate data was not appended to row_count_history.jsonl."
+            exit "$rc"
+          fi
 
       - name: Per-type canaries (floor + classification confidence)
         # Per-type ingestion floors + classifier-confidence guard. Catches:
@@ -713,6 +958,23 @@ jobs:
           python3 -m pulpo.cli check-hero-variants --top-only 10 \
             || { echo "::error::hero variant canary FAILED — see logs above"; exit 1; }
 
+      - name: Photo-contract truth canary (committed SV state)
+        # Independent of how/where enforce_photo_contract ran. Reads the
+        # COMMITTED ranked.json + photo_contract.json AFTER the SV/PA
+        # restore block, so it sees the SV apex state that actually ships.
+        # Asserts every hero_photo_path resolves to a real file AND that
+        # photo_contract.json's ranked_total matches ranked.json.
+        #
+        # Catches the 2026-06-08 PA-overwrite: the sidecar described 17 PA
+        # listings (/api/nightly/health read "all good") while SV's 1,037
+        # committed hero paths 404'd in production. A green per-listing
+        # contract pass does not prove the sidecar describes the shipping
+        # dataset — this canary does. Hard-fail by design: a missing top
+        # photo or a wrong-dataset sidecar must block the commit.
+        run: |
+          python3 scripts/check_photo_contract_truth.py \
+            || { echo "::error::photo-contract truth canary FAILED — see logs above"; exit 1; }
+
       - name: Snapshot ranked.json to Vercel Blob (post-canary, pre-commit)
         # PR-8 of the reliability plan — durable backup of every nightly's
         # canary-validated ranked.json. Lives AFTER the canaries pass but
@@ -765,7 +1027,10 @@ jobs:
           # data may be missing some nights). When pa.pulpo.club is
           # provisioned, these files become its source of truth.
           for f in ranked.PA.json ranked.list.PA.json \
-                   last_updated.PA.json featured.PA.json; do
+                   last_updated.PA.json featured.PA.json \
+                   validation_log.PA.jsonl dedup_audit.PA.json \
+                   duplicate_clusters.PA.json \
+                   shelf_audit.PA.json kpi_dashboard.PA.json; do
             git add "web/data/$f" 2>/dev/null || true
           done
           # Optional files — only add if they exist
@@ -777,6 +1042,7 @@ jobs:
           git add web/data/prd_feasibility.json 2>/dev/null || true
           git add web/data/prd_feasibility.md 2>/dev/null || true
           git add web/data/source_health_history.jsonl 2>/dev/null || true
+          git add web/data/scraper_failures/ 2>/dev/null || true
           git add web/data/type_classifier_log.jsonl 2>/dev/null || true
           git add web/data/prices_history.json 2>/dev/null || true
           git add web/data/ai_enrichment_cache.json 2>/dev/null || true
@@ -786,13 +1052,16 @@ jobs:
           # `photo_contract.json` carries the latest run's stats and is
           # consumed by /api/nightly/health.
           git add web/data/photo_contract.json 2>/dev/null || true
+          git add web/data/photo_contract.*.json 2>/dev/null || true
           git add web/data/photo_contract_log.jsonl 2>/dev/null || true
           # PRD "Inventory Expansion & Listing Quality Filter" — per-shelf
           # eligibility audit + KPI dashboard. Read-only telemetry; the
           # before/after diff between two nightly snapshots is the
           # acceptance deliverable for the inventory-expansion workstream.
           git add web/data/shelf_audit.json 2>/dev/null || true
+          git add web/data/shelf_audit.SV.json 2>/dev/null || true
           git add web/data/kpi_dashboard.json 2>/dev/null || true
+          git add web/data/kpi_dashboard.SV.json 2>/dev/null || true
           # PRD B1 — per-scrape coverage log (kept / target_discovered /
           # status). Phase C scrapers consume this via lib/coverage_logger
           # to track stated-vs-actual inventory each nightly.
@@ -801,6 +1070,13 @@ jobs:
           # complementary to the phone/coord pair detector. Drives the
           # PRD acceptance criterion "dedup rate documented per source."
           git add web/data/dedup_audit.json 2>/dev/null || true
+          git add web/data/dedup_audit.SV.json 2>/dev/null || true
+          # Cross-source duplicate clusters sidecar — operator-readable
+          # group view of fingerprint matches (see automation/dedup_audit.py).
+          # PA equivalents land via the PA-snapshot block above.
+          git add web/data/duplicate_clusters.json 2>/dev/null || true
+          git add web/data/duplicate_clusters.SV.json 2>/dev/null || true
+          git add web/data/validation_log.SV.jsonl 2>/dev/null || true
           # DeepSeek single-call enrichment sidecar + per-event log.
           # Sidecar enables incremental enrichment across nights
           # (cache_hits=0 is currently costing ~$12/mo). Log captures
@@ -808,6 +1084,11 @@ jobs:
           # they can be debugged without re-running the pipeline.
           git add web/data/llm_enrichment.json 2>/dev/null || true
           git add web/data/llm_enrichment_log.jsonl 2>/dev/null || true
+          # Weekly News Spotlight carry-forward artifact — refreshed above
+          # by scripts/refresh_news_spotlight.py. Read by every Pro email
+          # (build_issue._make_news_spotlight); committing it nightly is
+          # what makes carry-forward survive across runs.
+          git add web/data/news_spotlight.json 2>/dev/null || true
           git add "web/photos/" 2>/dev/null || true
           # Plan v2 — hires derivatives + sidecars + quarantine markers + hash cache
           git add "web/photos-hires/" 2>/dev/null || true
@@ -867,9 +1148,17 @@ jobs:
           # so the required check has a status to report against.
           gh workflow run ci.yml --ref "$BRANCH" || true
           gh workflow run tests-required.yml --ref "$BRANCH" || true
-          # Try auto-merge; fall back to admin merge for protected branches
-          gh pr merge "$BRANCH" --squash --delete-branch --admin || \
-            gh pr merge "$BRANCH" --squash --delete-branch --auto
+          # Auto-merge first: queue the merge to fire once the required
+          # checks (pytest / frontend / Vercel) dispatched above report
+          # green. Admin is the FALLBACK only — used when enabling
+          # auto-merge fails (e.g. auto-merge disabled on the repo). The
+          # previous order ran --admin FIRST, which merged immediately and
+          # bypassed every required check on every nightly data PR, making
+          # the ci.yml / tests-required dispatch above pointless. Matches
+          # CLAUDE.md: "--auto handles the Expected-Waiting race; reserve
+          # --admin for the data-PR fallback path."
+          gh pr merge "$BRANCH" --squash --delete-branch --auto || \
+            gh pr merge "$BRANCH" --squash --delete-branch --admin
           echo "committed=true" >> "$GITHUB_OUTPUT"
 
       - name: Deploy to Vercel
@@ -877,8 +1166,15 @@ jobs:
         # Direct vercel deploy --prod: no local build needed — this is a static
         # site (buildCommand = "echo ..."). Skipping vercel build avoids the
         # 'spawn uv ENOENT' error caused by Vercel CLI trying to install Python
-        # deps on the runner. VERCEL_TOKEN env var is read automatically by the
-        # CLI; no --token flag needed (which was rejected for containing hyphens).
+        # deps on the runner.
+        # IMPORTANT: Vercel CLI 44.x does NOT read the VERCEL_TOKEN env var —
+        # only `--token` works. The env-var assumption shipped in #830 and the
+        # step failed every run since with "No existing credentials found"
+        # (first real execution: run 27413389659, 2026-06-12 — data committed,
+        # deploy dead, site only refreshed because human PR merges triggered
+        # integration deploys). The value is passed via "$VERCEL_TOKEN" quoted,
+        # which is also the fix for the earlier hyphen-rejection: that came
+        # from unquoted interpolation, not from --token itself.
         # vercel.json ignoreCommand stops the GitHub-integration from making a
         # duplicate Blocked deploy for the same bot commit.
         id: deploy
@@ -888,8 +1184,54 @@ jobs:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
-          npm install -g vercel@latest
-          vercel deploy --prod --yes
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::VERCEL_TOKEN secret is empty — deploy cannot run. Rotate/restore it in Settings → Secrets."
+            exit 1
+          fi
+          # Pinned to 47.2.2 (2026-06-13): Vercel's deploy endpoint began
+          # rejecting CLI 44.7.3 with "Your Vercel CLI version is outdated.
+          # This endpoint requires version 47.2.2 or later." (nightly
+          # 27471280829 — auth + 2.8GB upload succeeded, then the server
+          # rejected the old client). Vercel deprecates old CLIs server-side
+          # over time, so this pin needs periodic bumps; if this error recurs,
+          # raise it to the version named in the error.
+          npm install -g vercel@47.2.2
+          for attempt in 1 2; do
+            if vercel deploy --prod --yes --archive=tgz --token "$VERCEL_TOKEN"; then
+              exit 0
+            fi
+            echo "::warning::Vercel deploy attempt $attempt failed"
+            sleep 15
+          done
+          exit 1
+
+      - name: Social-floor canary (alert-only, NEVER blocks)
+        # Guards the /api/social/listings hires floor: the contract test
+        # (web/tests/contracts/social-api.test.ts) + pulpo-social's daily
+        # Instagram/Facebook publish both need ≥1 listing in the top-50
+        # with hires_width≥1080 / hires_height≥1350 / hires_available≠false.
+        # 2026-06-12: nightly #861 silently dropped that count to 0 —
+        # every open PR failed the required check and nothing alerted.
+        #
+        # DELIBERATELY alert-only: `continue-on-error: true` + `if: always()`
+        # mean even a CRITICAL verdict (exit 1) only pages Slack + emits the
+        # `social_floor.checked` PostHog event — it NEVER blocks the data
+        # commit or fails the workflow. The 2026-05-26 → 2026-06-01 six-day
+        # freeze (CLAUDE.md: "NEVER let the nightly freeze data without a
+        # Slack page") was caused by a canary gating the commit path; a
+        # stale site is worse than a quiet Instagram day. Do not "harden"
+        # this step into a gate.
+        if: always()
+        continue-on-error: true
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
+          POSTHOG_HOST: ${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}
+        run: |
+          python3 scripts/check_social_floor.py \
+            --data-dir web/data \
+            --run-url "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            || echo "::warning::social floor CRITICAL — 0 hires-eligible listings in /api/social/listings top-50 (alert-only; data commit unaffected)"
 
       - name: Nightly summary (story)
         # End-of-run synthesis. Reads run_history.json +
@@ -913,6 +1255,26 @@ jobs:
         run: |
           python3 scripts/nightly_summary.py --data-dir web/data --write-md \
             || echo "::warning::nightly summary script failed (non-blocking)"
+
+      - name: Classify nightly outcome
+        # One queryable verdict per run so dashboards/alerts can treat a
+        # data-quality HOLD (production protected; the site keeps serving
+        # last-good from main — safe) differently from a plumbing failure
+        # (page someone). Writes web/data/nightly_outcome.json (uploaded with
+        # the diagnostics below, so it survives even when the data commit
+        # didn't land) and fires the `nightly.outcome` PostHog event.
+        # Best-effort: never fails the nightly.
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+          COMMITTED: ${{ steps.commit.outputs.committed || '' }}
+          DEPLOY_CONCLUSION: ${{ steps.deploy.conclusion || '' }}
+          GH_TOKEN: ${{ secrets.PULPO_BOT_TOKEN || github.token }}
+          POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
+          POSTHOG_HOST: ${{ vars.POSTHOG_HOST || 'https://eu.i.posthog.com' }}
+        run: |
+          python3 scripts/classify_nightly_outcome.py \
+            || echo "::warning::nightly outcome classification failed (non-blocking)"
 
       - name: Upload nightly diagnostics
         # Runs on success AND failure so the auto-repair workflow + a
@@ -939,6 +1301,8 @@ jobs:
             web/data/run_history.json
             web/data/hires_pipeline_metrics.jsonl
             web/data/nightly_summary.md
+            web/data/nightly_outcome.json
+            web/data/guard_report.json
 
       - name: Slack on failure or cancellation
         # Final-line alert: any failed OR cancelled step in this job sends
@@ -972,7 +1336,7 @@ jobs:
             STATUS_TEXT="CANCELLED (likely timeout — look at last in-progress step)"
           fi
           RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          curl -sS -X POST -H 'Content-Type: application/json' \
+          curl -sS --connect-timeout 3 --max-time 8 -X POST -H 'Content-Type: application/json' \
             "$SLACK_WEBHOOK_URL" \
             -d "$(printf '{"text":"*Pulpo nightly %s* — <%s|view run>"}' "$STATUS_TEXT" "$RUN_URL")" \
             >/dev/null || echo "Slack POST failed (non-blocking)"

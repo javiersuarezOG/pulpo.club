@@ -96,6 +96,11 @@ export interface Listing {
     built_area_m2: number | null;
     price_per_built_m2: number | null;
     year_built: number | null;
+    // Plan 009 — LLM-extracted facts (only-fill-nulls; scraper wins).
+    // Tri-state: null = source didn't state it, never inferred.
+    year_renovated: number | null;     // explicit renovation/remodel wording only
+    furnished: boolean | null;
+    has_pool: boolean | null;
     parking_spaces: number | null;
     floor: number | null;              // condo only
     hoa_fee_usd_monthly: number | null;
@@ -131,6 +136,8 @@ export interface Listing {
     photos_count: number;
     photo_urls: string[];               // [0] is hero
     hero_photo_path: string | null;     // local /photos/<source>_<id>.jpg
+    selected_photo_url: string | null;  // picker's winning broker URL; FE reorders photos[0] to match the card
+    photo_urls_rejected: string[] | null;  // broker URLs the picker scored + rejected; consumers skip them in galleries. null = none/no-verdict
     /** PR-7.6 — heuristic quality score (0..100) for hero_photo_path. null when not scored. */
     hero_photo_quality_score: number | null;
     /** OCR-based text-overlay flag for hero photos. True = brochure-style image
@@ -151,6 +158,15 @@ export interface Listing {
      *  nightly pipeline; consumers include the ranker (PR-S4c flag)
      *  and the operator dashboard. */
     existence_status: string | null;
+    last_seen_at: string | null;       // ISO8601 UTC, from existence ledger
+    missing_since: string | null;      // ISO8601 UTC when absence streak began
+    /** Plan 012 — sold detection. Producers: normalize's transition
+     *  rule (previously-seen listing re-scraped with a sold marker)
+     *  and the nightly sold probe (missing listing whose live page
+     *  says sold). Consumers: detail-page sold banner, Browse slice
+     *  exclusion, zone medians, featured pool, sitemap. */
+    is_sold: boolean;
+    sold_detected_at: string | null;   // ISO8601 UTC, first labeled sold
 
     // ── Broker ──────────────────────────────────────────────────────
     broker_name: string | null;
@@ -264,4 +280,5 @@ export interface Listing {
     hires_photo_quality_score: number | null;
     hires_resdet_upscaled: boolean | null;
     hires_quarantined: boolean | null;
+    hires_aesthetic_issues: string[] | null;  // deterministic aesthetic issues on the hires derivative (e.g. "logo_or_watermark"); featured + IG gates exclude on logo_or_watermark
 }

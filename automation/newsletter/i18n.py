@@ -61,6 +61,12 @@ STRINGS: dict[str, dict[Locale, str]] = {
     # source-aware `cta_view_on` / `cta_view` from v2.2 are deleted —
     # the rich-pick CTA now points at pulpo_url, not listing_url.
     "pick.cta_open":               {"en": "See on Pulpo →",                               "es": "Ver en Pulpo →"},
+    # Free general template only — the ranks 04-10 ("7 more") CTA. The card
+    # renders identically to the Pro card (photo, title, location, price,
+    # "Why we picked it"); only the CTA changes from "See on Pulpo" to a
+    # sign-up ask. Rendered by `_pick_card_html` when variant="free_general"
+    # and the pick is NOT a top-3 deal.
+    "pick.cta_signup":             {"en": "Sign up to Pro →",                              "es": "Regístrate en Pro →"},
     # v4 (2026-05-31): shortened from "Save to favorites" / "Guardar en
     # favoritos" — the long Spanish form was overflowing the card width
     # on mobile (375px in Gmail's narrow rendering) and breaking the
@@ -101,10 +107,23 @@ STRINGS: dict[str, dict[Locale, str]] = {
                                      "es": "Después del top 3. Cada una calza en un segmento — Bitcoin Beach lista para mudarse, frente al mar trofeo, lotes a escala de desarrollador, sitios de construcción de rango medio. Hojeá los puntos de \"por qué la elegimos\" y parate en la que te calza a vos."},
     # ── Weekly News Spotlight (v4) ────────────────────────────────────
     "spotlight.eyebrow":           {"en": "Weekly News Spotlight",                         "es": "Noticia de la semana"},
-    # Deterministic fallback that ships when the LLM news-search pipeline
-    # returns no relevant article (slow news week or pre-pipeline ship).
-    # No fake source citation — the renderer only attaches a citation
-    # line when `issue.news_spotlight` carries a real `source_url`.
+    # ── Free general template: the spotlight is Pro-LOCKED ────────────
+    # The free edition shows the REAL headline, source citation and the
+    # opening sentence of the real article (all from the committed
+    # news_spotlight.json artifact — no fabricated copy), then withholds
+    # the rest of the read behind a single sign-up panel. These strings are
+    # the generic upsell wrapper around that real content; they must NOT
+    # claim article-specific analysis that doesn't exist in the artifact.
+    "spotlight.pro_badge":         {"en": "Pro",                                          "es": "Pro"},
+    "spotlight.locked_label":      {"en": "Pro analysis",                                  "es": "Análisis Pro"},
+    "spotlight.locked_body":      {"en": "You're reading the headline. Pulpo Pro adds the analysis — what this news actually means for property prices on the coast.",
+                                     "es": "Estás leyendo el titular. Pulpo Pro suma el análisis — lo que esta noticia significa de verdad para los precios en la costa."},
+    "spotlight.locked_cta":        {"en": "Get the analysis with Pro →",                   "es": "Obtené el análisis con Pro →"},
+    # DEPRECATED (kept for parity; no longer rendered). The spotlight now
+    # reads from the committed artifact (web/data/news_spotlight.json) with
+    # nightly carry-forward, so a real cited article is always available —
+    # the renderer omits the section entirely on a cold start rather than
+    # ship this source-less filler. Safe to delete once no tooling reads it.
     "spotlight.fallback.title":    {"en": "What we're watching on the coast.",             "es": "Lo que estamos viendo en la costa."},
     "spotlight.fallback.body":     {"en": "No single headline drove the market this week. Surf City 1 (the La Libertad stretch) remains the most active corridor by listing volume; Surf City 2 (the eastern coast) is quieter. We'll surface a sourced story in next week's edition when one earns it.",
                                      "es": "Ningún titular en particular movió al mercado esta semana. Surf City 1 (la franja de La Libertad) sigue siendo el corredor más activo por volumen de listados; Surf City 2 (la costa este) está más tranquila. Sacaremos una historia con fuente en la próxima edición cuando se la gane."},
@@ -133,10 +152,16 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "yp.welcome.label":            {"en": "No filter set yet",                            "es": "Aún no configuraste tu filtro"},
     "yp.welcome.cta":              {"en": "Set your filter",                              "es": "Configurá tu filtro"},
     # ── Paywall (free tier) ──
+    # v1.1 (2026-06-07): rewritten for the free-general design. Free
+    # readers now see all 10 FULL picks (photo, title, price, why), so the
+    # old "you're seeing the public cut / photo and headline / eight times
+    # the depth" framing contradicted what's on screen. The honest upsell:
+    # you see the picks; Pro adds the address/broker/underwriting + the
+    # full news read. Banner only renders for the free cohort.
     "paywall.eyebrow":             {"en": "Free edition",                                 "es": "Edición gratuita"},
-    "paywall.headline":            {"en": "You're seeing the public cut.",                "es": "Estás viendo el corte público."},
-    "paywall.body":                {"en": "Pulpo Pro lifts the curtain on every pick — address, broker contact, full underwriting, and the negotiation lever the seller doesn't know we know about. Same weekly cadence, eight times the depth.",
-                                     "es": "Pulpo Pro levanta el telón en cada selección — dirección, contacto del corredor, análisis completo y la palanca de negociación que el vendedor no sabe que conocemos. Misma cadencia semanal, ocho veces la profundidad."},
+    "paywall.headline":            {"en": "Pro goes deeper on every pick.",               "es": "Pro profundiza en cada selección."},
+    "paywall.body":                {"en": "You're seeing all 10 picks, ranked. Pulpo Pro adds what closes a deal — the address, the broker contact, the full underwriting, the negotiation lever the seller doesn't know we know about, plus the full read on this week's news. Same weekly cadence, the complete file.",
+                                     "es": "Estás viendo las 10 selecciones, clasificadas. Pulpo Pro suma lo que cierra un trato — la dirección, el contacto del corredor, el análisis completo, la palanca de negociación que el vendedor no sabe que conocemos, y el análisis completo de la noticia de la semana. Misma cadencia semanal, el archivo completo."},
     # Aligned with the canonical $9.99/mo price (web/app/lib/pricing.ts +
     # web/app/config/legal-content.ts). The v2.1 newsletter shipped with
     # $19/month which was stale drift — fixed in v2.2.
@@ -194,6 +219,20 @@ STRINGS: dict[str, dict[Locale, str]] = {
     # no welcome-only how-it-works / cadence / start-here / picks-intro
     # strings anymore. Only welcome.email.subject + welcome.hero.* above are
     # welcome-specific; the welcome-back derives from them via welcome_text.
+
+    # ── Pulpo FREE Welcome (one-shot, fires when a free reader subscribes) ──
+    # The free-welcome is the free-general master with ONLY the hero swapped
+    # (render_html variant="free_welcome"): plain `pulpo` masthead, top-3
+    # "See on Pulpo" + ranks 04-10 "Sign up to Pro", Pro-locked spotlight.
+    # The identity is plain Pulpo (NOT "Pulpo Pro") — a free reader isn't a
+    # Pro member. Free welcome-back derives from these via welcome_text, same
+    # "Welcome → Welcome back" / "first 10 → next 10" rewrite as the Pro pair.
+    "free_welcome.email.subject":       {"en": "Welcome to Pulpo — your first 10",            "es": "Bienvenido a Pulpo — tus primeras 10"},
+    "free_welcome.hero.eyebrow":        {"en": "Welcome to Pulpo",                            "es": "Bienvenido a Pulpo"},
+    "free_welcome.hero.headline.named": {"en": "Welcome, {name}.",                            "es": "Bienvenido, {name}."},
+    "free_welcome.hero.headline.unnamed": {"en": "Welcome aboard.",                           "es": "Bienvenido a bordo."},
+    "free_welcome.hero.lede":           {"en": "Pulpo covers the coast and the lakes — Coatepeque, Ilopango, the surf strip from El Tunco to El Cuco. Ranked by value, refreshed weekly. Your first 10 are below — the top 3 open, the rest a tap away when you go Pro.",
+                                         "es": "Pulpo cubre la costa y los lagos — Coatepeque, Ilopango, la franja surfera de El Tunco a El Cuco. Clasificada por valor, revisada cada semana. Tus primeras 10 están abajo — las 3 mejores abiertas, el resto a un toque cuando pasés a Pro."},
 
     # ── Pulpo Pro Welcome BACK (resubscribe) ──────────────────────────────
     # NO stored welcome_back.* copy. The welcome-back email is the SAME
@@ -254,15 +293,24 @@ _WELCOMEBACK_REWRITES: dict[str, list] = {
 
 def welcome_text(key_suffix: str, locale: Locale = DEFAULT_LOCALE, *,
                  variant: str = "welcome", **fmt) -> str:
-    """Resolve a `welcome.<key_suffix>` string, applying the welcome-back
-    rewrite when `variant == "welcome_back"`.
+    """Resolve a welcome-hero string, applying the welcome-back rewrite for
+    the resubscribe variant.
 
-    This is the single entry point for welcome / welcome-back hero +
-    subject + picks-title copy. There is no separate welcome_back.* table —
-    the welcome-back string is a pure function of the welcome string, so
-    the two emails can never diverge beyond the documented rewrite."""
-    base = t(f"welcome.{key_suffix}", locale, **fmt)
-    if variant != "welcome_back":
+    Two parallel string families share this one entry point:
+      • Pro welcome     → reads `welcome.<suffix>`     (variants "welcome" /
+        "welcome_back").
+      • Free welcome    → reads `free_welcome.<suffix>` (variants
+        "free_welcome" / "free_welcome_back").
+    The "back" variant of either family applies the SAME locale-aware
+    rewrites ("Welcome" → "Welcome back", "first 10" → "next 10"), so a
+    free welcome-back can't drift from the free welcome any more than the
+    Pro pair can. There is no stored *_back.* table on either side."""
+    if variant in ("free_welcome", "free_welcome_back"):
+        prefix, is_back = "free_welcome", variant == "free_welcome_back"
+    else:
+        prefix, is_back = "welcome", variant == "welcome_back"
+    base = t(f"{prefix}.{key_suffix}", locale, **fmt)
+    if not is_back:
         return base
     rules = _WELCOMEBACK_REWRITES.get(locale) or _WELCOMEBACK_REWRITES[DEFAULT_LOCALE]
     out = base

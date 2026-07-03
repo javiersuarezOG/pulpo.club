@@ -54,10 +54,13 @@ describe("api/saves enrichment + backward-compat", () => {
     expect(src).toMatch(/_rankedIndex = new Map\(\)/);
   });
 
-  it("dedupes by ID — legacy duplicates don't burn the cap slot", () => {
-    // Cap check counts via _extractIds, not raw array length, so a
-    // historical duplicate ID doesn't waste one of the user's slots.
-    expect(src).toMatch(/_extractIds\(next\)\.length/);
+  it("adds are Pro-only (two-state model) — the free 10-save cap is retired", () => {
+    // 2026-06-08: the never-paid free account is gone, so saving is a Pro
+    // capability. `add` requires an active plan and 403s otherwise; the old
+    // free-tier `_extractIds(next).length >= FREE_SAVE_CAP` cap is removed.
+    expect(src).toMatch(/plan === "pro" \|\| plan === "agency"/);
+    expect(src).toMatch(/pro_required/);
+    expect(src).not.toMatch(/_extractIds\(next\)\.length/);
   });
 
   it("removes by ID regardless of stored shape", () => {

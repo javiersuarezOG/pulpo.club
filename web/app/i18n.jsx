@@ -1,5 +1,6 @@
 import React from "react";
 import { ACTIVE_COUNTRY } from "./config/countries";
+import { track } from "./telemetry/client";
 
 // Pulpo — minimal i18n layer.
 //
@@ -143,7 +144,10 @@ function tr(value, locale) {
 
 // UI strings table.
 // Keep keys descriptive and grouped. In a real app this becomes en.json / es.json.
-const UI_STRINGS = {
+// Exported (read-only) so capability-contract tests can iterate the table —
+// e.g. plans-copy.test.ts asserts the Free plan never advertises a Pro-gated
+// capability. Do not mutate at runtime.
+export const UI_STRINGS = {
   // Nav — Wave 3a renamed the three section labels:
   //   * Home tab stays "Home" (the /browse tab took the "Discover" label).
   //   * /browse is labelled "Discover" — catalog/search is where you discover.
@@ -336,8 +340,83 @@ const UI_STRINGS = {
                                    es: "Domingo en la mañana, café, y…" },
   "home.hero.v5.h1_b":           { en: "your top 10 properties.",
                                    es: "tu top 10 propiedades." },
-  "home.hero.v5.sub":            { en: "We watch every property site in El Salvador so you don't have to — top picks ranked, in your inbox, every Sunday.",
-                                   es: "Revisamos cada sitio de propiedades en El Salvador por vos — los mejores ranqueados, en tu inbox, cada domingo." },
+  // Identity line — niche emphasized for skimming.
+  "home.hero.v5.sub_pre":        { en: "Pulpo is your personal real estate agent for ", es: "Pulpo es tu agente inmobiliario personal para " },
+  "home.hero.v5.sub_em":         { en: "beach & lake property",                es: "propiedades de playa y lago" },
+  "home.hero.v5.sub_post":       { en: " in El Salvador.",                     es: " en El Salvador." },
+  // Deliverable line — the payoff, "Your top 10" emphasized.
+  "home.hero.v5.sub2_em":        { en: "Your top 10",                          es: "Tu top 10" },
+  "home.hero.v5.sub2_post":      { en: " straight to your inbox, every Sunday.", es: " directo a tu correo, cada domingo." },
+  // Free-vs-Pro clarifier under the buttons (bold labels for skimming).
+  "home.hero.v5.tier_free_label":{ en: "Free",                                 es: "Gratis" },
+  "home.hero.v5.tier_free":      { en: " — a weekly email with your top 3.",
+                                   es: " — un correo semanal con tu top 3." },
+  "home.hero.v5.tier_pro_label": { en: "Pro",                                  es: "Pro" },
+  "home.hero.v5.tier_pro":       { en: " — a weekly email with your top 10, plus the full listings catalogue unlocked.",
+                                   es: " — un correo semanal con tu top 10, más el catálogo completo desbloqueado." },
+
+  // ── Hero v6 (redesign): lead + 3-point checklist + inline email
+  //    capture + the "Pulpo Free" Top-3 card with a locked 4–10 zone.
+  "home.hero.v5.lead":           { en: "Pulpo is the best real estate agent you've ever had.",
+                                   es: "Pulpo es el mejor agente inmobiliario que has tenido." },
+  "home.hero.v5.usp_1":          { en: "Scans every beach & lake listing in El Salvador",
+                                   es: "Rastrea cada propiedad de playa y lago en El Salvador" },
+  "home.hero.v5.usp_2":          { en: "Ranks them by best value for money",
+                                   es: "Las ordena por la mejor relación calidad-precio" },
+  "home.hero.v5.usp_3":          { en: "Delivers your top picks to your inbox, every Sunday",
+                                   es: "Te envía tus mejores opciones al correo, cada domingo" },
+  "home.hero.v5.email_cta":      { en: "Get going — it's free",                 es: "Empieza — es gratis" },
+  // Pulpo Free Top-3 card
+  "home.hero.v5.card_free_tag":  { en: "Free",                                  es: "Gratis" },
+  "home.hero.v5.card_live":      { en: "Live · 6:00 AM",                        es: "En vivo · 6:00 AM" },
+  "home.hero.v5.card_title_a":   { en: "Your",                                  es: "Tu" },
+  "home.hero.v5.card_title_b":   { en: "Top 3",                                 es: "Top 3" },
+  "home.hero.v5.card_title_c":   { en: "this week",                             es: "esta semana" },
+  "home.hero.v5.card_kick":      { en: "Ranked by value · filtered to your preferences",
+                                   es: "Ordenado por valor · filtrado a tus preferencias" },
+  // Personalisation filter bubbles — sample chips that show the list is
+  // tuned to the reader (category, zone, budget, property type).
+  "home.hero.v5.card_filters_lead": { en: "Your filters",                       es: "Tus filtros" },
+  "home.hero.v5.card_filter_1":  { en: "Beach",                                 es: "Playa" },
+  "home.hero.v5.card_filter_2":  { en: "Surf City II",                          es: "Surf City II" },
+  "home.hero.v5.card_filter_3":  { en: "Under $500k",                           es: "Menos de $500k" },
+  "home.hero.v5.card_filter_4":  { en: "Lot",                                   es: "Terreno" },
+  "home.hero.v5.grade_value":    { en: "value",                                 es: "valor" },
+  "home.hero.v5.lock_more":      { en: "+{n} more in your top 10",              es: "+{n} más en tu top 10" },
+  "home.hero.v5.lock_sub":       { en: "Free gives you the top 3 each Sunday. Unlock all 10 — plus the full catalogue — with Pulpo Pro.",
+                                   es: "Gratis te da el top 3 cada domingo. Desbloquea las 10 — y el catálogo completo — con Pulpo Pro." },
+  "home.hero.v5.lock_cta":       { en: "Unlock with Pulpo Pro",                 es: "Desbloquea con Pulpo Pro" },
+
+  // Hero CTAs (two-state): primary = free newsletter ("Your property
+  // tracker", email captured in a modal — no account, Resend only),
+  // secondary = Go Pro.
+  // Free = "your property tracker": a tool that watches every property
+  // site for you and sends the best new listings weekly. Framed as a
+  // tracker you start (a utility), not a "Sunday edition" (a magazine).
+  "home.hero.v5.cta_free":       { en: "Try Pulpo for free",                   es: "Prueba Pulpo gratis" },
+  // Pro CTA — short, with the PRO badge supplying the "Pro" (renders
+  // "Get Pulpo [PRO]"). Pro filters to your preferences + unlocks all.
+  "home.hero.v5.cta_pro":        { en: "Get Pulpo",                            es: "Consigue Pulpo" },
+  // Newsletter capture modal.
+  "home.hero.v5.nl_modal_title": { en: "Meet Pulpo, your property agent",      es: "Conoce a Pulpo, tu agente inmobiliario" },
+  "home.hero.v5.nl_modal_body":  { en: "Pulpo finds the best properties for sale in El Salvador and emails them to you each week. Free — no account needed.",
+                                   es: "Pulpo encuentra las mejores propiedades en venta en El Salvador y te las envía por correo cada semana. Gratis — sin cuenta." },
+  "home.hero.v5.nl_placeholder": { en: "you@email.com",                        es: "tu@email.com" },
+  "home.hero.v5.nl_cta":         { en: "Put Pulpo to work",                    es: "Pon a Pulpo a trabajar" },
+  "home.hero.v5.nl_cta_loading": { en: "Setting it up…",                       es: "Activando…" },
+  "home.hero.v5.nl_success_title": { en: "Pulpo's on it.",                     es: "Pulpo está en ello." },
+  "home.hero.v5.nl_success":     { en: "Check your inbox to confirm — your first picks land this Sunday.",
+                                   es: "Revisa tu inbox para confirmar — tus primeras propiedades llegan este domingo." },
+  "home.hero.v5.nl_already":     { en: "You're already on the list — see you Sunday.",
+                                   es: "Ya estás en la lista — nos vemos el domingo." },
+  "home.hero.v5.nl_error":       { en: "Couldn't sign you up — try again in a moment.",
+                                   es: "No pudimos suscribirte — inténtalo de nuevo en un momento." },
+  "home.hero.v5.nl_invalid":     { en: "Enter a valid email address.",         es: "Ingresa un correo válido." },
+  "home.hero.v5.nl_aria":        { en: "Email address for the free weekly property tracker",
+                                   es: "Correo para el rastreador semanal de propiedades gratis" },
+  "home.hero.v5.nl_modal_aria":  { en: "Subscribe to the free weekly property tracker",
+                                   es: "Suscríbete al rastreador semanal gratis" },
+  "home.hero.v5.nl_close":       { en: "Close",                                es: "Cerrar" },
 
   // "Where to start" subsection above the 5 destination cards.
   "home.hero.v5.section_title":  { en: "Where to start",
@@ -560,10 +639,47 @@ const UI_STRINGS = {
   "sort.lowest_price":           { en: "Lowest price",    es: "Menor precio" },
   "sort.newest":                 { en: "Newest",          es: "Más recientes" },
   "sort.largest_plot":           { en: "Largest plot",    es: "Lote más grande" },
+  // Shown in place of the sort dropdown when a search query is active —
+  // results are ordered by keyword relevance, not the chosen sort.
+  "browse.sort.by_relevance":    { en: "Best match",      es: "Mejor coincidencia" },
 
   // Map view placeholder — disabled toggle next to cards/table view.
   "view.map_coming_soon":        { en: "Map (coming soon)",
                                    es: "Mapa (próximamente)" },
+  // Map view (WS4 PR-7).
+  "view.map":                    { en: "Map view",      es: "Vista en mapa" },
+  "map.aria":                    { en: "Property listings map", es: "Mapa de propiedades" },
+  "map.skeleton.loading":        { en: "Loading map…",   es: "Cargando mapa…" },
+  "map.approx_legend":           { en: "Locations are approximate",
+                                   es: "Las ubicaciones son aproximadas" },
+  "map.mapped_count":            { en: "{shown} of {total} listings mapped",
+                                   es: "{shown} de {total} propiedades en el mapa" },
+  "map.hide_approx":             { en: "Hide approximate ({n})",
+                                   es: "Ocultar aproximadas ({n})" },
+  "map.unavailable_for_filter":  { en: "Map unavailable — no mapped listings for this filter.",
+                                   es: "Mapa no disponible — no hay propiedades ubicadas para este filtro." },
+  "map.marker.aria":             { en: "{price} · {zone} — press Enter to preview",
+                                   es: "{price} · {zone} — presiona Enter para ver" },
+  "map.cluster.aria":            { en: "{n} listings in this area — click to zoom in",
+                                   es: "{n} propiedades en esta zona — haz clic para acercar" },
+  "map.popup.approx_location":   { en: "Approximate location",
+                                   es: "Ubicación aproximada" },
+  "map.popup.view_listing":      { en: "View listing →", es: "Ver propiedad →" },
+  "map.search_as_i_move":        { en: "Search as I move", es: "Buscar al mover" },
+  "map.search_as_i_move.aria":   { en: "Search as I move the map",
+                                   es: "Buscar mientras muevo el mapa" },
+  "map.sheet.handle_aria":       { en: "Drag to expand the listings",
+                                   es: "Arrastra para ver las propiedades" },
+  "map.sheet.results_aria":      { en: "Map listing results",
+                                   es: "Resultados del mapa" },
+  "map.sheet.row_aria":          { en: "{title}, {price}. Open listing",
+                                   es: "{title}, {price}. Abrir propiedad" },
+  "map.empty_in_view.title":     { en: "No results in this view",
+                                   es: "Sin resultados en esta vista" },
+  "map.empty_in_view.show_all":  { en: "Show all {n}",
+                                   es: "Mostrar las {n}" },
+  "map.empty_in_view.turn_off_saim": { en: "Turn off search as I move",
+                                   es: "Desactivar buscar al mover" },
 
   // Pill rail
   "pill.all":                { en: "All",                 es: "Todos" },
@@ -584,6 +700,65 @@ const UI_STRINGS = {
   "card.in":                 { en: "in",                  es: "en" },
   "card.see_all":            { en: "See all",             es: "Ver todos" },
   "browse.in_country":       { en: "listings in El Salvador",    es: "propiedades en El Salvador" },
+  // /browse search bar (PR-S1). Exact-lookup substring match over
+  // id / source_id / URL / zone / title / source_label / province_state.
+  // The placeholder examples — Pulpo id, URL fragment, zone slug — are
+  // the lookups the user actually does today (paste an id from a
+  // listing card, paste a broker URL, find every listing in a zone).
+  "browse.search.placeholder":
+    { en: "Search by id, URL, zone, or title",
+      es: "Buscar por id, URL, zona o título" },
+  "browse.search.aria_label":
+    { en: "Search listings",
+      es: "Buscar propiedades" },
+  "browse.search.clear_aria":
+    { en: "Clear search",
+      es: "Borrar búsqueda" },
+  // Autocomplete dropdown (PR-2) — listbox aria + per-suggestion count.
+  "browse.search.suggest.aria":
+    { en: "Search suggestions",
+      es: "Sugerencias de búsqueda" },
+  "browse.search.suggest.count":
+    { en: "{n} listings",
+      es: "{n} propiedades" },
+  "browse.list.use":
+    { en: "Use",
+      es: "Uso" },
+  "browse.list.size":
+    { en: "Size",
+      es: "Tamaño" },
+  "browse.list.price":
+    { en: "Price",
+      es: "Precio" },
+  "browse.list.ppm":
+    { en: "{suffix}",
+      es: "{suffix}" },
+  "browse.list.listed":
+    { en: "Listed",
+      es: "Publicado" },
+  "browse.list.signal":
+    { en: "Signal",
+      es: "Señal" },
+  "browse.list.facts_aria":
+    { en: "Listing facts",
+      es: "Datos de la propiedad" },
+  // No-results-for-query empty state (PR-3) + category-pill shortcuts.
+  "browse.search.no_results":
+    { en: "No listings matched “{q}”.",
+      es: "Ninguna propiedad coincide con “{q}”." },
+  "browse.search.no_results.try":
+    { en: "Try a category:",
+      es: "Prueba una categoría:" },
+  "browse.search.pill.beachfront":
+    { en: "Beachfront",        es: "Frente al mar" },
+  "browse.search.pill.under_100k":
+    { en: "Under $100k",       es: "Menos de $100k" },
+  "browse.search.pill.new_this_week":
+    { en: "New this week",     es: "Nuevas esta semana" },
+  "browse.search.pill.price_drops":
+    { en: "Price drops",       es: "Rebajas de precio" },
+  "browse.search.pill.build_ready":
+    { en: "Build-ready",       es: "Listo para construir" },
   "browse.clear_category":   { en: "Clear category",             es: "Quitar categoría" },
   // Top 10 chip header — shows "Top 10" + a count meta like "6 of 10"
   // so a user sees the slice when combining with Beach / Waterfront /
@@ -610,6 +785,7 @@ const UI_STRINGS = {
   "badge.price_drop":        { en: "Price drop",          es: "Bajó de precio" },
   "badge.off_market":        { en: "Off-market",          es: "Off-market" },
   "badge.new":               { en: "New",                 es: "Nuevo" },
+  "badge.stale":             { en: "Recently missing",    es: "No visto recientemente" },
   "badge.build_ready":       { en: "Build-ready",         es: "Listo para construir" },
   "badge.motivated":         { en: "Motivated seller",    es: "Vendedor motivado" },
   "badge.ocean_view":        { en: "Ocean view",          es: "Vista al mar" },
@@ -698,6 +874,20 @@ const UI_STRINGS = {
   "detail.reasons":          { en: "Reasons to buy",      es: "Razones para comprar" },
   "detail.key_facts":        { en: "Key facts",           es: "Datos clave" },
   "detail.location":         { en: "Location",            es: "Ubicación" },
+  // Location-precision note rendered next to the zone label on the
+  // detail page. Drives off ranked.json's `geocoding_source` field via
+  // web/app/lib/location-precision.ts. The "approximate" copy carries
+  // the visit-time warning explicitly because the FE has been silently
+  // plotting zone-centroid coordinates as if they were exact.
+  "detail.location.precision.precise.title":
+    { en: "Exact location from broker",
+      es: "Ubicación exacta confirmada por el corredor" },
+  "detail.location.precision.approximate.title":
+    { en: "Approximate location",
+      es: "Ubicación aproximada" },
+  "detail.location.precision.approximate.body":
+    { en: "Based on the broker's published area. Confirm the exact address before visiting.",
+      es: "Basada en la zona publicada por el corredor. Confirma la dirección exacta antes de visitar." },
   "detail.price":            { en: "Price",               es: "Precio" },
   "detail.size":             { en: "Size",                es: "Tamaño" },
   "detail.days_listed":      { en: "Days listed",         es: "Días publicado" },
@@ -766,6 +956,15 @@ const UI_STRINGS = {
   "view.cards":              { en: "Card view",                     es: "Vista en tarjetas" },
   "view.table":              { en: "Table view",                    es: "Vista en tabla" },
   "view.filters":            { en: "Filters",                       es: "Filtros" },
+  // Results table (desktop) column headers + the per-row rank screen-reader label.
+  "browse.table.col.listing": { en: "Listing",  es: "Propiedad" },
+  "browse.table.col.zone":    { en: "Zone",     es: "Zona" },
+  "browse.table.col.type":    { en: "Type",     es: "Tipo" },
+  "browse.table.col.size":    { en: "Size",     es: "Tamaño" },
+  "browse.table.col.price":   { en: "Price",    es: "Precio" },
+  "browse.table.col.days":    { en: "Days",     es: "Días" },
+  "browse.table.col.signal":  { en: "Signal",   es: "Señal" },
+  "browse.table.rank_aria":   { en: "Pulpo ranked {rank}", es: "Clasificación Pulpo {rank}" },
 
   // PillRail
   "pill.scroll_left":        { en: "Scroll left",                   es: "Desplazar a la izquierda" },
@@ -812,6 +1011,19 @@ const UI_STRINGS = {
   "detail.fact.yes":         { en: "Yes",                           es: "Sí" },
   "detail.fact.zoning":      { en: "Zoning",                        es: "Zonificación" },
   "detail.fact.photos":      { en: "Photos",                        es: "Fotos" },
+  // Built-property (house/condo) fact tiles — plan 010. Presence-gated
+  // on sparse ranked.json fields; plan 009/011 raise coverage.
+  "detail.fact.bedrooms":       { en: "Bedrooms",        es: "Habitaciones" },
+  "detail.fact.bathrooms":      { en: "Bathrooms",       es: "Baños" },
+  "detail.fact.built_area":     { en: "Built area",      es: "Área construida" },
+  "detail.fact.year_built":     { en: "Year built",      es: "Año de construcción" },
+  "detail.fact.year_renovated": { en: "Renovated",       es: "Remodelado" },
+  "detail.fact.parking":        { en: "Parking",         es: "Estacionamiento" },
+  "detail.fact.floor":          { en: "Floor",           es: "Piso" },
+  "detail.fact.hoa":            { en: "HOA fee",         es: "Cuota de mantenimiento" },
+  "detail.fact.furnished":      { en: "Furnished",       es: "Amueblado" },
+  "detail.fact.pool":           { en: "Pool",            es: "Piscina" },
+  "detail.fact.per_month":      { en: "/month",          es: "/mes" },
   // PriceContextBlock — "How this price compares" section on the
   // detail page. Pill copy + caption. Peer-kind adapts to subcategory
   // (homes / condos / lots / listings). Scope label adapts to the
@@ -956,8 +1168,8 @@ const UI_STRINGS = {
   "plans.free.name":         { en: "Free",                    es: "Gratis" },
   "plans.free.tag":          { en: "Browse the catalogue",    es: "Explora el catálogo" },
   "plans.free.feat.browsing":         { en: "Unlimited card browsing",      es: "Explora tarjetas sin límite" },
-  "plans.free.feat.detail_views":     { en: "8 detail views per month",     es: "8 fichas detalladas al mes" },
-  "plans.free.feat.saves_cap":        { en: "Save up to 10 listings",       es: "Guarda hasta 10 propiedades" },
+  "plans.free.feat.top3_detail":      { en: "Full details on this week's top 3", es: "Ficha completa del top 3 de la semana" },
+  "plans.free.feat.weekly_email":     { en: "Weekly top-3 email every Sunday",   es: "Correo semanal con tu top 3 cada domingo" },
   // The Free plan card "what Pro adds" mirrors live at pro.usp.*.short
   // (used with the featMuted variant). The two old `_excluded` keys are
   // gone with the rest of the deprecated Pro USP copy.
@@ -1075,6 +1287,13 @@ const UI_STRINGS = {
   // the nav rename "Discover" labels /browse, so this label moved to
   // "Home" to match the actual destination.
   "account.back":            { en: "← Back to Home",                es: "← Volver al Inicio" },
+  // Free-member settings view (email-only, no Clerk account).
+  "account.free.title":       { en: "Your Pulpo",                    es: "Tu Pulpo" },
+  "account.free.badge":       { en: "Pulpo Free",                    es: "Pulpo Free" },
+  "account.free.value":       { en: "This week's top 3 — the best new beach & lake listings — in your inbox every Sunday.", es: "El top 3 de esta semana — las mejores propiedades nuevas de playa y lago — en tu correo cada domingo." },
+  "account.free.email_label": { en: "Your email",                    es: "Tu correo" },
+  "account.free.email_hint":  { en: "This is where your weekly picks land. To stop them, use the unsubscribe link in any Pulpo email.", es: "Aquí llegan tus selecciones semanales. Para detenerlas, usa el enlace para darte de baja en cualquier correo de Pulpo." },
+  "account.free.signout":     { en: "Sign out",                      es: "Cerrar sesión" },
   "account.profile":         { en: "Profile",                       es: "Perfil" },
   // Renamed `notifications` → `newsletter` 2026-05-29. The legacy key
   // is preserved for back-compat with cached bundles during rollout.
@@ -1290,6 +1509,12 @@ const UI_STRINGS = {
   // Reactivate CTA shown to canceling + canceled users instead of "Manage plan".
   "account.sub.reactivate":            { en: "Resubscribe →",
                                           es: "Volver a suscribirme →" },
+  // Post-cancel "you're on Free now" panel — frames the downgrade as a
+  // real choice: keep the free weekly, or resubscribe for the full thing.
+  "account.sub.free_panel.head":       { en: "You're on Pulpo Free",
+                                          es: "Estás en Pulpo Free" },
+  "account.sub.free_panel.body":       { en: "Your weekly top 3 — the best new beach & lake listings — still lands in your inbox every Sunday. Resubscribe to Pro for all 10 plus the full listings catalogue.",
+                                          es: "Tu top 3 semanal — las mejores propiedades nuevas de playa y lago — sigue llegando a tu correo cada domingo. Vuelve a Pro para las 10 y el catálogo completo." },
 
   // ── /start landing + /welcome (acquisition funnel — PR-B) ────────
   // Public marketing surfaces that funnel cold visitors into Stripe
@@ -1457,6 +1682,10 @@ const UI_STRINGS = {
                                 es: "Qué incluye" },
   "start.nav.login_link":     { en: "Log in",
                                 es: "Iniciar sesión" },
+  "start.already_pro.cta":    { en: "Manage your plan",
+                                es: "Administrar tu plan" },
+  "start.already_pro.note":   { en: "You're already on Pulpo Pro.",
+                                es: "Ya tienes Pulpo Pro." },
   // /  home-page Pro upsell modal (PR-B.5). Triggered when the URL
   // carries a campaign signal (utm_*, code, or ?upsell=1). Pro signed-in
   // users never see it. Mobile-first; reuses the .modal infra in index.css.
@@ -1500,30 +1729,87 @@ const UI_STRINGS = {
   // and listing-card clicks for anon + free users (paid users skip).
   // Replaces the previous "redirect to /start?intent=upgrade" page
   // jump with an in-page modal that POSTs to /api/stripe/start-checkout.
-  "free_month_modal.headline":         { en: "Property in El Salvador, before the rest of the internet sees it.",
-                                          es: "Propiedades en El Salvador, antes de que las vea el resto del internet." },
-  "free_month_modal.body":             { en: "Pulpo curates properties in El Salvador — land, homes, commercial — before they hit the big portals. One weekly digest. No noise.",
-                                          es: "Pulpo selecciona propiedades en El Salvador — terrenos, casas, locales — antes de que lleguen a los portales grandes. Un resumen semanal. Sin ruido." },
-  "free_month_modal.bullet.1":         { en: "Weekly 10 picks in your inbox",
-                                          es: "10 propiedades cada semana, en tu correo" },
-  "free_month_modal.bullet.2":         { en: "Filters + smart sorting",
-                                          es: "Filtros y orden inteligente" },
-  "free_month_modal.bullet.3":         { en: "Direct seller links",
-                                          es: "Enlaces directos al vendedor" },
-  "free_month_modal.cta_primary":      { en: "Try a free month — {price}/month after",
-                                          es: "Pruébalo un mes gratis — luego {price}/mes" },
+  // Plain, non-native-friendly copy (2026-06-08): short words, one idea
+  // per line, concrete benefits. Shared by every Pro-conversion CTA
+  // (listing gate, hero, USP, etc.), so it stays generic to the value,
+  // not to one entry point.
+  // ── Auth chooser (logged-out avatar / account click) ───────────────
+  // Two-state model: the account icon offers two clear paths — log in
+  // (existing Pro members) or go Pro (new visitors). No free signup.
+  "auth_choice.headline":              { en: "Welcome to Pulpo.",                            es: "Bienvenido a Pulpo." },
+  "auth_choice.body":                  { en: "Log in to your account, or go Pro to unlock every listing.",
+                                          es: "Inicia sesión en tu cuenta, o pasá a Pro para desbloquear cada propiedad." },
+  "auth_choice.login":                 { en: "Log in",                                       es: "Iniciar sesión" },
+  "auth_choice.get_pro":               { en: "Get Pulpo Pro",                                es: "Obtené Pulpo Pro" },
+
+  // Access v2 — unified "3 ways in" block (hero + every modal), Pulpo voice.
+  "access.or":                         { en: "or",                            es: "o" },
+  "access.email.placeholder":          { en: "Your email",                    es: "Tu correo" },
+  "access.email.aria":                 { en: "Email address",                 es: "Correo electrónico" },
+  "access.free.cta":                   { en: "Send me my top 3 →",            es: "Envíame mi top 3 →" },
+  "access.free.cta_loading":           { en: "Joining…",                      es: "Uniéndote…" },
+  "access.free.note":                  { en: "No account, no card — just your email", es: "Sin cuenta, sin tarjeta — solo tu correo" },
+  "access.go_pro.cta":                 { en: "Unlock everything — $9.99/mo",  es: "Desbloquea todo — $9.99/mes" },
+  "access.go_pro.sub":                 { en: "Every listing + all 10 of our weekly picks. First month's on us.", es: "Todas las propiedades + las 10 selecciones de la semana. El primer mes va por nuestra cuenta." },
+  "access.signin.prefix":              { en: "Already one of us?",            es: "¿Ya eres de los nuestros?" },
+  "access.signin.link":                { en: "Sign in",                       es: "Inicia sesión" },
+  "access.error.invalid":              { en: "Enter a valid email address.",  es: "Ingresa un correo válido." },
+  "access.error.generic":              { en: "Something went wrong. Try again.", es: "Algo salió mal. Inténtalo de nuevo." },
+  "access.modal.top3.title":           { en: "We've picked this week's top 3 for you.", es: "Elegimos el top 3 de esta semana para ti." },
+  "access.modal.top3.lead":            { en: "We read every new beach & lake listing in El Salvador and keep the three best. They're yours to open in full — free.", es: "Leemos cada propiedad nueva de playa y lago en El Salvador y nos quedamos con las tres mejores. Son tuyas para abrir completas — gratis." },
+  "access.modal.welcome.title":        { en: "Welcome to Pulpo.",             es: "Bienvenido a Pulpo." },
+  "access.modal.welcome.lead":         { en: "Start free with this week's top 3, go Pro for everything, or sign in if you're already one of us.", es: "Empieza gratis con el top 3 de esta semana, hazte Pro para todo, o inicia sesión si ya eres de los nuestros." },
+  "access.modal.gopro.title":          { en: "Want the whole coast?",         es: "¿Quieres toda la costa?" },
+  "access.modal.gopro.lead":           { en: "You've got your free top 3. Go Pro to open every listing and get all 10 of our weekly picks.", es: "Ya tienes tu top 3 gratis. Hazte Pro para abrir todas las propiedades y recibir las 10 selecciones de la semana." },
+  "access.modal.aria":                 { en: "Get started with Pulpo",        es: "Empieza con Pulpo" },
+  "access.modal.aria.close":           { en: "Close",                         es: "Cerrar" },
+
+  // Email-first "start free" capture modal (anonymous → Free member).
+  "email_capture.headline":            { en: "See this week's top 3 — free.",
+                                          es: "Mira el top 3 de la semana — gratis." },
+  "email_capture.body":                { en: "Add your email to open Pulpo's 3 best new listings in full — and get them in your inbox every Sunday.",
+                                          es: "Agrega tu correo para abrir las 3 mejores propiedades nuevas de Pulpo completas — y recíbelas en tu correo cada domingo." },
+  "email_capture.bullet.1":            { en: "Open this week's top 3 in full",
+                                          es: "Abre el top 3 de la semana completo" },
+  "email_capture.bullet.2":            { en: "The 3 best new listings, every Sunday",
+                                          es: "Las 3 mejores propiedades nuevas, cada domingo" },
+  "email_capture.bullet.3":            { en: "No account, no card — just your email",
+                                          es: "Sin cuenta, sin tarjeta — solo tu correo" },
+  "email_capture.placeholder":         { en: "you@email.com",                  es: "tu@correo.com" },
+  "email_capture.cta":                 { en: "Get the top 3",                  es: "Ver el top 3" },
+  "email_capture.cta_loading":         { en: "Joining…",                       es: "Uniéndote…" },
+  "email_capture.go_pro":              { en: "Want every listing? Go Pro →",   es: "¿Quieres todas? Hazte Pro →" },
+  "email_capture.dismiss":             { en: "Not now",                        es: "Ahora no" },
+  "email_capture.invalid":             { en: "Enter a valid email address.",   es: "Ingresa un correo válido." },
+  "email_capture.error":               { en: "Something went wrong. Try again.", es: "Algo salió mal. Inténtalo de nuevo." },
+  "email_capture.aria.dialog":         { en: "Start free with Pulpo",          es: "Empieza gratis con Pulpo" },
+  "email_capture.aria.close":          { en: "Close",                          es: "Cerrar" },
+  "email_capture.aria.email":          { en: "Email address",                  es: "Correo electrónico" },
+
+  "free_month_modal.headline":         { en: "Unlock every listing with Pulpo Pro.",
+                                          es: "Desbloquea cada propiedad con Pulpo Pro." },
+  "free_month_modal.body":             { en: "See full details, all photos, the price, and how to contact the seller. Plus the 10 best new listings in your inbox each week.",
+                                          es: "Ve todos los detalles, todas las fotos, el precio y cómo contactar al vendedor. Más las 10 mejores propiedades nuevas en tu correo cada semana." },
+  "free_month_modal.bullet.1":         { en: "Open any listing in full",
+                                          es: "Abre cualquier propiedad completa" },
+  "free_month_modal.bullet.2":         { en: "The 10 best new listings each week",
+                                          es: "Las 10 mejores propiedades nuevas cada semana" },
+  "free_month_modal.bullet.3":         { en: "Contact sellers directly",
+                                          es: "Contacta a los vendedores directamente" },
+  "free_month_modal.cta_primary":      { en: "Start free month — then {price}/month",
+                                          es: "Empieza gratis un mes — luego {price}/mes" },
   "free_month_modal.cta_primary_submitting": { en: "Opening checkout…",
                                           es: "Abriendo el pago…" },
-  "free_month_modal.cta_dismiss":      { en: "Maybe later",
-                                          es: "Quizás más tarde" },
-  "free_month_modal.aria.dialog":      { en: "Try a free month",
-                                          es: "Prueba un mes gratis" },
+  "free_month_modal.cta_dismiss":      { en: "Not now",
+                                          es: "Ahora no" },
+  "free_month_modal.aria.dialog":      { en: "Subscribe to Pulpo Pro",
+                                          es: "Suscríbete a Pulpo Pro" },
   "free_month_modal.aria.close":       { en: "Close",
                                           es: "Cerrar" },
   "free_month_modal.error":            { en: "Couldn't open checkout. Try again.",
                                           es: "No pudimos abrir el pago. Inténtalo de nuevo." },
-  "free_month_modal.code_applied_note":{ en: "✓ First month free, applied at checkout",
-                                          es: "✓ Primer mes gratis, se aplica al pagar" },
+  "free_month_modal.code_applied_note":{ en: "✓ First month free. Cancel anytime.",
+                                          es: "✓ Primer mes gratis. Cancela cuando quieras." },
 
   // Trimmed footer (home + browse + all legal-suite pages).
   "footer.fine_print":                 { en: "© {year} Pulpo",
@@ -1774,11 +2060,34 @@ const UI_STRINGS = {
                                              es: "Bloqueadores activos" },
 };
 
+// i18n leak canary — a non-default-locale user who falls back to English (or
+// to the raw key) is the silent failure mode that shipped to prod twice. Make
+// it observable: fire i18n.fallback_used ONCE per (locale, key) per session so
+// the hot render path never spams PostHog, and never let reporting break t().
+const _reportedI18nFallbacks = new Set();
+function reportI18nFallback(key, locale) {
+  if (typeof window === "undefined") return; // build/SSR/node: no-op
+  const sig = `${locale}:${key}`;
+  if (_reportedI18nFallbacks.has(sig)) return;
+  _reportedI18nFallbacks.add(sig);
+  try {
+    track("i18n.fallback_used", { key, locale });
+  } catch {
+    /* telemetry must never break a render */
+  }
+}
+
 // `t("nav.discover")` → string in current locale, with simple {var} interpolation
 function t(key, locale, vars) {
   const entry = UI_STRINGS[key];
+  const localized = entry ? entry[locale] : undefined;
+  // A real leak only when a NON-default locale was asked for and missed — the
+  // entry has no row for this locale (or the key doesn't exist at all).
+  if (localized == null && locale && locale !== DEFAULT_LOCALE) {
+    reportI18nFallback(key, locale);
+  }
   if (!entry) return key; // fallback so missing keys are visible
-  let s = entry[locale] ?? entry[DEFAULT_LOCALE] ?? key;
+  let s = localized ?? entry[DEFAULT_LOCALE] ?? key;
   if (vars) {
     for (const [k, v] of Object.entries(vars)) s = s.replace(`{${k}}`, v);
   }

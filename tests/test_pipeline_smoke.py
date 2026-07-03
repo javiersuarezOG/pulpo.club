@@ -52,6 +52,36 @@ def test_offline_pipeline_produces_ranked_json(tmp_path, monkeypatch):
             "the listings_history.json sidecar should populate this for every listing."
         )
 
+    # The pre-commit row-count gate HARD-REQUIRES the country-scoped fresh
+    # candidate (#830 — it fail-loud errors if missing). Prove the offline
+    # pipeline actually produces it, so a refactor that stops writing it fails
+    # here instead of erroring every nightly at 02:00 UTC. (Active country
+    # defaults to SV → ranked.fresh.SV.json.)
+    fresh_sv_path = tmp_path / "web" / "data" / "ranked.fresh.SV.json"
+    assert fresh_sv_path.exists(), (
+        "ranked.fresh.SV.json not written by the offline pipeline — the "
+        "row-count gate would error on every nightly without it."
+    )
+    fresh_data = json.loads(fresh_sv_path.read_text())
+    assert isinstance(fresh_data, list) and len(fresh_data) > 0, (
+        "ranked.fresh.SV.json must be a non-empty list of candidate listings."
+    )
+
+    # The photo-contract truth canary (scripts/check_photo_contract_truth.py)
+    # cross-checks photo_contract.json.ranked_total against the committed
+    # ranked.json and hard-fails on drift > 5. enforce_photo_contract MUST run
+    # AFTER the agricultural-land purge, or the sidecar describes a pre-purge
+    # SUPERSET and the canary false-fails a shippable catalogue (nightly
+    # 27394603436: sidecar 2129 vs ranked.json 1932). Lock that ordering here.
+    contract_path = tmp_path / "web" / "data" / "photo_contract.json"
+    if contract_path.exists():
+        contract = json.loads(contract_path.read_text())
+        assert contract.get("ranked_total") == len(data), (
+            f"photo_contract.ranked_total ({contract.get('ranked_total')}) must "
+            f"equal len(ranked.json) ({len(data)}) — enforce_photo_contract is "
+            f"running before the agricultural purge again (sidecar/ship drift)."
+        )
+
     # Confirm the real production file was NOT touched
     prod_ranked = REPO / "web" / "data" / "ranked.json"
     if prod_ranked.exists():

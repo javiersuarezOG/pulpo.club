@@ -55,6 +55,12 @@ export type FilterShape = {
   // intentionally the same so /browse without any query maintains
   // the default-hide semantic.
   include_incomplete: boolean;
+  // Free-text search query. Default "". URL key: `q=…`. Tokenized
+  // and matched as case-insensitive substrings against id /
+  // source_id / original_url / zone_name / title / source_label /
+  // province_state — see web/app/lib/search-match.ts. Empty string
+  // (or whitespace-only) is a no-op.
+  query: string;
 };
 
 // Visual scale for the price histogram. Listings above this still pass
@@ -145,6 +151,7 @@ export function readFilterFromURL(search: string, baseDefaults: FilterShape): Fi
     discovery_tags:  tagsFromUrl.size > 0 ? tagsFromUrl : baseDefaults.discovery_tags,
     rank_max: p.get("rmax") != null ? parseInt0(p.get("rmax"), 0) : baseDefaults.rank_max,
     include_incomplete: p.get("inc") === "1" ? true : baseDefaults.include_incomplete,
+    query: (p.get("q") ?? baseDefaults.query ?? "").slice(0, 200),
   };
   const sm = p.get("score_min");
   if (sm != null) out.score_min = parseInt0(sm, 0);
@@ -166,10 +173,53 @@ export function readSortFromURL(search: string, fallback: string): string {
   return p.get("sort") || fallback;
 }
 
+// View state (cards | table | map) lives in the URL so `?view=map` is
+// shareable and survives back/forward. Deliberately kept OUT of
+// FILTER_URL_KEYS so a bare `?view=map` does NOT suppress the
+// Clerk-persisted filter seed — view is orthogonal to "what to find".
+const VALID_VIEWS: ReadonlySet<string> = new Set(["cards", "table", "map"]);
+
+export function readViewFromURL(search: string, fallback: string): string {
+  const p = new URLSearchParams(search);
+  const v = p.get("view");
+  return v && VALID_VIEWS.has(v) ? v : fallback;
+}
+
+// Map viewport bbox — "minLat,minLng,maxLat,maxLng" (4 dp). Only set in
+// map view with "search as I move" on, so the viewport is shareable.
+// Like `view`, kept out of FILTER_URL_KEYS (it's not a "what to find"
+// axis). Malformed values parse to null rather than throwing.
+export type Bbox = { minLat: number; minLng: number; maxLat: number; maxLng: number };
+
+export function readBboxFromURL(search: string): Bbox | null {
+  const raw = new URLSearchParams(search).get("bbox");
+  if (!raw) return null;
+  const tokens = raw.split(",");
+  if (tokens.length !== 4 || tokens.some((s) => s.trim() === "")) return null;
+  const parts = tokens.map((s) => Number(s));
+  if (parts.length !== 4 || parts.some((n) => !Number.isFinite(n))) return null;
+  const [minLat, minLng, maxLat, maxLng] = parts;
+  if (minLat >= maxLat || minLng >= maxLng) return null;
+  return { minLat, minLng, maxLat, maxLng };
+}
+
+export function writeBboxToURL(bbox: Bbox | null, history: History = window.history) {
+  const p = new URLSearchParams(window.location.search);
+  if (bbox) {
+    const r = (n: number) => n.toFixed(4);
+    p.set("bbox", `${r(bbox.minLat)},${r(bbox.minLng)},${r(bbox.maxLat)},${r(bbox.maxLng)}`);
+  } else {
+    p.delete("bbox");
+  }
+  const qs = p.toString();
+  history.replaceState({}, "", `${window.location.pathname}${qs ? `?${qs}` : ""}`);
+}
+
 export function writeFilterToURL(
   filters: FilterShape,
   category: string | null,
   sort: string,
+  view: string = "cards",
   history: History = window.history
 ) {
   const p = new URLSearchParams(window.location.search);
@@ -209,6 +259,9 @@ export function writeFilterToURL(
   setOrRemove("tag",    [...filters.discovery_tags].join(","));
   setOrRemove("rmax",   filters.rank_max != null && filters.rank_max > 0 ? String(filters.rank_max) : "");
   setOrRemove("inc",    filters.include_incomplete ? "1" : "");
+  setOrRemove("q",      (filters.query ?? "").trim());
+  // View — omitted when "cards" (the default) so plain links stay clean.
+  setOrRemove("view",   view && view !== "cards" ? view : "");
   const qs = p.toString();
   const url = `${window.location.pathname}${qs ? `?${qs}` : ""}`;
   history.replaceState({}, "", url);

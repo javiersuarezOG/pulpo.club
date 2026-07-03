@@ -222,6 +222,40 @@ HIRES_MIN_HEIGHT_PX = 1080
 HIRES_MAX_SIZE_KB   = 10240  # 10 MB ceiling; brokers rarely exceed this
 
 
+# Logo / icon / placeholder URL deny-list. The eligibility gates above are
+# purely structural (≥800×600), so a broker's logo or generic placeholder
+# served at a large-enough resolution scores card_eligible=True and can win
+# the pick. Example confirmed 2026-06-08: xitios serves
+# https://www.xitios.com.sv/img/icon.jpeg as the hero on 19 listings — a
+# logo, card_eligible=True. Patterns are matched as case-insensitive
+# substrings against the candidate's URL. Keep them CONSERVATIVE so a
+# legitimate listing photo whose path merely contains "icon" or "logo"
+# isn't dropped — prefer host-qualified or distinctive fragments.
+LOGO_PLACEHOLDER_URL_PATTERNS: tuple[str, ...] = (
+    "xitios.com.sv/img/icon",       # xitios logo served as hero (19 listings)
+    "/images/propiedad-no-disponible.jpg",  # nexo "unavailable" graphic
+    "/placeholder",
+    "/no-image",
+    "/sin-imagen",
+    "/default-property",
+)
+
+
+def is_logo_or_placeholder_url(url: Optional[str]) -> bool:
+    """True when ``url`` matches a known logo/icon/placeholder pattern.
+
+    Used by the hero picker to force card_eligible/hero_eligible False so a
+    logo or placeholder can never be marked a renderable card image — the
+    structural resolution gates alone can't tell a 1200×1200 logo from a
+    real photo. Consumers: automation/run.py + automation/repick_heroes.py
+    (picker), and web/app/home/HomeShelf.jsx via the card_eligible gate.
+    """
+    if not url or not isinstance(url, str):
+        return False
+    u = url.lower()
+    return any(pat in u for pat in LOGO_PLACEHOLDER_URL_PATTERNS)
+
+
 def compute_image_metadata(raw_bytes: bytes, *, file_size_bytes: Optional[int] = None) -> Optional[dict]:
     """Return the sidecar metadata dict for an image, or None when undecodable.
 

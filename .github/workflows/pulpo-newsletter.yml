@@ -53,6 +53,18 @@ on:
         type: choice
         default: "en"
         options: ["en", "es"]
+      newsletter_template:
+        description: "Which template to route through (TEMPLATES registry id). Default is the Pro weekly master."
+        required: false
+        type: choice
+        default: "pulpo-pro-general"
+        options: ["pulpo-pro-general", "pulpo-free-general", "pulpo-free-welcome", "pulpo-free-welcome-back"]
+      free_audience:
+        description: "Send to the FREE audience (free Clerk + anonymous, Pro excluded). Pair with newsletter_template=pulpo-free-general. Staged: dry-run unless send_mode=yes."
+        required: false
+        type: choice
+        default: "no"
+        options: ["no", "yes"]
       allow_all_subscribers:
         description: "LAUNCH SEND — bypass the Pro/Agency gate; send to ALL audience contacts (anonymous, free, Pro). Default no."
         required: false
@@ -171,9 +183,14 @@ jobs:
           PREVIEW_LOCALE="${{ github.event.inputs.preview_locale || 'en' }}"
           ISSUE_NUMBER="${{ github.event.inputs.issue_number || '' }}"
           ALLOW_ALL="${{ github.event.inputs.allow_all_subscribers || 'no' }}"
-          ARGS=(--write-html-to newsletter-drafts/sent)
+          NEWSLETTER_TEMPLATE="${{ github.event.inputs.newsletter_template || 'pulpo-pro-general' }}"
+          FREE_AUDIENCE="${{ github.event.inputs.free_audience || 'no' }}"
+          ARGS=(--write-html-to newsletter-drafts/sent --newsletter "$NEWSLETTER_TEMPLATE")
           if [ -n "$ISSUE_NUMBER" ]; then
             ARGS+=(--issue-number "$ISSUE_NUMBER")
+          fi
+          if [ "$FREE_AUDIENCE" = "yes" ]; then
+            ARGS+=(--free-audience)
           fi
           if [ -n "$PREVIEW_EMAIL" ]; then
             ARGS+=(--preview-cohorts "$PREVIEW_EMAIL" --preview-locale "$PREVIEW_LOCALE")
@@ -195,3 +212,18 @@ jobs:
           path: newsletter-drafts/sent/*.html
           retention-days: 30
           if-no-files-found: ignore
+
+      - name: Slack on newsletter job failure
+        if: failure() || cancelled()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL unset; skipping newsletter failure Slack ping."
+            exit 0
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            "$SLACK_WEBHOOK_URL" \
+            -d "$(printf '{"text":"*Pulpo newsletter JOB FAILED* — weekly send may be silent. <%s|view run>"}' "$RUN_URL")" \
+            >/dev/null || echo "Slack POST failed (non-blocking)"

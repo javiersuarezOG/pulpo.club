@@ -50,6 +50,15 @@ class Listing:
     # the lot-based price_per_m2 metric in the value leg.
     price_per_built_m2: Optional[float] = None
     year_built: Optional[int] = None
+    # Plan 009 — LLM-extracted facts. Producer: the DeepSeek enrichment
+    # call (automation/llm_enrichment_schema.py::_apply_extracted_facts,
+    # only-fill-nulls — a scraper-parsed value always wins). Consumers:
+    # the detail-page Key Facts tiles (web/app/pages.jsx, plan 010) via
+    # the _RANKED_LIST_FIELDS allowlist in automation/pipeline_steps.py.
+    # All tri-state: None = source didn't state it, never inferred.
+    year_renovated: Optional[int] = None   # only from explicit renovation/remodel wording
+    furnished: Optional[bool] = None       # True/False only when source states it
+    has_pool: Optional[bool] = None
     parking_spaces: Optional[int] = None
     floor: Optional[int] = None                  # condo only
     hoa_fee_usd_monthly: Optional[float] = None  # condo only
@@ -90,6 +99,24 @@ class Listing:
     photos_count: int = 0
     photo_urls: list[str] = field(default_factory=list)   # broker-hosted; [0] is hero
     hero_photo_path: Optional[str] = None                  # local /photos/<source>_<id>.jpg
+    # The broker URL the hero picker SELECTED as the winning image
+    # (winning_url in the .hero.jpg.meta.json sidecar). Persisted to
+    # ranked.json so the FE can reorder `photo_urls` to show the same
+    # image the card thumbnail used as photos[0] on the detail page.
+    # Consumer: web/app/data/listings.ts::buildPhotos. None = not picked
+    # (offline, no candidates, or pre-P2 record).
+    selected_photo_url: Optional[str] = None
+    # Per-photo picker verdicts: broker URLs the hero picker downloaded,
+    # scored, and REJECTED (picker_excluded below the cheap-score floor,
+    # or a Tesseract text overlay). Consumers filter these out of
+    # user-facing galleries so a rejected flyer/logo/thumbnail never
+    # renders as photo 2..N. Consumers: web/app/data/listings.ts::
+    # buildPhotos + automation/ig_photo_gate.py::order_photo_indices.
+    # Only URLs the picker actually scored can appear here (the picker
+    # caps at PULPO_PHOTO_MAX_CANDIDATES, default 5); URLs beyond the cap
+    # are never scored and stay absent. Absence means "no verdict", NOT
+    # "approved". None = nothing rejected (or offline / pre-field record).
+    photo_urls_rejected: Optional[list[str]] = None
     # PR-7.6 — heuristic quality score (0..100) for hero_photo_path.
     # None = not yet scored (offline mode, OpenCV unavailable, or
     # download failed). Featured-listing picker filters on this.
@@ -150,12 +177,29 @@ class Listing:
     hires_photo_quality_score: Optional[int] = None  # compute_score on native bytes, 0..100
     hires_resdet_upscaled: Optional[bool] = None     # resdet detected upscale fraud
     hires_quarantined: Optional[bool] = None         # True when .quarantine marker is present
+    # Deterministic aesthetic issues detected on the hires derivative
+    # (automation/aesthetic_deterministic.py): e.g. "logo_or_watermark",
+    # "poor_lighting". Consumers: featured_listing._is_elite/_is_soft and
+    # ig_photo_gate exclude listings whose hero carries logo_or_watermark.
+    hires_aesthetic_issues: Optional[list[str]] = None
     first_seen_at: Optional[str] = None  # ISO8601 UTC, stable across re-scrapes via sidecar
     # PR-S4b — existence ledger output (see automation/listing_ledger.py).
     # One of KNOWN_EXISTENCE_STATUSES: confirmed_current | missing_recently | stale.
     # Stamped by automation/run.py's ledger-update block; None when the
     # ledger hasn't been computed yet (e.g. legacy fixtures, smoke tests).
     existence_status: Optional[str] = None
+    last_seen_at: Optional[str] = None
+    missing_since: Optional[str] = None
+    # Plan 012 — sold detection. Producers: pulpo/normalize.py (a
+    # previously-seen listing re-scraped with a sold/under-contract
+    # marker is kept + flagged instead of dropped) and
+    # automation/sold_probe.py via run.py's probe block (a missing
+    # listing whose live page says sold). Consumers: FE sold banner
+    # (web/app/pages.jsx, listings.ts), Browse slice exclusion,
+    # zone_medians.py comp exclusion, sitemap.py exclusion, the
+    # ranked-list allowlist in pipeline_steps.py.
+    is_sold: bool = False
+    sold_detected_at: Optional[str] = None  # ISO-8601; when we first labeled it sold
 
     # Broker
     broker_name: Optional[str] = None

@@ -197,6 +197,44 @@ def test_join_drops_anonymous_resend_only_contacts():
     assert recipients == []
 
 
+# ── free_only audience (free weekly) ──────────────────────────────────────
+def test_free_only_includes_free_and_anon_excludes_pro():
+    """The free-tier audience is the inverse of the default: free Clerk
+    users + anonymous contacts are IN, Pro/Agency are OUT."""
+    contacts = [
+        subs.ResendContact(id="c1", email="free@pulpo.club", unsubscribed=False, created_at=None),
+        subs.ResendContact(id="c2", email="pro@pulpo.club", unsubscribed=False, created_at=None),
+        subs.ResendContact(id="c3", email="anon@example.com", unsubscribed=False, created_at=None),
+    ]
+    clerk_users = [
+        subs._parse_clerk_user(_clerk_user("free@pulpo.club", plan="free")),
+        subs._parse_clerk_user(_clerk_user("pro@pulpo.club", plan="pro")),
+    ]
+    recipients = subs.join_recipients(contacts=contacts, clerk_users=clerk_users, free_only=True)
+    tiers = sorted(r.tier for r in recipients)
+    emails = {r.email_hash for r in recipients}
+    assert tiers == ["free", "free"]                          # free Clerk + anon (synth free)
+    assert subs.email_hash("pro@pulpo.club") not in emails    # Pro excluded
+    assert subs.email_hash("anon@example.com") in emails      # anon included
+    assert subs.email_hash("free@pulpo.club") in emails
+
+
+def test_default_audience_still_pro_only():
+    """Regression guard: with neither flag, the Pro/Agency gate holds."""
+    contacts = [
+        subs.ResendContact(id="c1", email="free@pulpo.club", unsubscribed=False, created_at=None),
+        subs.ResendContact(id="c2", email="pro@pulpo.club", unsubscribed=False, created_at=None),
+        subs.ResendContact(id="c3", email="anon@example.com", unsubscribed=False, created_at=None),
+    ]
+    clerk_users = [
+        subs._parse_clerk_user(_clerk_user("free@pulpo.club", plan="free")),
+        subs._parse_clerk_user(_clerk_user("pro@pulpo.club", plan="pro")),
+    ]
+    recipients = subs.join_recipients(contacts=contacts, clerk_users=clerk_users)
+    assert len(recipients) == 1
+    assert recipients[0].tier == "pro"
+
+
 def test_join_keeps_agency_tier():
     """Agency tier is also part of the Pro audience."""
     contacts = [
@@ -620,50 +658,63 @@ def test_join_recipients_stamps_preference_source_per_user():
     assert by_hash[subs.email_hash("empty@pulpo.club")].preference_source == "none"
 
 
-# ── Pro Welcome — 24h weekly-skip filter ──────────────────────────────
-# Locked 2026-06-01: a Pro recipient whose welcome shipped in the past
-# 24h is dropped from the weekly queue to avoid back-to-back welcome +
-# weekly with the same 10 picks. Stamp lives on
-# publicMetadata.welcome_newsletter_sent_at (ISO-8601 UTC).
+# ── First-Sunday skip — 96h signup-grace filter (Free + Pro) ──────────
+# Locked 2026-07-03: any recipient (Free OR Pro) who signed up within 96h
+# before an upcoming Sunday send is deferred to the FOLLOWING Sunday —
+# they just got the instant welcome (which carries picks), so the coming
+# Sunday would be a near-duplicate. Replaces the earlier Pro-only 24h
+# welcome-collision skip. Two signup signals feed the check:
+#   • Pro   — publicMetadata.welcome_newsletter_sent_at (welcome ≈ signup)
+#   • Free  — the Resend contact's created_at (audience-join time)
+# Both windows are SIGNUP_SKIP_WINDOW_HOURS; either being recent defers.
 
-def _clerk_user_with_welcome(email, *, welcome_sent_at):
+def _clerk_user_with_welcome(email, *, welcome_sent_at, plan="pro"):
     return {
         "id": f"user_{email.split('@')[0]}",
         "first_name": None,
         "email_addresses": [{"id": "ea_1", "email_address": email}],
         "primary_email_address_id": "ea_1",
         "public_metadata": {
-            "plan": "pro",
+            "plan": plan,
             "profile": {},
             "welcome_newsletter_sent_at": welcome_sent_at,
         },
     }
 
 
-def test_welcome_within_24h_helper_handles_recent_stamp():
+def test_window_constant_is_96h():
+    """Anchor: the skip window is 96h. Changing it is a deliberate
+    product decision, not an incidental edit."""
+    assert subs.SIGNUP_SKIP_WINDOW_HOURS == 96
+
+
+def test_signup_within_grace_helper_handles_recent_stamp():
     from datetime import datetime, timedelta, timezone
     now = datetime(2026, 6, 1, 16, 0, 0, tzinfo=timezone.utc)
     # 6h ago — within window
     recent = (now - timedelta(hours=6)).isoformat()
-    assert subs._welcome_within_24h(recent, now=now) is True
-    # 30h ago — outside window
-    stale = (now - timedelta(hours=30)).isoformat()
-    assert subs._welcome_within_24h(stale, now=now) is False
-    # 23h59m ago — just barely inside
-    edge = (now - timedelta(hours=23, minutes=59)).isoformat()
-    assert subs._welcome_within_24h(edge, now=now) is True
+    assert subs._signup_within_grace(recent, now=now) is True
+    # 100h ago — outside the 96h window
+    stale = (now - timedelta(hours=100)).isoformat()
+    assert subs._signup_within_grace(stale, now=now) is False
+    # 95h59m ago — just barely inside
+    edge = (now - timedelta(hours=95, minutes=59)).isoformat()
+    assert subs._signup_within_grace(edge, now=now) is True
+    # exactly 96h ago — outside (strict `<`)
+    boundary = (now - timedelta(hours=96)).isoformat()
+    assert subs._signup_within_grace(boundary, now=now) is False
 
 
-def test_welcome_within_24h_helper_handles_z_suffix_and_garbage():
+def test_signup_within_grace_helper_handles_z_suffix_and_garbage():
     from datetime import datetime, timezone
     now = datetime(2026, 6, 1, 16, 0, 0, tzinfo=timezone.utc)
     # `Z` suffix is the spec-compliant UTC marker; we tolerate it.
-    assert subs._welcome_within_24h("2026-06-01T10:00:00Z", now=now) is True
-    # Garbage strings degrade to False (don't crash the weekly send
-    # over an upstream metadata format change).
-    assert subs._welcome_within_24h("not-a-date", now=now) is False
-    assert subs._welcome_within_24h("", now=now) is False
-    assert subs._welcome_within_24h(None, now=now) is False
+    assert subs._signup_within_grace("2026-06-01T10:00:00Z", now=now) is True
+    # Garbage / missing degrade to False (don't crash the weekly send
+    # over an upstream metadata format change → send one extra weekly).
+    assert subs._signup_within_grace("not-a-date", now=now) is False
+    assert subs._signup_within_grace("", now=now) is False
+    assert subs._signup_within_grace(None, now=now) is False
 
 
 def test_parse_clerk_user_reads_welcome_sent_at():
@@ -678,63 +729,106 @@ def test_parse_clerk_user_reads_welcome_sent_at():
     assert no_stamp.welcome_sent_at is None
 
 
-def test_join_recipients_drops_user_with_recent_welcome(monkeypatch):
-    """Pro user whose welcome shipped 6h ago must NOT land in the
-    weekly queue. Without this filter the user gets two emails with
-    the same 10 picks on a same-day collision."""
+def test_join_recipients_defers_pro_with_recent_welcome():
+    """Pro user welcomed 6h before the send is deferred; one welcomed
+    100h before (outside the 96h window) still gets this Sunday."""
     from datetime import datetime, timedelta, timezone
     now = datetime(2026, 6, 1, 16, 0, 0, tzinfo=timezone.utc)
-    recent_stamp = (now - timedelta(hours=6)).isoformat()
-    # Patch the helper's wall-clock so the test is deterministic.
-    monkeypatch.setattr(
-        subs, "_welcome_within_24h",
-        lambda iso, now=None: subs._welcome_within_24h.__wrapped__(iso, now=now) if hasattr(subs._welcome_within_24h, "__wrapped__") else (iso is not None and "2026-06-01" in (iso or "")),
-    )
-    # Simpler: just verify the integration via the date constants.
+    recent = (now - timedelta(hours=6)).isoformat()
+    old = (now - timedelta(hours=100)).isoformat()
     contacts = [
         subs.ResendContact(id="c1", email="recent@pulpo.club", unsubscribed=False, created_at=None),
         subs.ResendContact(id="c2", email="old@pulpo.club", unsubscribed=False, created_at=None),
     ]
     users = [
-        subs._parse_clerk_user(
-            _clerk_user_with_welcome("recent@pulpo.club", welcome_sent_at=recent_stamp)
-        ),
-        subs._parse_clerk_user(
-            _clerk_user_with_welcome("old@pulpo.club", welcome_sent_at="2025-01-01T10:00:00Z")
-        ),
+        subs._parse_clerk_user(_clerk_user_with_welcome("recent@pulpo.club", welcome_sent_at=recent)),
+        subs._parse_clerk_user(_clerk_user_with_welcome("old@pulpo.club", welcome_sent_at=old)),
     ]
-    # Reset the monkeypatch — we want the real helper now.
-    monkeypatch.undo()
-    # We can't easily inject `now=` into join_recipients, so use a
-    # `welcome_sent_at` that's guaranteed-recent (just now).
-    fresh = datetime.now(timezone.utc).isoformat()
-    users[0] = subs._parse_clerk_user(
-        _clerk_user_with_welcome("recent@pulpo.club", welcome_sent_at=fresh)
-    )
-    recipients = subs.join_recipients(contacts=contacts, clerk_users=users)
-    emails_in_queue = {r.email_hash for r in recipients}
-    assert subs.email_hash("recent@pulpo.club") not in emails_in_queue
-    assert subs.email_hash("old@pulpo.club") in emails_in_queue
+    recipients = subs.join_recipients(contacts=contacts, clerk_users=users, now=now)
+    queue = {r.email_hash for r in recipients}
+    assert subs.email_hash("recent@pulpo.club") not in queue
+    assert subs.email_hash("old@pulpo.club") in queue
 
 
-def test_allow_all_subscribers_bypasses_welcome_skip():
-    """Operator launch broadcasts use --allow-all-subscribers to bypass
-    gates wholesale. The welcome 24h skip MUST be bypassed too — the
-    operator is deliberately overriding cohort filters."""
-    from datetime import datetime, timezone
-    fresh = datetime.now(timezone.utc).isoformat()
+def test_join_recipients_defers_free_clerk_by_created_at():
+    """A FREE Clerk user (no welcome stamp) is deferred purely on the
+    Resend contact created_at when it's inside the window."""
+    from datetime import datetime, timedelta, timezone
+    now = datetime(2026, 6, 1, 16, 0, 0, tzinfo=timezone.utc)
+    fresh = (now - timedelta(hours=10)).isoformat()
+    old = (now - timedelta(hours=200)).isoformat()
     contacts = [
-        subs.ResendContact(id="c1", email="recent@pulpo.club", unsubscribed=False, created_at=None),
+        subs.ResendContact(id="c1", email="fresh@pulpo.club", unsubscribed=False, created_at=fresh),
+        subs.ResendContact(id="c2", email="settled@pulpo.club", unsubscribed=False, created_at=old),
     ]
     users = [
-        subs._parse_clerk_user(
-            _clerk_user_with_welcome("recent@pulpo.club", welcome_sent_at=fresh)
-        ),
+        subs._parse_clerk_user(_clerk_user("fresh@pulpo.club", plan="free")),
+        subs._parse_clerk_user(_clerk_user("settled@pulpo.club", plan="free")),
     ]
     recipients = subs.join_recipients(
-        contacts=contacts, clerk_users=users, allow_non_pro=True
+        contacts=contacts, clerk_users=users, free_only=True, now=now
     )
-    # With allow_non_pro=True (the --allow-all-subscribers flag), the
-    # recent-welcome recipient should still be in the queue.
-    assert len(recipients) == 1
-    assert recipients[0].email_hash == subs.email_hash("recent@pulpo.club")
+    queue = {r.email_hash for r in recipients}
+    assert subs.email_hash("fresh@pulpo.club") not in queue      # deferred
+    assert subs.email_hash("settled@pulpo.club") in queue        # sends
+
+
+def test_join_recipients_defers_anonymous_by_created_at():
+    """An anonymous (no Clerk) free subscriber is deferred on created_at
+    the same way — the free welcome already went out on signup."""
+    from datetime import datetime, timedelta, timezone
+    now = datetime(2026, 6, 1, 16, 0, 0, tzinfo=timezone.utc)
+    fresh = (now - timedelta(hours=5)).isoformat()
+    old = (now - timedelta(hours=300)).isoformat()
+    contacts = [
+        subs.ResendContact(id="c1", email="new@example.com", unsubscribed=False, created_at=fresh),
+        subs.ResendContact(id="c2", email="veteran@example.com", unsubscribed=False, created_at=old),
+    ]
+    recipients = subs.join_recipients(
+        contacts=contacts, clerk_users=[], free_only=True, now=now
+    )
+    queue = {r.email_hash for r in recipients}
+    assert subs.email_hash("new@example.com") not in queue       # deferred
+    assert subs.email_hash("veteran@example.com") in queue       # sends
+
+
+def test_join_recipients_sends_second_sunday_after_defer():
+    """The deferral is exactly one Sunday: a signup 5h before the first
+    Sunday is skipped there but included on the next Sunday (+168h)."""
+    from datetime import datetime, timedelta, timezone
+    signup = datetime(2026, 6, 1, 11, 0, 0, tzinfo=timezone.utc)  # 5h pre-send
+    first_sunday = datetime(2026, 6, 1, 16, 0, 0, tzinfo=timezone.utc)
+    second_sunday = first_sunday + timedelta(hours=168)
+    contacts = [
+        subs.ResendContact(id="c1", email="new@example.com",
+                           unsubscribed=False, created_at=signup.isoformat()),
+    ]
+    first = subs.join_recipients(contacts=contacts, clerk_users=[],
+                                 free_only=True, now=first_sunday)
+    second = subs.join_recipients(contacts=contacts, clerk_users=[],
+                                  free_only=True, now=second_sunday)
+    assert first == []                                            # skipped week 1
+    assert len(second) == 1                                       # sends week 2
+
+
+def test_allow_all_subscribers_bypasses_signup_skip():
+    """Operator launch broadcasts use --allow-all-subscribers to bypass
+    gates wholesale. The first-Sunday skip MUST be bypassed too — Pro
+    (welcome stamp) AND Free (created_at) alike."""
+    from datetime import datetime, timedelta, timezone
+    now = datetime(2026, 6, 1, 16, 0, 0, tzinfo=timezone.utc)
+    fresh = (now - timedelta(hours=2)).isoformat()
+    contacts = [
+        subs.ResendContact(id="c1", email="pro@pulpo.club", unsubscribed=False, created_at=fresh),
+        subs.ResendContact(id="c2", email="anon@example.com", unsubscribed=False, created_at=fresh),
+    ]
+    users = [
+        subs._parse_clerk_user(_clerk_user_with_welcome("pro@pulpo.club", welcome_sent_at=fresh)),
+    ]
+    recipients = subs.join_recipients(
+        contacts=contacts, clerk_users=users, allow_non_pro=True, now=now
+    )
+    queue = {r.email_hash for r in recipients}
+    # Both recent signups stay in the queue under the broadcast override.
+    assert subs.email_hash("pro@pulpo.club") in queue
+    assert subs.email_hash("anon@example.com") in queue

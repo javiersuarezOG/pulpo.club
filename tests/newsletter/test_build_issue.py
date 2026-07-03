@@ -54,7 +54,14 @@ def test_pro_with_prefs_uses_recipient_preference(pro_with_prefs, ranked_pool):
     assert issue.paywall_banner is False  # Pro tier never sees the banner
 
 
-def test_free_with_prefs_paywalls_after_pick_one(free_with_prefs, ranked_pool):
+def test_free_with_prefs_paywalls_after_top3(free_with_prefs, ranked_pool):
+    """Free cohort: the Top 3 (picks_top) are OPEN for every cohort,
+    Free included — they render "See on Pulpo". The paywall flag starts
+    at rank 04 (picks_shortlist), which the free-general template renders
+    as a full listing card behind a "Sign up to Pro" CTA. (Pre-2026-06-07
+    the gate started at rank 02; opening the Top 3 is the free-weekly
+    design — see automation/newsletter/templates/pulpo_free_general.py.)
+    """
     issue = build_issue(
         recipient=free_with_prefs,
         ranked_listings=ranked_pool,
@@ -63,10 +70,10 @@ def test_free_with_prefs_paywalls_after_pick_one(free_with_prefs, ranked_pool):
         history_rows=[],
     )
     assert issue.paywall_banner is True
-    # First top pick stays unlocked; everything else is paywalled
-    assert issue.picks_top[0].paywalled is False
-    if len(issue.picks_top) > 1:
-        assert issue.picks_top[1].paywalled is True
+    # All of the Top 3 are open now.
+    for p in issue.picks_top:
+        assert p.paywalled is False
+    # The paywall flag begins at rank 04.
     for p in issue.picks_shortlist:
         assert p.paywalled is True
 
@@ -206,6 +213,58 @@ def test_pulpo_urls_canonical_form():
     # Defensive — the separator must not be a colon. A colon would
     # silently route every CTA to home because the SPA's regex bans it.
     assert ":" not in see_url.split("/listing/", 1)[1].split("?", 1)[0]
+
+
+def test_absolute_photo_prefers_selected_photo_url():
+    """Continuity contract (PR #785): when the hero picker's winning URL
+    is present and the card is eligible, the email leads with it — not
+    raw photo_urls[0]."""
+    from automation.newsletter.build_issue import _absolute_photo
+    listing = {
+        "card_eligible": True,
+        "has_text_overlay": False,
+        "selected_photo_url": "https://cdn.example/winner.jpg",
+        "photo_urls": ["https://cdn.example/first.jpg", "https://cdn.example/winner.jpg"],
+    }
+    assert _absolute_photo(listing, "https://pulpo.club") == "https://cdn.example/winner.jpg"
+
+
+def test_absolute_photo_falls_back_to_first_url_without_selected():
+    """No selected_photo_url → original photo_urls[0] behaviour intact."""
+    from automation.newsletter.build_issue import _absolute_photo
+    listing = {
+        "card_eligible": True,
+        "has_text_overlay": False,
+        "photo_urls": ["https://cdn.example/first.jpg", "https://cdn.example/second.jpg"],
+    }
+    assert _absolute_photo(listing, "https://pulpo.club") == "https://cdn.example/first.jpg"
+
+
+def test_absolute_photo_eligibility_gate_outranks_selected_url():
+    """Regression guard: the card_eligible gate stays ABOVE the URL pick.
+    A non-eligible card returns '' even when selected_photo_url is set —
+    we never surface a broker-branded image in the newsletter."""
+    from automation.newsletter.build_issue import _absolute_photo
+    listing = {
+        "card_eligible": False,
+        "has_text_overlay": False,
+        "selected_photo_url": "https://cdn.example/winner.jpg",
+        "photo_urls": ["https://cdn.example/first.jpg"],
+    }
+    assert _absolute_photo(listing, "https://pulpo.club") == ""
+
+
+def test_absolute_photo_text_overlay_gate_outranks_selected_url():
+    """Regression guard: has_text_overlay rejection stays ABOVE the URL
+    pick even when selected_photo_url is set."""
+    from automation.newsletter.build_issue import _absolute_photo
+    listing = {
+        "card_eligible": True,
+        "has_text_overlay": True,
+        "selected_photo_url": "https://cdn.example/winner.jpg",
+        "photo_urls": ["https://cdn.example/first.jpg"],
+    }
+    assert _absolute_photo(listing, "https://pulpo.club") == ""
 
 
 def test_chips_warm_price_drop():

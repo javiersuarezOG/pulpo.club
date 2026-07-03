@@ -11,6 +11,8 @@ import os
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
 
+from pulpo.display_gates import is_card_displayable
+
 from . import commentary as commentary_mod
 from . import i18n
 from .favorites import build_ranked_index, compute_favorites
@@ -328,10 +330,13 @@ def _listing_has_eligible_photo(listing: dict) -> bool:
     that passes here will always produce a non-empty photo_url after
     being picked. Keeping the rules in one helper here prevents drift
     between the upstream filter and the downstream resolver.
+
+    The card_eligible + has_text_overlay verdict is the shared
+    display-gate contract (plan 003) — `is_card_displayable` is the
+    single source of truth, mirrored on the frontend and in the
+    featured pools.
     """
-    if listing.get("card_eligible") is not True:
-        return False
-    if listing.get("has_text_overlay") is True:
+    if not is_card_displayable(listing):
         return False
     urls = listing.get("photo_urls") or []
     has_url = bool(urls and isinstance(urls[0], str) and urls[0].startswith("http"))
@@ -356,12 +361,20 @@ def _absolute_photo(listing: dict, site_root: str) -> str:
     brand-logo placeholder.
 
     Belt-and-suspenders: also reject when `has_text_overlay == True`
-    (the pipeline's positive flag for branded watermarks).
+    (the pipeline's positive flag for branded watermarks). Both checks
+    are the shared display-gate contract (plan 003) via
+    `is_card_displayable` — the single source of truth.
     """
-    if listing.get("card_eligible") is not True:
+    if not is_card_displayable(listing):
         return ""
-    if listing.get("has_text_overlay") is True:
-        return ""
+    # Continuity contract (PR #785): prefer the hero picker's winning
+    # broker URL so the email leads with the same image the listing page
+    # shows first. Eligibility guards above still apply — the selected
+    # winner is only surfaced once the card has cleared card_eligible /
+    # has_text_overlay. Falls back to photo_urls[0] / hero_photo_path.
+    sel = listing.get("selected_photo_url")
+    if isinstance(sel, str) and sel.startswith("http"):
+        return sel
     urls = listing.get("photo_urls") or []
     if urls and isinstance(urls[0], str) and urls[0].startswith("http"):
         return urls[0]
@@ -868,18 +881,14 @@ def _to_pick(
     pulpo_url, save_url = _pulpo_urls(listing, issue_number=issue_number, site_root=site_root)
     chips = _chips_for_listing(listing, rank=rank, locale=locale)
     story_html, story_source = ("", "")
-    why_bullets: list[str] = []
     shortlist_frame_html = ""
+    # Why-bullets describe EVERY pick's opportunity — including the locked
+    # ranks 04-10 (Free cohort). Those cards render the full listing
+    # component as a tease (title, location, price, "Why we picked it")
+    # behind a single "Sign up to Pro" CTA, so the why-block must be
+    # populated regardless of paywall.
+    why_bullets = commentary_mod.deterministic_why_for_pick(listing, locale)
     if not paywalled:
-        # v4 (2026-05-30): the locked `_pick_card_html` component
-        # renders ALL 10 picks through the same Why-block — top 3 and
-        # picks 04-10 alike. Generating why_bullets only for heroes (the
-        # v3 split) left picks 04-10 with an EMPTY why-block in v4 — the
-        # cards looked dramatically less informative than the top 3 and
-        # broke the "all cards identical except background color"
-        # contract the redesign locked in. Fix: populate why_bullets for
-        # every non-paywalled pick.
-        why_bullets = commentary_mod.deterministic_why_for_pick(listing, locale)
         if is_hero:
             # `story_html` and `shortlist_frame_html` are dead code in
             # v4 (only the legacy `_rich_pick` / `_short_pick` renderers
@@ -1020,7 +1029,11 @@ def build_issue(
             listing,
             rank=i + 1,
             locale=locale,
-            paywalled=paywall_all and i > 0,
+            # Top 3 are open (See on Pulpo) for every cohort, Free included.
+            # The Free paywall starts at rank 04 (the "7 more" shortlist),
+            # which renders the full listing card behind a "Sign up to Pro"
+            # CTA.
+            paywalled=False,
             site_root=site_root,
             issue_number=issue_number,
             is_hero=True,                          # PR-NL-6 — generate story_html
@@ -1107,6 +1120,16 @@ def build_issue(
     UNSUBSCRIBE_SECRET_ENV = "PULPO_UNSUBSCRIBE_SECRET"
     _unsub_secret = os.environ.get(UNSUBSCRIBE_SECRET_ENV, "")
     _unsub_t = _unsub_token(recipient.email_hash, issue_number, _unsub_secret) if _unsub_secret else ""
+    # Base unsubscribe URL: r|i|t only. The `&e=<edition>&l=<locale>`
+    # cosmetic params that pick the free-vs-pro confirmation page are
+    # appended at RENDER time by `_footer_html`, NOT here — because the
+    # edition the reader should see must match the edition they were
+    # actually sent, which is the renderer's `free` flag (variant-driven),
+    # not `recipient.tier`. The two can diverge: a free-tier reader can be
+    # rendered into a Pro-variant template (paywall_all path), and `agency`
+    # tier is a paid edition that is NOT "free". Deriving the stamp from the
+    # same `free` flag that draws the masthead keeps page == email by
+    # construction. (e/l are outside the HMAC, which signs r|i only.)
     unsubscribe_url = (
         f"{site_root.rstrip('/')}/api/unsubscribe"
         f"?r={recipient.email_hash}&i={issue_number}&t={_unsub_t}"
@@ -1171,11 +1194,13 @@ def build_issue(
         issue_id=issue_id,
     )
 
-    # Weekly News Spotlight (v4.0) — LLM-curated regional news story.
-    # Cached per-issue across recipients via `_make_news_spotlight` so
-    # 1000 recipients in a single cron run share one LLM call. None →
-    # renderer falls back to the deterministic "What we're watching"
-    # copy; never fabricates a citation.
+    # Weekly News Spotlight — regional news story READ from the committed
+    # artifact (web/data/news_spotlight.json), refreshed nightly by
+    # scripts/refresh_news_spotlight.py. No live LLM call on the send path,
+    # so the Stripe-webhook welcome emails (Vercel, no DeepSeek key) get the
+    # same real, attributed article the weekly cron does. Cached per-issue
+    # across recipients via `_make_news_spotlight`. None only at cold start
+    # (artifact not yet seeded) → renderer omits the section.
     news_spotlight = _make_news_spotlight(
         locale=locale,
         issue_id=issue_id,
@@ -1205,43 +1230,37 @@ def build_issue(
     )
 
 
-# ── Weekly News Spotlight — LLM news pipeline ────────────────────────
+# ── Weekly News Spotlight — committed-artifact read ──────────────────
 
-# Per-process cache so a single cron run that builds N issues hits the
-# news fetch + LLM ONCE per (issue_id, locale). Cleared between processes
-# by being module-level state. Keyed on (issue_id, locale) so EN and ES
-# sends in the same run each get one call.
+# Per-process cache so a single cron run that builds N issues reads the
+# spotlight artifact ONCE per (issue_id, locale) instead of re-parsing the
+# JSON for every recipient. Module-level state, fresh per process. Keyed on
+# (issue_id, locale) so EN and ES sends in the same run each resolve once.
 _NEWS_SPOTLIGHT_CACHE: dict[tuple[str, str], object] = {}
 
 
 def _make_news_spotlight(*, locale: str, issue_id: str, issue_number: int):
-    """Fetch + LLM-pick the Weekly News Spotlight for this issue.
+    """Load the carried-forward Weekly News Spotlight for this issue.
 
-    Returns a `NewsSpotlight` (truthy) when the LLM picked an article,
-    `None` for: LLM toggle off, no DEEPSEEK_API_TOKEN, no candidates
-    surfaced this week, LLM picked `{"pick": null}` (slow week), or
-    any exception. Renderer handles None via deterministic fallback.
+    Reads the committed artifact (web/data/news_spotlight.json) via
+    `news_store.load_spotlight`. The artifact has a single writer —
+    scripts/refresh_news_spotlight.py in the nightly pipeline — so EVERY
+    Pro email, including the Stripe-webhook welcome / welcome-back emails
+    that run on Vercel without a DeepSeek key, renders the same real,
+    attributed article. No live RSS fetch or LLM call on the send path.
 
-    Cached per-process by (issue_id, locale) — a cron with N recipients
-    in the same locale fires the LLM exactly once.
+    Returns a `NewsSpotlight`, or `None` only at cold start (artifact not
+    yet seeded) — the renderer then omits the section rather than ship
+    source-less filler. Cached per (issue_id, locale).
     """
-    use_llm = os.environ.get(LLM_TOGGLE_ENV, "").strip() in ("1", "true", "yes")
-    if not use_llm:
-        return None
-    # Skip the RSS fetch + LLM call entirely when no DeepSeek key is
-    # available. Avoids burning 5×10s network timeouts in tests / dev
-    # environments that toggle USE_LLM on but don't have a token wired.
-    if not os.environ.get("DEEPSEEK_API_TOKEN", "").strip():
-        return None
-
     cache_key = (issue_id, locale)
     if cache_key in _NEWS_SPOTLIGHT_CACHE:
         return _NEWS_SPOTLIGHT_CACHE[cache_key]
 
     try:
-        from . import llm_news as llm_news_mod
-        spotlight = llm_news_mod.fetch_pick_and_summarize(locale=locale)
-    except Exception:  # noqa: BLE001
+        from . import news_store
+        spotlight = news_store.load_spotlight(locale)
+    except Exception:  # noqa: BLE001 — a bad artifact must omit the section, never crash a send
         spotlight = None
 
     _NEWS_SPOTLIGHT_CACHE[cache_key] = spotlight
@@ -1249,7 +1268,7 @@ def _make_news_spotlight(*, locale: str, issue_id: str, issue_number: int):
         "issue_id": issue_id,
         "issue_number": issue_number,
         "locale": locale,
-        "source": "llm" if spotlight else "fallback",
+        "source": "artifact" if spotlight else "missing",
         "outlet": getattr(spotlight, "source_name", None),
         "article_url": getattr(spotlight, "source_url", None),
         "candidates_seen": getattr(spotlight, "candidates_seen", 0),

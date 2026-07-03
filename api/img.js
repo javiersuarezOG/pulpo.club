@@ -61,6 +61,17 @@ function acceptsWebp(req) {
   return /image\/webp/i.test(String(accept));
 }
 
+// Short negative cache for every error return (400 / 404 / 500). Vercel
+// previews can race the photo commit, so a momentarily-missing src would
+// otherwise re-invoke this serverless function on every render — a retry
+// storm. 60s browser / 300s edge is long enough to break the storm,
+// short enough that a propagating preview photo appears within minutes.
+// The success path keeps its 1y-immutable header (set inline below).
+function errJson(res, status, body) {
+  res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300");
+  return res.status(status).json(body);
+}
+
 module.exports = async (req, res) => {
   const src = (req.query.src || "").toString();
   const wRaw = (req.query.w || "").toString();
@@ -68,23 +79,23 @@ module.exports = async (req, res) => {
   const width = Number.parseInt(wRaw, 10);
 
   if (!src || !/^[a-z0-9_.-]+$/i.test(src)) {
-    return res.status(400).json({ error: "bad_src" });
+    return errJson(res, 400, { error: "bad_src" });
   }
   if (!ALLOWED_WIDTHS.has(width)) {
-    return res.status(400).json({
+    return errJson(res, 400, {
       error: "bad_width",
       detail: `w must be one of ${[...ALLOWED_WIDTHS].join(", ")}`,
     });
   }
   if (!PHOTO_ROOTS.includes(root)) {
-    return res.status(400).json({ error: "bad_root" });
+    return errJson(res, 400, { error: "bad_root" });
   }
 
   const base = cdnBaseUrl();
   const url = `${base}/${root}/${src}`;
   const buf = await fetchAsset(url);
   if (!buf) {
-    return res.status(404).json({ error: "not_found", detail: `no asset at ${root}/${src}` });
+    return errJson(res, 404, { error: "not_found", detail: `no asset at ${root}/${src}` });
   }
 
   const wantWebp = acceptsWebp(req);
@@ -114,6 +125,6 @@ module.exports = async (req, res) => {
     res.setHeader("X-Pulpo-Image-Format", wantWebp ? "webp" : "jpeg");
     return res.status(200).send(out);
   } catch (err) {
-    return res.status(500).json({ error: "resize_failed", detail: String(err && err.message) });
+    return errJson(res, 500, { error: "resize_failed", detail: String(err && err.message) });
   }
 };

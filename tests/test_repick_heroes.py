@@ -156,6 +156,8 @@ def test_execute_writes_hero_and_mutates_ranked(fake_ranked: Path, tmp_path: Pat
     remax_abc = next(li for li in data if li["source_id"] == "abc123")
     assert remax_abc["hero_photo_path"] == "/photos/remax_abc123.jpg"
     assert remax_abc["hero_photo_quality_score"] is not None
+    # P2 — repick persists the winning URL so the FE can reorder the gallery.
+    assert remax_abc["selected_photo_url"] == hero_meta["winning_url"]
 
     # Summary log written.
     lines = summary.read_text().strip().splitlines()
@@ -254,3 +256,83 @@ def test_missing_input(tmp_path: Path, capsys):
     assert rc == 1
     err = capsys.readouterr().err
     assert "not found" in err
+
+
+# ── Per-photo verdicts (plan 004) ─────────────────────────────────────────
+# _repick_one_listing must persist `photo_urls_rejected` = every SCORED
+# candidate the picker rejected (picker_excluded or text overlay), never
+# the winner, None when nothing is rejected.
+
+def _scored(url, *, excluded=False, text=None, score=80, content=None):
+    return {
+        "url": url,
+        "content": content if content is not None else _png_bytes(1920, 1080),
+        "score": score,
+        "has_text_overlay": text,
+        "hero_eligible": True,
+        "cheap_score": score,
+        "picker_excluded": excluded,
+    }
+
+
+def _patch_pick(monkeypatch, candidates, winning_url):
+    """Patch the picker pipeline inside repick_heroes so _repick_one_listing
+    works on a controlled candidate set and a chosen winner — no network."""
+    from automation import repick_heroes
+    winning = next(c for c in candidates if c["url"] == winning_url)
+    monkeypatch.setattr(repick_heroes, "_score_candidates_cheap",
+                        lambda *a, **k: candidates)
+    monkeypatch.setattr(repick_heroes, "_apply_aesthetic_to_eligible",
+                        lambda *a, **k: None)
+    monkeypatch.setattr(
+        repick_heroes, "_pick_winner_from_scored",
+        lambda *a, **k: (winning["url"], winning["content"], 80, False, False),
+    )
+
+
+def test_repick_persists_rejected_candidates(tmp_path: Path, monkeypatch):
+    photos_dir = tmp_path / "web" / "photos"
+    photos_dir.mkdir(parents=True, exist_ok=True)
+    cands = [
+        _scored("https://x/a.jpg"),                       # winner
+        _scored("https://x/b.jpg", excluded=True),        # rejected: floor
+        _scored("https://x/c.jpg", text=True),            # rejected: text overlay
+    ]
+    _patch_pick(monkeypatch, cands, "https://x/a.jpg")
+    listing = _stub_listing("remax", "abc123",
+                            ["https://x/a.jpg", "https://x/b.jpg", "https://x/c.jpg"])
+    from automation.repick_heroes import _repick_one_listing
+    _repick_one_listing(listing, photos_dir=photos_dir, booster_only_cached=False)
+
+    rejected = listing["photo_urls_rejected"]
+    assert set(rejected) == {"https://x/b.jpg", "https://x/c.jpg"}
+    # Winner is never in the rejected set.
+    assert "https://x/a.jpg" not in rejected
+
+
+def test_repick_no_rejects_yields_none(tmp_path: Path, monkeypatch):
+    photos_dir = tmp_path / "web" / "photos"
+    photos_dir.mkdir(parents=True, exist_ok=True)
+    cands = [
+        _scored("https://x/a.jpg"),
+        _scored("https://x/b.jpg"),  # also clean
+    ]
+    _patch_pick(monkeypatch, cands, "https://x/a.jpg")
+    listing = _stub_listing("remax", "clean1",
+                            ["https://x/a.jpg", "https://x/b.jpg"])
+    from automation.repick_heroes import _repick_one_listing
+    _repick_one_listing(listing, photos_dir=photos_dir, booster_only_cached=False)
+    # No rejects → field is None (not an empty list).
+    assert listing["photo_urls_rejected"] is None
+
+
+def test_repick_no_photos_leaves_field_unset(tmp_path: Path, monkeypatch):
+    photos_dir = tmp_path / "web" / "photos"
+    photos_dir.mkdir(parents=True, exist_ok=True)
+    listing = _stub_listing("remax", "nophotos", [])
+    from automation.repick_heroes import _repick_one_listing
+    result = _repick_one_listing(listing, photos_dir=photos_dir,
+                                 booster_only_cached=False)
+    assert result["action"] == "no_photo_urls"
+    # No candidates scored → no verdict written.
+    assert "photo_urls_rejected" not in listing

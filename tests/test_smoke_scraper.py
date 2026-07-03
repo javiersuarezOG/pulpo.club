@@ -85,10 +85,54 @@ def test_smoke_one_result_shape_is_stable():
     """The JSON output (--json flag) is consumed by humans + future
     dashboards. Lock the shape so a refactor doesn't break it."""
     result = smoke_scraper.smoke_one("nexo", limit=1, offline=True)
-    required_keys = {"slug", "ok", "duration_s", "raw_count", "error", "sample"}
+    required_keys = {
+        "slug", "ok", "duration_s", "raw_count", "lifecycle", "error", "sample"
+    }
     assert required_keys <= set(result.keys()), (
         f"missing keys: {required_keys - set(result.keys())}"
     )
+
+
+def test_active_source_zero_count_is_failure(monkeypatch):
+    """Active source + zero listings must be red in smoke output."""
+    import types
+
+    mod = types.SimpleNamespace(crawl=lambda limit, offline: [])
+    monkeypatch.setitem(sys.modules, "pulpo.scrapers.fakeactive", mod)
+    monkeypatch.setattr(smoke_scraper, "source_lifecycle", lambda slug: "active")
+
+    result = smoke_scraper.smoke_one("fakeactive", limit=5, offline=False)
+    assert result["ok"] is False
+    assert "zero listings" in result["error"]
+
+
+def test_experimental_source_zero_count_is_allowed(monkeypatch):
+    """Experimental WAF/discovery sources can be empty without blocking smoke."""
+    import types
+
+    mod = types.SimpleNamespace(crawl=lambda limit, offline: [])
+    monkeypatch.setitem(sys.modules, "pulpo.scrapers.fakeexperimental", mod)
+    monkeypatch.setattr(smoke_scraper, "source_lifecycle", lambda slug: "experimental")
+
+    result = smoke_scraper.smoke_one("fakeexperimental", limit=5, offline=False)
+    assert result["ok"] is True
+    assert result["raw_count"] == 0
+
+
+def test_allow_empty_overrides_active_zero_count(monkeypatch):
+    import types
+
+    mod = types.SimpleNamespace(crawl=lambda limit, offline: [])
+    monkeypatch.setitem(sys.modules, "pulpo.scrapers.fakeempty", mod)
+    monkeypatch.setattr(smoke_scraper, "source_lifecycle", lambda slug: "active")
+
+    result = smoke_scraper.smoke_one(
+        "fakeempty",
+        limit=5,
+        offline=False,
+        allow_empty=True,
+    )
+    assert result["ok"] is True
 
 
 # ---------- print_report doesn't crash on edge cases ----------

@@ -147,10 +147,44 @@ function buildPhotos(raw: any): string[] {
   // upscaled thumb right next to the same image at broker-native
   // resolution — the visible "low+high quality dupe."
   const urls = Array.isArray(raw.photo_urls) ? raw.photo_urls : [];
+  // Per-photo picker verdicts (plan 004): broker URLs the hero picker
+  // downloaded, scored, and rejected (below the cheap-score floor or a
+  // text overlay). Skip them so a rejected flyer/logo/thumbnail never
+  // renders as photo 2..N. Absence (pre-field record) → null → no-op,
+  // identical to today's order. Producer: automation/run.py +
+  // automation/repick_heroes.py (`photo_urls_rejected`).
+  const rejected =
+    Array.isArray(raw.photo_urls_rejected)
+      ? new Set(raw.photo_urls_rejected.filter((u: any) => typeof u === "string"))
+      : null;
   const out: string[] = [];
   for (const u of urls) {
     if (typeof u !== "string") continue;
+    if (rejected && rejected.has(u)) continue;
     if (out.length === 0 || u !== out[out.length - 1]) out.push(u);
+  }
+  // P2 — surface the hero picker's SELECTED image first so the detail
+  // gallery's primary photo matches the card thumbnail (which paints the
+  // same winning image via thumbnail_url). The picker writes the chosen
+  // broker URL to `selected_photo_url` (ranked.json); reorder so it's
+  // photos[0]. Null-safe no-op when absent (pre-P2 records) or not found
+  // among photo_urls — older records keep today's order and still render.
+  const selected =
+    typeof raw.selected_photo_url === "string" && raw.selected_photo_url.length > 0
+      ? raw.selected_photo_url
+      : null;
+  // Survival guard: the picker APPROVED selected_photo_url by definition,
+  // so it must never be filtered out — even if it was (incorrectly) also
+  // listed as rejected, or if rejection emptied the gallery entirely. Keep
+  // it as photos[0] so the detail page always has at least the hero shot.
+  if (selected) {
+    const idx = out.indexOf(selected);
+    if (idx > 0) {
+      out.splice(idx, 1);
+      out.unshift(selected);
+    } else if (idx < 0 && urls.includes(selected)) {
+      out.unshift(selected);
+    }
   }
   return out;
 }
@@ -315,12 +349,32 @@ export function adaptListing(raw: any): Listing {
     dist_airport_km: typeof raw.dist_airport_km === "number" ? raw.dist_airport_km : null,
     dist_nearest_town_km:
       typeof raw.dist_nearest_town_km === "number" ? raw.dist_nearest_town_km : null,
-    has_lat_lng: typeof raw.lat === "number" && typeof raw.lng === "number",
+    has_lat_lng: Number.isFinite(raw.lat) && Number.isFinite(raw.lng),
+    // PR-5/WS4 — pass the raw coordinates through for the map view.
+    // Clamp non-numbers to null so map read-sites can guard with hasCoords().
+    lat: Number.isFinite(raw.lat) ? raw.lat : null,
+    lng: Number.isFinite(raw.lng) ? raw.lng : null,
     geocoding_confidence:
       raw.geocoding_confidence === "high" ||
       raw.geocoding_confidence === "medium" ||
       raw.geocoding_confidence === "low"
         ? raw.geocoding_confidence
+        : null,
+    geocoding_source:
+      raw.geocoding_source === "extracted" ||
+      raw.geocoding_source === "estimated" ||
+      raw.geocoding_source === "nominatim"
+        ? raw.geocoding_source
+        : null,
+    geocoding_reference:
+      typeof raw.geocoding_reference === "string" && raw.geocoding_reference.trim().length > 0
+        ? raw.geocoding_reference
+        : null,
+    existence_status:
+      raw.existence_status === "confirmed_current" ||
+      raw.existence_status === "missing_recently" ||
+      raw.existence_status === "stale"
+        ? raw.existence_status
         : null,
     is_sold: Boolean(raw.is_sold),
     original_url: sourceType === "on_market" && typeof raw.url === "string" ? raw.url : null,
@@ -331,6 +385,18 @@ export function adaptListing(raw: any): Listing {
     momentum_score: typeof raw.momentum_score === "number" ? raw.momentum_score : null,
     property_type: typeof raw.property_type === "string" ? raw.property_type : null,
     bedrooms: typeof raw.bedrooms === "number" ? raw.bedrooms : null,
+    // Built-property facts (plan 010) — same graceful-null guard style
+    // as bedrooms above. ranked.json carries these sparsely today;
+    // plan 009/011 raise coverage and the tiles light up as data lands.
+    bathrooms: typeof raw.bathrooms === "number" ? raw.bathrooms : null,
+    built_area_m2: typeof raw.built_area_m2 === "number" ? raw.built_area_m2 : null,
+    year_built: typeof raw.year_built === "number" ? raw.year_built : null,
+    year_renovated: typeof raw.year_renovated === "number" ? raw.year_renovated : null,
+    parking_spaces: typeof raw.parking_spaces === "number" ? raw.parking_spaces : null,
+    floor: typeof raw.floor === "number" ? raw.floor : null,
+    hoa_fee_usd_monthly: typeof raw.hoa_fee_usd_monthly === "number" ? raw.hoa_fee_usd_monthly : null,
+    furnished: typeof raw.furnished === "boolean" ? raw.furnished : null,
+    has_pool: typeof raw.has_pool === "boolean" ? raw.has_pool : null,
     // IA-axis fields. During the rollout window, ranked.json may not
     // yet carry them — graceful nulls keep the legacy homepage code
     // working unchanged while the backend catches up.

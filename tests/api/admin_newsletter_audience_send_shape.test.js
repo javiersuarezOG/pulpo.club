@@ -23,9 +23,21 @@ const COUNT_HANDLER = path.resolve(
 const SEND_HANDLER = path.resolve(
   __dirname, "../../api/admin/newsletter/trigger-audience-send.js",
 );
+const PREVIEW_HANDLER = path.resolve(
+  __dirname, "../../api/admin/newsletter/trigger-preview.js",
+);
+const WELCOME_TEST_HANDLER = path.resolve(
+  __dirname, "../../api/admin/newsletter/trigger-welcome-test.js",
+);
+const FREE_WELCOME_TEST_HANDLER = path.resolve(
+  __dirname, "../../api/admin/newsletter/trigger-free-welcome-test.js",
+);
 
 const countSrc = fs.readFileSync(COUNT_HANDLER, "utf8");
 const sendSrc = fs.readFileSync(SEND_HANDLER, "utf8");
+const previewSrc = fs.readFileSync(PREVIEW_HANDLER, "utf8");
+const welcomeTestSrc = fs.readFileSync(WELCOME_TEST_HANDLER, "utf8");
+const freeWelcomeTestSrc = fs.readFileSync(FREE_WELCOME_TEST_HANDLER, "utf8");
 
 describe("api/admin/newsletter/audience-count", () => {
   it("is GET-only", () => {
@@ -125,5 +137,40 @@ describe("api/admin/newsletter/trigger-audience-send", () => {
     // Three failure exits all hit emitAuditEvent before returning
     const auditCalls = (sendSrc.match(/await emitAuditEvent\(/g) || []).length;
     expect(auditCalls).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe("api/admin/newsletter write endpoints auth", () => {
+  it("single-recipient test endpoints stay open — no requireAdminAuth gate", () => {
+    // Operator decision 2026-06-10: the PULPO_ADMIN_DEBUG_TOKEN gate was
+    // removed from /admin. That decision still holds for the low-blast
+    // single-recipient surfaces (preview + the two test-send triggers):
+    // they email one operator-chosen address, so the open posture is an
+    // accepted, bounded risk. This test pins that so a future
+    // re-introduction of the gate on these is a deliberate, visible change.
+    for (const src of [previewSrc, welcomeTestSrc, freeWelcomeTestSrc]) {
+      expect(src).not.toMatch(/requireAdminAuth/);
+    }
+  });
+
+  it("the full-audience blast IS bearer-gated (deliberate carve-out from open admin)", () => {
+    // Operator decision (audit 2026-06-11): trigger-audience-send fires a
+    // LIVE blast to the ENTIRE Pro audience. The public SEND string + per-IP
+    // (cold-start-resettable) rate-limit are not sufficient for an unbounded
+    // consent/reputation surface, so this one endpoint is re-gated with
+    // requireAdminAuth while the single-recipient triggers stay open.
+    expect(sendSrc).toMatch(/requireAdminAuth/);
+  });
+
+  it("the high-blast audience send keeps its type-to-confirm SEND gate", () => {
+    // Removing auth does NOT remove the guardrail on the one path that
+    // emails every Pro subscriber — the literal "SEND" confirm must stay.
+    expect(sendSrc).toMatch(/SEND/);
+  });
+
+  it("free welcome tests use the dedicated synchronous endpoint, not the weekly preview workflow", () => {
+    expect(freeWelcomeTestSrc).toMatch(/INTERNAL_PATH\s*=\s*"\/api\/internal\/free-welcome-send"/);
+    expect(freeWelcomeTestSrc).toMatch(/variant === "free_welcome_back"/);
+    expect(freeWelcomeTestSrc).toMatch(/is_new_contact:\s*true/);
   });
 });

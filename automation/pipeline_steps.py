@@ -22,22 +22,30 @@ from pulpo.cli import _row, CSV_FIELDS
 from automation.validation import validate as _validate
 from automation.field_audit import build_completeness_block
 from automation._atomic import atomic_write_json
+from automation.country_sidecars import country_path
 from pulpo.countries import active as _active_country, data_filename as _data_filename
 
 
 # ── Phase: normalize ──────────────────────────────────────────────────
 
-def phase_normalize(raw: list[dict]) -> tuple[list, int]:
+def phase_normalize(
+    raw: list[dict], *, seen_keys: Optional[frozenset] = None,
+) -> tuple[list, int]:
     """Convert raw scraper dicts → Listing objects. Returns (listings, dropped_count).
 
     Dropped count is the number of raw records that normalize() rejected
     (returned None) — typically because both price and area were missing,
     or the listing failed property-type filters.
+
+    ``seen_keys`` (plan 012): ledger keys (``source|source_id``) tracked
+    before this run — threads into normalize()'s transition-aware sold
+    rule (previously-seen listing turning sold is kept + flagged instead
+    of dropped). ``None`` preserves the legacy drop-all-sold behavior.
     """
     listings: list = []
     dropped = 0
     for r in raw:
-        li = _normalize(r, source=r.get("source") or "unknown")
+        li = _normalize(r, source=r.get("source") or "unknown", seen_keys=seen_keys)
         if li:
             listings.append(li)
         else:
@@ -93,12 +101,18 @@ def phase_validate(
             bucket["pass"] += 1
             kept.append(li)
 
-    # Write validation log
+    # Write validation log. Keep the legacy filename for current readers
+    # and a country-scoped sibling so PA/SV shards do not overwrite each
+    # other's operator diagnostics.
     web_data_dir.mkdir(parents=True, exist_ok=True)
     val_log_path = web_data_dir / "validation_log.jsonl"
-    with val_log_path.open("w", encoding="utf-8") as f:
-        for entry in val_log_entries:
-            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    val_lines = "".join(
+        json.dumps(entry, ensure_ascii=False) + "\n"
+        for entry in val_log_entries
+    )
+    for path in {val_log_path, country_path(val_log_path)}:
+        with path.open("w", encoding="utf-8") as f:
+            f.write(val_lines)
 
     # Legacy price-outlier log stub (kept so the commit step's git add
     # doesn't fail — file existed before validation_log.jsonl took over).
@@ -234,6 +248,14 @@ _RANKED_LIST_FIELDS: frozenset[str] = frozenset({
     "zone", "department", "country",
     # Land type / property
     "land_type", "property_type", "bedrooms",
+    # Built-property facts (plan 010) — the FE adapter
+    # (web/app/data/listings.ts) now reads these for the detail-page
+    # Key Facts tiles on houses/condos. Sparse coverage today; plans
+    # 009/011 raise it. All-null per record costs ~nothing in the slim
+    # file (nulls are dropped only if absent from the source dict).
+    "bathrooms", "built_area_m2", "year_built", "year_renovated",
+    "parking_spaces", "floor", "hoa_fee_usd_monthly",
+    "furnished", "has_pool",
     # Price + size
     "area_m2", "price_usd", "previous_price", "price_per_m2",
     # Zone-relative price context (powers the detail-page PriceContextBlock).
@@ -263,7 +285,7 @@ _RANKED_LIST_FIELDS: frozenset[str] = frozenset({
     "dist_beach_km", "dist_airport_km", "dist_nearest_town_km",
     "lat", "lng", "geocoding_confidence",
     # State
-    "is_sold",
+    "is_sold", "sold_detected_at",
     # Ranking
     "rank", "rank_score",
     "value_score", "location_score", "momentum_score",

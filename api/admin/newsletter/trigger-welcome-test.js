@@ -25,9 +25,12 @@
 //   reason: string | null, message_id: string | null,
 //   dry_run: bool, variant, locale }
 //
-// Auth to the internal endpoint: Bearer PULPO_INTERNAL_TOKEN (shared with
-// the Stripe webhook). When it's unset we return status:"error" — never a
-// false "sent".
+// Auth: none on the admin wrapper — the /admin surface is intentionally
+// open (operator decision 2026-06-10 — the PULPO_ADMIN_DEBUG_TOKEN gate
+// was removed); the rate-limit is the only throttle. Auth to the
+// internal endpoint still uses Bearer PULPO_INTERNAL_TOKEN (shared with
+// the Stripe webhook). When it's unset we return status:"error" — never
+// a false "sent".
 
 const { makeRateLimiter, send429, ipFromRequest } = require("../../_rate_limit");
 const posthog = require("../../_posthog");
@@ -126,6 +129,7 @@ async function handler(req, res, { fetchImpl } = {}) {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "method_not_allowed" });
   }
+  // No auth gate — admin surface is open by design (see header).
 
   const rl = limiter.hit(ipFromRequest(req));
   if (!rl.allowed) {

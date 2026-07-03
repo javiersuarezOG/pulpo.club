@@ -113,12 +113,32 @@ export type Listing = {
   dist_airport_km: number | null;
   dist_nearest_town_km: number | null;
   has_lat_lng: boolean;
+  /** Raw geocoded coordinates (PR-5/WS4). Exposed for the /browse map
+   *  view. ~99.5% populated, but ~97% are 'estimated' (zone-level) — see
+   *  geocoding_confidence / geocoding_source before trusting precision.
+   *  null when the listing has no coordinates (~0.5%); guard every read
+   *  with hasCoords() (web/app/components.jsx). */
+  lat: number | null;
+  lng: number | null;
   /** DeepSeek's self-reported confidence on the lat/lng. 'high' = within
    *  ~2km, 'medium' = within municipality, 'low' = department-level guess.
    *  null when DeepSeek didn't run OR the listing has no lat/lng (in which
    *  case any populated dist_*_km comes from a zone-table fallback and is
    *  itself approximate). The FE uses this to soften distance displays. */
   geocoding_confidence: "high" | "medium" | "low" | null;
+  /** How the lat/lng was obtained. 'extracted' = parsed from the broker's
+   *  own structured payload (precise). 'estimated' = DeepSeek inferred
+   *  from zone/landmark cues (approximate). 'nominatim' = OSM fallback
+   *  geocoder (approximate). null when no geocoding ran at all. Drives
+   *  the location-precision note rendered next to the zone label on the
+   *  detail page — see web/app/lib/location-precision.ts. */
+  geocoding_source: "extracted" | "estimated" | "nominatim" | null;
+  /** Human-readable description of what the geocoder anchored on
+   *  (e.g. "Near Playa El Tunco, Tamanique, La Libertad, El Salvador").
+   *  Surfaced under the approximate-location note so users see WHICH
+   *  area the broker actually published. null when no geocoding ran. */
+  geocoding_reference: string | null;
+  existence_status: "confirmed_current" | "missing_recently" | "stale" | null;
   is_sold: boolean;
   original_url: string | null;
   // Position-rank from pulpo/ranker.py (1 = best opportunity). Distinct
@@ -132,6 +152,20 @@ export type Listing = {
   momentum_score: number | null;
   property_type: string | null;
   bedrooms: number | null;
+  // Built-property facts for the detail page Key Facts grid (plan 010).
+  // Coverage is sparse today (bathrooms ~107/308 built listings,
+  // year_built 3) — plan 009 ships year_renovated/furnished/has_pool
+  // and plan 011's backfill raises coverage. Tiles are presence-gated,
+  // so null simply means "no tile". bathrooms can be fractional (3.5).
+  bathrooms: number | null;
+  built_area_m2: number | null;
+  year_built: number | null;
+  year_renovated: number | null;
+  parking_spaces: number | null;
+  floor: number | null;
+  hoa_fee_usd_monthly: number | null;
+  furnished: boolean | null;
+  has_pool: boolean | null;
   // IA-axis derives (populated by pulpo.derived_rules.apply_ia_derives).
   // master_category/subcategory are null for interior land, raw, or
   // property_type that doesn't map to the homes/condos/land trichotomy.

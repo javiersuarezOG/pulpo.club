@@ -8,6 +8,7 @@
   "currency": "USD",
   "centroid_lat": 13.7942,
   "centroid_lng": -88.8965,
+  "bbox": { "lat": [13.0, 14.6], "lng": [-90.6, -87.6] },
   "traditional_units": ["manzanas", "varas"],
   "known_zones": [
     { "name": "El Tunco",           "region": "La Libertad" },

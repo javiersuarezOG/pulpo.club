@@ -19,6 +19,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Callable
 
+from pulpo.countries import active as _active_country
+
 
 # ── dict / dataclass helpers (pattern shared with price_history.py) ────
 
@@ -67,9 +69,9 @@ def _present_latlong(li: Any) -> bool:
 # Fail-closed: any False here → the entire enrichment for this listing
 # is rejected. Partial saves are forbidden.
 
-# El Salvador bounding box — same constants as automation/geocoding.py
-# (kept duplicated rather than imported to avoid coupling the schema
-# module to the legacy Mapbox path).
+# Default SV bounding box. The live validator reads the active country
+# manifest; these constants remain as compatibility pins for tests and
+# callers that imported them directly.
 _SV_BBOX_LAT = (13.0, 14.6)
 _SV_BBOX_LNG = (-90.6, -87.6)
 _VALID_CONFIDENCES = {"high", "medium", "low"}
@@ -101,8 +103,13 @@ def _valid_title(v: Any) -> bool:
 
 
 def _valid_description(v: Any) -> bool:
-    """Bilingual description — each language ≤ 2000 chars (prompt asks for ≤150 words)."""
-    return _valid_localized(v, 2000)
+    """Bilingual description — each language ≤ 700 chars (prompt asks for ≤60 words).
+
+    60 words ≈ 400–480 chars; 700 leaves headroom so a slightly long ES
+    rendering doesn't burn the API call (the fail-closed gate in
+    _enrich_one discards the whole response on validation failure).
+    """
+    return _valid_localized(v, 700)
 
 
 def _valid_usps(v: Any) -> bool:
@@ -122,7 +129,7 @@ def _valid_url_language(v: Any) -> bool:
 
 
 def _valid_latlong(v: Any) -> bool:
-    """Dict with lat (number, in SV bbox), lng (number, in SV bbox),
+    """Dict with lat/lng inside the active country's bbox,
     source ∈ {extracted, estimated}, confidence ∈ {high, medium, low},
     reference (string, may be empty)."""
     if not isinstance(v, dict):
@@ -132,9 +139,12 @@ def _valid_latlong(v: Any) -> bool:
         return False
     if not (isinstance(lng, (int, float)) and not isinstance(lng, bool)):
         return False
-    if not (_SV_BBOX_LAT[0] <= float(lat) <= _SV_BBOX_LAT[1]):
+    bbox = _active_country().bbox()
+    lat_bbox = bbox["lat"]
+    lng_bbox = bbox["lng"]
+    if not (lat_bbox[0] <= float(lat) <= lat_bbox[1]):
         return False
-    if not (_SV_BBOX_LNG[0] <= float(lng) <= _SV_BBOX_LNG[1]):
+    if not (lng_bbox[0] <= float(lng) <= lng_bbox[1]):
         return False
     if v.get("source") not in _VALID_LATLONG_SOURCES:
         return False
@@ -176,6 +186,67 @@ def _apply_url_language(li: Any, v: Any) -> None:
 
 def _present_url_language(li: Any) -> bool:
     return _g(li, "url_language") in _VALID_URL_LANGUAGES
+
+
+# ── extracted_facts (plan 009) ─────────────────────────────────────────
+# Structured house/condo facts the LLM reads out of the source text in
+# the SAME enrichment call (~zero marginal tokens). Merge is only-fill-
+# nulls: a scraper-parsed value always wins over the LLM's extraction.
+# Consumers: the listing attrs below (shipped via the _RANKED_LIST_FIELDS
+# allowlist in automation/pipeline_steps.py) → the detail-page Key Facts
+# tiles (web/app/pages.jsx, plan 010); the raw dict is also persisted to
+# the web/data/llm_enrichment.json sidecar for rebuild + audit.
+
+_FACT_KEYS: frozenset[str] = frozenset({
+    "year_built", "year_renovated", "bedrooms", "bathrooms",
+    "built_area_m2", "parking_spaces", "furnished", "has_pool",
+})
+
+
+def _fact_in_bounds(key: str, v: Any) -> bool:
+    """Anti-hallucination bounds. A value outside its bound invalidates
+    ONLY that key (coerced to None at apply time), never the whole
+    response — rejecting the response would re-spend the API call over
+    one bad number."""
+    if v is None:
+        return True
+    if key in ("furnished", "has_pool"):
+        return isinstance(v, bool)
+    if isinstance(v, bool):
+        return False   # bool is an int subclass; never valid for numerics
+    if key in ("year_built", "year_renovated"):
+        return isinstance(v, int) and 1900 <= v <= 2100
+    if key == "bedrooms":
+        return isinstance(v, int) and 0 <= v <= 20
+    if key == "parking_spaces":
+        return isinstance(v, int) and 0 <= v <= 50
+    if key == "bathrooms":
+        return isinstance(v, (int, float)) and 0 <= v <= 20
+    if key == "built_area_m2":
+        return isinstance(v, (int, float)) and 10 <= v <= 5000
+    return False
+
+
+def _present_extracted_facts(li: Any) -> bool:
+    return isinstance(_g(li, "extracted_facts"), dict)
+
+
+def _valid_extracted_facts(v: Any) -> bool:
+    """Accept a dict whose keys ⊆ _FACT_KEYS. Out-of-bounds VALUES are
+    allowed here (sanitized at apply) — validity is about shape. Missing
+    keys are tolerated as null; an empty dict is valid (this is what old
+    pre-plan-009 sidecar entries hydrate with — see _hydrate_from_sidecar)."""
+    return isinstance(v, dict) and set(v.keys()) <= _FACT_KEYS
+
+
+def _apply_extracted_facts(li: Any, v: Any) -> None:
+    """Sanitize + only-fill-nulls merge: scraper value always wins."""
+    clean = {k: (val if _fact_in_bounds(k, val) else None)
+             for k, val in (v or {}).items() if k in _FACT_KEYS}
+    _set(li, "extracted_facts", clean)   # raw store: sidecar rebuild + audit
+    for k, val in clean.items():
+        if val is not None and _g(li, k) is None:
+            _set(li, k, val)
 
 
 def _apply_latlong(li: Any, v: Any) -> None:
@@ -227,11 +298,10 @@ class EnrichmentSchema:
     temperature: float = 0.3
     base_url:    str = "https://api.deepseek.com"
     api_key_env: str = "DEEPSEEK_API_TOKEN"
-    # Schema version 3: bilingual {en, es} dicts on title/description/usps
-    # + url_language. Bumped from 1 (post-#149 monolingual revert) so any
-    # on-disk sidecar entries written under v1 fail re-validation in
-    # _hydrate_from_sidecar and trigger a fresh DeepSeek call.
-    schema_version: int = 3
+    # Schema version 4: prompt v4 — short factual descriptions (≤700 chars),
+    # fact-anchored usps. (v3 was bilingual {en, es} dicts on title/
+    # description/usps + url_language; v1 the post-#149 monolingual revert.)
+    schema_version: int = 4
 
 
 DEFAULT_SCHEMA = EnrichmentSchema(
@@ -259,6 +329,19 @@ DEFAULT_SCHEMA = EnrichmentSchema(
             validate     = _valid_usps,
             apply        = _apply_usps,
             skip_reason  = "already_has_reasons_to_buy",
+        ),
+        # extracted_facts (plan 009): structured house/condo facts read
+        # from the source text. NOT part of eligibility-by-presence in
+        # practice — it sits after title/description/usps, and any listing
+        # carrying it also carries those. The merge in
+        # _apply_extracted_facts only fills nulls (scraper wins).
+        EnrichmentField(
+            json_key     = "extracted_facts",
+            target_attrs = ("extracted_facts",),
+            is_present   = _present_extracted_facts,
+            validate     = _valid_extracted_facts,
+            apply        = _apply_extracted_facts,
+            skip_reason  = "already_has_extracted_facts",
         ),
         EnrichmentField(
             json_key     = "latlong",

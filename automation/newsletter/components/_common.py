@@ -49,13 +49,31 @@ from ..types import Issue
 #   v4.0 (2026-05-30) — locked card component · section intros ·
 #       Weekly News Spotlight · Your Pulpo cream cards · footer pill
 #       buttons · skip + next-issue blocks removed
-TEMPLATE_VERSION = "newsletter-v4.4-2026-06-01"
+#   v4.5 (2026-06-06) — Weekly News Spotlight now READS from the committed
+#       artifact (web/data/news_spotlight.json, nightly carry-forward) so
+#       every Pro email cites a real outlet article; the source-less
+#       "Pulpo Pro coastal scan" filler is retired and the section is
+#       omitted entirely on a cold start. Spotlight HTML changed.
+#   v4.6 (2026-06-09) — footer Unsubscribe link now carries `&e=<edition>`
+#       + `&l=<locale>` so /api/unsubscribe can render the in-brand
+#       free-vs-pro confirmation page. Cosmetic params only (not in the
+#       HMAC); rendered footer HTML changed, hence the bump.
+#   v4.7 (2026-06-10) — footer Unsubscribe link's edition/locale params
+#       (`&e=`/`&l=`) now derive from the renderer's `free` flag in
+#       _footer_html (variant-driven) instead of recipient.tier, so the
+#       /api/unsubscribe confirmation page always matches the edition
+#       sent. Standard-send output byte-identical; logic changed.
+#   v4.8 (2026-06-12) — listing <img> tags now carry a height attribute
+#       (680x453 = 3:2 reservation; save-thumb 96x84) so email clients
+#       reserve vertical space pre-load and don't reflow. CSS height:auto
+#       still rescales on load (plan 007 step 4).
+TEMPLATE_VERSION = "newsletter-v4.8-2026-06-12"
 
 # Human-readable timestamp surfaced in component docs + the admin
 # widget so collaborators can see when the locked design was last
 # revised without trawling git log. Matches the `vN.N (date)` line at
 # the top of the revision history above.
-LAST_UPDATED = "2026-06-01"
+LAST_UPDATED = "2026-06-12"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -86,8 +104,18 @@ LAST_UPDATED = "2026-06-01"
 #   welcome-v1.0 (2026-06-01) — initial ship. Welcome hero + "How
 #       Pulpo works" 3-beat block + cadence note + "Your first 10
 #       picks" section intro + "Start here" onboarding cards.
-WELCOME_TEMPLATE_VERSION = "welcome-v2.0-2026-06-02"
-WELCOME_LAST_UPDATED = "2026-06-02"
+#   welcome-v2.1 (2026-06-06) — inherits the v4.5 Weekly News Spotlight
+#       change (real-article artifact read, filler retired). Welcome body
+#       carries the spotlight, so its HTML changed.
+#   welcome-v2.2 (2026-06-09) — inherits the v4.6 footer Unsubscribe-link
+#       edition/locale params. Welcome body carries the footer, so its
+#       HTML changed.
+#   welcome-v2.3 (2026-06-10) — inherits the v4.7 footer edition-stamp
+#       change (page == email edition). Welcome body carries the footer.
+#   welcome-v2.4 (2026-06-12) — inherits the v4.8 listing <img> height
+#       reservation. Welcome body carries listing cards, so its HTML changed.
+WELCOME_TEMPLATE_VERSION = "welcome-v2.4-2026-06-12"
+WELCOME_LAST_UPDATED = "2026-06-12"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -107,8 +135,70 @@ WELCOME_LAST_UPDATED = "2026-06-02"
 #       welcome.* strings via i18n.welcome_text, so it can't drift from
 #       the first-time welcome beyond the greeting. Same full weekly body
 #       as the General + first-time welcome.
-WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.0-2026-06-02"
-WELCOME_BACK_LAST_UPDATED = "2026-06-02"
+#   welcome-back-v1.1 (2026-06-06) — inherits the v4.5 Weekly News
+#       Spotlight change (real-article artifact read, filler retired).
+#       Welcome-back body carries the spotlight, so its HTML changed.
+#   welcome-back-v1.2 (2026-06-09) — inherits the v4.6 footer
+#       Unsubscribe-link edition/locale params. Welcome-back body carries
+#       the footer, so its HTML changed.
+#   welcome-back-v1.3 (2026-06-10) — inherits the v4.7 footer edition-
+#       stamp change. Welcome-back body carries the footer.
+#   welcome-back-v1.4 (2026-06-12) — inherits the v4.8 listing <img>
+#       height reservation. Welcome-back body carries listing cards.
+WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.4-2026-06-12"
+WELCOME_BACK_LAST_UPDATED = "2026-06-12"
+
+
+# ─────────────────────────────────────────────────────────────────────
+# Pulpo FREE General — own version line.
+#
+# The free-tier weekly digest. It IS the General weekly master
+# (render_html variant="free_general") with three free-cohort changes,
+# all gated on the variant so the Pro path never sees them:
+#   1. masthead drops the gold "PRO" badge -> plain `pulpo`.
+#   2. ranks 04-10 swap the "See on Pulpo" CTA for "Sign up to Pro"
+#      (top 3 keep "See on Pulpo"); every card still renders the full
+#      listing component (photo, title, location, price, why-block).
+#   3. the Weekly News Spotlight is Pro-LOCKED: real headline + source +
+#      opening sentence show, the rest of the read sits behind a sign-up
+#      panel.
+# Same parallel-version rationale as the welcome lines above — lets
+# PostHog slice free-weekly renders from Pro weeklies, and the admin
+# widget surface the right version chip. The regex in
+# api/admin/newsletter/template-version.js reads this at line-start.
+#
+# Revision history (most recent first):
+#   free-general-v1.0 (2026-06-07) — initial ship. Plain `pulpo`
+#       masthead, top-3 "See on Pulpo" + ranks 04-10 "Sign up to Pro",
+#       Pro-locked Weekly News Spotlight. Built on the v4.5 master body
+#       (real-article spotlight artifact).
+FREE_GENERAL_TEMPLATE_VERSION = "free-general-v1.0-2026-06-07"
+FREE_GENERAL_LAST_UPDATED = "2026-06-07"
+
+
+# ─────────────────────────────────────────────────────────────────────
+# Pulpo FREE Welcome + Welcome-back — own version lines.
+#
+# The free-tier onboarding pair. Each is the free-general master
+# (render_html variant="free_welcome" / "free_welcome_back") with ONLY
+# the hero swapped — same plain-`pulpo` masthead, "Sign up to Pro" ranks
+# 04-10, and Pro-locked spotlight as the free weekly. The welcome-back
+# hero DERIVES from the free welcome copy via i18n.welcome_text (same
+# "Welcome → Welcome back" / "first 10 → next 10" rewrite as the Pro
+# pair), so the two free onboarding emails cannot drift. Parallel version
+# lines let PostHog slice free welcome / welcome-back renders from the
+# free weekly and from the Pro onboarding pair.
+#
+# Revision history (most recent first):
+#   free-welcome-v1.0 (2026-06-07) — initial ship. Free welcome hero
+#       ("Welcome to Pulpo", plain — not "Pulpo Pro") on the free-general
+#       body.
+#   free-welcome-back-v1.0 (2026-06-07) — initial ship. The free welcome
+#       with the "Welcome back" / "next 10" rewrite.
+FREE_WELCOME_TEMPLATE_VERSION = "free-welcome-v1.0-2026-06-07"
+FREE_WELCOME_LAST_UPDATED = "2026-06-07"
+FREE_WELCOME_BACK_TEMPLATE_VERSION = "free-welcome-back-v1.0-2026-06-07"
+FREE_WELCOME_BACK_LAST_UPDATED = "2026-06-07"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
@@ -309,6 +399,12 @@ __all__ = [
     "WELCOME_LAST_UPDATED",
     "WELCOME_BACK_TEMPLATE_VERSION",
     "WELCOME_BACK_LAST_UPDATED",
+    "FREE_GENERAL_TEMPLATE_VERSION",
+    "FREE_GENERAL_LAST_UPDATED",
+    "FREE_WELCOME_TEMPLATE_VERSION",
+    "FREE_WELCOME_LAST_UPDATED",
+    "FREE_WELCOME_BACK_TEMPLATE_VERSION",
+    "FREE_WELCOME_BACK_LAST_UPDATED",
     "CSS",
     "escape",
     "site_root_from_issue",

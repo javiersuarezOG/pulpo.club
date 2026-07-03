@@ -34,6 +34,9 @@
       "built_area_m2",
       "price_per_built_m2",
       "year_built",
+      "year_renovated",
+      "furnished",
+      "has_pool",
       "parking_spaces",
       "floor",
       "hoa_fee_usd_monthly",
@@ -61,6 +64,8 @@
       "photos_count",
       "photo_urls",
       "hero_photo_path",
+      "selected_photo_url",
+      "photo_urls_rejected",
       "hero_photo_quality_score",
       "has_text_overlay",
       "has_marketing_overlay",
@@ -75,8 +80,13 @@
       "hires_photo_quality_score",
       "hires_resdet_upscaled",
       "hires_quarantined",
+      "hires_aesthetic_issues",
       "first_seen_at",
       "existence_status",
+      "last_seen_at",
+      "missing_since",
+      "is_sold",
+      "sold_detected_at",
       "broker_name",
       "broker_phone",
       "broker_email",
@@ -280,6 +290,26 @@
         "minimum": 1800,
         "maximum": 2100
       },
+      "year_renovated": {
+        "type": [
+          "integer",
+          "null"
+        ],
+        "minimum": 1900,
+        "maximum": 2100
+      },
+      "furnished": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
+      "has_pool": {
+        "type": [
+          "boolean",
+          "null"
+        ]
+      },
       "parking_spaces": {
         "type": [
           "integer",
@@ -405,6 +435,21 @@
           "null"
         ]
       },
+      "selected_photo_url": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "photo_urls_rejected": {
+        "type": [
+          "array",
+          "null"
+        ],
+        "items": {
+          "type": "string"
+        }
+      },
       "hero_photo_quality_score": {
         "type": [
           "integer",
@@ -483,6 +528,15 @@
           "null"
         ]
       },
+      "hires_aesthetic_issues": {
+        "type": [
+          "array",
+          "null"
+        ],
+        "items": {
+          "type": "string"
+        }
+      },
       "first_seen_at": {
         "type": [
           "string",
@@ -490,6 +544,27 @@
         ]
       },
       "existence_status": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "last_seen_at": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "missing_since": {
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "is_sold": {
+        "type": "boolean"
+      },
+      "sold_detected_at": {
         "type": [
           "string",
           "null"

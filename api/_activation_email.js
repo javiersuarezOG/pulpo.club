@@ -115,7 +115,7 @@ const TEMPLATES = {
   en: {
     subject: "Set up your Pulpo Pro account — your subscription is active",
     preheader: "One step left: set your password and start exploring.",
-    html: (actionUrl) => `<!doctype html>
+    html: (actionUrl, fallbackUrl) => `<!doctype html>
 <html><head><meta charset="utf-8"></head><body style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;color:#1a1a1a;line-height:1.5;max-width:560px;margin:0 auto;padding:24px;">
 ${BRAND_HEADER_HTML}
 <p>Hi there,</p>
@@ -124,12 +124,12 @@ ${BRAND_HEADER_HTML}
 <p style="margin:24px 0;">
   <a href="${actionUrl}" style="background:#1a1a1a;color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;">Set up my Pulpo Pro account →</a>
 </p>
-<p>This link is unique to your account and expires in 24 hours. If it expires, request a new one from the activation modal on <a href="https://pulpo.club/account">pulpo.club/account</a>.</p>
+<p>This link is unique to your account and expires in about 30 days. If the button does not work, return to your activation page: <a href="${fallbackUrl}">${fallbackUrl}</a>.</p>
 <p>If this lands in Promotions, drag it to Primary so the next Pulpo email finds you faster.</p>
 <p>Questions? Reply to this email or write to <a href="mailto:hello@pulpo.club">hello@pulpo.club</a>.</p>
 <p>— The Pulpo Club team</p>
 </body></html>`,
-    text: (actionUrl) => `Hi there,
+    text: (actionUrl, fallbackUrl) => `Hi there,
 
 Thanks for joining Pulpo Pro — your subscription is active.
 
@@ -138,7 +138,10 @@ One step left to access your account: set a password so you can sign in from any
 Set up my Pulpo Pro account:
 ${actionUrl}
 
-This link is unique to your account and expires in 24 hours.
+This link is unique to your account and expires in about 30 days.
+
+If the button does not work, return to your activation page:
+${fallbackUrl}
 
 If this lands in Promotions, drag it to Primary so the next Pulpo email finds you faster.
 
@@ -149,7 +152,7 @@ Questions? Reply to this email or write to hello@pulpo.club.
   es: {
     subject: "Configura tu cuenta Pulpo Pro — tu suscripción está activa",
     preheader: "Solo falta un paso: elige tu contraseña y empieza a explorar.",
-    html: (actionUrl) => `<!doctype html>
+    html: (actionUrl, fallbackUrl) => `<!doctype html>
 <html><head><meta charset="utf-8"></head><body style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;color:#1a1a1a;line-height:1.5;max-width:560px;margin:0 auto;padding:24px;">
 ${BRAND_HEADER_HTML}
 <p>Hola,</p>
@@ -158,12 +161,12 @@ ${BRAND_HEADER_HTML}
 <p style="margin:24px 0;">
   <a href="${actionUrl}" style="background:#1a1a1a;color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block;">Configurar mi cuenta Pulpo Pro →</a>
 </p>
-<p>Este enlace es único para tu cuenta y expira en 24 horas. Si expira, solicita uno nuevo desde la ventana de activación en <a href="https://pulpo.club/account">pulpo.club/account</a>.</p>
+<p>Este enlace es único para tu cuenta y expira en aproximadamente 30 días. Si el botón no funciona, vuelve a tu página de activación: <a href="${fallbackUrl}">${fallbackUrl}</a>.</p>
 <p>Si este correo llega a Promociones, muévelo a Principal para que el próximo email de Pulpo te encuentre más rápido.</p>
 <p>¿Dudas? Responde a este correo o escribe a <a href="mailto:hello@pulpo.club">hello@pulpo.club</a>.</p>
 <p>— El equipo de Pulpo Club</p>
 </body></html>`,
-    text: (actionUrl) => `Hola,
+    text: (actionUrl, fallbackUrl) => `Hola,
 
 Gracias por sumarte a Pulpo Pro — tu suscripción está activa.
 
@@ -172,7 +175,10 @@ Solo queda un paso para acceder a tu cuenta: elige una contraseña para iniciar 
 Configurar mi cuenta Pulpo Pro:
 ${actionUrl}
 
-Este enlace es único para tu cuenta y expira en 24 horas.
+Este enlace es único para tu cuenta y expira en aproximadamente 30 días.
+
+Si el botón no funciona, vuelve a tu página de activación:
+${fallbackUrl}
 
 Si este correo llega a Promociones, muévelo a Principal para que el próximo email de Pulpo te encuentre más rápido.
 
@@ -221,13 +227,17 @@ async function sendActivationEmail({ email, locale, actionUrl, sessionId }) {
   const lc = pickLocale(locale);
   const tpl = TEMPLATES[lc];
   const hash = recipientHash(email);
+  const siteRoot = (process.env.PULPO_SITE_ROOT || "https://pulpo.club").replace(/\/+$/, "");
+  const fallbackUrl = sessionId
+    ? `${siteRoot}/account?welcome=1&session_id=${encodeURIComponent(sessionId)}`
+    : `${siteRoot}/account?welcome=1`;
 
   const payload = {
     from,
     to: [email],
     subject: tpl.subject,
-    html: tpl.html(actionUrl),
-    text: tpl.text(actionUrl),
+    html: tpl.html(actionUrl, fallbackUrl),
+    text: tpl.text(actionUrl, fallbackUrl),
     // Tags + headers are how the lifecycle events at /api/resend-webhook
     // join back to the post-Stripe funnel in PostHog. The resend-webhook
     // handler's pickPostHogProps reads tags.recipient_hash and the

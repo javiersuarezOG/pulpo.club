@@ -14,6 +14,7 @@
 
 import { test, expect } from "@playwright/test";
 import { isTolerated, seedProUser } from "./_helpers";
+import { pathForListing } from "../../web/app/lib/url-routing";
 
 test.describe("New app boots cleanly on key routes", () => {
   for (const route of ["/", "/?dev=1"]) {
@@ -179,6 +180,30 @@ test.describe("New app boots cleanly on key routes", () => {
     );
 
     expect(errors, "console errors during histogram interaction").toEqual([]);
+  });
+
+  // PR-1 (WS4) — keyword relevance. When a search query is active,
+  // results re-order by keyword relevance, so the sort dropdown is
+  // swapped for a static "Best match" label. Asserts the swap both ways.
+  test("browse search swaps sort dropdown for the Best-match relevance label", async ({ page }) => {
+    await page.goto("/browse", { waitUntil: "networkidle" });
+    const search = page.locator(".browse-search__input");
+    await search.waitFor({ state: "visible", timeout: 10_000 });
+
+    // No query → sort dropdown present, relevance label absent.
+    await expect(page.locator(".sort-select")).toBeVisible();
+    await expect(page.locator(".sort-relevance-label")).toHaveCount(0);
+
+    // Type a query → dropdown hides, "Best match" label shows.
+    await search.fill("tunco");
+    await expect(page.locator(".sort-relevance-label")).toBeVisible({ timeout: 3_000 });
+    await expect(page.locator(".sort-relevance-label")).toHaveText("Best match");
+    await expect(page.locator(".sort-select")).toHaveCount(0);
+
+    // Clear the query → dropdown returns.
+    await search.fill("");
+    await expect(page.locator(".sort-select")).toBeVisible({ timeout: 3_000 });
+    await expect(page.locator(".sort-relevance-label")).toHaveCount(0);
   });
 
   // PR upgrade-flow-polish — verifies the Pro CTA on /plans actually
@@ -486,6 +511,7 @@ test.describe("New app boots cleanly on key routes", () => {
     const ENGLISH_CANARIES = [
       "Paved", "Gravel", "Dirt",                      // road_access_type enum (the report)
       "On beach", "Walk to beach", "Near beach",      // beachfront_tier enum
+      "Recently missing",                             // badge.stale (carry-forward stale chip)
       "Back to results",                              // detail-panel back link
       "Save listing", "Remove from saved",            // heart-button aria
       "Previous photo", "Next photo",                 // photo-nav aria (read by AT but visible in dev tools)
@@ -561,6 +587,31 @@ test.describe("New app boots cleanly on key routes", () => {
       // waiver tops up a thin shelf with loose-eligible listings
       // (no photo). Card is fully clickable; only the visual differs.
       "Photo pending",                                // home.shelf.photo_pending
+      // Location-precision note on the detail page. Drives off
+      // ranked.json's `geocoding_source` field via
+      // web/app/lib/location-precision.ts. The "approximate" variant
+      // renders for 95%+ of listings (estimated/nominatim), so a stuck
+      // EN string here would leak on essentially every detail page.
+      "Approximate location",                         // detail.location.precision.approximate.title
+      "Exact location from broker",                   // detail.location.precision.precise.title
+      "Confirm the exact address",                    // detail.location.precision.approximate.body (anchor phrase)
+      // /browse search bar (PR-S1). Renders on every /browse load — a
+      // stuck EN string here is visible to every Spanish-locale visitor.
+      "Search by id",                                 // browse.search.placeholder (first half)
+      "Search listings",                              // browse.search.aria_label
+      "Clear search",                                 // browse.search.clear_aria
+      "Best match",                                   // browse.sort.by_relevance (relevance label, query-active)
+      // Browse active-filter chips + results-table headers. These render only
+      // with a facet applied / table view active (driven by dedicated tests in
+      // browse-search-autocomplete.spec.ts) — listed here as documented backstop.
+      "ocean view", "price drop",                     // active-filter enum chips (raw-slug leak)
+      "Signal",                                       // browse.table.col.signal header
+      // Built-property fact tiles (plan 010) — house/condo Key Facts.
+      // Render on the detail panel when ranked.json carries the field;
+      // a hardcoded EN label would leak on every Spanish-locale house.
+      "Bedrooms",                                     // detail.fact.bedrooms (es: Habitaciones)
+      "Year built",                                   // detail.fact.year_built (es: Año de construcción)
+      "Built area",                                   // detail.fact.built_area (es: Área construida)
     ];
 
     // Tokens that legitimately exist in BOTH EN and ES copy and would
@@ -605,10 +656,24 @@ test.describe("New app boots cleanly on key routes", () => {
     // scan exercise the in-panel upgrade CTA ("Contrata Pulpo Pro —
     // 1 mes gratis"), which renders only for non-paid tiers.
 
-    await page.goto("/browse", { waitUntil: "networkidle" });
-    await page.locator(".listing-card").first().waitFor({ state: "visible", timeout: 10_000 });
-    await page.locator(".listing-card").first().click();
-    await page.locator(".detail-panel").waitFor({ state: "visible", timeout: 5_000 });
+    // The road_access "Paved" bug was on the detail panel; scan it in ES.
+    // Two-state walls an anonymous viewer out of arbitrary detail — but
+    // this week's TOP 3 open in full for anyone (web/app/lib/free-view), so
+    // deep-link to one of those to mount the panel. The app exposes the
+    // live ids on a DEV-only window seam (the set is adapter-computed, so
+    // it's not derivable from raw ranked.json). locale=es persists from the
+    // home sweep above, so the panel bootstraps in Spanish.
+    const top3Id: string | null = await page.evaluate(async () => {
+      for (let i = 0; i < 100; i++) {
+        const ids = (window as unknown as { __pulpoTestIds?: { freeViewable?: string[] } }).__pulpoTestIds;
+        if (ids?.freeViewable?.length) return ids.freeViewable[0];
+        await new Promise((r) => setTimeout(r, 100));
+      }
+      return null;
+    });
+    expect(top3Id, "free-viewable top-3 id should be exposed for the ES detail scan").toBeTruthy();
+    await page.goto(pathForListing(top3Id as string), { waitUntil: "networkidle" });
+    await page.locator(".detail-panel").waitFor({ state: "visible", timeout: 8_000 });
     await page.waitForTimeout(500);
     const detailText: string = await page.evaluate(() => document.body.textContent || "");
     for (const word of ENGLISH_CANARIES) {
@@ -629,6 +694,29 @@ test.describe("New app boots cleanly on key routes", () => {
     for (const word of ["Save listing", "Remove from saved", "Previous photo", "Next photo"]) {
       const hit = ariaLabels.find((l) => l.includes(word));
       expect(hit, `aria-label still in English: "${word}" — wire via t()`).toBeUndefined();
+    }
+
+    // Non-default render states — the scans above only cover the home, the
+    // default card view, and the detail panel. The active-filter chips +
+    // results-table headers leaked precisely BECAUSE no canary ever rendered
+    // them (table view, applied facets). Drive those states in ES and scan the
+    // whole canary set against them, so the next leak in these views is caught
+    // too — not just the chip/header words. (Locale persists from above.)
+    await page.setViewportSize({ width: 1280, height: 800 }); // desktop → real <table> headers
+    await page.goto("/browse?view=table&features=ocean_view&status=price_drop", {
+      waitUntil: "networkidle",
+    });
+    await page.locator(".results-table thead, .active-filter-row").first().waitFor({
+      state: "visible",
+      timeout: 10_000,
+    });
+    await page.waitForTimeout(500);
+    const tableFacetText: string = await page.evaluate(() => document.body.textContent || "");
+    for (const word of ENGLISH_CANARIES) {
+      expect(
+        tableFacetText,
+        `Spanish locale leaked English text in table/facet view: "${word}". Wire the source via t() against an i18n.jsx key.`,
+      ).not.toContain(word);
     }
   });
 

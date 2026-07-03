@@ -74,7 +74,7 @@ def _row(li: Listing) -> dict:
 # slug and dispatches there before argparse ever runs. Anything else
 # falls through to the original rank-pipeline flow unchanged.
 
-_SUBCOMMANDS = {"enrich-photos", "check-hero-pool", "check-hero-variants", "backfill-listing-photo-meta", "scrape-external"}
+_SUBCOMMANDS = {"enrich-photos", "check-hero-pool", "check-hero-variants", "backfill-listing-photo-meta", "scrape-external", "scraper-lab"}
 
 
 def _run_enrich_photos(argv: list[str]) -> int:
@@ -721,6 +721,61 @@ def _run_scrape_external(argv: list[str]) -> int:
     return 0 if overall_ok else 1
 
 
+def _run_scraper_lab(argv: list[str]) -> int:
+    """PR-FB-1 — single-source fast-path harness.
+
+    See ``automation.scraper_lab.lab_run`` for the orchestration core.
+    This entry point is the human / CI front door: parse args, call
+    lab_run, print the per-PRD summary, exit non-zero on failure.
+    """
+    from automation.scraper_lab import lab_run, render_human_report
+
+    sp = argparse.ArgumentParser(
+        prog="pulpo scraper-lab",
+        description="Single-source fast-path harness (PR-FB-1).",
+    )
+    sp.add_argument("--source", required=True,
+                    help="Scraper slug (e.g. 'xitios').")
+    sp.add_argument("--limit", type=int, default=25,
+                    help="Per-source listings cap (default 25).")
+    sp.add_argument("--offline", action="store_true",
+                    help="Use offline fixtures instead of hitting the live source.")
+    sp.add_argument("--no-validate", action="store_true",
+                    help="Skip the validation stage.")
+    sp.add_argument("--no-dedup", action="store_true",
+                    help="Skip the dedup stage.")
+    sp.add_argument("--no-rank", action="store_true",
+                    help="Skip the ranking stage.")
+    sp.add_argument("--skip-llm", action="store_true", default=True,
+                    help="(default ON) LLM enrichment is out-of-scope for the lab.")
+    sp.add_argument("--skip-photos", action="store_true", default=True,
+                    help="(default ON) Photo downloads are out-of-scope for the lab.")
+    sp.add_argument("--write", type=str, default=None,
+                    help="Optional directory to dump raw.jsonl, normalized.jsonl, "
+                         "failures.jsonl, ranked.json.")
+    sp.add_argument("--json", action="store_true",
+                    help="Emit machine-readable JSON instead of the human report.")
+    args = sp.parse_args(argv)
+
+    write_dir = Path(args.write).resolve() if args.write else None
+
+    result = lab_run(
+        args.source,
+        limit=args.limit,
+        offline=args.offline,
+        with_validate=not args.no_validate,
+        with_dedup=not args.no_dedup,
+        with_rank=not args.no_rank,
+        write_dir=write_dir,
+    )
+
+    if args.json:
+        print(json.dumps(result.to_json(), indent=2, default=str))
+    else:
+        print(render_human_report(result))
+    return 0 if result.ok else 1
+
+
 def _dispatch_subcommand(name: str, argv: list[str]) -> int:
     if name == "enrich-photos":
         return _run_enrich_photos(argv)
@@ -732,6 +787,8 @@ def _dispatch_subcommand(name: str, argv: list[str]) -> int:
         return _run_backfill_listing_photo_meta(argv)
     if name == "scrape-external":
         return _run_scrape_external(argv)
+    if name == "scraper-lab":
+        return _run_scraper_lab(argv)
     print(f"pulpo: unknown subcommand '{name}'", file=sys.stderr)
     return 2
 

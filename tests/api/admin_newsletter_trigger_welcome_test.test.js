@@ -23,18 +23,29 @@ function mockRes() {
 let ipCounter = 0;
 function mockReq(body) {
   ipCounter += 1;
-  return { method: "POST", headers: { "x-forwarded-for": `10.0.0.${ipCounter}` }, body };
+  return {
+    method: "POST",
+    headers: {
+      "x-forwarded-for": `10.0.0.${ipCounter}`,
+      authorization: "Bearer admin_test",
+    },
+    body,
+  };
 }
 
 describe("trigger-welcome-test → internal endpoint", () => {
   const ORIGINAL = process.env.PULPO_INTERNAL_TOKEN;
+  const ORIGINAL_ADMIN = process.env.PULPO_ADMIN_DEBUG_TOKEN;
   beforeEach(() => {
     process.env.PULPO_INTERNAL_TOKEN = "internal_test";
+    process.env.PULPO_ADMIN_DEBUG_TOKEN = "admin_test";
     process.env.PULPO_SITE_ROOT = "https://pulpo.club";
   });
   afterEach(() => {
     if (ORIGINAL === undefined) delete process.env.PULPO_INTERNAL_TOKEN;
     else process.env.PULPO_INTERNAL_TOKEN = ORIGINAL;
+    if (ORIGINAL_ADMIN === undefined) delete process.env.PULPO_ADMIN_DEBUG_TOKEN;
+    else process.env.PULPO_ADMIN_DEBUG_TOKEN = ORIGINAL_ADMIN;
     delete process.env.PULPO_SITE_ROOT;
   });
 

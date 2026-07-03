@@ -39,6 +39,7 @@ def _li(**overrides) -> dict:
         "photos_count":             10,
         "days_listed":              7,
         "rank_score":               80.0,
+        "card_eligible":            True,
     }
     base.update(overrides)
     return base
@@ -97,13 +98,55 @@ def test_filters_sold_listings_at_every_tier():
     assert pick_featured_pool([_li(is_sold=True)], now=_NOW) is None
 
 
-def test_elite_excludes_text_overlay_hero():
-    """OCR-flagged brochure-style hero photos are excluded from the
-    elite pool. Soft tier doesn't gate on this — text-overlay listings
-    are still acceptable as soft fallbacks since the bar is lower."""
+def test_text_overlay_hero_excluded_from_elite_and_soft():
+    """Display-gate contract (plan 003): an OCR-flagged brochure-style
+    hero is now excluded from BOTH curated pools (elite AND soft) — the
+    owner rule says a text-only image must never display on a curated
+    surface. It drops to the last-resort fallback tier (which gates only
+    on sold + >=1 photo)."""
     pool = pick_featured_pool([_li(has_text_overlay=True)], now=_NOW)
     assert pool is not None
-    assert pool.tier == "soft"
+    assert pool.tier == "fallback"
+
+
+def test_card_ineligible_excluded_from_elite_and_soft():
+    """Display-gate contract (plan 003): a listing meeting every other
+    elite gate but with card_eligible=False (logo/too-small hero) is
+    excluded from BOTH curated pools and drops to fallback."""
+    pool = pick_featured_pool([_li(card_eligible=False)], now=_NOW)
+    assert pool is not None
+    assert pool.tier == "fallback"
+
+
+def test_card_eligible_none_excluded_from_elite_and_soft():
+    """Display-gate contract (plan 003): card_eligible is None when the
+    photo phase never approved a card image — treated as ineligible by
+    design (the hard rule), so the listing drops from both curated pools
+    even with strong rank/photo proxies."""
+    pool = pick_featured_pool([_li(card_eligible=None)], now=_NOW)
+    assert pool is not None
+    assert pool.tier == "fallback"
+
+
+def test_watermark_hero_excluded_from_elite_and_soft():
+    """Watermark signal (plan 005): a listing meeting every other curated
+    gate but whose hires hero was flagged logo_or_watermark by the
+    deterministic aesthetic pass is excluded from BOTH curated pools and
+    drops to the last-resort fallback tier."""
+    from pulpo.featured_listing import _is_elite, _is_soft
+    li = _li(hires_aesthetic_issues=["logo_or_watermark"])
+    assert _is_elite(li) is False
+    assert _is_soft(li) is False
+    pool = pick_featured_pool([li], now=_NOW)
+    assert pool is not None
+    assert pool.tier == "fallback"
+
+
+def test_non_watermark_aesthetic_issue_does_not_exclude():
+    """Only logo_or_watermark gates the curated pools — other aesthetic
+    issues (e.g. low_quality) are not a curated-surface exclusion here."""
+    from pulpo.featured_listing import _is_elite
+    assert _is_elite(_li(hires_aesthetic_issues=["low_quality"])) is True
 
 
 def test_elite_accepts_null_text_overlay():

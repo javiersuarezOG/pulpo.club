@@ -3,14 +3,14 @@
   "layout": "v1",
   "blocks": {
     "hero": "v4",
-    "hero_v5": "v5.4",
+    "hero_v5": "v6.2",
     "featured": "v1",
     "shoreline": "v2",
-    "top_beach_terrenos": "v3",
-    "top_beach_condos": "v3",
-    "top_beach_homes": "v3",
-    "top_lake_terrenos": "v3",
-    "top_lake_condos": "v3",
-    "top_lake_homes": "v3"
+    "top_beach_terrenos": "v4.1",
+    "top_beach_condos": "v4.1",
+    "top_beach_homes": "v4.1",
+    "top_lake_terrenos": "v4.1",
+    "top_lake_condos": "v4.1",
+    "top_lake_homes": "v4.1"
   }
 }

@@ -159,6 +159,90 @@ test.describe("responsive — section sweep (anonymous)", () => {
   }
 });
 
+test.describe("responsive — /browse list view", () => {
+  for (const vp of VIEWPORTS.filter((v) => v.width < 768)) {
+    test(`/browse mobile list rows stay compact @ ${vp.name}`, async ({ page }) => {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      const errors = attachErrorRecorder(page);
+
+      await page.goto("/browse", { waitUntil: "networkidle" });
+      await page.getByLabel("Table view").click();
+      const row = page.locator(".mobile-list-row").first();
+      await row.waitFor({ state: "visible", timeout: 10_000 });
+
+      await expect(row.locator(".mobile-list-row__title")).toBeVisible();
+      await expect(row.locator(".mobile-list-row__place")).toBeVisible();
+      await expect(row.locator(".mobile-list-row__facts")).toContainText("$");
+      await expect(row.locator("text=Listed")).toHaveCount(0);
+      await expect(row.locator("text=Signal")).toHaveCount(0);
+      await expect(row.locator(".mobile-list-row__photo img").first()).toBeVisible();
+      const rowHeight = await row.evaluate((el) => el.getBoundingClientRect().height);
+      expect(rowHeight, "mobile list rows should stay dense enough to scan").toBeLessThanOrEqual(96);
+
+      assertNoOverflow(
+        await measureOverflow(page),
+        `/browse list view @ ${vp.name}`,
+      );
+      expect(errors, `console errors on /browse list view @ ${vp.name}`).toEqual([]);
+    });
+  }
+
+  test("/browse desktop keeps the real table layout", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    const errors = attachErrorRecorder(page);
+
+    await page.goto("/browse", { waitUntil: "networkidle" });
+    await page.getByLabel("Table view").click();
+    await page.locator(".results-table tbody tr").first().waitFor({ state: "visible", timeout: 10_000 });
+
+    await expect(page.locator(".results-table")).toBeVisible();
+    await expect(page.locator(".results-mobile-list")).toBeHidden();
+    await expect(page.locator(".results-table th", { hasText: "Listing" })).toBeVisible();
+    await expect(page.locator(".results-table th", { hasText: "Price" })).toBeVisible();
+
+    assertNoOverflow(
+      await measureOverflow(page),
+      "/browse desktop list table @ 1280×800",
+    );
+    expect(errors, "console errors on /browse desktop list table").toEqual([]);
+  });
+});
+
+// The map is the newest, most fragile surface and was NOT in the section
+// sweep above. Cover all five viewports for horizontal overflow. OSM tiles
+// can 404 in CI, so we wait on the Leaflet container + a loaded tile (not the
+// console allowlist) and assert LAYOUT only — no zero-console-error gate here.
+test.describe("responsive — /browse map view", () => {
+  for (const vp of VIEWPORTS) {
+    test(`/browse?view=map holds layout @ ${vp.name}`, async ({ page }) => {
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await page.goto("/browse?view=map", { waitUntil: "networkidle" });
+      await page.locator(".leaflet-container").waitFor({ state: "visible", timeout: 10_000 });
+      // Wait for at least one tile; tolerate CI blocking OSM (catch + move on).
+      await page.locator(".leaflet-tile-loaded").first()
+        .waitFor({ state: "visible", timeout: 8_000 }).catch(() => {});
+      await page.waitForTimeout(400); // settle the fit animation + layout
+
+      assertNoOverflow(await measureOverflow(page), `/browse?view=map @ ${vp.name}`);
+
+      // Mobile: the bottom sheet expands to ~62dvh — the expanded state (cards
+      // scrolling over a full-bleed Leaflet pane) is the real overflow risk,
+      // and collapsed-only coverage would look green while missing it.
+      if (vp.width < 768) {
+        const handle = page.locator(".map-sheet__handle");
+        await handle.waitFor({ state: "visible", timeout: 5_000 });
+        await handle.click();
+        await expect(page.locator(".map-sheet--expanded")).toBeVisible();
+        await page.waitForTimeout(300);
+        assertNoOverflow(
+          await measureOverflow(page),
+          `/browse?view=map expanded sheet @ ${vp.name}`,
+        );
+      }
+    });
+  }
+});
+
 // 2. Account deep-dive — every sub-section at every viewport, both auth
 // content paths (free / pro). Clerk-on path is the legacy seed path
 // flipped via env or fixture; in CI today the publishable key is unset

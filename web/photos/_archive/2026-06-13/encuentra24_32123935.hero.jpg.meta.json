@@ -1,0 +1,17 @@
+{
+  "width": 2048,
+  "height": 1536,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 835.9,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-06-13T16:40:05.834940+00:00",
+  "derivative_width": 1440,
+  "derivative_height": 1080,
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": null,
+  "has_marketing_overlay": null,
+  "winning_url": "https://photos.encuentra24.com/t_full/f_auto/v1/sv/32/12/39/35/32123935_3f3468e",
+  "candidate_count": 5
+}

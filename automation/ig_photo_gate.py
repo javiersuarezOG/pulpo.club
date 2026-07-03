@@ -10,6 +10,7 @@ ranked.json already carries:
   - card_eligible OR hero_eligible        truthy
   - has_text_overlay                      not True
   - has_marketing_overlay                 not True
+  - hires_aesthetic_issues       no "logo_or_watermark"   (plan 005)
   - data_quality_score    ≥ IG_GATE_MIN_DATA_QUALITY  (default 0.55)
   - is_incomplete                         not True
   - is_agricultural                       not True   (per the founder brief)
@@ -67,6 +68,7 @@ from typing import Any, Iterable, Optional, Tuple
 
 from automation._atomic import atomic_write_json
 from automation._config import env_bool, env_float, env_int
+from pulpo.display_gates import has_watermark_issue
 
 
 # ── tunables (env-overridable) ─────────────────────────────────────────
@@ -123,6 +125,10 @@ def _check_overlays(li: dict, _cfg: dict) -> _LandPredicate:
         return False, "text_overlay"
     if li.get("has_marketing_overlay") is True:
         return False, "marketing_overlay"
+    # Watermark signal (plan 005): the hires deterministic aesthetic pass
+    # flagged this hero as a logo/watermark — never run it full-bleed on IG.
+    if has_watermark_issue(li):
+        return False, "logo_or_watermark"
     return True, None
 
 
@@ -200,10 +206,19 @@ def passes_gate(li: dict, cfg: dict | None = None) -> bool:
 def select_hero_index(li: dict) -> int:
     """Which photo_url index is the hero shot.
 
-    Today: 0.  The nightly's repick_heroes.py has already shuffled
-    photo_urls so the best image is first (that's the whole point of
-    that module).  Future: if per-photo quality scores get computed,
-    pick the max here."""
+    The nightly picker writes its winning broker URL to
+    ``selected_photo_url`` (repick_heroes.py / run.py); ``photo_urls``
+    itself is NOT reordered. Resolve the winner's index so the IG
+    carousel leads with the same image every other surface shows first.
+    Falls back to 0 when the field is missing or no longer present in
+    photo_urls (e.g. the broker dropped the image between runs)."""
+    sel = li.get("selected_photo_url")
+    urls = li.get("photo_urls") or []
+    if isinstance(sel, str) and sel:
+        try:
+            return urls.index(sel)
+        except ValueError:
+            pass
     return 0
 
 
@@ -216,7 +231,23 @@ def order_photo_indices(li: dict) -> list[int]:
     if n <= 0:
         return []
     hero = select_hero_index(li)
-    rest = [i for i in range(n) if i != hero]
+    # Per-photo picker verdicts (plan 004): drop indices whose broker URL
+    # the hero picker scored + rejected (below the cheap-score floor or a
+    # text overlay) so a rejected flyer/logo never lands in the carousel.
+    # Producer: automation/run.py + automation/repick_heroes.py
+    # (`photo_urls_rejected`). Absence/None → no drop (pre-field record).
+    # The hero index is approved by definition — never dropped, even if it
+    # somehow appears in the rejected set.
+    urls = li.get("photo_urls") or []
+    rejected = li.get("photo_urls_rejected")
+    rejected_idx: set[int] = set()
+    if isinstance(rejected, list) and rejected:
+        rejected_urls = {u for u in rejected if isinstance(u, str)}
+        rejected_idx = {
+            i for i, u in enumerate(urls)
+            if i < n and isinstance(u, str) and u in rejected_urls and i != hero
+        }
+    rest = [i for i in range(n) if i != hero and i not in rejected_idx]
     ordered = [hero, *rest]
     return ordered[:10]
 

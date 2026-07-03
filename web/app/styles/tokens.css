@@ -80,6 +80,7 @@
   --badge-drop: oklch(0.58 0.18 25);
   --badge-off: oklch(0.46 0.10 290);
   --badge-new: oklch(0.55 0.12 145);
+  --badge-stale: oklch(0.50 0.08 250);
   --badge-ready: oklch(0.55 0.12 240);
   --badge-motivated: oklch(0.65 0.15 60);
 
@@ -152,6 +153,25 @@
   --shadow-1: 0 1px 2px rgba(40, 28, 18, 0.04), 0 4px 12px rgba(40, 28, 18, 0.04);
   --shadow-2: 0 2px 6px rgba(40, 28, 18, 0.06), 0 12px 28px rgba(40, 28, 18, 0.08);
   --shadow-modal: 0 30px 60px rgba(20, 12, 5, 0.25);
+
+  /* ============== Z-INDEX ============== */
+  /* Root stacking ladder. Leaflet panes are isolated inside
+     .map-view__canvas, so map-local pin z-indexes stay small and never
+     compete with app overlays. */
+  --z-topnav: 50;
+  --z-bottomnav: 80;
+  --z-map-sheet: 120;
+  --z-map-ui: 130;
+  --z-drawer: 180;
+  --z-detail-overlay: 220;
+  --z-modal: 300;
+  --z-toast: 400;
+  --z-consent: 500;
+
+  /* ============== MAP XP ============== */
+  --map-mobile-top-offset: 72px;
+  --map-sheet-collapsed-height: 188px;
+  --map-sheet-expanded-height: 62dvh;
 
   /* ============== BREAKPOINTS ============== */
   /* CSS variables can't drive @media queries directly, so these are

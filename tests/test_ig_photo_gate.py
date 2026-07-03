@@ -100,6 +100,7 @@ def test_good_terreno_passes():
     ({"card_eligible": False, "hero_eligible": False}, "not_eligible"),
     ({"has_text_overlay": True},                  "text_overlay"),
     ({"has_marketing_overlay": True},             "marketing_overlay"),
+    ({"hires_aesthetic_issues": ["logo_or_watermark"]}, "logo_or_watermark"),
     ({"is_incomplete": True},                     "incomplete"),
     ({"data_quality_score": 0.40},                "low_data_quality"),
     ({"data_quality_score": None},                "low_data_quality"),
@@ -138,11 +139,44 @@ def test_lower_min_photos_threshold_lets_thin_listing_through():
 
 # ── hero + photo ordering ──────────────────────────────────────────────
 
-def test_select_hero_index_returns_zero_today():
-    """Current pipeline shuffles photo_urls so hero is at index 0.
-    Pin the contract — if select_hero_index ever changes, the
-    publisher needs to know."""
+def test_select_hero_index_defaults_to_zero_without_selected_url():
+    """No selected_photo_url field → fall back to index 0 (older
+    listings, or the winner is already photo_urls[0])."""
     assert select_hero_index(_good_terreno()) == 0
+
+
+def test_select_hero_index_resolves_selected_photo_url():
+    """The picker's winner (selected_photo_url) decides the hero index so
+    the carousel leads with the same image every other surface shows
+    first (continuity contract, PR #785)."""
+    li = _good_terreno(
+        photo_urls=["http://x/a.jpg", "http://x/b.jpg", "http://x/c.jpg"],
+        selected_photo_url="http://x/c.jpg",
+    )
+    assert select_hero_index(li) == 2
+
+
+def test_select_hero_index_falls_back_when_selected_url_absent_from_list():
+    """Broker dropped the winning image between runs → URL no longer in
+    photo_urls → fall back to 0 rather than crash."""
+    li = _good_terreno(
+        photo_urls=["http://x/a.jpg", "http://x/b.jpg"],
+        selected_photo_url="http://x/gone.jpg",
+    )
+    assert select_hero_index(li) == 0
+
+
+def test_order_photo_indices_leads_with_selected_hero():
+    """The resolved hero index lands first in the carousel order."""
+    li = _good_terreno(
+        photos_count=5,
+        photo_urls=["http://x/0.jpg", "http://x/1.jpg", "http://x/2.jpg",
+                    "http://x/3.jpg", "http://x/4.jpg"],
+        selected_photo_url="http://x/3.jpg",
+    )
+    ordered = order_photo_indices(li)
+    assert ordered[0] == 3
+    assert sorted(ordered) == [0, 1, 2, 3, 4]
 
 
 @pytest.mark.parametrize("count,expected", [
@@ -160,6 +194,44 @@ def test_order_photo_indices_cap(count, expected):
 def test_order_photo_indices_None_safe():
     li = _good_terreno(photos_count=None)
     assert order_photo_indices(li) == []
+
+
+# ── per-photo verdicts: rejected indices dropped (plan 004) ────────────────
+
+def test_order_photo_indices_drops_rejected_middle_index():
+    """A rejected broker URL in the middle of the carousel is skipped."""
+    li = _good_terreno(
+        photos_count=4,
+        photo_urls=["http://x/0.jpg", "http://x/1.jpg",
+                    "http://x/2.jpg", "http://x/3.jpg"],
+        selected_photo_url="http://x/0.jpg",
+        photo_urls_rejected=["http://x/2.jpg"],
+    )
+    # index 2 dropped; hero (0) leads; 1 and 3 follow in source order.
+    assert order_photo_indices(li) == [0, 1, 3]
+
+
+def test_order_photo_indices_never_drops_hero_even_if_rejected():
+    """Hero is picker-approved by definition — never dropped, even if its
+    URL somehow appears in photo_urls_rejected."""
+    li = _good_terreno(
+        photos_count=3,
+        photo_urls=["http://x/0.jpg", "http://x/1.jpg", "http://x/2.jpg"],
+        selected_photo_url="http://x/1.jpg",
+        photo_urls_rejected=["http://x/1.jpg", "http://x/2.jpg"],
+    )
+    # hero (1) survives + leads; 2 dropped; 0 kept.
+    assert order_photo_indices(li) == [1, 0]
+
+
+def test_order_photo_indices_no_rejected_field_is_unchanged():
+    """Pre-004 record (no photo_urls_rejected) → identical to today."""
+    li = _good_terreno(
+        photos_count=3,
+        photo_urls=["http://x/0.jpg", "http://x/1.jpg", "http://x/2.jpg"],
+        selected_photo_url="http://x/2.jpg",
+    )
+    assert order_photo_indices(li) == [2, 0, 1]
 
 
 # ── palette suggestion ─────────────────────────────────────────────────
@@ -213,6 +285,34 @@ def test_build_candidates_mixed_input():
     assert payload["stats"]["rejection_reasons"]["low_photos"] == 1
     # candidates ordered by rank_score desc — b (90) before a (80)
     assert [c["listing_id"] for c in payload["candidates"]] == ["b__2", "a__1"]
+
+
+def test_watermark_reason_lands_in_rejection_telemetry():
+    """Watermark signal (plan 005): a logo_or_watermark hero is rejected and
+    the reason is counted in the build's rejection_reasons stats."""
+    listings = [
+        _good_terreno(source="a", source_id="1"),
+        _good_terreno(source="b", source_id="2",
+                      hires_aesthetic_issues=["logo_or_watermark"]),  # rejected
+    ]
+    payload = build_candidates(listings, cfg=_CFG)
+    assert payload["stats"]["passed"] == 1
+    assert payload["stats"]["rejection_reasons"]["logo_or_watermark"] == 1
+
+
+def test_non_watermark_aesthetic_issue_passes_ig_gate():
+    """Only logo_or_watermark gates IG — other deterministic issues (e.g.
+    low_quality) don't block a post."""
+    li = _good_terreno(hires_aesthetic_issues=["low_quality"])
+    assert passes_gate(li, _CFG) is True
+
+
+def test_no_hires_aesthetic_field_passes_ig_gate():
+    """Older listings without the hires_aesthetic_issues field (None) are
+    not blocked — no signal means no exclusion."""
+    li = _good_terreno()
+    li.pop("hires_aesthetic_issues", None)
+    assert passes_gate(li, _CFG) is True
 
 
 def test_build_candidates_orders_by_rank_score_descending():

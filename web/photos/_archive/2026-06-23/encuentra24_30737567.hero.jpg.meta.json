@@ -1,0 +1,17 @@
+{
+  "width": 1024,
+  "height": 768,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 86.9,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-06-22T09:01:40.678586+00:00",
+  "derivative_width": 1024,
+  "derivative_height": 768,
+  "hero_photo_quality_score": 50,
+  "has_text_overlay": null,
+  "has_marketing_overlay": null,
+  "winning_url": "https://photos.encuentra24.com/t_or_fh_l/f_auto/v1/pa/30/73/75/67/30737567_ca77df",
+  "candidate_count": 5
+}

@@ -263,7 +263,7 @@ def _call_segmind(raw_bytes: bytes) -> Optional[tuple[Optional[float], Optional[
         "temperature": 0,
         "max_tokens": 256,
     }
-    resp = httpx.post(url, headers=headers, json=payload, timeout=30.0)
+    resp = httpx.post(url, headers=headers, json=payload, timeout=httpx.Timeout(30.0, connect=30.0, read=30.0, write=30.0, pool=30.0))
     resp.raise_for_status()
     body = resp.json()
     try:

@@ -6,6 +6,8 @@ import { uspsVisibleFor } from "./lib/gating.ts";
 import { categoryImageForListing } from "./assets/categories";
 import { readFeatureFlag } from "./lib/feature-flag";
 import { buildSrcSet } from "./lib/img-url";
+import { deriveLocationPrecision } from "./lib/location-precision";
+import { isCardImageDisplayable } from "./lib/card-image";
 
 // ===== Formatters =====
 // Locale-aware wrappers — pull current locale from <html lang> so plain helpers work.
@@ -56,6 +58,17 @@ function formatPpm(n) {
 function ppmSuffix() {
   return currentUnits() === "vrs2" ? "/vr²" : "/m²";
 }
+// PR-5/WS4 — the single guards every map read-site uses. `hasCoords`
+// gates whether a listing can be a map pin at all (~0.5% lack coords);
+// `isLowConfidenceGeo` flags the pins the map softens + can hide
+// (low/None geocoding_confidence — the only quality signal available,
+// since ~97% of coords share the 'estimated' source).
+function hasCoords(l) {
+  return l != null && Number.isFinite(l.lat) && Number.isFinite(l.lng);
+}
+function isLowConfidenceGeo(l) {
+  return l == null || l.geocoding_confidence === "low" || l.geocoding_confidence == null;
+}
 function daysListedTone(d) {
   if (d == null) return "muted";
   if (d < 30) return "muted";
@@ -92,6 +105,54 @@ function formatDistanceKm(km, listing) {
   const step = (!hasLatLng || conf === "low") ? 10 : 5;
   const rounded = Math.max(step, Math.round(km / step) * step);
   return { n: rounded, approx: true };
+}
+
+// Location-precision note rendered inside the detail-page Location
+// section. Driven by deriveLocationPrecision (see ./lib/location-
+// precision.ts) — the FE was previously blind to ranked.json's
+// `geocoding_source` and showed all coordinates as if they were
+// broker-precise. The "approximate" variant carries the visit-time
+// warning so users planning a trip know to confirm the address.
+// Renders nothing when no geocoding ran at all — the surface should
+// not claim precision it does not have.
+export function LocationPrecisionNote({ listing }) {
+  if (!listing) return null;
+  const tier = deriveLocationPrecision(listing);
+  if (tier === "unknown") return null;
+  const lc = currentLocale();
+  if (tier === "precise") {
+    return (
+      <p
+        className="location-precision-note location-precision-note--precise"
+        data-precision="precise"
+      >
+        <Icon name="check" size={13} strokeWidth={1.8} />
+        <span>{t("detail.location.precision.precise.title", lc)}</span>
+      </p>
+    );
+  }
+  // Approximate — show the body warning + the geocoder's anchor when
+  // present (e.g. "Near Playa El Tunco, Tamanique..."). The anchor is
+  // optional; older listings can have a null reference.
+  const reference = (listing.geocoding_reference || "").trim();
+  return (
+    <p
+      className="location-precision-note location-precision-note--approximate"
+      data-precision="approximate"
+    >
+      <Icon name="info" size={13} strokeWidth={1.8} />
+      <span>
+        <strong>{t("detail.location.precision.approximate.title", lc)}.</strong>{" "}
+        {t("detail.location.precision.approximate.body", lc)}
+        {reference && (
+          <>
+            {" "}
+            <span className="location-precision-note__reference">{reference}</span>
+          </>
+        )}
+      </span>
+    </p>
+  );
 }
 
 // ===== Icons (inline SVG, Lucide-style) =====
@@ -132,6 +193,18 @@ const Icon = ({ name, size = 18, className = "", strokeWidth = 1.6 }) => {
     bookmark: <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>,
     star: <polygon points="12 2 15 8.5 22 9.3 17 14 18.5 21 12 17.5 5.5 21 7 14 2 9.3 9 8.5"/>,
     info: <><circle cx="12" cy="12" r="10"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="12" y1="7.5" x2="12" y2="7.51"/></>,
+
+    /* ===== Built-property fact icons (plan 010) ===== */
+    /* Detail-page Key Facts tiles for houses/condos. Lucide-sourced,
+       same hairline stroke style as the rest of the set. */
+    bed: <><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></>,
+    bath: <><path d="M10 4 8 6"/><path d="M17 19v2"/><path d="M2 12h20"/><path d="M7 19v2"/><path d="M9 5 7.621 3.621A2.121 2.121 0 0 0 4 5v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></>,
+    ruler: <><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/><path d="m14.5 12.5 2-2"/><path d="m11.5 9.5 2-2"/><path d="m8.5 6.5 2-2"/><path d="m17.5 15.5 2-2"/></>,
+    calendar: <><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></>,
+    refresh: <><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></>,
+    car: <><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></>,
+    receipt: <><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></>,
+    sofa: <><path d="M20 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v3"/><path d="M2 11v5a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v2H6v-2a2 2 0 0 0-4 0Z"/><path d="M4 18v2"/><path d="M20 18v2"/></>,
 
     /* ===== Category icons (monochrome, line) ===== */
     /* Used by PillRail. Hairline (1.6) line, geometric, no fills. */
@@ -271,6 +344,9 @@ function Badge({ listing }) {
 // is 7 days, matching the home shelf's "new this week" definition.
 function signalForListing(listing) {
   if (!listing) return null;
+  if (listing.existence_status === "missing_recently" || listing.existence_status === "stale") {
+    return { kind: "stale", labelKey: "badge.stale", icon: "info" };
+  }
   if (listing.is_repriced) {
     return { kind: "drop", labelKey: "badge.price_drop", icon: "cat_price_drop" };
   }
@@ -384,7 +460,19 @@ function Photo({
   // lands on a real image" guarantee while keeping us off the
   // generic stock visual when a real photo exists upstream.
   const [localUrlFailed, setLocalUrlFailed] = useState(false);
-  const url = heroSrc
+  // Display-gate contract (plan 003): on the CARD image (the
+  // `thumbnail` choke point used by Browse/Saved/home/map cards), a
+  // listing the photo phase never approved as card-displayable
+  // (logo/flyer/text-overlay/render) must NEVER render its source
+  // image — resolve to null so the category-fallback path below paints
+  // the bundled illustration instead. The listing stays findable; only
+  // the bad image is suppressed. This does NOT touch the detail-page
+  // gallery (raw <img>, not <Photo thumbnail>) or the carousel
+  // broker-native slots (idx > 0, non-thumbnail) — those are plan 004.
+  const cardImageBlocked = thumbnail && !isCardImageDisplayable(listing);
+  const url = cardImageBlocked
+    ? null
+    : heroSrc
     ? heroSrc
     : thumbnail
       ? (
@@ -764,6 +852,11 @@ const PHOTO_PRELOAD_MAX = 5;
 function ListingCard({
   listing, app, compact = false, onOpen, variant = "default",
   priority = false, source, topRank, sharedPin = false,
+  // PR-9/WS4 — map↔card sync. `highlighted` draws the sync ring;
+  // `onHover` reports hover (id | null) so the map can highlight the
+  // matching marker. data-listing-id lets the card panel scroll a card
+  // into view when its marker is hovered.
+  highlighted = false, onHover,
 }) {
   const [photoIdx, setPhotoIdx] = useState(0);
   const [hovered, setHovered] = useState(false);
@@ -835,10 +928,11 @@ function ListingCard({
 
   return (
     <article
-      className={`listing-card ${compact ? "compact" : ""} ${isMag ? "listing-card-magazine" : ""} ${sharedPin ? "listing-card-shared-pinned" : ""}`}
+      data-listing-id={listing.id}
+      className={`listing-card ${compact ? "compact" : ""} ${isMag ? "listing-card-magazine" : ""} ${sharedPin ? "listing-card-shared-pinned" : ""} ${highlighted ? "listing-card-highlighted" : ""}`}
       onClick={handleClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={() => { setHovered(true); onHover?.(listing.id); }}
+      onMouseLeave={() => { setHovered(false); onHover?.(null); }}
     >
       {/* SEO + middle-click anchor. aria-hidden + tabIndex=-1 keep it
           out of the keyboard tab order — the card itself stays the
@@ -1004,4 +1098,5 @@ export {
   Icon, RankTrophy, PulpoLogo, PulpoMark, Badge, CardSignalChip, DealGradeChip, dealGradeForListing, signalForListing, Photo, HeartButton, ShareButton, ListingCard, SkeletonCard, Toast,
   formatPrice, formatSize, formatDaysListed, formatPpm, ppmSuffix,
   daysListedTone, landTypeLabel, formatDistanceKm, currentLocale, currentUnits,
+  hasCoords, isLowConfidenceGeo,
 };

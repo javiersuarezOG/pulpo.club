@@ -106,6 +106,18 @@ function formatPpm(n) {
   return `$${Math.round(n)}/m²`;
 }
 
+// Continuity contract (PR #785): lead with the hero picker's winning
+// broker URL when present, so the OG card the user clicks matches the
+// first image the detail gallery shows on arrival. Falls back to the
+// raw first photo when the field is missing (older listings, or the
+// winner is already photo_urls[0]).
+function pickPhotoUrl(listing) {
+  if (typeof listing.selected_photo_url === "string" && listing.selected_photo_url.startsWith("http")) {
+    return listing.selected_photo_url;
+  }
+  return (Array.isArray(listing.photo_urls) && listing.photo_urls[0]) ? listing.photo_urls[0] : null;
+}
+
 // Render the OG card image. React.createElement (not JSX) so the file
 // stays as plain .js — Vercel's serverless function classifier only
 // auto-detects .js / .ts / .mjs / .cjs in api/; .jsx/.tsx in this
@@ -133,9 +145,7 @@ function renderCard({ listing, lang }) {
   if (listing.has_water) features.push(lang === "es" ? "agua" : "water");
   if (listing.is_flat) features.push(lang === "es" ? "plano" : "flat");
 
-  const photoUrl = (Array.isArray(listing.photo_urls) && listing.photo_urls[0])
-    ? listing.photo_urls[0]
-    : null;
+  const photoUrl = pickPhotoUrl(listing);
 
   const titleLine = area ? `${title} · ${area}` : title;
   const metaParts = [muni, dept, features.join(" · ")].filter(Boolean);
@@ -405,3 +415,7 @@ export default async function handler(req) {
     return new Response(`render error: ${err && err.message}`, { status: 500 });
   }
 }
+
+// Pure helpers exposed for unit testing (no render, no fetch). Mirrors
+// the `_internal` convention used by api/l/[token].js.
+handler._internal = { pickPhotoUrl };

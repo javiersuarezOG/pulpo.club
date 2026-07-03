@@ -111,7 +111,9 @@ export function SiteHeader({ app }) {
           ) : (
             <button
               className="topnav-auth-icon"
-              onClick={() => app.openSignup({ mode: "login" })}
+              onClick={() => app.accessV2
+                ? app.requestAccess({ reason: "account_entry", member: false })
+                : app.openSignup({ mode: "login" })}
               aria-label={t("nav.account_or_sign_in", lc)}
               title={t("nav.account_or_sign_in", lc)}
             >

@@ -56,6 +56,7 @@ from pulpo.source_health import (  # noqa: E402
     SourceBrownoutResult,
     compute_brownout_states,
 )
+from pulpo.scrapers._metadata import SCRAPER_METADATA  # noqa: E402
 
 
 # Stale-row cutoff. A red row older than this is silently ignored — it
@@ -74,6 +75,12 @@ def latest_row_per_source(rows: list[dict]) -> dict[str, dict]:
         if src not in by_src or cur_ts > (by_src[src].get("ts") or ""):
             by_src[src] = r
     return by_src
+
+
+def source_lifecycle(source: str) -> str:
+    meta = SCRAPER_METADATA.get(source) or {}
+    lifecycle = meta.get("lifecycle")
+    return lifecycle if isinstance(lifecycle, str) else "active"
 
 
 def fresh_red_rows(
@@ -102,6 +109,8 @@ def fresh_red_rows(
         if ts < cutoff:
             continue
         if r.get("status") == "red":
+            if source_lifecycle(_src) == "experimental":
+                continue
             out.append(r)
     return out
 
@@ -136,7 +145,7 @@ def _post_slack(webhook_url: str, text: str) -> None:
         method="POST",
     )
     try:
-        urllib.request.urlopen(req, timeout=20).read()
+        urllib.request.urlopen(req, timeout=5).read()
     except (urllib.error.URLError, TimeoutError) as e:
         # We never block the nightly on alerting. The next scheduled
         # watchdog will still see the row once it commits.
@@ -150,6 +159,8 @@ def brownout_alert_lines(results: list[SourceBrownoutResult]) -> list[str]:
     out: list[str] = []
     for r in sorted(results, key=lambda x: x.source):
         if r.status in {"green", "skipped", "unknown"}:
+            continue
+        if source_lifecycle(r.source) == "experimental":
             continue
         median_str = (
             f"{r.rolling_median_7:.0f}" if r.rolling_median_7 is not None else "?"

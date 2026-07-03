@@ -19,6 +19,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO_ROOT))
 
 
 def main() -> int:
@@ -46,9 +47,34 @@ def main() -> int:
         action="store_true",
         help="Exit 1 if any source has level=critical. CI uses this.",
     )
+    parser.add_argument(
+        "--no-append",
+        action="store_true",
+        help=(
+            "Classify without appending to row_count_history.jsonl. "
+            "Use for pre-commit candidate gates."
+        ),
+    )
+    parser.add_argument(
+        "--floor",
+        type=int,
+        default=None,
+        help=(
+            "Catalogue count floor. When set, a per-source CRITICAL drop no "
+            "longer blocks the commit if the sv __total__ is healthy (>= floor "
+            "and not itself critical) — a single dead source can't freeze a "
+            "healthy catalogue. Only a catastrophic total collapse blocks."
+        ),
+    )
     args = parser.parse_args()
 
-    from automation.row_count_sentinel import any_critical, run_tick
+    from automation.row_count_sentinel import (
+        downgrade_experimental,
+        gate_decision,
+        load_history,
+        run_tick,
+    )
+    from pulpo.scrapers._metadata import SCRAPER_METADATA
 
     ranked_paths = {"sv": args.sv_ranked}
     if args.pa_ranked.exists():
@@ -57,7 +83,9 @@ def main() -> int:
     verdicts = run_tick(
         ranked_paths=ranked_paths,
         history_path=args.history_path,
+        record=not args.no_append,
     )
+    verdicts = downgrade_experimental(verdicts, SCRAPER_METADATA)
 
     # Print a compact table.
     print(f"{'level':<10} {'country':<8} {'source':<22} prev → curr (delta)")
@@ -69,11 +97,18 @@ def main() -> int:
             f"{v.prev_count} → {v.curr_count} (Δ{v.delta}, {pct})"
         )
 
-    print(f"\nWrote {len(verdicts)} ticks to {args.history_path}")
+    if args.no_append:
+        if not load_history(args.history_path):
+            print("\n[row_count] no baseline history; gate skipped by first_observation semantics")
+        print(f"\nClassified {len(verdicts)} counts without appending to {args.history_path}")
+    else:
+        print(f"\nWrote {len(verdicts)} ticks to {args.history_path}")
 
-    if args.fail_on_crit and any_critical(verdicts):
-        print("\n[row_count] at least one source is CRITICAL — exiting 1")
-        return 1
+    if args.fail_on_crit:
+        should_block, msg = gate_decision(verdicts, floor=args.floor)
+        if msg:
+            print(f"\n[row_count] {msg}")
+        return 1 if should_block else 0
     return 0
 
 

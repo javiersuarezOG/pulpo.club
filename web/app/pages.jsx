@@ -18,12 +18,15 @@ import {
   SUBCATEGORY_LABELS,
   DISCOVERY_PILL_LABELS,
 } from "./config/ia.ts";
-import { getCategoryImage } from "./assets/categories/index.js";
+import { getCategoryImage, categoryImageForListing } from "./assets/categories/index.js";
 import { useListings, useListingsState } from "./data/use-listings.tsx";
 import {
   hasFilterParamsInURL,
   readFilterFromURL,
   readSortFromURL,
+  readViewFromURL,
+  readBboxFromURL,
+  writeBboxToURL,
   writeFilterToURL,
 } from "./data/filter-url.ts";
 import {
@@ -33,10 +36,12 @@ import {
 import { track, optIn, optOut } from "./telemetry/hook";
 import { readConsent, writeConsent, CONSENT_POLICY_VERSION } from "./lib/consent";
 import { useDebouncedValue } from "./lib/use-debounced-value.ts";
+import { safeLocalGet, safeLocalSet } from "./lib/safe-storage";
 import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
 import { markUpsellDismissed, decideShouldShowUpsell } from "./lib/upsell-config";
 import { captureCampaignParams } from "./lib/campaign";
 import { startCheckoutFromModal } from "./lib/stripe-modal-checkout";
+import { tokenize, matchesQuery, scoreListing, buildSuggestions } from "./lib/search-match";
 import {
   Icon,
   RankTrophy,
@@ -57,6 +62,7 @@ import {
   daysListedTone,
   landTypeLabel,
   formatDistanceKm,
+  LocationPrecisionNote,
   currentLocale,
   currentUnits,
 } from "./components.jsx";
@@ -70,12 +76,20 @@ async function startStripeCheckout(opts) {
   return mod.startStripeCheckout(opts);
 }
 import { resolvePinFromParam } from "./lib/share";
+import { buildLocalImgUrl } from "./lib/img-url";
 import {
   uspsVisibleFor,
   galleryThumbsUnlockedFor,
   isPaid as gateIsPaid,
 } from "./lib/gating.ts";
 import { trackCtaRouted, routeCtaForState, dispatchCentralBranch } from "./lib/cta-routing";
+
+// PR-7/WS4 — map view, lazy so Leaflet + markercluster land in their own
+// Vite chunk and never touch the Browse entry bundle.
+const LazyMapView = React.lazy(() => import("./components/MapView.jsx"));
+// PR-10 — mobile map bottom sheet (reuses ListingCard; lazy to keep it
+// out of the entry bundle, it only renders in map view).
+const LazyMapBottomSheet = React.lazy(() => import("./components/MapBottomSheet.jsx"));
 
 // Hide the Agency plan tier until we're ready to ship it. Flip to true to
 // re-enable. Kept as a module constant so a single edit (no tweak panel,
@@ -868,6 +882,11 @@ function makeDefaultFilters() {
     // surfaces them at the bottom of the result set (ranker already
     // hard-floored them, so the order is correct without extra work).
     include_incomplete: false,
+    // Free-text exact-lookup search (web/app/lib/search-match.ts). The
+    // user types a Pulpo id, broker URL, zone, or title fragment;
+    // every whitespace-separated token must hit somewhere in the
+    // listing's haystack. Empty = match-all (no-op).
+    query: "",
   };
 }
 
@@ -905,6 +924,10 @@ function buildTopRankMap(listings, n = 10) {
 }
 
 function applyFilters(listings, f) {
+  // Tokenize once for the whole filter pass — matchesQuery is a hot
+  // path (runs per-listing per-render) and re-splitting + re-folding
+  // the same query string per row is wasteful.
+  const queryTokens = tokenize(f && f.query);
   return listings.filter(l => {
     if (l.is_sold) return false;
     // Quality gate — incomplete listings are hidden by default.
@@ -942,6 +965,10 @@ function applyFilters(listings, f) {
         if (!tags.includes(required)) return false;
       }
     }
+    // Free-text exact-lookup search. Done last because (a) it's the
+    // most expensive predicate per row (string concat + substring),
+    // and (b) most filtered-out rows never reach this check.
+    if (queryTokens.length > 0 && !matchesQuery(l, queryTokens)) return false;
     // rank_max is intentionally NOT applied here — it operates on a
     // position rank that only makes sense AFTER every other predicate
     // has narrowed the set. Callers compute the cap via applyRankCap.
@@ -1088,6 +1115,21 @@ function resolveResultsHeader(filters, locale, resultCount) {
   return null;
 }
 
+// Active-filter chips echo the SAME labels the FilterPanel renders, so a
+// Spanish user never sees a raw enum slug. features/infra reuse their
+// filter.feature.* / filter.infra.* keys directly (the panel guarantees a key
+// for every value in the set); status has ad-hoc per-value keys, mapped here
+// with a capitalize() safety net for any future untranslated value (a smell to
+// catch in review, never a raw slug shipped to the user).
+const STATUS_CHIP_KEYS = {
+  price_drop: "filter.ranking.price_drops",
+  new: "filter.ranking.new",
+};
+function statusChipLabel(v, lc) {
+  // i18n-allow: capitalize() safety net after the closed-set t() guard above
+  return STATUS_CHIP_KEYS[v] ? t(STATUS_CHIP_KEYS[v], lc) : capitalize(v.replace(/_/g, " "));
+}
+
 function BrowsePage({ app }) {
   const LISTINGS = useListings();
   const listingsState = useListingsState();
@@ -1116,13 +1158,34 @@ function BrowsePage({ app }) {
   // weekly newsletter pipeline in P3). Debounced + skip-if-equal; no
   // write for anonymous users.
   useDiscoverFilterPersist(app, filters);
-  const [view, setView] = pUseState(() => localStorage.getItem("pulpo-view") || "cards");
+  // View seeds from the URL first (`?view=map` is shareable), then falls
+  // back to the localStorage default. Cards remains the default.
+  const [view, setView] = pUseState(() => {
+    if (typeof window === "undefined") return "cards";
+    const ls = safeLocalGet("pulpo-view") || "cards";
+    return readViewFromURL(window.location.search, ls);
+  });
   const [sort, setSort] = pUseState(() =>
     typeof window !== "undefined"
       ? readSortFromURL(window.location.search, "recent")
       : "recent"
   );
   const [filterDrawerOpen, setFilterDrawerOpen] = pUseState(false);
+
+  // PR-9/WS4 — map split-pane sync + "search as I move".
+  const [hoveredId, setHoveredId] = pUseState(null);
+  const [searchAsIMove, setSearchAsIMove] = pUseState(true);
+  const [mapBbox, setMapBbox] = pUseState(() =>
+    typeof window !== "undefined" ? readBboxFromURL(window.location.search) : null,
+  );
+  // WS4 map↔search sync — fitNonce is the parent→MapView "refit to the
+  // matches" signal; didInitMapRef skips the entry run so an inbound ?bbox=
+  // deep-link survives (unless a text query is active — that's authoritative).
+  const [fitNonce, setFitNonce] = pUseState(0);
+  const didInitMapRef = pUseRef(false);
+  const searchSigRef = pUseRef(null);
+  const hoverSourceRef = pUseRef(null); // "card" | "map" — gates scroll-into-view
+  const cardPanelRef = pUseRef(null);
 
   // Share-pin state — recipient landed via /l/<token> OR the canonical
   // /browse?pin=<token> share URL. We seed from ?pin so the pinned card
@@ -1167,6 +1230,8 @@ function BrowsePage({ app }) {
       const seeded = buildFiltersForCategory(params.get("cat"));
       setFilters(readFilterFromURL(window.location.search, seeded));
       setSort(readSortFromURL(window.location.search, "recent"));
+      setView(readViewFromURL(window.location.search, safeLocalGet("pulpo-view") || "cards"));
+      setMapBbox(readBboxFromURL(window.location.search));
       setPinnedListingId(resolvePinFromParam(params.get("pin")));
     };
     window.addEventListener("popstate", onPop);
@@ -1182,6 +1247,11 @@ function BrowsePage({ app }) {
   // the priority lane.
   const ABOVE_FOLD_COUNT = 6;
   const [visibleCount, setVisibleCount] = pUseState(PAGE_SIZE);
+  // Map view paginates its card panel + bottom sheet too: unfiltered, the
+  // map shows the whole catalog (~1500), and rendering that many full
+  // ListingCards — on mobile, inside a fixed bottom sheet — janks low-end
+  // devices. Same PAGE_SIZE cap + "Load more" as the list view.
+  const [mapVisibleCount, setMapVisibleCount] = pUseState(PAGE_SIZE);
 
   // When the category in the URL changes (incl. "All" which is null), resync
   // filters to match. Without this, useState's lazy initializer only runs once
@@ -1204,10 +1274,10 @@ function BrowsePage({ app }) {
   // Persist filter + sort + category to URLSearchParams (replaceState
   // — no new history entries on every chip toggle).
   pUseEffect(() => {
-    writeFilterToURL(filters, app.routeParams.category ?? null, sort);
-  }, [filters, sort, app.routeParams.category]);
+    writeFilterToURL(filters, app.routeParams.category ?? null, sort, view);
+  }, [filters, sort, app.routeParams.category, view]);
 
-  pUseEffect(() => { localStorage.setItem("pulpo-view", view); }, [view]);
+  pUseEffect(() => { safeLocalSet("pulpo-view", view); }, [view]);
 
   // Reset pagination back to page 1 whenever the result set could change.
   // Without this, a filter that drops the count below visibleCount leaves
@@ -1237,6 +1307,18 @@ function BrowsePage({ app }) {
     // last set to.
     const r = applyRankCap(filtered, debouncedFilters.rank_max);
     const rankActive = debouncedFilters.rank_max != null && debouncedFilters.rank_max > 0;
+    // Keyword relevance: when a search query is active, order by
+    // scoreListing desc (title > zone > id/url, +1 word-boundary boost),
+    // tie-broken by rank_score. rank_max still wins over relevance so
+    // "Top 10 + query" stays best-first. This is keyword ranking, not
+    // natural-language/semantic search — no intent parsing.
+    const qTokens = tokenize(debouncedFilters.query);
+    const queryActive = qTokens.length > 0;
+    const relevanceSorter = (a, b) => {
+      const d = scoreListing(b, qTokens) - scoreListing(a, qTokens);
+      if (d !== 0) return d;
+      return (b.rank_score ?? 0) - (a.rank_score ?? 0);
+    };
     const sorters = {
       recent: (a, b) => a.first_seen_date - b.first_seen_date,
       price_asc: (a, b) => (a.price ?? Infinity) - (b.price ?? Infinity),
@@ -1257,7 +1339,13 @@ function BrowsePage({ app }) {
         recomputeComposite(b, debouncedFilters.weights) -
         recomputeComposite(a, debouncedFilters.weights),
     };
-    const sorted = [...r].sort(rankActive ? sorters.stars_desc : (sorters[sort] || sorters.recent));
+    const sorted = [...r].sort(
+      rankActive
+        ? sorters.stars_desc
+        : queryActive
+          ? relevanceSorter
+          : (sorters[sort] || sorters.recent),
+    );
     // Emit perf telemetry for the full filter+sort cycle.
     if (_perf_t0 > 0 && typeof performance !== "undefined" && performance.now) {
       const ms = Math.round(performance.now() - _perf_t0);
@@ -1277,6 +1365,188 @@ function BrowsePage({ app }) {
   }, [debouncedFilters, sort, LISTINGS]);
 
   const activeFilterCount = filters.zones.size + filters.land_types.size + filters.features.size + filters.infra.size + filters.status.size + (filters.price_max != null || filters.price_min > 0 ? 1 : 0) + (filters.readiness > 0 ? 1 : 0);
+
+  // When a search query is active, results are ordered by keyword
+  // relevance (see the results memo) so the sort dropdown no longer
+  // applies — swap it for a static "Best match" label. rank_max still
+  // overrides relevance, so keep the dropdown visible in that case.
+  const rankActive = filters.rank_max != null && filters.rank_max > 0;
+  const showRelevanceLabel = tokenize(filters.query).length > 0 && !rankActive;
+
+  // Map popup "View listing" — routes through the SAME CTA matrix as a
+  // card click so anon/free hit the FreeMonthModal and paid users open
+  // the detail panel (never a silent bypass).
+  const handleMapOpenListing = pUseCallback((id) => {
+    track("card.clicked", { listing_id: id, source_view: "map" });
+    const branch = routeCtaForState("shelf_card", app?.user);
+    trackCtaRouted("shelf_card", app?.user, branch, true);
+    if (branch === "passthrough") { app.openListing(id); return; }
+    void dispatchCentralBranch(branch, app, { trigger: "map_pin", pendingListing: id });
+  }, [app]);
+
+  // PR-9 — "search as I move" narrows the map + card panel to the
+  // viewport, CLIENT-SIDE (every listing is already in the browser).
+  // Map-branch-only post-filter — never touches applyFilters, so the
+  // cards/table views are unaffected.
+  const mapResults = pUseMemo(() => {
+    if (view !== "map" || !searchAsIMove || !mapBbox) return results;
+    return results.filter(
+      (l) =>
+        l.lat != null && l.lng != null &&
+        l.lat >= mapBbox.minLat && l.lat <= mapBbox.maxLat &&
+        l.lng >= mapBbox.minLng && l.lng <= mapBbox.maxLng,
+    );
+  }, [results, view, searchAsIMove, mapBbox]);
+
+  // Reset the map card cap whenever the shown set changes (fresh search or
+  // a pan that re-narrows the viewport) so the first 60 of the new set show.
+  pUseEffect(() => {
+    setMapVisibleCount(PAGE_SIZE);
+  }, [mapResults]);
+  const mapVisible = pUseMemo(() => mapResults.slice(0, mapVisibleCount), [mapResults, mapVisibleCount]);
+
+  // In map view every visible count reflects what's actually shown
+  // (mapResults) so the list, the map, and the header never disagree —
+  // after a fresh search mapResults===results; after a pan both narrow.
+  const displayCount = view === "map" ? mapResults.length : results.length;
+
+  const handleMapBounds = pUseCallback((bbox) => {
+    setMapBbox(bbox);
+    writeBboxToURL(bbox);
+  }, []);
+  const handleToggleSearchAsIMove = pUseCallback((on) => {
+    setSearchAsIMove(on);
+    if (!on) { setMapBbox(null); writeBboxToURL(null); }
+  }, []);
+  // Empty-in-view escape hatch: clear the viewport filter and refit to all
+  // matches (same path the authoritative-search refit uses).
+  const handleShowAllInView = pUseCallback(() => {
+    setMapBbox(null); writeBboxToURL(null);
+    setFitNonce((n) => n + 1);
+  }, []);
+  const handleMarkerHover = pUseCallback((id) => { hoverSourceRef.current = "map"; setHoveredId(id); }, []);
+  const handleCardHover = pUseCallback((id) => { hoverSourceRef.current = "card"; setHoveredId(id); }, []);
+
+  // Marker-hover → scroll the matching card into the panel (only when
+  // the hover originated on the map, so card-hover doesn't self-scroll).
+  pUseEffect(() => {
+    if (view !== "map" || hoverSourceRef.current !== "map" || !hoveredId) return;
+    const panel = cardPanelRef.current;
+    const card = panel && panel.querySelector(`[data-listing-id="${(window.CSS && CSS.escape) ? CSS.escape(hoveredId) : hoveredId}"]`);
+    if (card) card.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [hoveredId, view]);
+
+  // bbox is map-only — clear it (and the URL param) when leaving map view.
+  pUseEffect(() => {
+    if (view !== "map" && mapBbox) { setMapBbox(null); writeBboxToURL(null); }
+  }, [view]);
+
+  // Map↔search sync — the search/filters are authoritative over the map
+  // viewport: a real search change drops the stale viewport bbox and tells
+  // MapView to refit to the matches. We key off an explicit SIGNATURE of the
+  // search intent (query+sort+filters), NOT the `results` array identity.
+  // `results` churns during mount (the URL→filters re-seed + the 300ms
+  // debounce, doubled under StrictMode) WITHOUT the search actually changing;
+  // keying the effect off `results` made that hydration churn race the entry
+  // latch and wrongly clear an inbound ?bbox= deep-link. `searchSig` is a
+  // primitive string derived from debouncedFilters, so React's own dependency
+  // check on the effect below short-circuits it whenever the intent is
+  // unchanged — the effect simply never fires on hydration churn.
+  const searchSig = pUseMemo(() => JSON.stringify([
+    debouncedFilters.query || "", sort,
+    [...debouncedFilters.zones].sort(), [...debouncedFilters.land_types].sort(),
+    [...debouncedFilters.features].sort(), [...debouncedFilters.infra].sort(),
+    [...debouncedFilters.status].sort(),
+    debouncedFilters.price_min, debouncedFilters.price_max,
+    debouncedFilters.readiness, debouncedFilters.rank_max,
+  ]), [debouncedFilters, sort]);
+
+  pUseEffect(() => {
+    if (view !== "map") { didInitMapRef.current = false; searchSigRef.current = null; return; }
+    if (!didInitMapRef.current) {
+      // ENTRY (first map render): latch the baseline signature and PRESERVE an
+      // inbound ?bbox= deep-link (PR-9 shareable viewport) — UNLESS a text
+      // query is active, which is authoritative over a stale viewport (handles
+      // ?q=…&bbox=elsewhere). We never clear bbox on hydration here: the effect
+      // only re-runs when `searchSig` genuinely changes (primitive dep).
+      didInitMapRef.current = true;
+      searchSigRef.current = searchSig;
+      if (tokenize(debouncedFilters.query).length > 0 && mapBbox) {
+        setMapBbox(null); writeBboxToURL(null);
+      } else if (mapBbox) {
+        // Positive heartbeat — an inbound ?bbox= deep-link survived the
+        // hydration race and is being applied to the viewport. Alert if
+        // ?bbox= traffic stops producing this (A1 regressed). See
+        // map.deeplink_bbox_applied in telemetry/events.ts.
+        track("map.deeplink_bbox_applied", {});
+      }
+      setFitNonce((n) => n + 1);
+      return;
+    }
+    if (searchSig === searchSigRef.current) return; // unchanged intent — ignore
+    // Genuine post-init search change: the viewport is now stale → refit.
+    searchSigRef.current = searchSig;
+    setMapBbox(null); writeBboxToURL(null);
+    setFitNonce((n) => n + 1);
+  }, [searchSig, view]);
+
+  // Mobile map mode is a viewport surface, not a long Browse document.
+  // Toggle a body class only while the mobile media query matches so
+  // desktop split-pane behavior remains unchanged.
+  pUseEffect(() => {
+    if (typeof window === "undefined" || typeof document === "undefined") return undefined;
+    const mq = window.matchMedia("(max-width: 767px)");
+    const cls = "map-xp-mobile-active";
+    const sync = () => {
+      document.body.classList.toggle(cls, view === "map" && mq.matches);
+    };
+    sync();
+    if (typeof mq.addEventListener === "function") {
+      mq.addEventListener("change", sync);
+      return () => {
+        mq.removeEventListener("change", sync);
+        document.body.classList.remove(cls);
+      };
+    }
+    mq.addListener(sync);
+    return () => {
+      mq.removeListener(sync);
+      document.body.classList.remove(cls);
+    };
+  }, [view]);
+
+  // Mobile map height keys off the REAL header height, not a hardcoded 72px.
+  // The .topnav grows/shrinks with auth state (signed-out vs Pro), locale
+  // wrapping, and viewport — a fixed offset re-breaks the map layout whenever
+  // any of those change. Measure .topnav and publish it as
+  // --map-mobile-top-offset while the mobile map surface is active; clear it on
+  // exit so the token default (72px) applies everywhere else.
+  pUseEffect(() => {
+    if (typeof window === "undefined" || typeof document === "undefined") return undefined;
+    const mq = window.matchMedia("(max-width: 767px)");
+    const root = document.documentElement;
+    const PROP = "--map-mobile-top-offset";
+    const header = document.querySelector(".topnav");
+    const apply = () => {
+      if (view !== "map" || !mq.matches || !header) { root.style.removeProperty(PROP); return; }
+      const h = Math.round(header.getBoundingClientRect().height);
+      if (h > 0) root.style.setProperty(PROP, `${h}px`);
+    };
+    apply();
+    let ro;
+    if (view === "map" && header && typeof ResizeObserver === "function") {
+      ro = new ResizeObserver(apply);
+      ro.observe(header);
+    }
+    mq.addEventListener?.("change", apply);
+    window.addEventListener("resize", apply);
+    return () => {
+      ro?.disconnect();
+      mq.removeEventListener?.("change", apply);
+      window.removeEventListener("resize", apply);
+      root.style.removeProperty(PROP);
+    };
+  }, [view]);
 
   // Telemetry: report empty-result state once per filter change so the
   // funnel can flag filter combinations that nuke the results.
@@ -1365,6 +1635,7 @@ function BrowsePage({ app }) {
     // good enough — Google reads the trail as breadcrumb context, not
     // marketing copy. Full localization lives in the page <title> +
     // meta description set by useDocumentMeta.
+    // i18n-allow: SEO breadcrumb leaf; full localization is in the page <title>/meta
     const leaf = browseCat.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
     browseBreadcrumb.push({
       name: leaf,
@@ -1373,13 +1644,22 @@ function BrowsePage({ app }) {
   }
 
   return (
-    <div className="page page-browse">
+    <div className={`page page-browse${view === "map" ? " page-browse--map" : ""}`}>
       <BreadcrumbListJsonLd items={browseBreadcrumb} />
       <div className="browse-layout">
         <div className="filter-desktop">
-          <FilterPanel filters={filters} setFilters={setFiltersWithPinClear} count={results.length} app={app} />
+          <FilterPanel filters={filters} setFilters={setFiltersWithPinClear} count={displayCount} app={app} />
         </div>
         <div className="results-col">
+          <BrowseSearchBar
+            value={filters.query || ""}
+            onChange={(next) => setFiltersWithPinClear({ ...filters, query: next })}
+            resultCount={displayCount}
+            locale={app.locale}
+            listings={LISTINGS}
+            filters={filters}
+            onApplyFilters={setFiltersWithPinClear}
+          />
           <div className="results-header">
             <div className="results-count">
               {(() => {
@@ -1387,11 +1667,11 @@ function BrowsePage({ app }) {
                 // URL `cat=` slug. See resolveResultsHeader's docblock —
                 // without this, switching from Lake to Beach (etc.) left
                 // the original slug pinned at the top of the page.
-                const header = resolveResultsHeader(filters, app.locale, results.length);
+                const header = resolveResultsHeader(filters, app.locale, displayCount);
                 if (!header) {
                   return (
                     <>
-                      <span className="num">{results.length}</span> {t("card.listings_count", app.locale)}
+                      <span className="num">{displayCount}</span> {t("card.listings_count", app.locale)}
                     </>
                   );
                 }
@@ -1401,11 +1681,11 @@ function BrowsePage({ app }) {
                     <span className="results-cat-meta">
                       {header.meta ? (
                         <>
-                          <span className="num">{results.length}</span> {t("browse.top10.of_ten", app.locale)}
+                          <span className="num">{displayCount}</span> {t("browse.top10.of_ten", app.locale)}
                         </>
                       ) : (
                         <>
-                          <span className="num">{results.length}</span> {t("browse.in_country", app.locale)}
+                          <span className="num">{displayCount}</span> {t("browse.in_country", app.locale)}
                         </>
                       )}
                       <button
@@ -1439,17 +1719,21 @@ function BrowsePage({ app }) {
                   sort KEYS are unchanged so saved URLs (?sort=stars_desc
                   etc.) keep working; only the visible labels move. The
                   legacy options stay below for power-user access. */}
-              <select className="sort-select" value={sort} onChange={(e) => setSortTelemeter(e.target.value)}>
-                <option value="stars_desc">{t("sort.highest_value", app.locale)}</option>
-                <option value="price_asc">{t("sort.lowest_price", app.locale)}</option>
-                <option value="days_asc">{t("sort.newest", app.locale)}</option>
-                <option value="size_desc">{t("sort.largest_plot", app.locale)}</option>
-                <option value="recent">{t("sort.recent", app.locale)}</option>
-                <option value="price_desc">{t("sort.price_desc", app.locale)}</option>
-                <option value="ppm_asc">{t("sort.ppm_asc_suffix", app.locale, { suffix: `$${ppmSuffix()}` })}</option>
-                <option value="ready_desc">{t("sort.ready_desc", app.locale)}</option>
-                <option value="composite_desc">{t("sort.composite_desc", app.locale)}</option>
-              </select>
+              {showRelevanceLabel ? (
+                <span className="sort-relevance-label">{t("browse.sort.by_relevance", app.locale)}</span>
+              ) : (
+                <select className="sort-select" value={sort} onChange={(e) => setSortTelemeter(e.target.value)}>
+                  <option value="stars_desc">{t("sort.highest_value", app.locale)}</option>
+                  <option value="price_asc">{t("sort.lowest_price", app.locale)}</option>
+                  <option value="days_asc">{t("sort.newest", app.locale)}</option>
+                  <option value="size_desc">{t("sort.largest_plot", app.locale)}</option>
+                  <option value="recent">{t("sort.recent", app.locale)}</option>
+                  <option value="price_desc">{t("sort.price_desc", app.locale)}</option>
+                  <option value="ppm_asc">{t("sort.ppm_asc_suffix", app.locale, { suffix: `$${ppmSuffix()}` })}</option>
+                  <option value="ready_desc">{t("sort.ready_desc", app.locale)}</option>
+                  <option value="composite_desc">{t("sort.composite_desc", app.locale)}</option>
+                </select>
+              )}
               <div className="view-toggle">
                 <button className={view === "table" ? "active" : ""} onClick={() => setViewTelemeter("table")} aria-label={t("view.table", app.locale)}>
                   <Icon name="list" size={16}/>
@@ -1457,14 +1741,12 @@ function BrowsePage({ app }) {
                 <button className={view === "cards" ? "active" : ""} onClick={() => setViewTelemeter("cards")} aria-label={t("view.cards", app.locale)}>
                   <Icon name="grid" size={16}/>
                 </button>
-                {/* Map view placeholder per rewrite plan step 6. Disabled
-                    until the map prototype lands; the tooltip explains
-                    that to users who try clicking. */}
+                {/* Map view (WS4 PR-7) — third view option. */}
                 <button
-                  disabled
-                  className="map-view-placeholder"
-                  aria-label={t("view.map_coming_soon", app.locale)}
-                  title={t("view.map_coming_soon", app.locale)}
+                  className={view === "map" ? "active" : ""}
+                  onClick={() => setViewTelemeter("map")}
+                  aria-label={t("view.map", app.locale)}
+                  title={t("view.map", app.locale)}
                 >
                   <Icon name="map_pin" size={16}/>
                 </button>
@@ -1477,9 +1759,9 @@ function BrowsePage({ app }) {
             <div className="active-filter-row">
               {[...filters.zones].map(z => <span key={z} className="active-chip" onClick={() => { const s = new Set(filters.zones); s.delete(z); setFiltersWithPinClear({...filters, zones: s});}}>{z} <Icon name="close" size={12}/></span>)}
               {[...filters.land_types].map(t => <span key={t} className="active-chip" onClick={() => { const s = new Set(filters.land_types); s.delete(t); setFiltersWithPinClear({...filters, land_types: s});}}>{landTypeLabel(t)} <Icon name="close" size={12}/></span>)}
-              {[...filters.features].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.features); s.delete(f); setFiltersWithPinClear({...filters, features: s});}}>{f.replace("_", " ")} <Icon name="close" size={12}/></span>)}
-              {[...filters.infra].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.infra); s.delete(f); setFiltersWithPinClear({...filters, infra: s});}}>{f} <Icon name="close" size={12}/></span>)}
-              {[...filters.status].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.status); s.delete(f); setFiltersWithPinClear({...filters, status: s});}}>{f.replace("_", " ")} <Icon name="close" size={12}/></span>)}
+              {[...filters.features].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.features); s.delete(f); setFiltersWithPinClear({...filters, features: s});}}>{t(`filter.feature.${f}`, app.locale)} <Icon name="close" size={12}/></span>)}
+              {[...filters.infra].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.infra); s.delete(f); setFiltersWithPinClear({...filters, infra: s});}}>{t(`filter.infra.${f}`, app.locale)} <Icon name="close" size={12}/></span>)}
+              {[...filters.status].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.status); s.delete(f); setFiltersWithPinClear({...filters, status: s});}}>{statusChipLabel(f, app.locale)} <Icon name="close" size={12}/></span>)}
               {(filters.price_min > 0 || filters.price_max != null) && <span className="active-chip" onClick={() => setFiltersWithPinClear({...filters, price_min: 0, price_max: null})}>{formatPrice(filters.price_min)}–{filters.price_max != null ? formatPrice(filters.price_max) : (app.locale === "es" ? "sin tope" : "no max")} <Icon name="close" size={12}/></span>}
             </div>
           )}
@@ -1491,6 +1773,90 @@ function BrowsePage({ app }) {
               listings={LISTINGS}
               setFilters={setFiltersWithPinClear}
             />
+          ) : view === "map" ? (
+            <div className="map-split">
+              <div className="map-split__cards" ref={cardPanelRef}>
+                {mapVisible.map((l) => (
+                  <ListingCard
+                    key={l.id}
+                    listing={l}
+                    app={app}
+                    compact
+                    source="map"
+                    highlighted={l.id === hoveredId}
+                    onHover={handleCardHover}
+                    onOpen={() => handleMapOpenListing(l.id)}
+                  />
+                ))}
+                {mapVisibleCount < mapResults.length && (
+                  <div className="browse-load-more">
+                    <button
+                      type="button"
+                      className="btn-ghost lg"
+                      onClick={() => {
+                        const next = mapVisibleCount + PAGE_SIZE;
+                        track("browse.load_more_clicked", {
+                          from: mapVisibleCount,
+                          to: Math.min(next, mapResults.length),
+                          total: mapResults.length,
+                          surface: "map",
+                        });
+                        setMapVisibleCount(next);
+                      }}
+                    >
+                      {t("browse.load_more", app.locale, { n: mapResults.length - mapVisibleCount })}
+                    </button>
+                  </div>
+                )}
+              </div>
+              <React.Suspense fallback={<div className="map-view map-view--loading">{t("map.skeleton.loading", app.locale)}</div>}>
+                <LazyMapView
+                  results={mapResults}
+                  app={app}
+                  onOpenListing={handleMapOpenListing}
+                  hoveredId={hoveredId}
+                  onHoverMarker={handleMarkerHover}
+                  onBoundsChange={handleMapBounds}
+                  searchAsIMove={searchAsIMove}
+                  onToggleSearchAsIMove={handleToggleSearchAsIMove}
+                  fitNonce={fitNonce}
+                />
+              </React.Suspense>
+              {/* Search-as-I-move narrowed the viewport to nothing (the
+                  outer guard guarantees results.length > 0 here, so this is
+                  the "no matches in THIS area" case, never "no matches"). */}
+              {mapResults.length === 0 && (
+                <div className="map-empty-inview" role="status">
+                  <p className="map-empty-inview__title">{t("map.empty_in_view.title", app.locale)}</p>
+                  <button className="map-empty-inview__primary" onClick={handleShowAllInView}>
+                    {t("map.empty_in_view.show_all", app.locale, { n: results.length })}
+                  </button>
+                  <button className="map-empty-inview__secondary" onClick={() => handleToggleSearchAsIMove(false)}>
+                    {t("map.empty_in_view.turn_off_saim", app.locale)}
+                  </button>
+                </div>
+              )}
+              {/* Mobile-only (CSS): floating Filters pill + bottom sheet
+                  with the result cards. Desktop uses the split-pane panel. */}
+              <button
+                className="map-filters-pill"
+                onClick={() => setFilterDrawerOpen(true)}
+                aria-label={t("view.filters", app.locale)}
+              >
+                <Icon name="sliders" size={16} /> {t("view.filters", app.locale)}
+                {activeFilterCount > 0 && <span className="count-badge">{activeFilterCount}</span>}
+              </button>
+              <React.Suspense fallback={null}>
+                <LazyMapBottomSheet
+                  listings={mapResults}
+                  app={app}
+                  lc={app.locale}
+                  onOpenListing={handleMapOpenListing}
+                  onHover={handleCardHover}
+                  hoveredId={hoveredId}
+                />
+              </React.Suspense>
+            </div>
           ) : view === "cards" ? (
             <>
               <div className="card-grid">
@@ -1582,6 +1948,103 @@ function BrowsePage({ app }) {
 }
 
 // ====== Results table ======
+function listingForIntentionalFallback(listing) {
+  return {
+    ...listing,
+    thumbnail_url: null,
+    photos: [],
+  };
+}
+
+function localThumbnailLooksLikeBrokerLogo(listing) {
+  const thumb = String(listing?.thumbnail_url || "").toLowerCase();
+  if (!thumb) return false;
+  if (thumb.includes("logo") || thumb.includes("placeholder") || thumb.includes("icon")) return true;
+  const photos = Array.isArray(listing?.photos) ? listing.photos : [];
+  return (
+    thumb.startsWith("/photos/xitios_") &&
+    photos.some((u) => String(u || "").toLowerCase().includes("xitios.com.sv/img/icon"))
+  );
+}
+
+function listingForCompactPhoto(listing) {
+  if (!localThumbnailLooksLikeBrokerLogo(listing)) return listing;
+  return {
+    ...listing,
+    thumbnail_url: null,
+  };
+}
+
+function listingForSuggestionThumb(listing) {
+  const suitable =
+    listing &&
+    typeof listing.thumbnail_url === "string" &&
+    listing.thumbnail_url.length > 0 &&
+    listing.card_eligible === true &&
+    listing.has_text_overlay !== true;
+  if (!suitable) return listingForIntentionalFallback(listing);
+  if (localThumbnailLooksLikeBrokerLogo(listing)) return listingForIntentionalFallback(listing);
+  return listing;
+}
+
+function MobileListRow({ listing: l, app, topRank }) {
+  const open = () => app.openListing(l.id);
+  const onKeyDown = (e) => {
+    if (e.key !== "Enter" && e.key !== " ") return;
+    e.preventDefault();
+    open();
+  };
+  const daysCompact = typeof l.days_listed === "number" ? `${l.days_listed}d` : null;
+  const ppm = formatPpm(l.price_per_m2);
+  const ppmText = ppm === "—" ? ppm : `${ppm}${ppmSuffix()}`;
+  const typeLabel = landTypeLabel(l.land_type);
+
+  return (
+    <article
+      className="mobile-list-row"
+      role="button"
+      tabIndex={0}
+      onClick={open}
+      onKeyDown={onKeyDown}
+    >
+      <div className="mobile-list-row__thumb">
+        <Photo listing={listingForCompactPhoto(l)} thumbnail ratio="1/1" className="mobile-list-row__photo" source="browse_mobile_list" />
+        {topRank != null && (
+          <span className="mobile-list-row__rank" aria-label={t("browse.table.rank_aria", app.locale, { rank: topRank })}>
+            <RankTrophy />
+            <span>{topRank}</span>
+          </span>
+        )}
+      </div>
+      <div className="mobile-list-row__main">
+        <div className="mobile-list-row__title">
+          {tr(l.title, app.locale)}
+        </div>
+        <div className="mobile-list-row__place">
+          <span>{l.zone_name}</span>
+          {typeLabel && <span>{typeLabel}</span>}
+        </div>
+        <div className="mobile-list-row__facts" aria-label={t("browse.list.facts_aria", app.locale)}>
+          <span className="mobile-list-row__price">{formatPrice(l.price)}</span>
+          <span>{formatSize(l.size_m2)}</span>
+          <span>{ppmText}</span>
+        </div>
+        <div className="mobile-list-row__meta">
+          <Badge listing={l}/>
+          {daysCompact && l.days_listed > 0 && (
+            <span className={`mobile-list-row__days tone-${daysListedTone(l.days_listed)}`}>
+              {daysCompact}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="mobile-list-row__heart" onClick={(e) => e.stopPropagation()}>
+        <HeartButton listingId={l.id} app={app} variant="inline" size={16}/>
+      </div>
+    </article>
+  );
+}
+
 function ResultsTable({ results, app, sort, setSort, topRankMap }) {
   const headerSortable = (key, label) => {
     const map = { price: "price_asc", days: "days_asc", size: "size_desc", ppm: "ppm_asc" };
@@ -1594,18 +2057,28 @@ function ResultsTable({ results, app, sort, setSort, topRankMap }) {
   };
   return (
     <div className="results-table-wrap">
+      <div className="results-mobile-list" aria-label={t("view.table", app.locale)}>
+        {results.map(l => (
+          <MobileListRow
+            key={l.id}
+            listing={l}
+            app={app}
+            topRank={topRankMap ? topRankMap.get(l.id) : null}
+          />
+        ))}
+      </div>
       <table className="results-table">
         <thead>
           <tr>
             <th></th>
-            <th>Listing</th>
-            <th>Zone</th>
-            <th>Type</th>
-            {headerSortable("size", "Size")}
-            {headerSortable("price", "Price")}
+            <th>{t("browse.table.col.listing", app.locale)}</th>
+            <th>{t("browse.table.col.zone", app.locale)}</th>
+            <th>{t("browse.table.col.type", app.locale)}</th>
+            {headerSortable("size", t("browse.table.col.size", app.locale))}
+            {headerSortable("price", t("browse.table.col.price", app.locale))}
             {headerSortable("ppm", `$${ppmSuffix()}`)}
-            {headerSortable("days", "Days")}
-            <th>Signal</th>
+            {headerSortable("days", t("browse.table.col.days", app.locale))}
+            <th>{t("browse.table.col.signal", app.locale)}</th>
             <th></th>
           </tr>
         </thead>
@@ -1613,35 +2086,11 @@ function ResultsTable({ results, app, sort, setSort, topRankMap }) {
           {results.map(l => (
             <tr key={l.id} onClick={() => app.openListing(l.id)}>
               <td className="thumb-cell">
-                {(() => {
-                  const _thumbUrl = l.thumbnail_url ?? l.photos[0];
-                  if (!_thumbUrl) return <div className="thumb-placeholder"/>;
-                  return (
-                    <img
-                      src={_thumbUrl}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                      width={56}
-                      height={56}
-                      onError={() => {
-                        try {
-                          track("image.error", {
-                            url: String(_thumbUrl).slice(0, 200),
-                            listing_id: l.id,
-                            idx: 0,
-                            source: "browse_table",
-                            is_local: String(_thumbUrl).startsWith("/photos/"),
-                          });
-                        } catch { /* never let telemetry break the render */ }
-                      }}
-                    />
-                  );
-                })()}
+                <Photo listing={listingForCompactPhoto(l)} thumbnail ratio="1/1" className="results-table-thumb" source="browse_table" />
               </td>
               <td className="title-cell">
                 {topRankMap && topRankMap.get(l.id) != null && (
-                  <span className="pulpo-rank pulpo-rank-inline" aria-label={`Pulpo ranked ${topRankMap.get(l.id)}`}>
+                  <span className="pulpo-rank pulpo-rank-inline" aria-label={t("browse.table.rank_aria", app.locale, { rank: topRankMap.get(l.id) })}>
                     <span className="pulpo-rank-star" aria-hidden="true">
                       <RankTrophy />
                     </span>
@@ -1886,16 +2335,31 @@ function PriceContextBlock({ listing, locale }) {
 function ListingDetail({ listing, app, asPanel = true }) {
   const [galleryIdx, setGalleryIdx] = pUseState(0);
   const [lightbox, setLightbox] = pUseState(false);
+  // Lightbox image-load failure (dead broker URL). Reset on every
+  // galleryIdx change so a failed slide doesn't poison the next one.
+  const [lbFailed, setLbFailed] = pUseState(false);
+  pUseEffect(() => { setLbFailed(false); }, [galleryIdx]);
   const isSold = listing.is_sold;
   const isOffMarket = listing.source_type === "off_market";
   // Single source of truth for paywall rules — see web/app/lib/gating.ts.
   // Off-market is paid-only; anonymous + free hit the soft paywall.
   const isPaid = gateIsPaid(app.user);
-  const offMarketLocked = isOffMarket && !isPaid;
+  // Free top-3 exemption: a non-paid viewer reaching this panel for one of
+  // this week's top 3 picks (the only listings openListing lets them open)
+  // sees the FULL detail — broker/source link, full gallery, all USPs,
+  // precise location. We feed the tier-based visual gates a synthetic Pro
+  // user for these; real paid status (`isPaid`) still drives telemetry.
+  const freeUnlocked = !isPaid && typeof app.isFreeViewable === "function" && app.isFreeViewable(listing.id);
+  // Effective unlock for THIS listing: truly paid, or a free top-3 pick.
+  // Drives every visual gate (broker outbound link, USP cap, gallery,
+  // off-market). `isPaid` alone still drives telemetry auth_state.
+  const effectivePaid = isPaid || freeUnlocked;
+  const gateUser = freeUnlocked ? { plan: "pro" } : app.user;
+  const offMarketLocked = isOffMarket && !effectivePaid;
   // Free signup unlocks: source URL, full gallery, all USPs, precise location.
-  const needsSignup = !app.user;
-  const uspCap = uspsVisibleFor(app.user);
-  const thumbCap = galleryThumbsUnlockedFor(app.user);
+  const needsSignup = !app.user && !freeUnlocked;
+  const uspCap = uspsVisibleFor(gateUser);
+  const thumbCap = galleryThumbsUnlockedFor(gateUser);
 
   // PR-5 — detail telemetry. Fire `detail.opened` once per listing
   // (re-fires when user navigates to a different listing). Auth state
@@ -1917,9 +2381,25 @@ function ListingDetail({ listing, app, asPanel = true }) {
   // listing change so the head doesn't grow unboundedly across
   // navigations. fetchpriority="high" matches the <img> hint so the
   // browser doesn't downgrade the preload mid-stream.
+  // P3 — prefer the local hero derivative (/photos/<id>.hero.jpg) as the
+  // detail LCP image, routed through /api/img for WebP. This is the same
+  // winning image the card thumbnail paints, so the detail main now
+  // matches the card AND drops the broker-CDN LCP long-tail (the home
+  // hero's broker fallback measured P95=14.5s). Broker photos[0] stays
+  // the onError fallback + the gallery/lightbox source. Mirrors the
+  // HeroV4 heroSrc derivation.
+  const detailLocalHeroUrl = pUseMemo(() => {
+    const tn = listing.thumbnail_url;
+    if (typeof tn !== "string" || !tn.startsWith("/photos/")) return null;
+    return buildLocalImgUrl(tn.replace(/\.jpg$/i, ".hero.jpg"), 1600);
+  }, [listing.thumbnail_url]);
+
   pUseEffect(() => {
     if (typeof document === "undefined") return;
-    const lcp = listing.photos && listing.photos[0];
+    // Preload the SAME URL the gallery-main <img> will request so the
+    // <link rel=preload> matches the LCP element (a mismatch double-
+    // fetches). Local hero when available; broker photos[0] otherwise.
+    const lcp = detailLocalHeroUrl || (listing.photos && listing.photos[0]);
     if (!lcp) return;
     const link = document.createElement("link");
     link.rel = "preload";
@@ -1930,7 +2410,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
     return () => {
       try { document.head.removeChild(link); } catch { /* already gone — fine */ }
     };
-  }, [listing.id, listing.photos && listing.photos[0]]);
+  }, [listing.id, detailLocalHeroUrl, listing.photos && listing.photos[0]]);
 
   // Paywall telemetry. Fires once per listing+lock transition when the
   // off-market hard paywall renders. Bypass events fire on the buttons
@@ -1940,6 +2420,23 @@ function ListingDetail({ listing, app, asPanel = true }) {
     if (!offMarketLocked) return;
     track("paywall.shown", { kind: "off_market", listing_id: listing.id });
   }, [listing.id, offMarketLocked]);
+
+  // Prefetch the lightbox neighbors (galleryIdx ± 1, modulo to match the
+  // arrow wraparound below) so arrow navigation hits warm cache instead
+  // of a cold fetch. Bounds-safe: no-op with fewer than 2 photos.
+  pUseEffect(() => {
+    if (!lightbox || typeof Image === "undefined") return;
+    const photos = Array.isArray(listing.photos) ? listing.photos : [];
+    if (photos.length < 2) return;
+    const n = photos.length;
+    for (const j of [(galleryIdx + 1) % n, (galleryIdx - 1 + n) % n]) {
+      const url = photos[j];
+      if (typeof url === "string" && url) {
+        const im = new Image();
+        im.src = url;
+      }
+    }
+  }, [lightbox, galleryIdx, listing.photos]);
 
   // PR-5 — lightbox a11y. ESC closes, ←/→ navigate, Tab is trapped
   // inside the lightbox. Focus moves to the close button on open and
@@ -2021,6 +2518,45 @@ function ListingDetail({ listing, app, asPanel = true }) {
   const BEACHFRONT_ENUMS = new Set(["on_beach", "walk_to_beach", "near_beach"]);
 
   const facts = [];
+  // Built-property facts (plan 010) — houses/condos lead with bedrooms /
+  // bathrooms / built area instead of the land-centric set. Every field
+  // is nullable in the Listing type and presence-gated here (the two
+  // shipped /preview crashes were missing exactly these guards — see
+  // CLAUDE.md). Coverage is sparse until plans 009/011 land; tiles
+  // simply appear as data arrives.
+  const isBuilt = listing.property_type === "house" || listing.property_type === "condo";
+  if (isBuilt) {
+    if (isKnown(listing.bedrooms)) {
+      facts.push({ icon: "bed", label: t("detail.fact.bedrooms", lc), value: `${listing.bedrooms}` });
+    }
+    if (isKnown(listing.bathrooms)) {
+      facts.push({ icon: "bath", label: t("detail.fact.bathrooms", lc), value: `${listing.bathrooms}` });
+    }
+    if (isKnown(listing.built_area_m2)) {
+      facts.push({ icon: "ruler", label: t("detail.fact.built_area", lc), value: formatSize(listing.built_area_m2) });
+    }
+    if (isKnown(listing.year_built)) {
+      facts.push({ icon: "calendar", label: t("detail.fact.year_built", lc), value: `${listing.year_built}` });
+    }
+    if (isKnown(listing.year_renovated)) {
+      facts.push({ icon: "refresh", label: t("detail.fact.year_renovated", lc), value: `${listing.year_renovated}` });
+    }
+    if (isKnown(listing.parking_spaces) && listing.parking_spaces > 0) {
+      facts.push({ icon: "car", label: t("detail.fact.parking", lc), value: `${listing.parking_spaces}` });
+    }
+    if (listing.property_type === "condo" && isKnown(listing.floor)) {
+      facts.push({ icon: "type_condo", label: t("detail.fact.floor", lc), value: `${listing.floor}` });
+    }
+    if (listing.property_type === "condo" && isKnown(listing.hoa_fee_usd_monthly)) {
+      facts.push({ icon: "receipt", label: t("detail.fact.hoa", lc), value: formatPrice(listing.hoa_fee_usd_monthly) + t("detail.fact.per_month", lc) });
+    }
+    if (listing.furnished === true) {
+      facts.push({ icon: "sofa", label: t("detail.fact.furnished", lc), value: t("detail.fact.yes", lc) });
+    }
+    if (listing.has_pool === true) {
+      facts.push({ icon: "droplet", label: t("detail.fact.pool", lc), value: t("detail.fact.yes", lc) });
+    }
+  }
   if (isKnown(listing.road_access_type)) {
     const v = listing.road_access_type;
     const roadValue = ROAD_ENUMS.has(v)
@@ -2034,12 +2570,17 @@ function ListingDetail({ listing, app, asPanel = true }) {
   if (listing.has_power) {
     facts.push({ icon: "bolt", label: t("detail.fact.electricity", lc), value: t("detail.fact.power_at", lc) });
   }
-  // Topography is always known (boolean), so it always shows.
-  facts.push({ icon: "leaf", label: t("detail.fact.topography", lc), value: listing.is_flat ? t("detail.fact.flat_yes", lc) : t("detail.fact.flat_no", lc) });
+  // Topography is always known (boolean), so it always shows — for LAND.
+  // Built properties skip it: a condo labeled "Sloped" reads as a bug
+  // (plan 010 — the only edit to the existing land facts).
+  if (!isBuilt) {
+    facts.push({ icon: "leaf", label: t("detail.fact.topography", lc), value: listing.is_flat ? t("detail.fact.flat_yes", lc) : t("detail.fact.flat_no", lc) });
+  }
   if (isKnown(listing.beachfront_tier)) {
     const v = listing.beachfront_tier;
     const beachValue = BEACHFRONT_ENUMS.has(v)
       ? t(`detail.fact.beachfront_tier.${v}`, lc)
+      // i18n-allow: capitalize() safety net after the closed-set t() guard
       : capitalize(v.replace("_", " "));
     facts.push({ icon: "wave", label: t("detail.fact.beachfront_tier", lc), value: beachValue });
   }
@@ -2100,21 +2641,38 @@ function ListingDetail({ listing, app, asPanel = true }) {
             onClick={() => listing.photos.length && !needsSignup && openLightbox(0)}
             aria-label={listing.photos.length ? t("detail.gallery.open", lc) : undefined}
           >
-            {listing.photos[0] ? (
+            {(detailLocalHeroUrl || listing.photos[0]) ? (
+              // card-image-allow: detail-page gallery main photo, user-navigated (plan 004/007)
               <img
-                src={listing.photos[0]}
+                src={detailLocalHeroUrl || listing.photos[0]}
                 alt={tr(listing.title, app.locale)}
                 loading="eager"
                 decoding="async"
                 fetchpriority="high"
-                onError={() => {
+                onError={(e) => {
+                  // Local hero 404 (e.g. preview deploy before the bot's
+                  // photo commit propagates) → fall back to the broker
+                  // photos[0] once. The flag guards against an infinite
+                  // onError loop if the broker URL also fails.
+                  const img = e.currentTarget;
+                  const broker = listing.photos[0];
+                  if (
+                    detailLocalHeroUrl &&
+                    broker &&
+                    !img.dataset.brokerFallback &&
+                    img.src.indexOf("/api/img") !== -1
+                  ) {
+                    img.dataset.brokerFallback = "1";
+                    img.src = broker;
+                    return;
+                  }
                   try {
                     track("image.error", {
-                      url: String(listing.photos[0] ?? "").slice(0, 200),
+                      url: String(img.src ?? "").slice(0, 200),
                       listing_id: listing.id,
                       idx: 0,
                       source: "detail_main",
-                      is_local: String(listing.photos[0] ?? "").startsWith("/photos/"),
+                      is_local: String(img.src ?? "").indexOf("/api/img") !== -1,
                     });
                   } catch { /* never let telemetry break the render */ }
                 }}
@@ -2154,6 +2712,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
                   }
                 }}
               >
+                {/* card-image-allow: detail-page gallery thumb, user-navigated (plan 004/007) */}
                 <img
                   src={listing.photos[i]}
                   alt=""
@@ -2260,7 +2819,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
                 FreeMonthModal with `detail_upgrade` trigger, which
                 pre-applies PULPOFREEMONTH at /api/stripe/start-checkout.
                 Paid users see every USP and skip this row. */}
-            {!isPaid && listing.usps.length > uspCap && (
+            {!effectivePaid && listing.usps.length > uspCap && (
               <li className="usp-locked">
                 <Icon name="lock" size={14} strokeWidth={2}/>
                 <button
@@ -2341,6 +2900,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
                 return <span className="dpill"><Icon name="cat_commercial" size={13} strokeWidth={1.6}/> {t(key, lc, { n: town.n })}</span>;
               })()}
             </div>
+            <LocationPrecisionNote listing={listing} />
             {/* Real interactive map deferred — see plan followup. We
                 used to render a CSS .static-map illustration here, but
                 a fake map mislead users (no real coords behind it).
@@ -2367,7 +2927,7 @@ function ListingDetail({ listing, app, asPanel = true }) {
           (no point upselling on a finished sale). */}
       {!isSold && (
         <div className="detail-cta-bar">
-          {!isPaid ? (
+          {!effectivePaid ? (
             <button
               className="btn-primary lg block"
               onClick={() => {
@@ -2433,8 +2993,9 @@ function ListingDetail({ listing, app, asPanel = true }) {
           >
             <Icon name="close" size={22}/>
           </button>
+          {/* card-image-allow: detail-page lightbox, user-navigated (plan 004/007) */}
           <img
-            src={listing.photos[galleryIdx]}
+            src={lbFailed ? categoryImageForListing(listing) : listing.photos[galleryIdx]}
             alt={`${tr(listing.title, app.locale)} — ${t("detail.fact.photos", lc)} ${galleryIdx + 1}`}
             decoding="async"
             fetchpriority="high"
@@ -2448,6 +3009,10 @@ function ListingDetail({ listing, app, asPanel = true }) {
                   is_local: String(listing.photos[galleryIdx] ?? "").startsWith("/photos/"),
                 });
               } catch { /* never let telemetry break the render */ }
+              // Swap to the bundled category image so a dead broker URL
+              // shows a relevant photo, not a blank modal. Guarded: only
+              // flip once (the fallback is a bundled WebP that won't 404).
+              if (!lbFailed) setLbFailed(true);
             }}
           />
           <div className="lightbox-controls" onClick={(e) => e.stopPropagation()}>
@@ -2476,9 +3041,9 @@ function capitalize(s) { return s ? s[0].toUpperCase() + s.slice(1) : s; }
 function SavedPage({ app }) {
   const LISTINGS = useListings();
   const items = LISTINGS.filter(l => app.savedIds.has(l.id));
-  const [view, setView] = pUseState(() => localStorage.getItem("pulpo-saved-view") || "cards");
+  const [view, setView] = pUseState(() => safeLocalGet("pulpo-saved-view") || "cards");
   const [sort, setSort] = pUseState("recent");
-  pUseEffect(() => { localStorage.setItem("pulpo-saved-view", view); }, [view]);
+  pUseEffect(() => { safeLocalSet("pulpo-saved-view", view); }, [view]);
 
   const topRankMap = pUseMemo(() => buildTopRankMap(LISTINGS), [LISTINGS]);
 
@@ -2660,8 +3225,8 @@ function PlansPage({ app }) {
           <div className="plan-tag">{t("plans.free.tag", lc)}</div>
           <ul className="plan-features">
             {feat("plans.free.feat.browsing")}
-            {feat("plans.free.feat.detail_views")}
-            {feat("plans.free.feat.saves_cap")}
+            {feat("plans.free.feat.top3_detail")}
+            {feat("plans.free.feat.weekly_email")}
             {/* The three "this is what Pro adds" mirrors, muted on Free. */}
             {featMuted("pro.usp.alerts.short")}
             {featMuted("pro.usp.browse.short")}
@@ -2724,63 +3289,124 @@ function PlansPage({ app }) {
 }
 
 // ====== Sign-up modal ======
+// Two-state auth chooser. The logged-out account/avatar click (and the
+// /account route gate) land here: two clear paths — Log in (existing Pro
+// members) or Get Pulpo Pro (new visitors). NO free "Sign up". "Log in"
+// hands off to Clerk's hosted sign-in in prod (or the legacy login form
+// when Clerk is OFF in dev/CI). "Get Pulpo Pro" opens the subscribe modal.
+function AuthChoiceModal({ app, onLogin }) {
+  const lc = app.locale;
+  return (
+    <div className="modal-backdrop" onClick={() => app.closeSignup()}>
+      <div className="modal modal-signup" onClick={(e) => e.stopPropagation()}>
+        <button className="modal-close" onClick={() => app.closeSignup()} aria-label={t("common.close", lc)}>
+          <Icon name="close" size={18}/>
+        </button>
+        <div className="modal-head">
+          <PulpoLogo />
+          <h2>{t("auth_choice.headline", lc)}</h2>
+          <p>{t("auth_choice.body", lc)}</p>
+        </div>
+        <button type="button" className="btn-primary block lg" onClick={onLogin}>
+          {t("auth_choice.login", lc)}
+        </button>
+        <button
+          type="button"
+          className="btn-ghost block lg"
+          style={{ marginTop: 10 }}
+          onClick={() => {
+            app.closeSignup();
+            if (app.openFreeMonthModal) app.openFreeMonthModal({ trigger: "browse_card" });
+          }}
+        >
+          {t("auth_choice.get_pro", lc)}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function SignupModal({ app }) {
   const m = app.signupModal;
+  // Dev/CI (Clerk OFF) fallback: after "Log in" on the chooser we swap to
+  // the legacy email/password form. Reset whenever the modal closes.
+  const [showLoginForm, setShowLoginForm] = pUseState(false);
+  pUseEffect(() => { if (!m) setShowLoginForm(false); }, [m]);
 
-  // Flag-on hand-off to Clerk. Trigger the hosted modal imperatively
-  // via app.clerkActions (wired by ClerkActionsBinder once the SDK
-  // chunk has loaded) — no click-time Suspense, so React #426 doesn't
-  // fire. If clerkActions isn't ready yet (cold first paint), we wait;
-  // the effect re-runs when it lands.
-  //
-  // Hook is at the top so order is stable across renders, regardless
-  // of whether `m` or `clerkEnabled()` flip the early returns below.
+  // Flag-on defensive close + stray-signup hand-off. Hook at the top so
+  // order is stable across renders regardless of the early returns below.
   pUseEffect(() => {
     if (!m) return;
     if (!clerkEnabled()) return;
     if (!app.clerkActions) return;
-    // Defensive: Clerk's hosted SignIn/SignUp throws
-    // `cannot_render_single_session_enabled` when the user is already
-    // signed in — and we have a race where consumers (e.g. the topnav
-    // sign-in icon mid-Clerk-boot, or AccountPage redirects) can call
-    // openSignup before ClerkUserSync has committed user state. Both
-    // checks below are needed: `app.user` covers the legacy auth path
-    // and the post-sync window; `clerkActions.isSignedIn()` covers the
-    // boot-race window where Clerk's session is hydrated from cookies
-    // but app.user hasn't synced yet. In either case, close the modal
-    // silently and let app.jsx's post-signin effect process any
-    // pendingAction once ClerkUserSync catches up.
+    // Already signed in (boot-race / double-call)? Close silently and let
+    // app.jsx's post-signin effect handle any pendingAction.
     const clerkSays = typeof app.clerkActions.isSignedIn === "function"
       && app.clerkActions.isSignedIn();
     if (app.user || clerkSays) {
       app.closeSignup();
       return;
     }
-    const target = m.mode === "login" ? "openSignIn" : "openSignUp";
-    try {
-      app.clerkActions[target]();
-    } catch (err) {
-      // Belt-and-braces: if Clerk still throws (e.g. its error code
-      // changes between versions), don't blank the page via the
-      // ErrorBoundary — silently close the modal. The user can retry
-      // on the next render once state catches up.
-      if (typeof console !== "undefined" && console.warn) {
-        console.warn("[pulpo] clerk." + target + " failed:", err);
+    // Two-state: login mode renders the Pulpo chooser below (no auto
+    // hand-off to Clerk). Only a stray signup mode auto-opens Clerk's
+    // hosted signup — which shouldn't occur, since signup intent is
+    // diverted to the subscribe modal upstream (openSignup); kept as a
+    // defensive fallback.
+    if (m.mode !== "login") {
+      try {
+        app.clerkActions.openSignUp();
+      } catch (err) {
+        if (typeof console !== "undefined" && console.warn) {
+          console.warn("[pulpo] clerk.openSignUp failed:", err);
+        }
       }
+      app.closeSignup();
     }
-    app.closeSignup();
   }, [m, app.clerkActions, app.user]);
 
   if (!m) return null;
-  if (clerkEnabled()) return null;
-  return <LegacySignupModal app={app} m={m} />;
+
+  // Login mode → the Pulpo "Log in / Get Pulpo Pro" chooser. (The
+  // explicit login links — /start "Log in" via ?login=1, WelcomeModal
+  // "sign in existing" — call clerk.openSignIn directly and never reach
+  // SignupModal, so they still go straight to sign-in.)
+  if (m.mode === "login" && !showLoginForm) {
+    return (
+      <AuthChoiceModal
+        app={app}
+        onLogin={() => {
+          if (clerkEnabled() && app.clerkActions && typeof app.clerkActions.openSignIn === "function") {
+            try {
+              app.clerkActions.openSignIn();
+            } catch (err) {
+              if (typeof console !== "undefined" && console.warn) {
+                console.warn("[pulpo] clerk.openSignIn failed:", err);
+              }
+            }
+            app.closeSignup();
+          } else {
+            // Clerk OFF (dev/CI): show the legacy email/password login form.
+            setShowLoginForm(true);
+          }
+        }}
+      />
+    );
+  }
+
+  if (!clerkEnabled()) return <LegacySignupModal app={app} m={m} />;
+  return null;
 }
 
 // Legacy email/password sign-in form. Only renders when VITE_USE_CLERK
 // is off — extracted so its useState hooks don't clash with the parent
 // component's lone useEffect on flag-on renders.
 function LegacySignupModal({ app, m }) {
-  const [mode, setMode] = pUseState(m.mode || "signup");
+  // Two-state model (2026-06-08): login-only. Free-account creation is
+  // removed — every signup intent routes to the Pro subscribe modal, so
+  // this fallback (rendered only when Clerk is OFF) never shows a signup
+  // form. Prospects get a "Get Pulpo Pro" link instead of "Create account".
+  // (Prod: the same is enforced by Clerk invitation-only sign-up config.)
+  const mode = "login";
   const [email, setEmail] = pUseState(m.email || "");
   const [password, setPassword] = pUseState("");
   const [error, setError] = pUseState("");
@@ -2840,13 +3466,9 @@ function LegacySignupModal({ app, m }) {
           </button>
         </form>
         <div className="modal-foot">
-          {mode === "signup" ? (
-            <>Already have an account? <button className="link-btn" onClick={() => setMode("login")}>Log in</button></>
-          ) : (
-            <>New here? <button className="link-btn" onClick={() => setMode("signup")}>Create account</button></>
-          )}
+          {/* i18n-allow: LegacySignupModal only renders when Clerk is OFF (dev/CI) */}
+          Not a member yet? <button className="link-btn" onClick={() => { app.closeSignup(); app.openFreeMonthModal?.({ trigger: "browse_card" }); }}>Get Pulpo Pro</button>
         </div>
-        <div className="modal-fine">By signing up you agree to the <a>Terms of Service</a>. You'll get weekly deal alerts — unsubscribe anytime.</div>
       </div>
     </div>
   );
@@ -2873,6 +3495,210 @@ function ToastHost({ app }) {
     <div className="toast">
       <Icon name="check" size={16} strokeWidth={2.4}/>
       <span>{app.toast.message}</span>
+    </div>
+  );
+}
+
+// ====== Browse search bar ======
+// PR-S1 — /browse exact-lookup search. Tokenized substring match against
+// id / source_id / URL / zone / title / source_label / province_state via
+// web/app/lib/search-match.ts::matchesQuery. No fuzzy ranking yet (Fuse.js
+// + scoring queued for PR-S2). Submit-side telemetry — we emit
+// `browse.search_submitted` on Enter / blur (not on every keystroke) so
+// the PostHog stream stays consumable.
+const SEARCH_SUGGEST_LISTBOX_ID = "browse-search-suggest";
+
+function AutocompleteThumb({ listing }) {
+  return (
+    <Photo
+      listing={listingForSuggestionThumb(listing)}
+      thumbnail
+      ratio="1/1"
+      className="browse-search__suggest-thumb"
+      lazy={false}
+      source="browse_autocomplete"
+    />
+  );
+}
+
+function BrowseSearchBar({ value, onChange, resultCount, locale, listings, filters, onApplyFilters }) {
+  const lc = locale || currentLocale();
+  // Local input mirrors `value` (the URL/filter state) so paint stays
+  // synchronous with typing. Sync back to filters on every change — the
+  // applyFilters debounce (300ms) handles the heavy work.
+  const inputRef = pUseRef(null);
+
+  // PR-2 — autocomplete dropdown. Suggestions (zones / land-types / up
+  // to 5 titles) are computed off a 150ms debounce of `value`. `closed`
+  // lets Escape / selection dismiss the panel without losing focus;
+  // typing reopens it. `open` is the render-time truth.
+  const [suggestions, setSuggestions] = pUseState([]);
+  const [activeIndex, setActiveIndex] = pUseState(-1);
+  const [hasFocus, setHasFocus] = pUseState(false);
+  const [closed, setClosed] = pUseState(false);
+  const open = hasFocus && !closed && suggestions.length > 0;
+
+  pUseEffect(() => {
+    const q = value || "";
+    if (q.trim().length < 2) { setSuggestions([]); return; }
+    const id = setTimeout(() => {
+      setSuggestions(buildSuggestions(q, listings, { max: 8, locale: lc, landTypeLabel }));
+    }, 150);
+    return () => clearTimeout(id);
+  }, [value, listings, lc]);
+
+  // Reset the keyboard cursor whenever the suggestion set changes.
+  pUseEffect(() => { setActiveIndex(-1); }, [suggestions]);
+
+  const handleChange = pUseCallback((e) => {
+    setClosed(false);
+    onChange(e.target.value);
+  }, [onChange]);
+  // Submit telemetry — fires once per "intent." Pressing Enter while
+  // typing counts as a submit; tabbing/blurring with a non-empty value
+  // also counts. Avoids per-keystroke spam.
+  const lastEmittedRef = pUseRef("");
+  const emitSubmit = pUseCallback(() => {
+    const v = (value || "").trim();
+    if (!v) return;
+    if (v === lastEmittedRef.current) return;
+    lastEmittedRef.current = v;
+    track("browse.search_submitted", {
+      q_length: v.length,
+      token_count: v.split(/\s+/).filter(Boolean).length,
+      result_count: resultCount,
+    });
+  }, [value, resultCount]);
+
+  // Apply a suggestion: zone / land-type set a structured facet and
+  // clear the query; a title sets the query to the exact listing title.
+  const selectSuggestion = pUseCallback((s) => {
+    if (!s) return;
+    setClosed(true);
+    setActiveIndex(-1);
+    if (s.kind === "zone" && filters && onApplyFilters) {
+      const zones = new Set(filters.zones); zones.add(s.value);
+      onApplyFilters({ ...filters, zones, query: "" });
+      track("browse.search_suggest_selected", { kind: "zone" });
+    } else if (s.kind === "land_type" && filters && onApplyFilters) {
+      const land_types = new Set(filters.land_types); land_types.add(s.value);
+      onApplyFilters({ ...filters, land_types, query: "" });
+      track("browse.search_suggest_selected", { kind: "land_type" });
+    } else {
+      onChange(s.value);
+      track("browse.search_suggest_selected", { kind: "title" });
+    }
+    inputRef.current?.blur();
+  }, [filters, onApplyFilters, onChange]);
+
+  const handleKeyDown = pUseCallback((e) => {
+    if (e.key === "ArrowDown" && open) {
+      e.preventDefault();
+      setActiveIndex((i) => Math.min(i + 1, suggestions.length - 1));
+    } else if (e.key === "ArrowUp" && open) {
+      e.preventDefault();
+      setActiveIndex((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (open && activeIndex >= 0) {
+        selectSuggestion(suggestions[activeIndex]);
+      } else {
+        emitSubmit();
+        inputRef.current?.blur();
+      }
+    } else if (e.key === "Escape") {
+      // Escape closes the panel first; a second press clears the query.
+      if (open) {
+        e.preventDefault();
+        setClosed(true);
+        setActiveIndex(-1);
+      } else if (value) {
+        e.preventDefault();
+        onChange("");
+      }
+    }
+  }, [open, suggestions, activeIndex, selectSuggestion, emitSubmit, onChange, value]);
+
+  const handleClear = pUseCallback(() => {
+    onChange("");
+    setClosed(false);
+    inputRef.current?.focus();
+  }, [onChange]);
+
+  const kindIcon = { zone: "map_pin", land_type: "sliders", title: "search" };
+  return (
+    <div className="browse-search">
+      <Icon name="search" size={16} className="browse-search__icon" />
+      <input
+        ref={inputRef}
+        type="search"
+        className="browse-search__input"
+        value={value}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        onFocus={() => setHasFocus(true)}
+        onBlur={() => { setHasFocus(false); emitSubmit(); }}
+        placeholder={t("browse.search.placeholder", lc)}
+        aria-label={t("browse.search.aria_label", lc)}
+        role="combobox"
+        aria-expanded={open}
+        aria-controls={SEARCH_SUGGEST_LISTBOX_ID}
+        aria-autocomplete="list"
+        aria-activedescendant={open && activeIndex >= 0 ? `${SEARCH_SUGGEST_LISTBOX_ID}-opt-${activeIndex}` : undefined}
+        maxLength={200}
+        autoComplete="off"
+        spellCheck={false}
+      />
+      {value && (
+        <button
+          type="button"
+          className="browse-search__clear"
+          onClick={handleClear}
+          aria-label={t("browse.search.clear_aria", lc)}
+          title={t("browse.search.clear_aria", lc)}
+        >
+          <Icon name="close" size={14} strokeWidth={2} />
+        </button>
+      )}
+      {open && (
+        <ul
+          className="browse-search__suggest"
+          id={SEARCH_SUGGEST_LISTBOX_ID}
+          role="listbox"
+          aria-label={t("browse.search.suggest.aria", lc)}
+        >
+          {suggestions.map((s, i) => (
+            <li
+              key={`${s.kind}-${s.value}-${i}`}
+              id={`${SEARCH_SUGGEST_LISTBOX_ID}-opt-${i}`}
+              role="option"
+              aria-selected={i === activeIndex}
+              className={`browse-search__suggest-item${i === activeIndex ? " active" : ""}`}
+              // preventDefault on mousedown so the input doesn't blur
+              // (and close the panel) before the click selects the item.
+              onMouseDown={(e) => e.preventDefault()}
+              onMouseEnter={() => setActiveIndex(i)}
+              onClick={() => selectSuggestion(s)}
+            >
+              {s.kind === "title" ? (
+                <AutocompleteThumb listing={s.listing} />
+              ) : (
+                <span className="browse-search__suggest-icon">
+                  <Icon name={kindIcon[s.kind]} size={14} />
+                </span>
+              )}
+              <span className="browse-search__suggest-label">
+                {s.kind === "land_type" ? s.label : s.value}
+              </span>
+              {(s.kind === "zone" || s.kind === "land_type") && (
+                <span className="browse-search__suggest-meta">
+                  {t("browse.search.suggest.count", lc, { n: s.count })}
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -2929,6 +3755,45 @@ function EmptyResults({ onClear, filters, listings, setFilters }) {
     candidates.sort((a, b) => b.count - a.count);
     return candidates[0] || null;
   }, [filters, listings]);
+
+  // PR-3 — query-specific empty state. When a search query is active and
+  // nothing matched, echo the query (via t(), plain text) and offer
+  // category-pill shortcuts that clear the query and apply a preset.
+  // Distinct from the filter-based empty state below.
+  const queryActive = filters && tokenize(filters.query).length > 0;
+  if (queryActive) {
+    const q = (filters.query || "").slice(0, 200);
+    const PILLS = [
+      { key: "beachfront", labelKey: "browse.search.pill.beachfront" },
+      { key: "under_100k", labelKey: "browse.search.pill.under_100k" },
+      { key: "new_this_week", labelKey: "browse.search.pill.new_this_week" },
+      { key: "price_drops", labelKey: "browse.search.pill.price_drops" },
+      { key: "build_ready", labelKey: "browse.search.pill.build_ready" },
+    ];
+    return (
+      <div className="empty-state">
+        <div className="empty-illus" aria-hidden="true">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <circle cx="35" cy="35" r="20" stroke="var(--ink-3)" strokeWidth="2"/>
+            <line x1="50" y1="50" x2="65" y2="65" stroke="var(--ink-3)" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+        </div>
+        <h3>{t("browse.search.no_results", lc, { q })}</h3>
+        <p>{t("browse.search.no_results.try", lc)}</p>
+        <div className="empty-pills">
+          {PILLS.map((p) => (
+            <button
+              key={p.key}
+              className="empty-pill"
+              onClick={() => setFilters && setFilters(buildFiltersForCategory(p.key))}
+            >
+              {t(p.labelKey, lc)}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="empty-state">
@@ -3834,6 +4699,10 @@ function ProUpsellModal({ app, trigger, urlCode, utms, onClose }) {
       locale: lc,
       utms,
       urlCode,
+      // Lock Stripe's email to the signed-in account (anonymous → null).
+      email: app.user?.email || null,
+      // Return to where they were if they cancel on Stripe (not /start).
+      cancelPath: typeof window !== "undefined" ? window.location.pathname + window.location.search : null,
     });
 
     if (result.kind === "redirect") {

@@ -128,6 +128,22 @@ def test_phase_write_outputs_writes_legacy_and_per_country(tmp_path: Path):
     json.loads(legacy_lu.read_text(encoding="utf-8"))
 
 
+def test_phase_validate_writes_legacy_and_per_country_log(tmp_path: Path):
+    """Validation diagnostics must be country-scoped like public data."""
+    from automation.pipeline_steps import phase_validate
+
+    kept, counts, dropped = phase_validate([], tmp_path)
+
+    assert kept == []
+    assert counts["pass"] == 0
+    assert dropped == 0
+    legacy = tmp_path / "validation_log.jsonl"
+    per_cc = tmp_path / "validation_log.SV.jsonl"
+    assert legacy.is_file()
+    assert per_cc.is_file()
+    assert legacy.read_bytes() == per_cc.read_bytes()
+
+
 def test_phase_write_outputs_keeps_run_history_unified(tmp_path: Path):
     """``run_history.json`` stays single-file across countries — it's
     an append-only audit log that spans the whole pipeline run, not a

@@ -68,6 +68,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Optional
 
+from pulpo.display_gates import has_watermark_issue, is_card_displayable
+
 
 # Elite tier - the visible, exclusive bar.
 MIN_PHOTOS_COUNT     = 8        # rich gallery; signals seller invested
@@ -132,7 +134,19 @@ def _is_elite(li: Any) -> bool:
     """
     if _g(li, "is_sold") is True:
         return False
-    if _g(li, "has_text_overlay") is True:
+    # Display-gate contract (plan 003): a logo/flyer/text-overlay hero
+    # never qualifies for a curated pool. is_card_displayable covers both
+    # the has_text_overlay flag AND the card_eligible verdict — a None
+    # card_eligible (photo phase never approved a card image) is treated
+    # as ineligible by design, so a logo-hero listing with 8 broker
+    # photos no longer slips into the elite pool.
+    if not is_card_displayable(li):
+        return False
+    # Watermark signal (plan 005): the hires deterministic aesthetic pass
+    # already detected a logo/watermark on this hero — never run it on a
+    # full-bleed curated surface. has_watermark_issue reads
+    # li.hires_aesthetic_issues (single source of truth in display_gates).
+    if has_watermark_issue(li):
         return False
     if (_g(li, "photos_count") or 0) < MIN_PHOTOS_COUNT:
         return False
@@ -152,6 +166,15 @@ def _is_elite(li: Any) -> bool:
 def _is_soft(li: Any) -> bool:
     """Softer gates - still selective. Used only if elite pool is empty."""
     if _g(li, "is_sold") is True:
+        return False
+    # Display-gate contract (plan 003): the soft pool is still a curated
+    # surface — a non-card-displayable image (logo/flyer/text-overlay or
+    # an unapproved card image) drops the listing here too.
+    if not is_card_displayable(li):
+        return False
+    # Watermark signal (plan 005): same exclusion as the elite pool — the
+    # soft pool is still curated.
+    if has_watermark_issue(li):
         return False
     if (_g(li, "photos_count") or 0) < SOFT_MIN_PHOTOS:
         return False

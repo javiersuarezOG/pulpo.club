@@ -67,11 +67,18 @@ jobs:
       - run: npm install --no-audit --no-fund
       - run: npm run typecheck
       - run: npm run lint:css
-      # Static i18n guard — catches hardcoded English in JSX attribute
-      # strings (`aria-label`, `placeholder`, `alt`, `title`) under
-      # web/app/. ~1s, runs before the heavier checks. See
-      # scripts/i18n_lint.mjs and CLAUDE.md → "i18n".
+      # Static i18n guard — two checks, ~1s, before the heavier steps:
+      #   1. hardcoded English in JSX attribute strings (`aria-label`,
+      #      `placeholder`, `alt`, `title`) under web/app/;
+      #   2. the raw-enum render trap (`{x.replace("_"," ")}`) that shipped
+      #      the active-filter chip + table-header leaks.
+      # See scripts/i18n_lint.mjs and CLAUDE.md → "i18n".
       - run: node scripts/i18n_lint.mjs
+      # Card-image gate guard — flags a raw <img> rendering a listing image
+      # (thumbnail_url / selected_photo_url / .photos[...]) outside the gated
+      # <Photo> component, the regression class behind the browse_table + map
+      # blank-slot 404s. See scripts/check_card_image_gate.mjs and plan 014.
+      - run: node scripts/check_card_image_gate.mjs
       - run: node scripts/check_e2e_stale_selectors.mjs
       - name: CSP allowlist drop guard
         run: |
@@ -102,9 +109,15 @@ jobs:
           node scripts/diff_home_version.mjs "$BASE_SHA"
       - name: newsletter TEMPLATE_VERSION bump guard
         run: |
-          BASE_SHA="${{ github.event.pull_request.base.sha || github.event.before }}"
-          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
-            BASE_SHA="$(git rev-parse HEAD^)"
+          # PR events carry the real base. Push events on a multi-commit
+          # branch must diff against the merge-base with main — NOT
+          # `github.event.before`/HEAD^, which only sees the last commit and
+          # false-fails when an earlier commit in the branch did the version
+          # bump (the version guard is a whole-branch contract, not per-commit).
+          BASE_SHA="${{ github.event.pull_request.base.sha || '' }}"
+          if [ -z "$BASE_SHA" ]; then
+            git fetch --no-tags --depth=200 origin main >/dev/null 2>&1 || true
+            BASE_SHA="$(git merge-base origin/main HEAD 2>/dev/null || git rev-parse HEAD^)"
           fi
           if ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
             echo "::warning::Base SHA $BASE_SHA is not available in checkout; falling back to HEAD^"

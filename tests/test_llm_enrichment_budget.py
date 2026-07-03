@@ -61,6 +61,8 @@ _OK_JSON = {
     "usps": [{"en": "🏖 Beachfront access",   "es": "🏖 Acceso a la playa"},
              {"en": "📐 Flat terrain",        "es": "📐 Terreno plano"},
              {"en": "🛣 Paved road",          "es": "🛣 Camino pavimentado"}],
+    # Plan 009 — required key in fresh model output; empty = no facts stated.
+    "extracted_facts": {},
     "url_language": "en",
     "latlong": {"lat": 13.4912, "lng": -89.3818,
                 "source": "estimated", "reference": "near El Tunco, La Libertad",

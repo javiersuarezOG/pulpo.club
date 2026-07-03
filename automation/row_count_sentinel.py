@@ -44,8 +44,9 @@ Consumers (per CLAUDE.md producer-consumer rule, post-2026-06-02)
   6h and Slack-pages on any CRIT.
 - The operator dashboard (PR-S7) reads
   ``web/data/row_count_history.jsonl`` for the per-source drop pill.
-- The nightly may also invoke this in-line as a final pre-commit
-  canary (TBD; today the 6h cron handles it).
+- ``.github/workflows/pulpo-nightly.yml`` invokes this in-line as a
+  pre-commit canary with ``record=False`` so candidate data can be
+  classified without polluting the committed-truth baseline.
 """
 from __future__ import annotations
 
@@ -53,6 +54,7 @@ import dataclasses
 import datetime as dt
 import json
 import typing as t
+from dataclasses import replace
 from pathlib import Path
 
 
@@ -321,14 +323,20 @@ def run_tick(
     ranked_paths: t.Mapping[str, Path],
     history_path: Path = DEFAULT_HISTORY_PATH,
     now_iso: str | None = None,
+    record: bool = True,
 ) -> list[DropVerdict]:
     """Read every (country, ranked_path), compute per-source counts +
-    total, classify vs history, append new history rows, return the
-    full verdict list (sorted level desc so the caller can stop at
-    first critical).
+    total, classify vs history, optionally append new history rows,
+    return the full verdict list (sorted level desc so the caller can
+    stop at first critical).
 
     ``ranked_paths`` is {country_code: Path}. Today: ``{'sv':
     Path('web/data/ranked.json'), 'pa': Path('web/data/ranked.PA.json')}``.
+
+    ``record=False`` is load-bearing for the nightly pre-commit gate:
+    the gate classifies a candidate ``ranked.json`` that may never ship,
+    so appending it would poison the 7-tick baseline used by the 6h
+    committed-data cron.
     """
     tick_at = now_iso or dt.datetime.now(dt.timezone.utc).isoformat()
     history = load_history(history_path)
@@ -338,19 +346,31 @@ def run_tick(
         counts = count_listings_by_source(ranked_path)
         if not counts:
             continue
-        for source, count in sorted(counts.items()):
+        # Classify the UNION of (sources present today) and (sources seen in
+        # this country's trailing history). A source that zero-yielded is
+        # absent from today's ranked.json, so iterating `counts` alone would
+        # never classify it — exactly the 2026-06-08 incident (citymax_sc
+        # 162→0) that this gate exists to catch. A history-known source
+        # missing today is classified with count=0, which trips a 100% drop.
+        history_sources = {tk.source for tk in history if tk.country == country}
+        for source in sorted(set(counts) | history_sources):
+            count = counts.get(source, 0)
             prior = prior_counts_for(source, country, history)
+            if not prior and source not in counts:
+                # Never seen before AND absent today — nothing to classify.
+                continue
             verdict = classify_drop(source, country, count, prior)
             verdicts.append(verdict)
-            append_tick(
-                Tick(
-                    tick_at=tick_at,
-                    source=source,
-                    count=count,
-                    country=country,
-                ),
-                history_path,
-            )
+            if record:
+                append_tick(
+                    Tick(
+                        tick_at=tick_at,
+                        source=source,
+                        count=count,
+                        country=country,
+                    ),
+                    history_path,
+                )
 
     # Critical first; then warn; then ok.
     order = {"critical": 0, "warn": 1, "ok": 2}
@@ -360,6 +380,96 @@ def run_tick(
 
 def any_critical(verdicts: t.Sequence[DropVerdict]) -> bool:
     return any(v.level == "critical" for v in verdicts)
+
+
+def gate_decision(
+    verdicts: t.Sequence[DropVerdict],
+    floor: int | None = None,
+) -> tuple[bool, str]:
+    """Decide whether a ``--fail-on-crit`` row-count gate should BLOCK or DEGRADE.
+
+    A single source cratering must never freeze a healthy catalogue. Block ONLY
+    on a catastrophic TOTAL collapse — the ``sv __total__`` verdict itself going
+    critical, or the total dropping below ``floor``. Per-source craters while the
+    catalogue is healthy DEGRADE to a non-blocking warning (the dead source is
+    still surfaced by delta-decision, the source_health red row, and the
+    scraper-repair agent).
+
+    Motivation — nightly 27399389866: ``xitios`` 28→0 (critical) hard-failed the
+    run while the ``sv __total__`` GREW 1590→2104 (+32%). One dead source froze
+    2104 perfectly good listings.
+
+    ``floor=None`` preserves the original strict behaviour (any critical blocks),
+    so callers that don't pass a floor are unchanged.
+
+    Returns ``(should_block, message)``. ``message`` is empty when nothing is
+    critical.
+    """
+    crit = [v for v in verdicts if v.level == "critical"]
+    if not crit:
+        return False, ""
+
+    sv_total = next(
+        (v for v in verdicts if v.source == TOTAL_KEY and v.country == "sv"),
+        None,
+    )
+    total_curr = (
+        sv_total.curr_count
+        if sv_total is not None
+        else sum(v.curr_count for v in verdicts
+                 if v.source != TOTAL_KEY and v.country == "sv")
+    )
+    total_critical = bool(sv_total is not None and sv_total.level == "critical")
+    crit_sources = [v.source for v in crit if v.source != TOTAL_KEY]
+    catalogue_healthy = (
+        floor is not None and total_curr >= floor and not total_critical
+    )
+
+    if catalogue_healthy and crit_sources:
+        return False, (
+            f"DEGRADE: per-source CRITICAL {crit_sources} but the catalogue is "
+            f"healthy (sv total {total_curr} >= floor {floor}, sv __total__ not "
+            f"critical) — shipping. A single source cratering must not freeze "
+            f"{total_curr} good listings; the dead source(s) are alerted via "
+            f"delta-decision + source_health + auto-repair."
+        )
+    return True, (
+        f"CATASTROPHIC: blocking commit (total_critical={total_critical}, "
+        f"total={total_curr}, floor={floor}, crit_sources={crit_sources})."
+    )
+
+
+def _lifecycle_for(source: str, metadata: t.Mapping[str, dict] | None) -> str:
+    if source == TOTAL_KEY:
+        return "active"
+    if not metadata:
+        return "active"
+    meta = metadata.get(source) or {}
+    lifecycle = meta.get("lifecycle")
+    return lifecycle if isinstance(lifecycle, str) else "active"
+
+
+def downgrade_experimental(verdicts: t.Sequence[DropVerdict],
+                           metadata: t.Mapping[str, dict] | None) -> list[DropVerdict]:
+    """Return verdicts with experimental-source CRITs downgraded to WARN.
+
+    Consumer: the row-count CLI and pre-commit gate. Experimental sources
+    are still visible in logs/Slack, but they must not block production
+    inventory commits.
+    """
+    out: list[DropVerdict] = []
+    for verdict in verdicts:
+        if verdict.level == "critical" and _lifecycle_for(verdict.source, metadata) == "experimental":
+            out.append(replace(
+                verdict,
+                level="warn",
+                reason=f"experimental_lifecycle_log_only | {verdict.reason}",
+            ))
+        else:
+            out.append(verdict)
+    order = {"critical": 0, "warn": 1, "ok": 2}
+    out.sort(key=lambda v: (order[v.level], v.source))
+    return out
 
 
 def format_slack_message(verdicts: t.Sequence[DropVerdict], run_url: str) -> str:

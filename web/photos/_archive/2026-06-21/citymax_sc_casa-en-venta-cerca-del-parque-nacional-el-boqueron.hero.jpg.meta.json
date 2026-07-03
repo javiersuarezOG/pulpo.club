@@ -1,0 +1,17 @@
+{
+  "width": 1536,
+  "height": 2048,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 2504.5,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-06-12T13:52:24.047862+00:00",
+  "derivative_width": 810,
+  "derivative_height": 1080,
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://d3owphs4fllasc.cloudfront.net/fotos-destacados/3ff3d40d04a38c3e8c14c8eefcf39df3.jpg",
+  "candidate_count": 1
+}

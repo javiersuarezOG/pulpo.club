@@ -462,6 +462,49 @@ def test_hero_download_picks_best_of_multiple(tmp_repo):
         "Picker should have chosen the full-HD candidate over the 600x400 first"
     assert sidecar_data["candidate_count"] == 3
 
+    # P2 — the winning URL is persisted onto the listing so the FE can
+    # reorder the gallery to match the card thumbnail.
+    assert li.selected_photo_url == "https://example.com/great_second.jpg", \
+        "selected_photo_url must equal the picker's winning_url"
+
+
+def test_winning_logo_url_forces_card_ineligible(tmp_repo):
+    """P5 — a logo/placeholder that wins the pick (structurally ≥800×600)
+    must be forced card_eligible=False so the homepage gate excludes it."""
+    pytest.importorskip("PIL")
+    from pulpo.models import Listing
+    from automation.run import _download_hero_photos
+
+    # A structurally card-eligible (1920×1080) image served at the known
+    # xitios logo URL — the exact 19-listing case from 2026-06-08.
+    logo_bytes = _make_jpeg(size=(1920, 1080))
+    logo_url = "https://www.xitios.com.sv/img/icon.jpeg"
+
+    li = Listing(
+        source="xitios", source_id="logo-001",
+        url="https://example.com/listing",
+        scraped_at="2026-01-01T00:00:00Z",
+        title="Listing whose hero is a logo",
+        photo_urls=[logo_url],
+    )
+
+    def fake_get(url, *_args, **_kwargs):
+        r = mock.MagicMock()
+        r.content = logo_bytes
+        r.raise_for_status = mock.MagicMock()
+        return r
+
+    with mock.patch("httpx.get", side_effect=fake_get):
+        _download_hero_photos([li], tmp_repo)
+
+    assert li.card_eligible is False, "logo winner must not be card_eligible"
+    assert li.hero_eligible is False, "logo winner must not be hero_eligible"
+    # The sidecar records the rejection for forensics.
+    sidecar = tmp_repo / "web" / "photos" / "xitios_logo-001.hero.jpg.meta.json"
+    meta = json.loads(sidecar.read_text())
+    assert meta.get("logo_placeholder_rejected") is True
+    assert meta["card_eligible"] is False
+
 
 def test_no_photo_listing_skipped(tmp_repo):
     """Listings with empty photo_urls are not attempted."""
@@ -529,3 +572,99 @@ def test_storage_canary_fails_over_limit(tmp_repo):
     total = sum(f.stat().st_size for f in photos_dir.rglob("*.jpg") if "_archive" not in f.parts)
     mb = total / (1024 * 1024)
     assert mb > 100, f"Expected > 100 MB, got {mb:.2f} MB"
+
+
+# ── Archived-photo restore (PR-P0a) ─────────────────────────────────────
+
+def _load_restore_module():
+    """Import scripts/restore_archived_photos.py as a module."""
+    import importlib.util
+    path = REPO / "scripts" / "restore_archived_photos.py"
+    spec = importlib.util.spec_from_file_location("restore_archived_photos", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _seed_archive(photos_dir, date, base, *, content=b"jpg", siblings=True):
+    """Write a `<base>.jpg` (+ siblings) into _archive/<date>/."""
+    d = photos_dir / "_archive" / date
+    d.mkdir(parents=True, exist_ok=True)
+    (d / f"{base}.jpg").write_bytes(content)
+    if siblings:
+        (d / f"{base}.hero.jpg").write_bytes(content + b"-hero")
+        (d / f"{base}.jpg.meta.json").write_text("{}")
+        (d / f"{base}.hero.jpg.meta.json").write_text("{}")
+        (d / f"{base}.jpg.hash").write_text("deadbeef")
+
+
+def _write_ranked(tmp_repo, basenames):
+    ranked = [{"source": b.split("_")[0], "hero_photo_path": f"/photos/{b}.jpg"}
+              for b in basenames]
+    p = tmp_repo / "web" / "data" / "ranked.json"
+    p.write_text(json.dumps(ranked))
+    return p
+
+
+def _run_restore(mod, ranked, photos_dir, *extra):
+    """Invoke the script's main() with a controlled argv."""
+    import sys as _sys
+    argv = ["restore", "--ranked", str(ranked), "--photos-dir", str(photos_dir), *extra]
+    old = _sys.argv
+    _sys.argv = argv
+    try:
+        return mod.main()
+    finally:
+        _sys.argv = old
+
+
+def test_restore_picks_newest_dated_copy(tmp_repo):
+    """When the same basename exists under two dated archive dirs, the
+    newest dated copy is the one restored."""
+    mod = _load_restore_module()
+    photos_dir = tmp_repo / "web" / "photos"
+    _seed_archive(photos_dir, "2026-05-01", "remax_001", content=b"OLD")
+    _seed_archive(photos_dir, "2026-06-08", "remax_001", content=b"NEW")
+    ranked = _write_ranked(tmp_repo, ["remax_001"])
+
+    assert _run_restore(mod, ranked, photos_dir) == 0
+    assert (photos_dir / "remax_001.jpg").read_bytes() == b"NEW", \
+        "newest dated archive copy must win"
+
+
+def test_restore_brings_sibling_set(tmp_repo):
+    """All five sibling files are restored together."""
+    mod = _load_restore_module()
+    photos_dir = tmp_repo / "web" / "photos"
+    _seed_archive(photos_dir, "2026-06-08", "goodlife_x")
+    ranked = _write_ranked(tmp_repo, ["goodlife_x"])
+
+    assert _run_restore(mod, ranked, photos_dir) == 0
+    for suffix in (".jpg", ".hero.jpg", ".jpg.meta.json",
+                   ".hero.jpg.meta.json", ".jpg.hash"):
+        assert (photos_dir / f"goodlife_x{suffix}").exists(), f"missing {suffix}"
+
+
+def test_restore_is_idempotent_and_keeps_archive(tmp_repo):
+    """A second run is a no-op, and the archive copy is never removed."""
+    mod = _load_restore_module()
+    photos_dir = tmp_repo / "web" / "photos"
+    _seed_archive(photos_dir, "2026-06-08", "essurf_5")
+    ranked = _write_ranked(tmp_repo, ["essurf_5"])
+
+    assert _run_restore(mod, ranked, photos_dir) == 0
+    assert _run_restore(mod, ranked, photos_dir) == 0  # idempotent
+    assert (photos_dir / "essurf_5.jpg").exists()
+    assert (photos_dir / "_archive" / "2026-06-08" / "essurf_5.jpg").exists(), \
+        "archive must remain intact (copy, not move)"
+
+
+def test_restore_fails_when_top_listing_unrecoverable(tmp_repo):
+    """A top-N ranked listing with no archive copy → exit 1."""
+    mod = _load_restore_module()
+    photos_dir = tmp_repo / "web" / "photos"
+    ranked = _write_ranked(tmp_repo, ["nexo_missing", "remax_present"])
+    _seed_archive(photos_dir, "2026-06-08", "remax_present")
+
+    assert _run_restore(mod, ranked, photos_dir, "--top-required", "5") == 1, \
+        "unrecoverable top-N listing must fail the canary"

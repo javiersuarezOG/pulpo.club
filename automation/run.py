@@ -58,10 +58,31 @@ from automation.posthog_client import (  # noqa: E402
     capture as _ph_capture,
     set_run_id as _ph_set_run_id,
 )
+from pulpo.countries import active as _active_country, data_filename as _data_filename  # noqa: E402
 
 import hashlib  # noqa: E402
 import io      # noqa: E402
 import time as _time  # noqa: E402
+import concurrent.futures  # noqa: E402
+
+
+def _write_fresh_ranked_snapshot(
+    web_data_dir: Path,
+    ranked: list,
+    *,
+    active_cc: str | None = None,
+) -> None:
+    """Write fresh-only ranked candidates before carry-forward can mutate them."""
+    fresh_ranked_dicts = [li.to_dict() for li in ranked]
+    cc = active_cc or _active_country().code
+    _atomic_write_json(
+        web_data_dir / "ranked.fresh.json",
+        fresh_ranked_dicts,
+    )
+    _atomic_write_json(
+        web_data_dir / _data_filename("ranked.fresh.json", cc),
+        fresh_ranked_dicts,
+    )
 
 
 def _classify_error(exc: BaseException) -> str:
@@ -177,7 +198,18 @@ def _score_candidates_cheap(photo_urls, on_url_error=None):
     candidates = []
     for url in photo_urls[:cap]:
         try:
-            r = httpx.get(url, timeout=5.0, follow_redirects=True)
+            # Explicit per-phase timeout (not a bare float): these are the same
+            # t_full Cloudinary URLs that hung the scrape-time HEAD and the hires
+            # GET (on-demand full-res generation dribbles bytes, so a float
+            # read-timeout never fires). This hero-download loop has NO wall
+            # budget, so one un-bounded GET wedges the whole phase indefinitely —
+            # the hang that survived the validate_via_head fix (froze nightly
+            # 2026-06-13). An explicit read timeout bounds each download.
+            r = httpx.get(
+                url,
+                timeout=httpx.Timeout(5.0, connect=5.0, read=5.0, write=5.0, pool=5.0),
+                follow_redirects=True,
+            )
             r.raise_for_status()
         except Exception as e:
             if on_url_error is not None:
@@ -454,6 +486,16 @@ def _populate_hires_fields_from_sidecar(li, sidecar: dict, *, quarantined: bool)
         li.hires_eligible = bool(sidecar.get("hires_eligible"))
     if sidecar.get("hires_photo_quality_score") is not None:
         li.hires_photo_quality_score = int(sidecar["hires_photo_quality_score"])
+    # Deterministic aesthetic issues (logo_or_watermark, etc.) — written by
+    # the hires QC pass as sidecar["aesthetic"] = {"issues": [...], ...}
+    # (see assess_deterministic_aesthetic). Consumed by the featured pools
+    # and the IG gate. Older sidecars predate the "aesthetic" key and leave
+    # the field None.
+    aes = sidecar.get("aesthetic")
+    if isinstance(aes, dict):
+        issues = aes.get("issues")
+        if isinstance(issues, list) and issues:
+            li.hires_aesthetic_issues = [str(x) for x in issues]
     if "resdet_upscaled" in sidecar:
         v = sidecar.get("resdet_upscaled")
         li.hires_resdet_upscaled = bool(v) if v is not None else None
@@ -564,6 +606,18 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 # because 600×400 thumbs never clear the 800×600 floor).
                 li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
                 li.card_eligible = bool(hero_meta.get("card_eligible", False))
+                # Cached-skip path: recover the picker's winning URL from
+                # the sidecar so selected_photo_url is populated even when
+                # we don't re-run the pick (P2 consumer: listings.ts).
+                if hero_meta.get("winning_url"):
+                    li.selected_photo_url = hero_meta["winning_url"]
+                # P5 — also reject a logo/placeholder winner so the 19
+                # existing xitios-icon listings self-heal on the next
+                # nightly without a forced repick.
+                from automation.photo_quality import is_logo_or_placeholder_url
+                if is_logo_or_placeholder_url(hero_meta.get("winning_url")):
+                    li.card_eligible = False
+                    li.hero_eligible = False
                 if hero_meta.get("width") is not None:
                     li.source_width = int(hero_meta["width"])
                 if hero_meta.get("height") is not None:
@@ -732,7 +786,10 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             # ≥ 1200 — the threshold is unreachable. See the upstream-gate
             # diagnostic at pulpo-social/admin/trigger (2026-05-19) where
             # 10/10 candidates rejected with `upstream_hero_ineligible`.
-            from automation.photo_quality import compute_image_metadata as _cim
+            from automation.photo_quality import (
+                compute_image_metadata as _cim,
+                is_logo_or_placeholder_url,
+            )
             source_meta = _cim(winning_content, file_size_bytes=len(winning_content))
 
             if hero_meta is not None:
@@ -760,6 +817,15 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 hero_meta["has_marketing_overlay"] = winning_has_marketing
                 hero_meta["winning_url"] = winning_url
                 hero_meta["candidate_count"] = len(candidate_urls)
+                # P5 — a logo/icon/placeholder that wins the pick (structural
+                # gates can't tell a big logo from a real photo) must never be
+                # card/hero eligible. Override BEFORE the sidecar write so both
+                # the sidecar and the listing reflect it. Consumer of
+                # card_eligible: web/app/home/HomeShelf.jsx homepage gate.
+                if is_logo_or_placeholder_url(winning_url):
+                    hero_meta["card_eligible"] = False
+                    hero_meta["hero_eligible"] = False
+                    hero_meta["logo_placeholder_rejected"] = True
                 hero_meta_path.write_text(json.dumps(hero_meta, indent=2) + "\n",
                                           encoding="utf-8")
                 li.hero_eligible = bool(hero_meta.get("hero_eligible", False))
@@ -775,6 +841,27 @@ def _download_hero_photos(listings, repo: Path) -> dict:
 
             hash_path.write_text(url_hash)
             li.hero_photo_path = f"/photos/{fname}"
+            # Persist the picker's winning broker URL so the FE can put the
+            # same image first in the detail gallery (P2). Consumer:
+            # web/app/data/listings.ts::buildPhotos.
+            li.selected_photo_url = winning_url
+            # Per-photo verdicts: every SCORED candidate (the first `cap`
+            # photo_urls) that the picker rejected — below the cheap-score
+            # floor (picker_excluded) or carrying a Tesseract text overlay.
+            # `scored` dicts don't carry has_marketing_overlay (that's only
+            # resolved for the winner in _pick_winner_from_scored), so the
+            # verdict set is limited to those two signals. URLs beyond the
+            # cap were never scored and stay out of the list (absence ≠
+            # rejected). The winner is never in this set by construction.
+            # Consumers: listings.ts::buildPhotos + ig_photo_gate.py::
+            # order_photo_indices.
+            rejected = [
+                c["url"] for c in scored
+                if c.get("url") and c["url"] != winning_url
+                and (c.get("picker_excluded")
+                     or c.get("has_text_overlay") is True)
+            ]
+            li.photo_urls_rejected = rejected or None
             if li.card_eligible:
                 card_eligible_count += 1
             if li.hero_eligible:
@@ -984,7 +1071,16 @@ def _download_hires_photos(listings, repo: Path) -> dict:
         print(f"[hires] start  {li.source}__{li.source_id} url={url}", file=sys.stderr)
         fetch_t0 = _time.monotonic()
         try:
-            r = httpx.get(url, timeout=8.0, follow_redirects=True)
+            # Explicit per-phase timeout (not a bare float): the same t_full
+            # Cloudinary URLs that hung the scrape-time HEAD (dribbled bytes
+            # past a float read-timeout; froze the nightly 2026-06-13) are
+            # fetched here. An explicit read timeout bounds a dribbling body
+            # so one slow derivative can't eat the whole hires wall budget.
+            r = httpx.get(
+                url,
+                timeout=httpx.Timeout(8.0, connect=8.0, read=8.0, write=8.0, pool=8.0),
+                follow_redirects=True,
+            )
             r.raise_for_status()
             raw = r.content
         except Exception as e:
@@ -1296,41 +1392,52 @@ def main() -> int:
         is_enabled as _failure_capture_enabled,
     )
 
-    for src in sources:
+    # ── Crawl phase ──────────────────────────────────────────────────
+    # Each source crawls independently and is independently rate-limited
+    # (per-host RateLimiter, _runtime.py). `_crawl_one` does the fetch +
+    # any failure-snapshot I/O and returns a fully-resolved OUTCOME; it does
+    # NOT mutate the shared run-level structures (raw / errors / source_*).
+    # The deterministic merge below applies outcomes in `sources` order, so a
+    # parallel run produces a bit-identical `raw` ordering to the sequential
+    # one — which matters because the ranker's stable sort lets input order
+    # break rank-score ties (see pulpo/ranker.py). Concurrency is gated by
+    # PULPO_SCRAPE_CONCURRENCY (default 1 = the original sequential path);
+    # bumping it fans the sources across a bounded thread pool so wall-clock
+    # becomes ~max(per-source duration) instead of the sum. Per-host request
+    # rate is unchanged (distinct domains; each keeps its own limiter).
+    def _crawl_one(src: str) -> dict:
         src = src.strip()
         mod = REGISTRY.get(src)
         if not mod:
             err = f"unknown source: {src}"
-            errors.append(err)
-            source_errors[src] = err
-            source_error_class[src] = "UnknownSource"
+            fid = None
             if _failure_capture_enabled():
                 fid = _write_failure_snapshot(
                     src,
                     kind="unknown_source",
                     context={"registry_keys": sorted(REGISTRY.keys())},
-                )
-                if fid:
-                    source_failure_id[src] = fid
-            continue
+                ) or None
+            return {
+                "src": src, "kind": "unknown",
+                "errors_line": err, "error_msg": err,
+                "error_class": "UnknownSource", "failure_id": fid,
+            }
         crawl_started = _time.monotonic()
         try:
             if hasattr(mod, "crawl_with_meta"):
                 result = mod.crawl_with_meta(limit=limit, offline=offline or None)
                 recs = result["records"]
-                source_meta[src] = {
+                meta = {
                     "max_pages_hit": result["max_pages_hit"],
                     "limit_hit": result["limit_hit"],
                 }
             else:
                 recs = mod.crawl(limit=limit, offline=offline or None)
-                source_meta[src] = {"max_pages_hit": False, "limit_hit": False}
+                meta = {"max_pages_hit": False, "limit_hit": False}
         except Exception as e:
+            duration = round(_time.monotonic() - crawl_started, 2)
             err = repr(e)
-            errors.append(f"{src}: {err}")
-            source_errors[src] = err
-            source_error_class[src] = _classify_error(e)
-            source_durations[src] = round(_time.monotonic() - crawl_started, 2)
+            fid = None
             if _failure_capture_enabled():
                 # The scraper may attach .last_response / .last_request_url
                 # on failure (Phase-0 polite_get does this once realtyelsalvador
@@ -1342,38 +1449,84 @@ def main() -> int:
                     response=getattr(mod, "last_response", None),
                     request_url=getattr(mod, "last_request_url", None),
                     request_headers=getattr(mod, "last_request_headers", None),
-                    context={
-                        "duration_s": source_durations[src],
-                        "offline":    bool(offline),
-                    },
-                )
-                if fid:
-                    source_failure_id[src] = fid
-            continue
-        source_durations[src] = round(_time.monotonic() - crawl_started, 2)
-        per_source_count[src] = len(recs)
+                    context={"duration_s": duration, "offline": bool(offline)},
+                ) or None
+            return {
+                "src": src, "kind": "exception",
+                "errors_line": f"{src}: {err}", "error_msg": err,
+                "error_class": _classify_error(e),
+                "duration_s": duration, "failure_id": fid,
+            }
+        duration = round(_time.monotonic() - crawl_started, 2)
         for r in recs:
             r.setdefault("source", src)
-            raw.append(r)
-
         # Capture an "empty_yield" snapshot when the scraper completed
         # without exception but returned zero records. This is the silent-
         # failure mode that bit realtyelsalvador (Cloudflare 403 swallowed
         # by the `break` in its pagination loop) — no traceback, just a
         # quiet count=0. The snapshot gives the watchdog + auto-repair
         # agent something concrete to look at.
+        fid = None
         if not recs and _failure_capture_enabled() and not offline:
             fid = _write_failure_snapshot(
                 src,
                 kind="empty_yield",
                 context={
-                    "duration_s":    source_durations[src],
-                    "max_pages_hit": source_meta[src].get("max_pages_hit"),
-                    "limit_hit":     source_meta[src].get("limit_hit"),
+                    "duration_s":    duration,
+                    "max_pages_hit": meta.get("max_pages_hit"),
+                    "limit_hit":     meta.get("limit_hit"),
                 },
-            )
-            if fid:
-                source_failure_id[src] = fid
+            ) or None
+        return {
+            "src": src, "kind": "ok", "records": recs, "meta": meta,
+            "duration_s": duration, "count": len(recs), "failure_id": fid,
+        }
+
+    scrape_concurrency = _env_int("PULPO_SCRAPE_CONCURRENCY", 1)
+    outcomes: list[dict] = []
+    if scrape_concurrency <= 1:
+        outcomes = [_crawl_one(s) for s in sources]
+    else:
+        # Index-aligned so the merge below stays in `sources` order even
+        # though futures resolve out of order. Duplicate source entries are
+        # preserved (each crawls), matching the sequential path.
+        slots: list[Optional[dict]] = [None] * len(sources)
+        with concurrent.futures.ThreadPoolExecutor(max_workers=scrape_concurrency) as _ex:
+            _futs = {_ex.submit(_crawl_one, s): i for i, s in enumerate(sources)}
+            for _fut in concurrent.futures.as_completed(_futs):
+                slots[_futs[_fut]] = _fut.result()
+        outcomes = [o for o in slots if o is not None]
+        print(f"[scrape] crawled {len(sources)} sources at concurrency={scrape_concurrency}")
+
+    # Deterministic merge — apply outcomes in `sources` order. Keeps `raw`
+    # and `errors` byte-identical to the sequential path regardless of how
+    # the pool scheduled the work.
+    for res in outcomes:
+        src = res["src"]
+        kind = res["kind"]
+        if kind == "unknown":
+            errors.append(res["errors_line"])
+            source_errors[src] = res["error_msg"]
+            source_error_class[src] = res["error_class"]
+            if res["failure_id"]:
+                source_failure_id[src] = res["failure_id"]
+            continue
+        if kind == "exception":
+            errors.append(res["errors_line"])
+            source_errors[src] = res["error_msg"]
+            source_error_class[src] = res["error_class"]
+            source_durations[src] = res["duration_s"]
+            if res["failure_id"]:
+                source_failure_id[src] = res["failure_id"]
+            continue
+        # kind == "ok"
+        source_durations[src] = res["duration_s"]
+        source_meta[src] = res["meta"]
+        per_source_count[src] = res["count"]
+        for r in res["records"]:
+            raw.append(r)
+        if res["failure_id"]:
+            source_failure_id[src] = res["failure_id"]
 
     # ── PostHog: per-source crawl results ────────────────────────────
     # Emit one event per source after the loop completes (success or
@@ -1477,8 +1630,21 @@ def main() -> int:
                 "failure_id":   source_failure_id.get(src),
             }, ensure_ascii=False) + "\n")
 
-    # Normalize
-    listings, dropped = phase_normalize(raw)
+    # Normalize. seen_keys (plan 012): read-only ledger snapshot so the
+    # transition-aware sold rule in pulpo/normalize.py can distinguish
+    # "never-seen + sold marker → drop" from "previously-tracked listing
+    # now sold → keep + is_sold=True". The ledger is loaded again later
+    # for the existence update — this early load is read-only and
+    # fail-open (empty set ⇒ legacy drop-all-sold behavior).
+    try:
+        from automation.listing_ledger import load_ledger as _sold_load_ledger
+        _seen_keys = frozenset(
+            _sold_load_ledger(REPO / "web" / "data" / "listings_ledger.json").keys()
+        )
+    except Exception as _seen_err:  # noqa: BLE001 — never crash on ledger
+        print(f"[sold_transition] seen-keys load failed (non-fatal): {_seen_err!r}")
+        _seen_keys = frozenset()
+    listings, dropped = phase_normalize(raw, seen_keys=_seen_keys)
 
     # PRD §FR-2 — shared NLP keyword extraction. Reads nlp_keywords/*.json
     # at startup, runs all dictionaries against title+description+location_text
@@ -1611,19 +1777,16 @@ def main() -> int:
         from automation.listing_ledger import (
             load_ledger, save_ledger, update_ledger,
         )
+        from automation.source_run_state import succeeded_sources_for_ledger
         ledger_path = web_data_dir / "listings_ledger.json"
         ledger = load_ledger(ledger_path)
         present_keys_by_source: dict[str, set[str]] = {}
         for li in listings:
             present_keys_by_source.setdefault(li.source, set()).add(str(li.source_id))
-        # A source "succeeded" if it isn't in source_errors. Sources
-        # that never registered (typos, kazu-style unknown_source) are
-        # naturally absent from REGISTRY and so aren't in succeeded_sources
-        # either — their listings carry forward unchanged per the
-        # source_succeeded=False semantics.
-        succeeded_sources = {
-            slug for slug in REGISTRY.keys() if slug not in source_errors
-        }
+        # A source "succeeded" only if this run actually attempted it and
+        # it did not error. Scoped dev runs (PULPO_SOURCES=nexo) must not
+        # mark every other registered source as successful-but-absent.
+        succeeded_sources = succeeded_sources_for_ledger(sources, source_errors)
         ledger = update_ledger(
             ledger=ledger,
             present_keys_by_source=present_keys_by_source,
@@ -1651,6 +1814,69 @@ def main() -> int:
               f"missing_recently={missing_count} stale={stale_count}")
     except Exception as _ledger_err:  # noqa: BLE001 — never crash on ledger
         print(f"[listing_ledger] update failed (non-fatal): {_ledger_err!r}")
+
+    # Plan 012 — sold/delisted probe for missing listings. Fail-open,
+    # capped, non-fatal (same contract as the ledger block above): a
+    # probe bug must never freeze the nightly. Reloads the ledger from
+    # disk rather than reusing the previous block's locals so a partial
+    # ledger failure can't leak an inconsistent in-memory state here.
+    # urls_by_key reads the PREVIOUS nightly's ranked.json — still the
+    # checked-out artifact at this point (phase_write_outputs runs much
+    # later); see automation/sold_probe.py's docstring for why that's
+    # the reliable URL source.
+    try:
+        if os.environ.get("PULPO_OFFLINE"):
+            print("[sold_probe] offline — probed=0")
+        else:
+            from automation.listing_ledger import (
+                load_ledger as _sp_load_ledger,
+                save_ledger as _sp_save_ledger,
+            )
+            from automation.sold_probe import probe_missing_listings
+            _sp_ledger_path = web_data_dir / "listings_ledger.json"
+            _sp_ledger = _sp_load_ledger(_sp_ledger_path)
+            _urls_by_key: dict[str, str] = {}
+            try:
+                _prev_ranked = json.loads(
+                    (web_data_dir / "ranked.json").read_text(encoding="utf-8")
+                )
+                if isinstance(_prev_ranked, list):
+                    for _row in _prev_ranked:
+                        if isinstance(_row, dict) and _row.get("url"):
+                            _urls_by_key[
+                                f"{_row.get('source')}|{_row.get('source_id')}"
+                            ] = str(_row["url"])
+            except (OSError, json.JSONDecodeError):
+                pass  # no previous ranked.json → probe skips (skipped_no_url)
+            _sp = probe_missing_listings(
+                _sp_ledger,
+                urls_by_key=_urls_by_key,
+                max_probes=int(os.environ.get("PULPO_SOLD_PROBE_MAX", "40")),
+                llm_budget=int(os.environ.get("PULPO_SOLD_PROBE_LLM_MAX", "20")),
+                now_iso=started_iso,
+            )
+            _sp_save_ledger(_sp_ledger, _sp_ledger_path)  # persist removal reasons
+            # Stamp is_sold onto shipped listings whose ledger entry says
+            # sold. Rarely hits in the fresh path (a probed listing is by
+            # definition missing from today's scrape) — the label's
+            # primary store is the ledger; this covers carried/recent rows.
+            for li in listings:
+                _sp_entry = _sp_ledger.get(f"{li.source}|{li.source_id}")
+                if (
+                    _sp_entry is not None
+                    and _sp_entry.removal_reason == "sold"
+                    and not getattr(li, "is_sold", False)
+                ):
+                    li.is_sold = True
+                    li.sold_detected_at = _sp_entry.removal_detected_at
+            print(f"[sold_probe] probed={_sp['probed']} sold={_sp['sold']} "
+                  f"delisted={_sp['delisted']} unknown={_sp['unknown']} "
+                  f"active={_sp['active']} fetch_errors={_sp['fetch_errors']} "
+                  f"skipped_no_url={_sp['skipped_no_url']} "
+                  f"llm_calls={_sp['llm_calls']} cost=${_sp['cost_usd']:.4f}")
+            _ph_capture("sold_probe_completed", _sp)
+    except Exception as _sp_err:  # noqa: BLE001 — never crash the nightly
+        print(f"[sold_probe] failed (non-fatal): {_sp_err!r}")
 
     # Price history (PRD §FR-3). Sets is_repriced before derived rules and
     # AI run, so downstream fields reflect cross-run price comparison.
@@ -2165,30 +2391,56 @@ def main() -> int:
     _download_hires_photos(ranked_pre, REPO)
     ranked = ranked_pre
 
-    # PRD P1-2 — enforce the card-photo contract: every listing whose
-    # `hero_photo_path` is set must point at a present root file. The
-    # audit found 884/959 stale references after the prune sweep
-    # archived the old root files. Listings whose root path is missing
-    # have `hero_photo_path` nulled (UI's Photo component falls back
-    # gracefully). Stats land in web/data/photo_contract.json + an
-    # append-only audit log; the nightly Slack alert (caller's call)
-    # can hard-fail on threshold violations.
+    # P0/P2 inventory-resilience invariant: write a fresh-only snapshot
+    # before any carry-forward merge. The pre-commit row-count gate reads
+    # this file when present so stale carry-forward cannot mask a source
+    # delta. The file is intentionally not staged by the workflow.
     try:
-        from pulpo.photo_contract import enforce_photo_contract
-        photo_contract_stats = enforce_photo_contract(
-            ranked,
-            REPO / "web" / "photos",
-            data_dir=REPO / "web" / "data",
-        )
-        print(f"[photo_contract] ranked={photo_contract_stats.ranked_total} "
-              f"with_path={photo_contract_stats.with_local_path} "
-              f"exists={photo_contract_stats.local_path_exists} "
-              f"missing={photo_contract_stats.local_path_missing} "
-              f"nulled={photo_contract_stats.nulled}")
-        for violation in photo_contract_stats.fails_threshold():
-            print(f"[photo_contract] WARNING: {violation}")
+        _write_fresh_ranked_snapshot(web_data_dir, ranked_pre)
     except Exception as _e:  # noqa: BLE001
-        print(f"[photo_contract] failed (non-fatal): {_e!r}")
+        print(f"[carry_forward] fresh snapshot failed (non-fatal): {_e!r}")
+
+    try:
+        from automation.carry_forward import (
+            load_previous_ranked_from_git,
+            merge_carry_forward,
+            preview_carry_forward_count,
+        )
+        from automation.listing_ledger import load_ledger as _cf_load_ledger
+        failed_sources_for_carry = {
+            src.strip()
+            for src in sources
+            if src.strip()
+            and (src.strip() in source_errors or per_source_count.get(src.strip(), 0) == 0)
+        }
+        previous_ranked = load_previous_ranked_from_git(REPO)
+        cf_ledger = _cf_load_ledger(web_data_dir / "listings_ledger.json")
+        if not previous_ranked:
+            print("[carry_forward] no origin/main ranked.json available — carry_count=0")
+        if _env_bool("PULPO_CARRY_FORWARD", False):
+            ranked, cf_metrics = merge_carry_forward(
+                today=ranked,
+                yesterday_ranked=previous_ranked,
+                ledger=cf_ledger,
+                failed_sources=failed_sources_for_carry,
+            )
+            print(f"[carry_forward] enabled carried={cf_metrics['carried_count']} "
+                  f"fresh={cf_metrics['fresh_count']} "
+                  f"failed_sources={cf_metrics['failed_sources']} "
+                  f"skipped_stale={cf_metrics['skipped_stale']}")
+        else:
+            cf_metrics = preview_carry_forward_count(
+                today=ranked,
+                yesterday_ranked=previous_ranked,
+                ledger=cf_ledger,
+                failed_sources=failed_sources_for_carry,
+            )
+            print(f"[carry_forward] disabled would_carry={cf_metrics['carried_count']} "
+                  f"fresh={cf_metrics['fresh_count']} "
+                  f"failed_sources={cf_metrics['failed_sources']} "
+                  f"skipped_stale={cf_metrics['skipped_stale']}")
+    except Exception as _e:  # noqa: BLE001
+        print(f"[carry_forward] failed (non-fatal): {_e!r}")
 
     # IA-axis derives — master_category × subcategory + discovery_tags
     # + star_rating. Runs AFTER rank() so star_rating + the top_rated
@@ -2245,6 +2497,54 @@ def main() -> int:
         print(f"[purge] dropped {agri_dropped} agricultural-LAND listings "
               f"(built structures retained) — {len(ranked)} remain")
 
+    # Plan 012 — sold listings keep shipping (detail page renders the
+    # sold banner; Browse/zone_medians/sitemap/featured all exclude
+    # is_sold themselves) but must not OCCUPY rank positions or sort
+    # above live inventory. Mirror of carry_forward.py's tail-demotion
+    # pattern (rank=None + rank_score=-1.0). NOTE asymmetry vs stale:
+    # the PR-S4c stale filter above is flag-gated FULL REMOVAL
+    # (default off); sold is keep-but-derank because the sold state is
+    # itself the product surface. Rank gaps are established precedent —
+    # the agricultural purge above already removes ranked rows.
+    sold_deranked = 0
+    for li in ranked:
+        if getattr(li, "is_sold", False):
+            li.rank = None
+            li.rank_score = -1.0
+            sold_deranked += 1
+    if sold_deranked:
+        print(f"[sold_derank] deranked={sold_deranked} (kept in ranked.json, rank=None)")
+
+    # PRD P1-2 — enforce the card-photo contract: every listing whose
+    # `hero_photo_path` is set must point at a present root file. Listings
+    # whose root path is missing have `hero_photo_path` nulled (UI's Photo
+    # component falls back gracefully). Stats land in web/data/photo_contract.json.
+    #
+    # MUST run AFTER the agricultural purge above. The photo-contract truth
+    # canary (scripts/check_photo_contract_truth.py) cross-checks
+    # photo_contract.ranked_total against the committed ranked.json — and the
+    # purge drops listings. Stamping the sidecar pre-purge made it describe a
+    # SUPERSET (nightly 27394603436: sidecar 2129 vs ranked.json 1932, drift
+    # 197) and the canary hard-failed a perfectly shippable catalogue where
+    # every hero resolved. Keeping enforcement below the purge guarantees the
+    # sidecar always reflects the exact list that ships (drift = 0).
+    try:
+        from pulpo.photo_contract import enforce_photo_contract
+        photo_contract_stats = enforce_photo_contract(
+            ranked,
+            REPO / "web" / "photos",
+            data_dir=REPO / "web" / "data",
+        )
+        print(f"[photo_contract] ranked={photo_contract_stats.ranked_total} "
+              f"with_path={photo_contract_stats.with_local_path} "
+              f"exists={photo_contract_stats.local_path_exists} "
+              f"missing={photo_contract_stats.local_path_missing} "
+              f"nulled={photo_contract_stats.nulled}")
+        for violation in photo_contract_stats.fails_threshold():
+            print(f"[photo_contract] WARNING: {violation}")
+    except Exception as _e:  # noqa: BLE001
+        print(f"[photo_contract] failed (non-fatal): {_e!r}")
+
     # PRD "Inventory Expansion & Listing Quality Filter" — emit per-shelf
     # eligibility audit + KPI dashboard. Read-only telemetry; does not
     # change which listings are visible. Phase A2 will wire the strictness
@@ -2276,6 +2576,62 @@ def main() -> int:
     except Exception as _e:  # noqa: BLE001
         print(f"[kpi] failed (non-fatal): {_e!r}")
 
+    # R1 — durable candidate bundle BEFORE the guards.
+    #
+    # Write a self-contained snapshot of the candidate to
+    # web/data/.staging/<run_id>/ so a downstream guard failure cannot
+    # strand fresh inventory. If the population guard below fires, the
+    # bundle still exists on disk and the workflow uploads it as
+    # candidate_bundle_<run_id>; a human can then promote it manually
+    # via scripts/promote_candidate.py.
+    #
+    # Flag-gated for one-toggle revert without a code change:
+    #   PULPO_R1_BUNDLE_ENABLED=0  →  skip the bundle write (legacy behavior)
+    # See docs/RESILIENCE-AUDIT-PRD.md § R1.
+    if os.environ.get("PULPO_R1_BUNDLE_ENABLED", "1") == "1":
+        try:
+            from automation import candidate_bundle as _cbund
+
+            _cb_run_id = _cbund.resolve_run_id()
+            _cb_staging = _cbund.staging_dir_for(web_data_dir, run_id=_cb_run_id)
+            _cb_ranked_dicts = [li.to_dict() for li in ranked]
+            _cb_meta_stub = {
+                "schema_version": _cbund.BUNDLE_SCHEMA_VERSION,
+                "run_id":         _cb_run_id,
+                "candidate":      True,
+                "visible_count":  len(_cb_ranked_dicts),
+                "started_at":     started.isoformat(),
+                "candidate_generated_at": datetime.now(timezone.utc).isoformat(),
+                "offline":        offline,
+            }
+            _cb_manifest = _cbund.write_candidate_bundle(
+                _cb_staging,
+                run_id=_cb_run_id,
+                ranked_dicts=_cb_ranked_dicts,
+                meta=_cb_meta_stub,
+                sidecars={
+                    "shelf_audit.json":               web_data_dir / "shelf_audit.json",
+                    "kpi_dashboard.json":             web_data_dir / "kpi_dashboard.json",
+                    "dedup_audit.json":               web_data_dir / "dedup_audit.json",
+                    "photo_contract.json":            web_data_dir / "photo_contract.json",
+                    "source_health_history.jsonl":   web_data_dir / "source_health_history.jsonl",
+                    "run_history.json":               web_data_dir / "run_history.json",
+                },
+            )
+            print(f"[candidate] written run_id={_cb_manifest.run_id} "
+                  f"files={len(_cb_manifest.files)} visible={_cb_manifest.visible_count} "
+                  f"path={_cb_staging}")
+            _ph_capture("nightly_candidate_written", {
+                "run_id":        _cb_manifest.run_id,
+                "visible_count": _cb_manifest.visible_count,
+                "file_count":    len(_cb_manifest.files),
+                "staging_path":  str(_cb_staging.relative_to(REPO)),
+            })
+        except Exception as _e:  # noqa: BLE001 — bundle write must never fail the run
+            print(f"[candidate] bundle write FAILED (non-fatal): {_e!r}", file=sys.stderr)
+    else:
+        print("[candidate] skipped (PULPO_R1_BUNDLE_ENABLED=0)")
+
     # PR-7 — population-rate regression guard. Read the previous run's
     # last_updated.json BEFORE we overwrite it, compare derived-field
     # population rates against the new ones, and fail the run if any
@@ -2295,25 +2651,67 @@ def main() -> int:
             print(f"[regression-guard] could not parse previous last_updated.json: {_e!r}")
     regressions = check_population_regression(prev_meta, new_rates, threshold=0.20)
     if regressions:
-        # PostHog: emit BEFORE SystemExit so a failing run still reports.
-        # atexit flush in posthog_client guarantees the event ships before
-        # the process dies.
+        # R2 guard policy: a population-MIX shift is a quality WARNING, not
+        # corruption, as long as the catalogue is healthy (visible inventory
+        # at/above the count floor). Only a drop that coincides with a genuine
+        # collapse (count < floor) BLOCKS. This is the fix for run 27050642483,
+        # which hard-failed on is_motivated 15.3%→8.1% while 2107 valid
+        # listings existed — stranding a perfectly shippable catalogue.
+        from automation.guard_policy import (
+            evaluate_population_regression, append_guard_report, BLOCK,
+        )
+        # Count floor: same source the nightly count canary uses — the active
+        # country manifest, falling back to the env default.
+        try:
+            _floor = _active_country().raw.get("listing_count_floor")
+        except Exception:
+            _floor = None
+        if _floor is None:
+            _floor = _env_int("LISTING_COUNT_FLOOR", 1000)
+        _floor = int(_floor)
+        decision = evaluate_population_regression(
+            regressions, visible_count=len(ranked), floor=_floor,
+        )
+        append_guard_report(web_data_dir, decision)
+
+        # PostHog: emit BEFORE any SystemExit so a failing run still reports.
+        # atexit flush in posthog_client guarantees the event ships before the
+        # process dies. New severity-aware event + the legacy event (so existing
+        # dashboards/alerts don't go dark mid-migration).
+        _override = _env_bool("PULPO_ALLOW_POPULATION_REGRESSION", False)
+        _ph_capture("nightly.guard_evaluated", {
+            "guard":            decision.name,
+            "severity":         decision.severity,
+            "visible_count":    len(ranked),
+            "floor":            _floor,
+            "regression_count": len(regressions),
+            "regressions":      regressions[:20],
+            "override_active":  _override,
+        })
         _ph_capture("regression_guard_triggered", {
             "regression_count": len(regressions),
-            "regressions":      regressions[:20],   # cap payload size
-            "override_active":  _env_bool("PULPO_ALLOW_POPULATION_REGRESSION", False),
+            "regressions":      regressions[:20],
+            "override_active":  _override,
         })
-        msg = "[regression-guard] population-rate drops exceeded 20% threshold:\n  " + "\n  ".join(regressions)
-        if _env_bool("PULPO_ALLOW_POPULATION_REGRESSION", False):
-            print(f"{msg}\n[regression-guard] override active — continuing.")
-        else:
+
+        msg = "[regression-guard] " + decision.message
+        if decision.severity == BLOCK and not _override:
             print(msg, file=sys.stderr)
             print(
-                "[regression-guard] failing run. Set PULPO_ALLOW_POPULATION_REGRESSION=1 "
-                "to override (use sparingly — this guard exists to catch silent NLP/keyword regressions).",
+                f"[regression-guard] BLOCK: population drop AND visible inventory "
+                f"below floor ({len(ranked)} < {_floor}) — genuine collapse, failing run. "
+                f"Set PULPO_ALLOW_POPULATION_REGRESSION=1 to override.",
                 file=sys.stderr,
             )
             raise SystemExit(2)
+        # WARN (or an explicitly-overridden block): ship the catalogue, but make
+        # the degradation loud and recorded (guard_report.json + telemetry).
+        _reason = "override" if (_override and decision.severity == BLOCK) else decision.severity
+        print(
+            f"{msg}\n[regression-guard] {_reason}: shipping — inventory healthy "
+            f"({len(ranked)} ≥ floor {_floor}); a population-mix shift is a quality "
+            f"warning, not corruption."
+        )
     else:
         print(f"[regression-guard] population rates OK (new={new_rates})")
 
@@ -2342,6 +2740,18 @@ def main() -> int:
     # pipeline_started via the shared distinct_id (`pipeline:nightly`),
     # so PostHog stitches them by run order; per-run drill-down uses
     # the run_id property propagated by posthog_client.set_run_id.
+    # Scrape-phase observability (added 2026-06-13 after the nightly freeze):
+    # per-source crawl seconds are already measured in source_durations; surface
+    # the total + the slowest source here. The freeze was a slow scrape phase
+    # creeping toward the 240-min job cap, invisible because only the OVERALL
+    # duration_s was emitted — and a HUNG run emits no completion event at all
+    # (see the operator alerts in the PR / postmortem: alert on pipeline_started
+    # with no pipeline_completed within the cap window, and on scrape_total_s /
+    # duration_s p95 trending up). slowest_source names the long pole instantly.
+    _scrape_total_s = round(sum(source_durations.values()), 1)
+    _slowest_src, _slowest_s = ("", 0.0)
+    if source_durations:
+        _slowest_src, _slowest_s = max(source_durations.items(), key=lambda kv: kv[1])
     _ph_capture("pipeline_completed", {
         "ranked_count":            len(ranked),
         "dropped":                 dropped,
@@ -2349,9 +2759,14 @@ def main() -> int:
         "sources_succeeded":       sum(1 for s in sources if s.strip() not in source_errors and per_source_count.get(s.strip(), 0) > 0),
         "sources_failed":          len([s for s in sources if s.strip() in source_errors]),
         "duration_s":              round((finished - started).total_seconds(), 2),
+        "scrape_total_s":          _scrape_total_s,
+        "scrape_slowest_source":   _slowest_src,
+        "scrape_slowest_s":        round(_slowest_s, 1),
         "offline":                 offline,
         "fixture_fallback_active": fixture_fallback_active,
     })
+    print(f"[pipeline] scrape_total={_scrape_total_s}s slowest={_slowest_src}({round(_slowest_s,1)}s) "
+          f"wall={round((finished - started).total_seconds(),1)}s")
 
     # PRD WS2 feasibility probe — refreshes web/data/prd_feasibility.{md,json}
     # so weekly drift in field populations is visible without a manual re-run.
@@ -2431,8 +2846,6 @@ def main() -> int:
     # bytes today; the legacy unified file goes away in PR-MC-5.
     try:
         from pulpo.featured_listing import write_featured_json
-        from pulpo.countries import active as _active_country
-        from pulpo.countries import data_filename as _data_filename
         active_cc = _active_country().code
         pool = write_featured_json(web_data_dir / "featured.json", ranked)
         # Mirror the same content to the per-country file. We re-call

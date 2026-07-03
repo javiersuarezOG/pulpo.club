@@ -22,6 +22,8 @@ import {
   ConsentBanner,
 } from "./pages.jsx";
 import { FreeMonthModal } from "./components/FreeMonthModal.jsx";
+import { EmailCaptureModal } from "./components/EmailCaptureModal.jsx";
+import { AccessModal } from "./components/AccessModal.jsx";
 import { NewHomePage } from "./home";
 // PR-perf-3a — route-level code split. AccountPage (44KB) and AdminPage
 // + its child widgets only render for users on /account or /admin, which
@@ -45,9 +47,12 @@ import { ContactPage } from "./pages/legal/ContactPage.jsx";
 const AdminPage = React.lazy(() =>
   import("./admin/AdminShell.jsx").then((m) => ({ default: m.AdminPage })),
 );
+import { safeLocalGet, safeLocalSet, safeLocalRemove } from "./lib/safe-storage";
 import { captureCampaignParams } from "./lib/campaign";
 import { readFeatureFlag } from "./lib/feature-flag";
 import { applyFounderPlan } from "./lib/founder-emails";
+import { isPaid, isFreeMember } from "./lib/gating";
+import { freeViewableIds } from "./lib/free-view";
 import { deriveSubscriptionState } from "./lib/subscription";
 
 // Resolves the hydrated user object's `plan` field to the effective
@@ -145,9 +150,13 @@ function HomeBlockOverridesPanel() {
               border: ".5px solid rgba(0,0,0,0.1)", background: "rgba(255,255,255,0.6)",
             }}
           >
-            {BLOCK_OVERRIDE_VALUES.map((v) => (
-              <option key={v} value={v}>{v.replace("_", " ")}</option>
-            ))}
+            {BLOCK_OVERRIDE_VALUES.map((v) => {
+              // i18n-allow: dev-only block-override control, not user-facing copy
+              const label = v.replace("_", " ");
+              return (
+                <option key={v} value={v}>{label}</option>
+              );
+            })}
           </select>
         </div>
       ))}
@@ -258,13 +267,18 @@ function App() {
   // popstate listener captures it via the closure and stale state would
   // restore yesterday's value.
   const scrollBeforeListingOpenRef = useRef(null);
+  // Free top-3 exemption: ids a non-paid viewer may open in full. Kept in
+  // a ref so `openListing` (defined before `listings` loads) reads the
+  // latest set at click time without re-creating the callback. Populated
+  // from the live listings just below the useListings() call.
+  const freeViewableRef = useRef(/** @type {Set<string>} */ (new Set()));
   // Mirror of `route` for the popstate listener, which is registered
   // once with [] deps and would otherwise see the route at mount.
   // Needed to distinguish "modal close within the same section" (preserve
   // scroll) from a real cross-section pop (scroll to top).
   const routeRef = useRef(_initialParsed.route);
   const [detailViewCount, setDetailViewCount] = useState(() => {
-    return +localStorage.getItem("pulpo-detail-views") || 0;
+    return +safeLocalGet("pulpo-detail-views") || 0;
   });
 
   // Dev panel gate: visible only when (a) the build is non-production AND
@@ -514,6 +528,46 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // 008: after a Stripe checkout return, poll Clerk for the webhook-flipped
+  // plan so a just-paid user isn't immediately re-paywalled. The webhook
+  // updates publicMetadata.plan 1–10s after the redirect; the toast effect
+  // above is one-shot and can land before the metadata catches up (esp. on
+  // a Clerk cold start), leaving isPaid(user)=false and the next listing
+  // click reopening the upgrade modal. Mirrors the /account ?from=portal
+  // poll: wait for clerkActions, then reload up to 5×1.5s until the plan
+  // flips. `userRef` gives the polling closure a live read of user state
+  // (the captured `user` would be stale). Captured via ref at first render
+  // because the toast effect strips ?upgrade before this effect settles.
+  const sawCheckoutSuccessRef = useRef(
+    typeof window !== "undefined"
+      && new URLSearchParams(window.location.search).get("upgrade") === "success",
+  );
+  const userRef = useRef(user);
+  useEffect(() => { userRef.current = user; }, [user]);
+  useEffect(() => {
+    if (!sawCheckoutSuccessRef.current) return undefined;
+    if (clerkEnabled() && !clerkActions) return undefined; // wait for hydrate
+    sawCheckoutSuccessRef.current = false;                 // consume once
+    const reload = clerkActions && typeof clerkActions.reloadUser === "function"
+      ? clerkActions.reloadUser
+      : null;
+    if (!reload || isPaid(userRef.current)) return undefined; // nothing to wait for
+    let cancelled = false;
+    (async () => {
+      for (let i = 0; i < 5 && !cancelled; i += 1) {
+        try { await reload(); } catch { /* transient — keep polling */ }
+        await new Promise((r) => setTimeout(r, 1500));
+        if (isPaid(userRef.current)) {
+          track("upgrade.plan_refresh_state_changed", { attempts: i + 1 });
+          return;
+        }
+      }
+      if (!cancelled) track("upgrade.plan_refresh_stale", { attempts: 5 });
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clerkActions]);
+
   // Handle `?welcome=1` — set by Stripe `success_url` after a /start
   // checkout AND by Clerk's invitation `redirectUrl` after a magic-link
   // accept. Both moments converge on the same surface; the
@@ -694,14 +748,14 @@ function App() {
   }, [clerkActions]);
 
   useEffect(() => {
-    if (user) localStorage.setItem("pulpo-user", JSON.stringify(user));
-    else localStorage.removeItem("pulpo-user");
+    if (user) safeLocalSet("pulpo-user", JSON.stringify(user));
+    else safeLocalRemove("pulpo-user");
   }, [user]);
   useEffect(() => {
-    localStorage.setItem("pulpo-saved", JSON.stringify([...savedIds]));
+    safeLocalSet("pulpo-saved", JSON.stringify([...savedIds]));
   }, [savedIds]);
   useEffect(() => {
-    localStorage.setItem("pulpo-detail-views", String(detailViewCount));
+    safeLocalSet("pulpo-detail-views", String(detailViewCount));
   }, [detailViewCount]);
 
   useEffect(() => {
@@ -927,6 +981,28 @@ function App() {
 
   const openListing = useCallback((id) => {
     if (!id) return;
+    // Two-state model (2026-06-08): opening a listing's detail is a Pro
+    // capability. A non-paid viewer — anonymous ("Free"), or a canceled /
+    // ever-paid user off an active plan — does NOT open the panel; the
+    // subscribe-to-Pro modal shows instead. The URL stays put (no
+    // /listing/<id> push), so the panel never mounts. `setFreeMonthModal`
+    // is the conversion surface (→ Stripe checkout). A deep-link backstop
+    // effect below covers cold-loads straight to /listing/<id>.
+    //
+    // Email-first gate. Pro opens everything. Otherwise:
+    //   • anonymous (no email yet)  → start-free email-capture modal. If the
+    //     click was a top-3, we remember the id and open it once they join.
+    //   • free member, top-3        → opens in full (the email unlocked it).
+    //   • free member, rank 4+      → Go-Pro modal.
+    if (!isPaid(user)) {
+      const isTop3 = freeViewableRef.current.has(id);
+      const member = isFreeMember(user);
+      if (!(isTop3 && member)) {
+        track("paywall.shown", { kind: "listing_click", listing_id: id, top3: isTop3, member });
+        requestAccess({ reason: isTop3 ? "top3" : "listing", listingId: isTop3 ? id : null, member });
+        return;
+      }
+    }
     const fromPath = typeof window !== "undefined"
       ? window.location.pathname + window.location.search
       : "";
@@ -948,7 +1024,9 @@ function App() {
       }
     }
     _measure("perf.detail_open", { listing_id: id });
-  }, [_measure]);
+    // openEmailCapture is a stable callback defined below; referenced in the
+    // body only (deps would hit its TDZ at this render position).
+  }, [_measure, user]);
 
   const closeListing = useCallback(() => {
     if (closingRef.current) return;
@@ -982,13 +1060,17 @@ function App() {
   const toggleSave = useCallback((id) => {
     const authState = !user ? "anonymous" : (user.plan === "pro" ? "pro" : "free");
 
-    // Anon click while flag-on → stash intent, open SignupModal. The
-    // hydration effect picks up `pulpo-pending-save` after Clerk
-    // sign-in completes and posts it server-side.
-    if (clerkEnabled() && !clerkUserId) {
-      try { localStorage.setItem("pulpo-pending-save", id); } catch {}
-      setSignupModal({ mode: "signup", pendingSave: id });
+    // Two-state model (2026-06-08): saving is a Pro-only capability. A
+    // non-paid user — anonymous, or a canceled/ever-paid user off an
+    // active plan — gets the Pro subscribe modal instead. No more
+    // anonymous-stash + sign-up, no free 10-save cap; you save once you're
+    // Pro. (The /api/saves cap is now dead for this path — backend cleanup
+    // is a follow-up; saving simply can't be reached by a non-paid user.)
+    // Saving is a Pro capability. Anonymous → start-free email capture
+    // (get them into Free first); free member → Go-Pro modal.
+    if (!isPaid(user)) {
       track("save.toggled", { listing_id: id, action: "add", auth_state: authState, gated: true });
+      requestAccess({ reason: "save", member: isFreeMember(user) });
       return;
     }
 
@@ -1038,7 +1120,7 @@ function App() {
         showToast("Couldn't save — try again.");
       }
     });
-  }, [clerkUserId, showToast, locale]);
+  }, [clerkUserId, showToast, locale, user]); // openEmailCapture used in body (stable, defined below)
 
   // ── PR-NL-8 — auto-save from email "♥ Save to favorites" links ────────
   //
@@ -1090,10 +1172,18 @@ function App() {
     if (cfg.pendingSave) trigger = "heart";
     else if (cfg.pendingAction === "checkout") trigger = "checkout";
     else if (cfg.pendingListing) trigger = "pendingListing";
-    track("signup_modal.shown", {
-      trigger,
-      mode: cfg.mode === "login" ? "login" : "signup",
-    });
+    // Two-state model (2026-06-08): free-account creation is removed. Any
+    // signup intent (save, hero CTA, paywall) now opens the Pro subscribe
+    // modal (FreeMonthModal → Stripe checkout). Only an explicit
+    // mode:"login" opens Clerk sign-in — login is Pro-only, accounts exist
+    // only for payers. This single chokepoint neutralizes every old
+    // free-signup entry point at once.
+    if (cfg.mode !== "login") {
+      track("signup_modal.shown", { trigger, mode: "signup", routed_to: "subscribe_modal" });
+      setFreeMonthModal({ trigger: cfg.pendingSave ? "favorites_action" : "browse_card" });
+      return;
+    }
+    track("signup_modal.shown", { trigger, mode: "login" });
     setSignupModal(cfg);
   }, []);
   const closeSignup = useCallback(() => setSignupModal(null), []);
@@ -1151,6 +1241,30 @@ function App() {
   const listings = useListings();
   const listingsState = useListingsState();
 
+  // Free top-3 exemption — the ids a non-paid viewer may open in full.
+  // Derived from the same ranked picks the home hero shows (shared helper
+  // → can't drift). Mirrored into `freeViewableRef` for `openListing`,
+  // and exposed to the detail panel via `app.isFreeViewable`.
+  const freeViewableIdSet = useMemo(() => freeViewableIds(listings), [listings]);
+  freeViewableRef.current = freeViewableIdSet;
+  const isFreeViewable = useCallback(
+    (id) => !!id && freeViewableRef.current.has(id),
+    [],
+  );
+
+  // Dev/test-only seam: expose the free-viewable top-3 ids (plus one walled
+  // id) so e2e can deterministically drive the open-gate. The set is
+  // adapter-computed (card_eligible/thumbnail_url are derived), so it can't
+  // be recomputed from raw ranked.json in a Playwright spec. DEV-gated, so
+  // it never ships in the production bundle.
+  useEffect(() => {
+    if (!import.meta.env.DEV || typeof window === "undefined") return;
+    window.__pulpoTestIds = {
+      freeViewable: [...freeViewableIdSet],
+      walled: (listings.find((l) => l && l.card_eligible && l.id && !freeViewableIdSet.has(l.id)) || {}).id || null,
+    };
+  }, [freeViewableIdSet, listings]);
+
   // Resolve the open listing once (used both by route-meta below and
   // the detail overlay further down). null while listings.json is still
   // loading OR if the id doesn't resolve (deleted/sold).
@@ -1207,6 +1321,22 @@ function App() {
       : undefined;
     const outcome = evaluateGate(route, user, searchParams);
     if (outcome.kind === "modal") {
+      // Email-first: a route gate (Favorites / Account) for a non-member
+      // routes through the unified access surface (join free / go pro /
+      // sign in), same as every other gate.
+      if (accessV2) {
+        requestAccess({ reason: route, member: isFreeMember(user) });
+        return;
+      }
+      // Two-state model: /saved (Favorites) is a Pro feature. A non-paid
+      // visitor clicking it should be sold Pro, not shown a "welcome back"
+      // login — they're a prospect, not a returning member. /account keeps
+      // the login modal (returning members manage billing/resubscribe; the
+      // header also carries a sign-in entry).
+      if (route === "saved") {
+        setFreeMonthModal({ trigger: "favorites_action" });
+        return;
+      }
       // Already in a signup/login flow? Don't re-fire.
       if (signupModal && (signupModal.mode === "login" || signupModal.mode === "signup")) {
         return;
@@ -1318,6 +1448,114 @@ function App() {
   }, []);
   const closeFreeMonthModal = useCallback(() => setFreeMonthModal(null), []);
 
+  // Email-first funnel — start-free email-capture modal. Shown to ANONYMOUS
+  // visitors hitting any gated action (open a top-3, save, hero lock). cfg =
+  // { reason, listingId } — listingId set when the gate was a top-3 click so
+  // we can open it the moment they become a member. Mutually exclusive with
+  // the Pro modals.
+  const [emailCaptureModal, setEmailCaptureModal] = useState(null);
+  const openEmailCapture = useCallback((cfg) => {
+    setProUpsellModal(null);
+    setFreeMonthModal(null);
+    setEmailCaptureModal(cfg || {});
+  }, []);
+  const closeEmailCapture = useCallback(() => setEmailCaptureModal(null), []);
+
+  // Access v2 — the unified "3 ways in" surface (registry-driven
+  // AccessBlock/AccessModal). ON by default; switch off with ?ff_access_v2=0.
+  // Deliberately NOT PostHog-gated yet: `readFeatureFlag` would resolve to
+  // OFF wherever PostHog is live but the flag is undefined (i.e. every
+  // deployed environment). When we want dashboard control, define the flag
+  // in PostHog and swap this to readFeatureFlag("access_v2", true).
+  const accessV2 = useMemo(() => {
+    if (typeof window === "undefined") return true;
+    try {
+      const v = new URLSearchParams(window.location.search).get("ff_access_v2");
+      if (v === "0") return false;
+      if (v === "1") return true;
+    } catch { /* ignore */ }
+    return true; // default ON
+  }, []);
+  const [accessModal, setAccessModal] = useState(null);
+  const openAccessModal = useCallback((cfg) => {
+    setProUpsellModal(null); setFreeMonthModal(null); setEmailCaptureModal(null);
+    setAccessModal(cfg || { surface: "gate_anon" });
+  }, []);
+  const closeAccessModal = useCallback(() => setAccessModal(null), []);
+
+  // Single gate entry point. Anonymous → start-free surface; Free member →
+  // Pro surface. v2 → AccessModal; otherwise the legacy split modals. All
+  // gates route through this so the funnel lives in one place.
+  const requestAccess = useCallback(({ reason, listingId, member } = {}) => {
+    if (accessV2) {
+      openAccessModal({ surface: member ? "gate_member" : "gate_anon", reason, listingId });
+    } else if (member) {
+      setFreeMonthModal({ trigger: reason || "browse_card" });
+    } else {
+      openEmailCapture({ reason: reason || "gate", listingId: listingId || null });
+    }
+  }, [accessV2, openAccessModal, openEmailCapture]);
+
+  // Turn an email submission into a Free member (no Clerk account). Mirrors
+  // the legacy `signin` seed but stamps plan:"free" + provider:"email" so
+  // `isFreeMember`/`tierFor` recognize it and ClerkUserSync preserves it
+  // while signed out. The pulpo-user localStorage effect persists it.
+  // `openListingId` (a top-3 they were trying to open) is opened once the
+  // membership lands — see the effect below (setUser is async, so the
+  // modal can't call openListing directly without a stale-user race).
+  const pendingOpenAfterJoinRef = useRef(null);
+  const becomeFreeMember = useCallback(({ email, openListingId } = {}) => {
+    if (!email) return;
+    if (openListingId) pendingOpenAfterJoinRef.current = openListingId;
+    setUser((prev) => {
+      // Never downgrade a paid/Clerk user to free-member.
+      if (prev && isPaid(prev)) return prev;
+      return hydrateUser({ email, provider: "email", plan: "free", email_member: true, joined: Date.now() });
+    });
+  }, []);
+
+  // Unified "they want more access" gate: anonymous → start-free email
+  // capture; free member → Go-Pro modal; Pro → no-op. Used by the hero lock
+  // and any direct upsell CTA so the anon-vs-member split stays in one place.
+  const gateToPro = useCallback(({ reason } = {}) => {
+    if (isPaid(user)) return;
+    requestAccess({ reason: reason || "gate", member: isFreeMember(user) });
+  }, [user, requestAccess]);
+
+  // Once a Free membership lands, open the top-3 the visitor was reaching
+  // for when the email-capture gate fired (continue-the-intent).
+  useEffect(() => {
+    if (isFreeMember(user) && pendingOpenAfterJoinRef.current) {
+      const id = pendingOpenAfterJoinRef.current;
+      pendingOpenAfterJoinRef.current = null;
+      openListing(id);
+    }
+  }, [user, openListing]);
+
+  // Two-state deep-link backstop: a non-paid user landing directly on
+  // /listing/<id> (shared link, bookmark, cold reload) gets the subscribe
+  // modal instead of the panel — symmetric with the openListing click
+  // gate. We clear openListingId so the panel never mounts and strip the
+  // URL back to /browse so refresh/back doesn't replay the listing path.
+  //
+  // Exceptions: paid viewers, and the free top-3 (a shared link to one of
+  // this week's top picks opens in full for anyone — SEO + virality). We
+  // must wait for listings to load before deciding: until the set is
+  // known, a cold-loaded top-3 link would otherwise be walled mid-fetch.
+  useEffect(() => {
+    if (!openListingId || isPaid(user)) return;
+    if (listingsState.state.status === "loading") return; // decide once the set is known
+    if (freeViewableIdSet.has(openListingId)) return; // top-3 deep link → open in full (SEO/share)
+    // Non-top-3 deep link, non-paid: anonymous → start-free; member → Pro.
+    const member = isFreeMember(user);
+    track("paywall.shown", { kind: "listing_deeplink", listing_id: openListingId, member });
+    requestAccess({ reason: "listing", member });
+    setOpenListingId(null);
+    if (typeof window !== "undefined" && window.location.pathname.startsWith("/listing/")) {
+      window.history.replaceState({ pulpo: true }, "", "/browse");
+    }
+  }, [openListingId, user, listingsState.state.status, freeViewableIdSet]); // openEmailCapture: stable, body-only
+
   // Open-dictionary update for `user.profile` (see lib/user-profile.ts).
   //
   // Flow:
@@ -1387,7 +1625,10 @@ function App() {
     signupModal, openSignup, closeSignup,
     proUpsellModal, openProUpsellModal, closeProUpsellModal,
     freeMonthModal, openFreeMonthModal, closeFreeMonthModal,
+    emailCaptureModal, openEmailCapture, closeEmailCapture, becomeFreeMember, gateToPro,
+    accessV2, accessModal, openAccessModal, closeAccessModal, requestAccess,
     openListing, closeListing, openListingId,
+    isFreeViewable,
     detailViewCount, recordDetailView,
     showToast, toast,
     locale, setLocale,
@@ -1403,8 +1644,8 @@ function App() {
   const openListingObj = _openListingObj;
   // Detail panel pending state: URL says /listing/:id but listings.json
   // hasn't resolved yet, OR the id doesn't match a known listing.
-  const listingPending = openListingId && !openListingObj && listingsState.status === "loading";
-  const listingMissing = openListingId && !openListingObj && listingsState.status !== "loading";
+  const listingPending = openListingId && !openListingObj && listingsState.state.status === "loading";
+  const listingMissing = openListingId && !openListingObj && listingsState.state.status !== "loading";
 
   return (
     // <ClerkShell> mounts <ClerkProvider> only when VITE_USE_CLERK=1.
@@ -1515,6 +1756,22 @@ function App() {
           app={app}
           trigger={freeMonthModal.trigger}
           onClose={closeFreeMonthModal}
+        />
+      )}
+      {emailCaptureModal && (
+        <EmailCaptureModal
+          app={app}
+          locale={locale}
+          cfg={emailCaptureModal}
+          onClose={closeEmailCapture}
+        />
+      )}
+      {accessModal && (
+        <AccessModal
+          app={app}
+          locale={locale}
+          cfg={accessModal}
+          onClose={closeAccessModal}
         />
       )}
       <ToastHost app={app} />
