@@ -2,13 +2,13 @@
   "source": "bienesraices",
   "drift_state": "unreachable",
   "reason": "http_status=404",
-  "probed_at": "2026-07-03T09:38:28.098214+00:00",
+  "probed_at": "2026-07-03T14:34:48.363479+00:00",
   "last_probe": {
     "probed_url": "https://secure.alterestate.com/api/v1/properties/sitemap/",
     "status_code": 404,
     "final_url": "https://secure.alterestate.com/api/v1/properties/sitemap/",
     "response_size_bytes": null,
-    "duration_ms": 166,
+    "duration_ms": 120,
     "error": null
   },
   "baseline": null
