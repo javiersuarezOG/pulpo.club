@@ -172,8 +172,8 @@ WELCOME_BACK_LAST_UPDATED = "2026-07-04"
 #       masthead, top-3 "See on Pulpo" + ranks 04-10 "Sign up to Pro",
 #       Pro-locked Weekly News Spotlight. Built on the v4.5 master body
 #       (real-article spotlight artifact).
-FREE_GENERAL_TEMPLATE_VERSION = "free-general-v1.0-2026-06-07"
-FREE_GENERAL_LAST_UPDATED = "2026-06-07"
+FREE_GENERAL_TEMPLATE_VERSION = "free-general-v1.1-2026-07-04"
+FREE_GENERAL_LAST_UPDATED = "2026-07-04"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -195,10 +195,10 @@ FREE_GENERAL_LAST_UPDATED = "2026-06-07"
 #       body.
 #   free-welcome-back-v1.0 (2026-06-07) — initial ship. The free welcome
 #       with the "Welcome back" / "next 10" rewrite.
-FREE_WELCOME_TEMPLATE_VERSION = "free-welcome-v1.0-2026-06-07"
-FREE_WELCOME_LAST_UPDATED = "2026-06-07"
-FREE_WELCOME_BACK_TEMPLATE_VERSION = "free-welcome-back-v1.0-2026-06-07"
-FREE_WELCOME_BACK_LAST_UPDATED = "2026-06-07"
+FREE_WELCOME_TEMPLATE_VERSION = "free-welcome-v1.1-2026-07-04"
+FREE_WELCOME_LAST_UPDATED = "2026-07-04"
+FREE_WELCOME_BACK_TEMPLATE_VERSION = "free-welcome-back-v1.1-2026-07-04"
+FREE_WELCOME_BACK_LAST_UPDATED = "2026-07-04"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
