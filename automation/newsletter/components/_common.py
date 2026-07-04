@@ -67,13 +67,13 @@ from ..types import Issue
 #       (680x453 = 3:2 reservation; save-thumb 96x84) so email clients
 #       reserve vertical space pre-load and don't reflow. CSS height:auto
 #       still rescales on load (plan 007 step 4).
-TEMPLATE_VERSION = "newsletter-v4.8-2026-06-12"
+TEMPLATE_VERSION = "newsletter-v4.9-2026-07-04"
 
 # Human-readable timestamp surfaced in component docs + the admin
 # widget so collaborators can see when the locked design was last
 # revised without trawling git log. Matches the `vN.N (date)` line at
 # the top of the revision history above.
-LAST_UPDATED = "2026-06-12"
+LAST_UPDATED = "2026-07-04"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -114,8 +114,8 @@ LAST_UPDATED = "2026-06-12"
 #       change (page == email edition). Welcome body carries the footer.
 #   welcome-v2.4 (2026-06-12) — inherits the v4.8 listing <img> height
 #       reservation. Welcome body carries listing cards, so its HTML changed.
-WELCOME_TEMPLATE_VERSION = "welcome-v2.4-2026-06-12"
-WELCOME_LAST_UPDATED = "2026-06-12"
+WELCOME_TEMPLATE_VERSION = "welcome-v2.5-2026-07-04"
+WELCOME_LAST_UPDATED = "2026-07-04"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -145,8 +145,8 @@ WELCOME_LAST_UPDATED = "2026-06-12"
 #       stamp change. Welcome-back body carries the footer.
 #   welcome-back-v1.4 (2026-06-12) — inherits the v4.8 listing <img>
 #       height reservation. Welcome-back body carries listing cards.
-WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.4-2026-06-12"
-WELCOME_BACK_LAST_UPDATED = "2026-06-12"
+WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.5-2026-07-04"
+WELCOME_BACK_LAST_UPDATED = "2026-07-04"
 
 
 # ─────────────────────────────────────────────────────────────────────

@@ -215,6 +215,22 @@ def test_pulpo_urls_canonical_form():
     assert ":" not in see_url.split("/listing/", 1)[1].split("?", 1)[0]
 
 
+def test_pulpo_urls_pin_spanish_locale():
+    """A Spanish edition's listing links carry `&lang=es` so the reader
+    lands on the Spanish listing, not the English one (the SPA's ?lang
+    query wins over stored/browser locale). English stays unstamped —
+    `?lang=en` is redundant (en is the SPA default)."""
+    from automation.newsletter.build_issue import _pulpo_urls
+    listing = {"source": "remax", "source_id": "001461165132"}
+
+    es_see, es_save = _pulpo_urls(listing, issue_number=5, site_root="https://pulpo.club", locale="es")
+    assert es_see == "https://pulpo.club/listing/remax__001461165132?ref=newsletter_issue_5&lang=es"
+    assert es_save == es_see + "&save=1"
+
+    en_see, _ = _pulpo_urls(listing, issue_number=5, site_root="https://pulpo.club", locale="en")
+    assert "lang=" not in en_see
+
+
 def test_absolute_photo_prefers_selected_photo_url():
     """Continuity contract (PR #785): when the hero picker's winning URL
     is present and the card is eligible, the email leads with it — not
