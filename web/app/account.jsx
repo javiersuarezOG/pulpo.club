@@ -240,7 +240,12 @@ function FreeMemberAccount({ app }) {
 
   return (
     <div className="page page-account">
-      <div className="account-layout account-layout-free">
+      {/* NOT `account-layout` — that base class is the two-column grid
+          (220px 1fr) and, being defined later in index.css with equal
+          specificity, its `display:grid` defeated `.account-layout-free`'s
+          `display:block`, trapping this single-column view in the 220px
+          nav column (desktop-only). The free view is its own layout. */}
+      <div className="account-layout-free">
         <main className="account-content account-free">
           <h1 className="account-free-title">{t("account.free.title", lc)}</h1>
 
