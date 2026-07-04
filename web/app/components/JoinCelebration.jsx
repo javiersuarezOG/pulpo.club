@@ -6,8 +6,11 @@
 //
 // The reveal: the Pulpo octopus squirts its ink, rises out of it, and hands
 // over this week's top 3 — a deliberately single-look deep-sea scene (it stays
-// dark-green in both themes; it's a moment, not a document). Auto-dismisses,
-// and is dismissible by tap / Escape / the CTA. Fully reduced-motion safe.
+// dark-green in both themes; it's a moment, not a document). It persists until
+// the user acts — the "see your top 3" CTA, the close (×) button, or Escape.
+// No auto-dismiss: a timed close yanked the payoff away before it could be
+// read. Backdrop taps do NOT dismiss, so a stray tap (common on mobile) can't
+// close it out from under the user. Fully reduced-motion safe.
 //
 // Colors come from CSS tokens: the octopus/text via classes in index.css, the
 // canvas ink + bubbles via the `--jc-ink` / `--jc-bubble` custom properties
@@ -21,18 +24,23 @@ export function JoinCelebration({ locale: lc, returning = false, onDone }) {
   const panelRef = useRef(null);
   const canvasRef = useRef(null);
 
-  const done = useCallback(() => { if (typeof onDone === "function") onDone(); }, [onDone]);
+  // Every close path routes through here so we always know HOW it was
+  // dismissed (cta = proceeded to top 3, close/escape = bailed) — that's the
+  // signal for whether the celebration is converting or just being cleared.
+  const dismiss = useCallback((method) => {
+    try { track("free_join_celebration.dismissed", { method, returning }); } catch { /* ignore */ }
+    if (typeof onDone === "function") onDone();
+  }, [onDone, returning]);
 
-  // Focus, auto-dismiss, Escape.
+  // Focus + Escape only. Intentionally NO auto-dismiss timer: the reveal must
+  // stay put until the user chooses to leave it.
   useEffect(() => {
     try { track("free_join_celebration.shown", { returning }); } catch { /* ignore */ }
     if (panelRef.current) panelRef.current.focus();
-    const reduce = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const timer = setTimeout(done, reduce ? 2600 : 4200);
-    const onKey = (e) => { if (e.key === "Escape") done(); };
+    const onKey = (e) => { if (e.key === "Escape") dismiss("escape"); };
     window.addEventListener("keydown", onKey);
-    return () => { clearTimeout(timer); window.removeEventListener("keydown", onKey); };
-  }, [done, returning]);
+    return () => { window.removeEventListener("keydown", onKey); };
+  }, [dismiss, returning]);
 
   // Ink squirt + rising bubbles on a canvas sized to the panel.
   useEffect(() => {
@@ -96,7 +104,7 @@ export function JoinCelebration({ locale: lc, returning = false, onDone }) {
   }, []);
 
   return (
-    <div className="jc-backdrop" role="presentation" onClick={done}>
+    <div className="jc-backdrop" role="presentation">
       <div
         ref={panelRef}
         tabIndex={-1}
@@ -104,10 +112,9 @@ export function JoinCelebration({ locale: lc, returning = false, onDone }) {
         aria-modal="true"
         aria-label={t("access.join.aria", lc)}
         className="jc-panel"
-        onClick={(e) => e.stopPropagation()}
       >
         <canvas ref={canvasRef} className="jc-ink" aria-hidden="true" />
-        <button type="button" className="jc-close" aria-label={t("access.join.aria.close", lc)} onClick={done}>
+        <button type="button" className="jc-close" aria-label={t("access.join.aria.close", lc)} onClick={() => dismiss("close")}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" /></svg>
         </button>
 
@@ -151,7 +158,7 @@ export function JoinCelebration({ locale: lc, returning = false, onDone }) {
 
           <h2 className="jc-title">{t(returning ? "access.join.back_title" : "access.join.title", lc)}</h2>
           <p className="jc-body">{t("access.join.body", lc)}</p>
-          <button type="button" className="jc-cta" onClick={done}>{t("access.join.cta", lc)}</button>
+          <button type="button" className="jc-cta" onClick={() => dismiss("cta")}>{t("access.join.cta", lc)}</button>
         </div>
       </div>
     </div>
