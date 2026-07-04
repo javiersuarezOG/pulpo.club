@@ -28,6 +28,34 @@ beforeEach(() => {
   process.env.PULPO_UNSUBSCRIBE_SECRET = "test-secret";
 });
 
+describe("hashEmail — cross-language contract with store.py email_hash", () => {
+  // These golden values are computed by automation/newsletter/store.py's
+  // email_hash() with the DEV_SALT ("pulpo-newsletter-dev-salt"):
+  //   python3 -c "import hashlib; \
+  //     print(hashlib.sha256('pulpo-newsletter-dev-salt:test@example.com'\
+  //     .encode()).hexdigest()[:24])"  ->  402d0067182b8a07b852cf22
+  // If JS drifts from Python, the unsubscribe/resubscribe link's r= hash
+  // stops matching any Resend contact and BOTH flows silently no-op. Pin it.
+  beforeEach(() => { delete process.env.PULPO_NEWSLETTER_SALT; });
+
+  it("matches the Python salted 24-char hash for a known email", () => {
+    expect(hashEmail("test@example.com")).toBe("402d0067182b8a07b852cf22");
+  });
+
+  it("lowercases + trims before hashing (parity with .strip().lower())", () => {
+    expect(hashEmail("  TEST@Example.com  ")).toBe("402d0067182b8a07b852cf22");
+  });
+
+  it("honors PULPO_NEWSLETTER_SALT when set (same var Python reads)", () => {
+    process.env.PULPO_NEWSLETTER_SALT = "prod-salt";
+    // sha256("prod-salt:test@example.com")[:24]
+    const crypto = require("crypto");
+    const expected = crypto.createHash("sha256")
+      .update("prod-salt:test@example.com").digest("hex").slice(0, 24);
+    expect(hashEmail("test@example.com")).toBe(expected);
+  });
+});
+
 describe("expectedToken", () => {
   it("is deterministic for the same (hash, issue)", () => {
     const a = expectedToken("abc", 1);
