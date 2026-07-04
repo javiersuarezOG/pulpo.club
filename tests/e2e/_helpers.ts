@@ -59,6 +59,27 @@ export async function seedProUser(page: Page): Promise<void> {
   await seedUser(page, "pro");
 }
 
+// Email-only Free MEMBER (no Clerk account) — the state app.becomeFreeMember
+// produces. isFreeMember() gates on `email_member === true`, so plain
+// seedUser(page, "free") is NOT a free member (it renders the tabbed
+// account, not <FreeMemberAccount>). This seed is the only way to reach
+// the FreeMemberAccount render path in e2e.
+export async function seedFreeMember(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "pulpo-user",
+      JSON.stringify({
+        email: "free-member-tester@pulpo.club",
+        name: "Free Member Tester",
+        plan: "free",
+        email_member: true,
+        joined: Date.now(),
+        provider: "email",
+      }),
+    );
+  });
+}
+
 export async function seedCancelingUser(page: Page): Promise<void> {
   await page.addInitScript(() => {
     const DAY = 24 * 60 * 60 * 1000;
