@@ -596,7 +596,20 @@ def _filter_summary_human(pref: Preference, locale: Locale, cohort: Cohort) -> s
     return " · ".join(parts) if parts else ""
 
 
-def _pulpo_urls(listing: dict, *, issue_number: int, site_root: str) -> tuple[str, str]:
+# The SPA reads `?lang=es` from the query string and it WINS over the
+# reader's stored/browser locale (web/app/i18n.jsx). Without it, a reader
+# who clicks a Spanish email lands on the ENGLISH listing/page whenever
+# their localStorage/browser default isn't Spanish. So every in-app link
+# in the email must pin the edition's locale. Only stamp non-default
+# locales — `?lang=en` is redundant (en is the SPA default) and would
+# churn every English URL + its tests for no behavior change.
+def _lang_suffix(locale: Locale) -> str:
+    return f"&lang={locale}" if locale and locale != "en" else ""
+
+
+def _pulpo_urls(
+    listing: dict, *, issue_number: int, site_root: str, locale: Locale = "en",
+) -> tuple[str, str]:
     """The canonical /listing/<source>__<source_id> page on pulpo.club plus
     a save variant. The save_url adds `?save=1` so the SPA auto-saves
     the listing on mount (PR-NL-8 wired this for /account-authed users).
@@ -609,11 +622,13 @@ def _pulpo_urls(listing: dict, *, issue_number: int, site_root: str) -> tuple[st
     detail. Caught 2026-05-29 after the first v3 send.
 
     Both URLs include `ref=newsletter_issue_<N>` so PostHog can attribute
-    in-app conversion back to the issue."""
+    in-app conversion back to the issue, and `&lang=<locale>` (non-en) so
+    a Spanish reader lands on the Spanish listing, not the English one."""
     source_id = f"{listing.get('source')}__{listing.get('source_id')}"
     base = f"{site_root.rstrip('/')}/listing/{source_id}"
     ref = f"ref=newsletter_issue_{issue_number}"
-    return (f"{base}?{ref}", f"{base}?{ref}&save=1")
+    lang = _lang_suffix(locale)
+    return (f"{base}?{ref}{lang}", f"{base}?{ref}{lang}&save=1")
 
 
 def _chips_for_listing(
@@ -878,7 +893,7 @@ def _to_pick(
     title = tc.get(locale) or tc.get("en") or listing.get("title") or "Listing"
     price_text, price_note = _format_price(listing, locale)
     callouts = commentary_mod.pick_callouts_for_listing(listing, locale)
-    pulpo_url, save_url = _pulpo_urls(listing, issue_number=issue_number, site_root=site_root)
+    pulpo_url, save_url = _pulpo_urls(listing, issue_number=issue_number, site_root=site_root, locale=locale)
     chips = _chips_for_listing(listing, rank=rank, locale=locale)
     story_html, story_source = ("", "")
     shortlist_frame_html = ""
@@ -1134,8 +1149,16 @@ def build_issue(
         f"{site_root.rstrip('/')}/api/unsubscribe"
         f"?r={recipient.email_hash}&i={issue_number}&t={_unsub_t}"
     )
+    # The paywall / "See on Pulpo Pro" CTA must point at the /start PAGE,
+    # NOT /api/stripe/start-checkout — that endpoint is POST-only, so a
+    # browser click (GET) returns {"error":"method_not_allowed"} on a black
+    # screen. /start is the public checkout landing (web/app/start.jsx,
+    # routed in vercel.json); its own button POSTs to start-checkout. Carry
+    # the issue ref for attribution and pin the edition locale so a Spanish
+    # reader lands on /start in Spanish.
     paywall_url = (
-        f"{site_root.rstrip('/')}/api/stripe/start-checkout?ref=newsletter_issue_{issue_number}"
+        f"{site_root.rstrip('/')}/start?ref=newsletter_issue_{issue_number}"
+        f"{_lang_suffix(locale)}"
     )
     welcome_prefs_url = None
     if cohort == "anonymous":
@@ -1173,6 +1196,7 @@ def build_issue(
             {"source": lid.split("__")[0], "source_id": lid.split("__", 1)[1] if "__" in lid else ""},
             issue_number=n,
             site_root=root,
+            locale=locale,
         )[0],
         issue_number=issue_number,
         site_root=site_root,
