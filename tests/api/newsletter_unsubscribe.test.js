@@ -4,7 +4,12 @@
 
 import { describe, it, expect, beforeEach } from "vitest";
 
-import handler, { expectedToken, verifyToken } from "../../api/unsubscribe.js";
+import handler, {
+  expectedToken,
+  verifyToken,
+  hashEmail,
+  recordResubscribe,
+} from "../../api/unsubscribe.js";
 
 function mockRes() {
   const res = {
@@ -152,6 +157,57 @@ describe("handler", () => {
     expect(res.body).toContain('lang="en"');
   });
 
+  it("renders the resubscribe confirmation (free) on action=resub", async () => {
+    const t = expectedToken("abc", 1);
+    const req = { method: "GET", query: { r: "abc", i: "1", t, action: "resub" }, headers: {} };
+    const res = mockRes();
+    await handler(req, res);
+    expect(res.statusCode).toBe(200);
+    expect(res.headers["Content-Type"]).toContain("text/html");
+    expect(res.body).toContain("You're back on the list.");
+    // Not the unsubscribe confirmation.
+    expect(res.body).not.toContain("You're unsubscribed.");
+  });
+
+  it("renders the resubscribe confirmation (pro) on action=resub&e=pro", async () => {
+    const t = expectedToken("abc", 1);
+    const req = { method: "GET", query: { r: "abc", i: "1", t, e: "pro", action: "resub" }, headers: {} };
+    const res = mockRes();
+    await handler(req, res);
+    expect(res.body).toContain("You're back on the weekly.");
+    expect(res.body).toContain('<span class="pro-pill">PRO</span>');
+  });
+
+  it("resub page renders Spanish copy for l=es", async () => {
+    const t = expectedToken("abc", 1);
+    const req = { method: "GET", query: { r: "abc", i: "1", t, l: "es", action: "resub" }, headers: {} };
+    const res = mockRes();
+    await handler(req, res);
+    expect(res.body).toContain("Estás de vuelta en la lista.");
+  });
+
+  it("the unsubscribe page's Resubscribe link carries the same token + action=resub", async () => {
+    const t = expectedToken("abc", 1);
+    const req = { method: "GET", query: { r: "abc", i: "1", t }, headers: {} };
+    const res = mockRes();
+    await handler(req, res);
+    // The free ghost CTA now round-trips through the token endpoint, not `/`.
+    expect(res.body).toContain(`action=resub`);
+    expect(res.body).toContain(`r=abc&i=1&t=${t}`);
+  });
+
+  it("still 400s on a bad token even with action=resub (no forgery path)", async () => {
+    const req = {
+      method: "GET",
+      query: { r: "abc", i: "1", t: "x".repeat(32), action: "resub" },
+      headers: {},
+    };
+    const res = mockRes();
+    await handler(req, res);
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe("invalid_link");
+  });
+
   it("200s with JSON on valid POST (RFC 8058 one-click)", async () => {
     const t = expectedToken("xyz", 7);
     const req = {
@@ -163,5 +219,82 @@ describe("handler", () => {
     await handler(req, res);
     expect(res.statusCode).toBe(200);
     expect(res.body.ok).toBe(true);
+  });
+});
+
+describe("recordResubscribe — welcome-back dispatch", () => {
+  const EMAIL = "resub@example.com";
+
+  function fakeResend({ unsubscribed }) {
+    return {
+      contacts: {
+        list: async () => ({ data: [{ id: "c1", email: EMAIL, unsubscribed }] }),
+        update: async () => ({ data: { id: "c1" } }),
+      },
+    };
+  }
+
+  function recordingFetch(calls) {
+    return async (url, opts) => {
+      calls.push({ url, body: JSON.parse(opts.body) });
+      return { status: 200, json: async () => ({ status: "sent", dry_run: true }) };
+    };
+  }
+
+  beforeEach(() => {
+    process.env.RESEND_AUDIENCE_ID = "aud_test";
+    process.env.RESEND_API_KEY = "re_test";
+    process.env.PULPO_INTERNAL_TOKEN = "internal_test";
+  });
+
+  it("fires free_welcome_back on a genuine free resubscribe, carrying email + locale", async () => {
+    const calls = [];
+    const out = await recordResubscribe(hashEmail(EMAIL), 3, {
+      edition: "free",
+      locale: "es",
+      fetchImpl: recordingFetch(calls),
+      resendImpl: fakeResend({ unsubscribed: true }),
+    });
+    expect(out.resend_status).toBe("updated");
+    expect(out.was_unsubscribed).toBe(true);
+    expect(calls.length).toBe(1);
+    expect(calls[0].body.variant).toBe("free_welcome_back");
+    expect(calls[0].body.email).toBe(EMAIL);
+    expect(calls[0].body.locale).toBe("es");
+  });
+
+  it("does NOT fire when the contact was already subscribed (repeat click)", async () => {
+    const calls = [];
+    const out = await recordResubscribe(hashEmail(EMAIL), 3, {
+      edition: "free",
+      fetchImpl: recordingFetch(calls),
+      resendImpl: fakeResend({ unsubscribed: false }),
+    });
+    expect(out.resend_status).toBe("updated");
+    expect(out.was_unsubscribed).toBe(false);
+    expect(calls.length).toBe(0);
+  });
+
+  it("does NOT fire the free welcome for a Pro edition resubscribe", async () => {
+    const calls = [];
+    const out = await recordResubscribe(hashEmail(EMAIL), 3, {
+      edition: "pro",
+      fetchImpl: recordingFetch(calls),
+      resendImpl: fakeResend({ unsubscribed: true }),
+    });
+    expect(out.resend_status).toBe("updated");
+    expect(calls.length).toBe(0);
+    expect(out.welcome.reason).toBe("pro_edition");
+  });
+
+  it("still resubscribes even if the welcome dispatch throws", async () => {
+    const out = await recordResubscribe(hashEmail(EMAIL), 3, {
+      edition: "free",
+      fetchImpl: async () => { throw new Error("network down"); },
+      resendImpl: fakeResend({ unsubscribed: true }),
+    });
+    expect(out.resend_status).toBe("updated");
+    // fireFreeWelcome catches its own fetch errors → returns fired:false.
+    expect(out.welcome.fired).toBe(false);
   });
 });
