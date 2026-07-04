@@ -20,7 +20,23 @@ from automation.newsletter.free_welcome_dispatch import dispatch_free_welcome
 _ROOT = Path(__file__).resolve().parents[2]
 _RANKED_JSON = str(_ROOT / "web" / "data" / "ranked.json")
 _EMAIL_RE = __import__("re").compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
-_VALID_SOURCES = {"signup", "stripe_downgrade", "resend_resubscribe", "admin", "test"}
+# Producers that may call this endpoint. Each is a telemetry discriminator,
+# not just a gate — keep it in sync with every caller of fireFreeWelcome:
+#   signup / resend_resubscribe → api/newsletter.js (homepage form)
+#   unsubscribe_page_resub      → api/unsubscribe.js (one-click Resubscribe
+#                                 on the unsubscribe confirmation page)
+#   stripe_downgrade            → Pro→free churn welcome-back
+#   admin / test                → admin trigger + tests
+# Adding a new caller = add its source here in the SAME PR, or the endpoint
+# 400s `invalid_source` and the email silently never sends.
+_VALID_SOURCES = {
+    "signup",
+    "stripe_downgrade",
+    "resend_resubscribe",
+    "unsubscribe_page_resub",
+    "admin",
+    "test",
+}
 
 
 def _log(fields: dict) -> None:
