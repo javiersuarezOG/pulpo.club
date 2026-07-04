@@ -38,11 +38,27 @@ const UNSUB_SECRET_ENV = "PULPO_UNSUBSCRIBE_SECRET";
 const RESEND_API_KEY_ENV = "RESEND_API_KEY";
 const RESEND_AUDIENCE_ID_ENV = "RESEND_AUDIENCE_ID";
 
+// Reverse-lookup key for a Resend contact. MUST byte-for-byte match
+// automation/newsletter/store.py `email_hash` — the unsubscribe/resubscribe
+// link's `r=` IS that Python hash (salted sha256, first 24 hex chars), and
+// lookupContactByHash reverses it by re-hashing each contact's email.
+//
+// The prior implementation (unsalted sha256, 16 chars) never matched a real
+// recipient hash, so the Resend `unsubscribed` flip silently no-op'd
+// (`not_in_audience`) on EVERY unsubscribe — masked only because the PostHog
+// cron filter still excluded the reader from the next send. Resubscribe
+// exposed it: with the contact never found, `wasUnsubscribed` was always
+// false and the welcome-back never fired. Keep the salt env var + fallback
+// literal identical to store.py or this silently breaks again.
+const NEWSLETTER_SALT_ENV = "PULPO_NEWSLETTER_SALT";
+const NEWSLETTER_DEV_SALT = "pulpo-newsletter-dev-salt";
+
 function hashEmail(email) {
+  const salt = process.env[NEWSLETTER_SALT_ENV] || NEWSLETTER_DEV_SALT;
   return crypto.createHash("sha256")
-    .update(String(email || "").trim().toLowerCase())
+    .update(`${salt}:${String(email || "").trim().toLowerCase()}`)
     .digest("hex")
-    .slice(0, 16);
+    .slice(0, 24);
 }
 
 function logApi(fields) {
