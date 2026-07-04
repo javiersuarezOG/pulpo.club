@@ -189,21 +189,28 @@ function distinctIdFor(props) {
 function shouldDispatchWelcomeForUserCreated(body) {
   const data = (body && body.data) || {};
   const pub = data.public_metadata || {};
-  const priv = data.private_metadata || {};
-  // plan="pro" is set by the Stripe webhook on the invitation;
-  // Clerk propagates publicMetadata from invitation → user at
-  // user creation. The user is born Pro.
+  // plan="pro" is set by the Stripe webhook on the invitation
+  // (api/stripe/webhook.js line ~972) and Clerk propagates invitation
+  // PUBLIC metadata → user at creation. A paid-invitation acceptee is
+  // therefore born plan="pro" — this is the authoritative "is this a
+  // paid Pro user" signal (and the only reason the app grants Pro
+  // access at all), so it is the single hard gate.
   if (pub.plan !== "pro") return false;
-  // Confirm it came via Stripe payment, not via an admin tool that
-  // happened to stamp plan="pro" on the user record. The Stripe
-  // webhook puts stripeCustomerId in the invitation's
-  // privateMetadata; Clerk copies it atomically to the user's
-  // private_metadata at signup. See block-comment above for why
-  // we can't use invitation_id (timing).
-  if (!priv.stripeCustomerId) return false;
-  // Re-send guard. Belt-and-suspenders: dispatchProWelcome also checks.
+  // Re-send guard. Belt-and-suspenders: dispatchProWelcome + the Python
+  // dispatcher's `welcome_newsletter_sent_at` stamp also dedup.
   if (pub.welcome_newsletter_sent_at) return false;
   return true;
+  //
+  // We deliberately do NOT also require private_metadata.stripeCustomerId.
+  // Clerk does not reliably surface invitation PRIVATE metadata on the
+  // user.created payload (public propagates; private lags or is absent),
+  // so that requirement silently `filter_skipped` EVERY real Path-C
+  // acceptance — the instant welcome never fired and the reader only got
+  // it via the ~1–2h reconcile backstop (welcome_reconcile), if at all.
+  // plan="pro" alone is sufficient: the dispatcher's idempotency stamp
+  // guarantees no double-send with the Stripe paths or the reconcile
+  // cron, and an admin-stamped plan="pro" (a comp grant) receiving the
+  // onboarding email is both harmless and arguably correct.
 }
 
 function primaryEmailFromUserCreated(data) {
