@@ -191,6 +191,71 @@ async function recordUnsubscribe(recipientHash, issueNumber) {
   }
 }
 
+// Pro reader re-enabling the weekly digest → Pulpo Pro welcome-back
+// (pulpo_pro_welcome_back), the Pro-branded analogue of the free path.
+// POSTs to the Pro dispatcher /api/internal/welcome-send with
+// variant=welcome_back. Best-effort + awaited; a slow/failed/unconfigured
+// dispatch never breaks the resubscribe.
+//
+// Two safety properties:
+//   • No subscription_id is passed, so the dispatcher stamps only the
+//     audit timestamp (resubscribe_welcome_sent_at) and NOT the Stripe
+//     re-acquisition dedup key (resubscribe_welcome_subscription_id) —
+//     this digest re-enable can't interfere with that separate funnel
+//     (automation/newsletter/welcome_dispatch.py).
+//   • The Pro dispatcher gates on the reader being a plan=pro Clerk user
+//     (find_clerk_user_by_email + plan check), so a non-Pro or
+//     account-less contact resolves to a clean skip, not a mis-send.
+const PRO_WELCOME_PATH = "/api/internal/welcome-send";
+const PRO_WELCOME_TIMEOUT_MS = 8000;
+
+function internalBaseUrl() {
+  return process.env.PULPO_SITE_ROOT || "https://pulpo.club";
+}
+
+async function fireProWelcomeBack({ email, locale, fetchImpl } = {}) {
+  const token = (process.env.PULPO_INTERNAL_TOKEN || "").trim();
+  if (!token) {
+    logApi({ pro_welcome_back: "skipped", reason: "internal_token_unset" });
+    return { fired: false, reason: "internal_token_unset" };
+  }
+  const controller = new AbortController();
+  const tid = setTimeout(() => controller.abort(), PRO_WELCOME_TIMEOUT_MS);
+  try {
+    const r = await (fetchImpl || fetch)(`${internalBaseUrl()}${PRO_WELCOME_PATH}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "User-Agent": "pulpo-unsubscribe-pro-welcome-back",
+      },
+      body: JSON.stringify({
+        email,
+        variant: "welcome_back",
+        source: "unsubscribe_page_resub",
+        locale,
+      }),
+      signal: controller.signal,
+    });
+    let body = null;
+    try { body = await r.json(); } catch { /* best-effort */ }
+    logApi({
+      pro_welcome_back: (body && body.status) || `http_${r.status}`,
+      reason: (body && body.reason) || "-",
+      dry_run: !!(body && body.dry_run),
+    });
+    return { fired: true, status: body && body.status, httpStatus: r.status };
+  } catch (err) {
+    const reason = err && err.name === "AbortError"
+      ? "timeout"
+      : `fetch_failed:${(err && err.message) || "unknown"}`;
+    logApi({ pro_welcome_back: "error", reason });
+    return { fired: false, reason };
+  } finally {
+    clearTimeout(tid);
+  }
+}
+
 // The inverse of recordUnsubscribe — flip the Resend contact back to
 // subscribed, fire the durable PostHog signal, and re-engage the reader
 // with the welcome-back email. Reached only via the in-page Resubscribe
@@ -198,17 +263,17 @@ async function recordUnsubscribe(recipientHash, issueNumber) {
 // mutation landed, exactly like the unsub path.
 //
 // The `unsubscribe?r=<hash>` link only carries the recipient HASH — but the
-// audience lookup recovers the plaintext email, which is exactly what the
-// free welcome dispatcher needs. So a token-link resubscribe fires
-// `free_welcome_back` the same way re-entering the address on the homepage
-// does (api/newsletter.js). Two guards keep it honest:
-//   • wasUnsubscribed — fireFreeWelcome always sends is_new_contact:true, so
-//     the anti-spam dedup is OURS: only a contact that was actually
-//     unsubscribed gets a welcome-back. A repeat click (already subscribed)
-//     flips nothing new and sends no email.
-//   • edition !== "pro" — Pro re-acquisition is Stripe/Clerk-driven and does
-//     not route through the FREE welcome template; a Pro reader re-enabling
-//     the weekly digest just gets the confirmation page, no email.
+// audience lookup recovers the plaintext email, which both welcome
+// dispatchers need. A token-link resubscribe fires the edition-matched
+// welcome-back:
+//   • FREE → free_welcome_back via fireFreeWelcome (api/newsletter.js), the
+//     same email re-entering the address on the homepage sends.
+//   • PRO  → pulpo_pro_welcome_back via fireProWelcomeBack (the Pro
+//     dispatcher), Pro-branded, gated Clerk-side on plan=pro.
+// One guard keeps it honest: wasUnsubscribed — only a contact that was
+// actually unsubscribed gets a welcome-back. A repeat click (already
+// subscribed) flips nothing new and sends no email. The dispatchers'
+// own idempotency (stamps) is the belt-and-suspenders layer.
 async function recordResubscribe(
   recipientHash,
   issueNumber,
@@ -252,18 +317,20 @@ async function recordResubscribe(
     };
   }
 
-  // Genuine re-subscribe of a FREE reader → welcome-back (best-effort;
+  // Genuine re-subscribe → edition-matched welcome-back (best-effort;
   // never break the resubscribe on a slow / failed / unconfigured dispatch).
-  let welcome = { fired: false, reason: edition === "pro" ? "pro_edition" : "already_subscribed" };
-  if (edition !== "pro" && wasUnsubscribed) {
+  let welcome = { fired: false, reason: "already_subscribed" };
+  if (wasUnsubscribed) {
     try {
-      welcome = await fireFreeWelcome({
-        email: contact.email,
-        locale,
-        variant: "free_welcome_back",
-        source: "unsubscribe_page_resub",
-        fetchImpl,
-      });
+      welcome = edition === "pro"
+        ? await fireProWelcomeBack({ email: contact.email, locale, fetchImpl })
+        : await fireFreeWelcome({
+            email: contact.email,
+            locale,
+            variant: "free_welcome_back",
+            source: "unsubscribe_page_resub",
+            fetchImpl,
+          });
     } catch (err) {
       welcome = { fired: false, reason: `welcome_threw:${err && err.message}` };
     }

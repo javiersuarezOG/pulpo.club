@@ -303,16 +303,36 @@ describe("recordResubscribe — welcome-back dispatch", () => {
     expect(calls.length).toBe(0);
   });
 
-  it("does NOT fire the free welcome for a Pro edition resubscribe", async () => {
+  it("fires the PRO welcome-back (welcome-send, variant=welcome_back) for a Pro edition resubscribe", async () => {
     const calls = [];
     const out = await recordResubscribe(hashEmail(EMAIL), 3, {
       edition: "pro",
+      locale: "es",
       fetchImpl: recordingFetch(calls),
       resendImpl: fakeResend({ unsubscribed: true }),
     });
     expect(out.resend_status).toBe("updated");
+    expect(calls.length).toBe(1);
+    // Pro routes to the Pro dispatcher, NOT the free one.
+    expect(calls[0].url).toContain("/api/internal/welcome-send");
+    expect(calls[0].url).not.toContain("free-welcome-send");
+    expect(calls[0].body.variant).toBe("welcome_back");
+    expect(calls[0].body.source).toBe("unsubscribe_page_resub");
+    expect(calls[0].body.locale).toBe("es");
+    // No subscription_id → can't collide with the Stripe re-acquisition dedup.
+    expect(calls[0].body.subscription_id).toBeUndefined();
+  });
+
+  it("does NOT fire the Pro welcome-back when the contact was already subscribed", async () => {
+    const calls = [];
+    const out = await recordResubscribe(hashEmail(EMAIL), 3, {
+      edition: "pro",
+      fetchImpl: recordingFetch(calls),
+      resendImpl: fakeResend({ unsubscribed: false }),
+    });
+    expect(out.resend_status).toBe("updated");
+    expect(out.was_unsubscribed).toBe(false);
     expect(calls.length).toBe(0);
-    expect(out.welcome.reason).toBe("pro_edition");
   });
 
   it("still resubscribes even if the welcome dispatch throws", async () => {
