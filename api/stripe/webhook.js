@@ -1430,6 +1430,26 @@ module.exports = async (req, res) => {
             payment_failed_at: undefined,
             grace_period_ends_at: undefined,
           });
+          // Second self-heal surface for Resend audience membership.
+          // invoice.payment_succeeded fires on the FIRST invoice at signup
+          // (billing_reason=subscription_create) AND on every renewal — so
+          // enrolling here gives an immediate, independent retry of the
+          // best-effort checkout-time enroll (no waiting for a renewal),
+          // plus a recurring one. Together with the subscription.updated
+          // site this makes enrollment fully self-healing through the
+          // webhook path — no reconcile cron needed. Idempotent (dedups on
+          // "already exists"), best-effort, never blocks the webhook.
+          let audienceEnroll = "skipped";
+          if (fallbackEmail) {
+            const enrolled = await enrollPaidUserInAudience({
+              email: fallbackEmail,
+              locale: (subMeta && subMeta.locale) || "en",
+              source: "stripe.invoice.payment_succeeded_self_heal",
+            });
+            audienceEnroll = enrolled.ok
+              ? (enrolled.dedup ? "dedup" : "ok")
+              : (enrolled.reason || "fail");
+          }
           posthog.capture(posthog.emailDistinctId(fallbackEmail), "webhook.invoice_payment_succeeded", {
             event_id: event.id,
             invoice_id: inv.id,
@@ -1439,6 +1459,8 @@ module.exports = async (req, res) => {
             // by checkout.session.completed) from a recovery — useful
             // for funnel attribution.
             billing_reason: typeof inv.billing_reason === "string" ? inv.billing_reason : "",
+            // ok = a Pro who was MISSING from the audience just got enrolled.
+            audience_enroll: audienceEnroll,
             ms: Date.now() - t0,
           });
         }
