@@ -117,3 +117,51 @@ describe("free-welcome source producer/consumer contract", () => {
     expect(valid.has("unsubscribe_page_resub")).toBe(true); // unsub page CTA
   });
 });
+
+// Same closed-set contract for the PRO welcome dispatcher. api/unsubscribe.js
+// fireProWelcomeBack POSTs source="unsubscribe_page_resub" to
+// api/internal/welcome-send.py; that source MUST be in the Pro endpoint's
+// _VALID_SOURCES or it 400s invalid_source and the Pro welcome-back never
+// sends (the same failure class as the free path).
+describe("pro-welcome source producer/consumer contract", () => {
+  const PRO_CONSUMER = "api/internal/welcome-send.py";
+  const PRO_PRODUCER = "api/unsubscribe.js";
+
+  function parseProValidSources() {
+    const src = readRepoFile(PRO_CONSUMER);
+    const m = src.match(/_VALID_SOURCES\s*=\s*\{([\s\S]*?)\}/);
+    if (!m) throw new Error(`could not locate _VALID_SOURCES in ${PRO_CONSUMER}`);
+    return new Set([...m[1].matchAll(/["']([^"']+)["']/g)].map((x) => x[1]));
+  }
+
+  function collectProProducerSources() {
+    const src = readRepoFile(PRO_PRODUCER);
+    const out = new Set();
+    // Target the Pro welcome-back payload precisely: the `source:` literal
+    // sitting next to `variant: "welcome_back"` in fireProWelcomeBack's
+    // JSON.stringify body. Avoids picking up unrelated `source:` keys
+    // (the PostHog capture, the free dispatch) elsewhere in the file.
+    for (const m of src.matchAll(
+      /variant:\s*["']welcome_back["']\s*,\s*source:\s*["']([^"']+)["']/g,
+    )) {
+      out.add(m[1]);
+    }
+    return out;
+  }
+
+  it("every Pro producer source is in welcome-send.py _VALID_SOURCES", () => {
+    const valid = parseProValidSources();
+    const found = collectProProducerSources();
+    expect(found.size).toBeGreaterThan(0);
+    const orphans = [...found].filter((s) => !valid.has(s));
+    expect(
+      orphans,
+      "fireProWelcomeBack stamped a source not in welcome-send.py _VALID_SOURCES — " +
+      "add it there or the endpoint 400s invalid_source and the Pro welcome-back never sends.",
+    ).toEqual([]);
+  });
+
+  it("unsubscribe_page_resub is allowlisted on the Pro endpoint", () => {
+    expect(parseProValidSources().has("unsubscribe_page_resub")).toBe(true);
+  });
+});
