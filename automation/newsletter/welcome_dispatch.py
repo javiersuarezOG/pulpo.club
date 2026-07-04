@@ -111,17 +111,27 @@ def find_clerk_user_by_email(email: str) -> Optional[ClerkUser]:
     (missing env, lookup error, no matches) — caller treats that as
     `clerk_lookup_failed` and skips the dispatch.
 
-    Uses Clerk's `email_address[]` query param to avoid paginating
+    Uses Clerk's `email_address` query param to avoid paginating
     through every user. Tolerant of both `data: [...]` and bare-array
-    response shapes (Clerk SDK versions differ)."""
+    response shapes (Clerk SDK versions differ).
+
+    CRITICAL: the param name is `email_address`, NOT `email_address[]`.
+    Clerk's REST API (like the JS SDK's getUserList({ emailAddress: [...] }))
+    reads a bare `email_address` query key; the `[]` bracket form is an
+    unrecognized key, so Clerk silently IGNORES the filter and returns an
+    arbitrary (unfiltered) user. The exact-match guard below then rejects
+    that user → None → clerk_lookup_failed. That bug sent Pro welcomes to
+    0 users for 7+ days (only the most-recently-created user ever matched
+    by luck, since it came back first). See tests/newsletter/
+    test_clerk_email_lookup.py::test_url_uses_bare_email_address_param."""
     secret = (os.environ.get("CLERK_SECRET_KEY") or "").strip()
     if not secret or not email:
         return None
     email_norm = email.strip().lower()
-    # URL-encode the email value so special characters can't break the
-    # filter; keep the literal `email_address[]` array-param name.
+    # URL-encode the email value so special characters (`+`, `@`) can't
+    # break the filter. Bare `email_address` param name — NOT the `[]` form.
     from urllib.parse import quote                                       # noqa: PLC0415
-    url = f"{CLERK_API_BASE}/users?email_address[]={quote(email_norm, safe='')}&limit=1"
+    url = f"{CLERK_API_BASE}/users?email_address={quote(email_norm, safe='')}&limit=1"
     headers = {"Authorization": f"Bearer {secret}"}
     try:
         import httpx                                                     # noqa: PLC0415

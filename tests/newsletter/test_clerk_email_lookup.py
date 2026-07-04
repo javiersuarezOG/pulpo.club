@@ -113,3 +113,23 @@ def test_email_is_url_encoded(monkeypatch):
     # '+' and '@' must be encoded in the emitted URL.
     assert "a%2Bb%40test.local" in captured["url"]
     assert "a+b@test.local" not in captured["url"]
+
+
+def test_url_uses_bare_email_address_param(monkeypatch):
+    """REGRESSION: the query MUST use the bare `email_address=` key, not the
+    `email_address[]=` bracket form.
+
+    Clerk's REST API ignores the unrecognized `email_address[]` key and
+    returns an arbitrary unfiltered user; the exact-match guard then rejects
+    it → clerk_lookup_failed. That shipped and sent Pro welcomes to 0 users
+    for 7+ days (only the newest user matched by luck). The mocked httpx in
+    these tests can't observe Clerk ignoring the filter, so we pin the wire
+    format directly here."""
+    captured = {}
+    payload = {"data": [_clerk_row("javier@suarez.ventures")]}
+    _patch_httpx(monkeypatch, payload, captured)
+
+    wd.find_clerk_user_by_email("javier@suarez.ventures")
+    assert "email_address=" in captured["url"]
+    assert "email_address[]" not in captured["url"]
+    assert "email_address%5B%5D" not in captured["url"]  # in case it gets encoded
