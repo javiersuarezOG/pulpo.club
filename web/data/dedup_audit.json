@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-06-30T07:08:08.747358+00:00",
+  "computed_at": "2026-07-04T06:41:11.964985+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -1110,10 +1110,10 @@
   "overlap_matrix": {},
   "per_source": {
     "bienesraices": {
-      "kept_as_unique": 509,
-      "raw": 510,
+      "kept_as_unique": 508,
+      "raw": 509,
       "shared_with_others": 0,
-      "unique_in_source": 509
+      "unique_in_source": 508
     },
     "century21": {
       "kept_as_unique": 14,
@@ -1128,16 +1128,16 @@
       "unique_in_source": 32
     },
     "citymax_sc": {
-      "kept_as_unique": 156,
-      "raw": 156,
+      "kept_as_unique": 159,
+      "raw": 159,
       "shared_with_others": 0,
-      "unique_in_source": 156
+      "unique_in_source": 159
     },
     "csbr": {
-      "kept_as_unique": 257,
-      "raw": 259,
+      "kept_as_unique": 254,
+      "raw": 256,
       "shared_with_others": 0,
-      "unique_in_source": 257
+      "unique_in_source": 254
     },
     "elagente": {
       "kept_as_unique": 2,
@@ -1146,10 +1146,10 @@
       "unique_in_source": 2
     },
     "encuentra24": {
-      "kept_as_unique": 23,
-      "raw": 23,
+      "kept_as_unique": 26,
+      "raw": 26,
       "shared_with_others": 0,
-      "unique_in_source": 23
+      "unique_in_source": 26
     },
     "essurf": {
       "kept_as_unique": 38,
@@ -1176,22 +1176,22 @@
       "unique_in_source": 23
     },
     "realestate_au_sv": {
-      "kept_as_unique": 275,
-      "raw": 306,
+      "kept_as_unique": 268,
+      "raw": 299,
       "shared_with_others": 0,
-      "unique_in_source": 275
+      "unique_in_source": 268
     },
     "realtyelsalvador": {
-      "kept_as_unique": 98,
-      "raw": 98,
+      "kept_as_unique": 123,
+      "raw": 123,
       "shared_with_others": 0,
-      "unique_in_source": 98
+      "unique_in_source": 123
     },
     "remax": {
-      "kept_as_unique": 297,
-      "raw": 312,
+      "kept_as_unique": 294,
+      "raw": 309,
       "shared_with_others": 0,
-      "unique_in_source": 297
+      "unique_in_source": 294
     },
     "santizo": {
       "kept_as_unique": 91,
@@ -1212,6 +1212,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2096,
-  "total_unique_fingerprints": 2043
+  "total_in_dataset": 2113,
+  "total_unique_fingerprints": 2060
 }
