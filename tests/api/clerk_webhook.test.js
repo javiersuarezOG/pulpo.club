@@ -353,24 +353,21 @@ describe("handler", () => {
 // ─────────────────────────────────────────────────────────────────────
 
 describe("shouldDispatchWelcomeForUserCreated", () => {
-  // Real-world payload shape: Clerk propagates the invitation's
-  // privateMetadata to the new user's private_metadata at user
-  // creation. The Stripe webhook (api/stripe/webhook.js Path C)
-  // stamps stripeCustomerId + stripeSubscriptionId on the invitation;
-  // both propagate to the user. `invitation_id` does NOT propagate
-  // until invitation.accepted fires AFTER user.created — see the
-  // block comment in api/clerk/webhook.js for the bug history.
+  // The gate is plan="pro" (+ no prior welcome stamp), full stop. Clerk
+  // propagates invitation PUBLIC metadata → user at creation, so a paid
+  // acceptee is born plan="pro". We do NOT require
+  // private_metadata.stripeCustomerId: Clerk doesn't reliably surface
+  // invitation PRIVATE metadata on the user.created payload, and the old
+  // requirement silently filter_skipped every real Path-C acceptance
+  // (2026-07-04 regression: instant welcome never fired, only the ~1-2h
+  // reconcile backstop delivered it). See api/clerk/webhook.js.
 
-  it("returns true for a Stripe-paid invitation acceptance", () => {
+  it("returns true for a Stripe-paid invitation acceptance (with stripeCustomerId)", () => {
     const body = {
       type: "user.created",
       data: {
         id: "user_abc",
         public_metadata: { plan: "pro" },
-        // stripeCustomerId IS on the user record at user.created time
-        // (Clerk copies it from the invitation's privateMetadata).
-        // invitation_id is NOT yet — Clerk stamps it later, on
-        // invitation.accepted. Reflecting reality.
         private_metadata: { stripeCustomerId: "cus_x", stripeSubscriptionId: "sub_y" },
         email_addresses: [{ id: "ea_1", email_address: "buyer@example.com" }],
         primary_email_address_id: "ea_1",
@@ -379,30 +376,31 @@ describe("shouldDispatchWelcomeForUserCreated", () => {
     expect(shouldDispatchWelcomeForUserCreated(body)).toBe(true);
   });
 
-  it("returns false for a direct signup (no plan, no stripeCustomerId)", () => {
+  it("returns true for plan='pro' even when stripeCustomerId is absent (the real Path-C payload)", () => {
+    // THE REGRESSION FIX: Clerk propagates public_metadata.plan but NOT
+    // private_metadata.stripeCustomerId onto the user.created payload, so
+    // the real paid-invitation acceptance looks exactly like this. The
+    // old code required stripeCustomerId and skipped every such user.
+    const body = {
+      type: "user.created",
+      data: {
+        id: "user_paid_no_priv",
+        public_metadata: { plan: "pro" },
+        private_metadata: {},  // private metadata didn't propagate — reality
+        email_addresses: [{ id: "ea_1", email_address: "buyer@example.com" }],
+        primary_email_address_id: "ea_1",
+      },
+    };
+    expect(shouldDispatchWelcomeForUserCreated(body)).toBe(true);
+  });
+
+  it("returns false for a direct signup (no plan)", () => {
     const body = {
       type: "user.created",
       data: {
         id: "user_direct",
         public_metadata: {},
         private_metadata: {},
-      },
-    };
-    expect(shouldDispatchWelcomeForUserCreated(body)).toBe(false);
-  });
-
-  it("returns false when plan='pro' but no stripeCustomerId (admin-stamped, not paid)", () => {
-    // Defensive: an admin tool could conceivably stamp plan=pro on a
-    // user record without going through Stripe payment. We only want
-    // to fire the welcome for genuine paying customers — admin
-    // grants shouldn't get a "your first 10" framing since they
-    // didn't actually buy anything.
-    const body = {
-      type: "user.created",
-      data: {
-        id: "user_admin_granted",
-        public_metadata: { plan: "pro" },
-        private_metadata: {},  // no stripeCustomerId — not from a Stripe payment
       },
     };
     expect(shouldDispatchWelcomeForUserCreated(body)).toBe(false);
