@@ -9,7 +9,10 @@ import handler, {
   verifySvixSignature,
   pickPostHogProps,
   EVENT_MAP,
+  distinctIdFor,
 } from "../../api/resend-webhook.js";
+import { recipientHash } from "../../api/_activation_email.js";
+import { emailDistinctId } from "../../api/_posthog.js";
 
 function makeSignature(secret, id, ts, body) {
   // Mirror Svix's signing: HMAC-SHA256 over `${id}.${ts}.${body}` using the
@@ -246,6 +249,43 @@ describe("EVENT_MAP", () => {
     expect(EVENT_MAP["email.bounced"]).toBe("newsletter.bounced");
     expect(EVENT_MAP["email.complained"]).toBe("newsletter.complained");
     expect(EVENT_MAP["email.delivery_delayed"]).toBe("newsletter.delivery_delayed");
+  });
+});
+
+describe("distinctIdFor — person stitching (2026-06-30 audit P1-4)", () => {
+  it("activation lifecycle stitches to the post-Stripe funnel person (email: prefix)", () => {
+    // Activation stamps recipient_hash = sha256(email)[:16], identical to the
+    // funnel person id, so its events must land on `email:<hash>` — NOT the
+    // orphaned `user:<hash>` the handler used to emit.
+    expect(distinctIdFor({ recipient_hash: "abc123def456", email_type: "activation" }))
+      .toBe("email:abc123def456");
+  });
+
+  it("newsletter stays on user: (salted 24-char hash — a different id space)", () => {
+    expect(distinctIdFor({ recipient_hash: "deadbeef001122334455", email_type: "newsletter" }))
+      .toBe("user:deadbeef001122334455");
+  });
+
+  it("unknown/absent email_type defaults to user: (no accidental stitch)", () => {
+    expect(distinctIdFor({ recipient_hash: "x", email_type: "unknown" })).toBe("user:x");
+    expect(distinctIdFor({ recipient_hash: "y" })).toBe("user:y");
+  });
+
+  it("missing recipient_hash falls back to the server bucket", () => {
+    expect(distinctIdFor({ recipient_hash: null, email_type: "activation" }))
+      .toBe("server:resend_webhook");
+    expect(distinctIdFor({})).toBe("server:resend_webhook");
+  });
+
+  it("CONTRACT: activation events land on the SAME person id as the conversion funnel", () => {
+    // The stitch only works because recipientHash (producer, api/_activation_email.js)
+    // and emailDistinctId (consumer, api/_posthog.js) hash the email identically.
+    // Lock that identity: if either drifts, activation lifecycle silently
+    // re-orphans onto a separate PostHog person.
+    const email = "Buyer@Example.com";
+    expect(`email:${recipientHash(email)}`).toBe(emailDistinctId(email));
+    expect(distinctIdFor({ recipient_hash: recipientHash(email), email_type: "activation" }))
+      .toBe(emailDistinctId(email));
   });
 });
 
