@@ -297,6 +297,63 @@ RATE_CHECKS = {
         "threshold": 0.05,               # 5%
         "min_denominator": 10,
     },
+    # ── Pro welcome HARD-SKIP rate (the 2026-07-04 blind spot) ───────
+    # The `welcome_failure_rate` check above watches `welcome_failed`,
+    # but the 7-day Pro-welcome outage (0 sent / 540 skipped) manifested
+    # as `welcome_skipped reason=clerk_lookup_failed` — the dispatcher
+    # returned status="skipped", NOT "failed", so failure-rate stayed 0%
+    # and every freshness check stayed green (the reconcile cron ran fine,
+    # it just skipped everyone). This catches that class: a HARD skip is
+    # one where the dispatcher WANTED to deliver but couldn't
+    # (clerk_lookup_failed / ranked_missing / no_picks_available) — as
+    # opposed to a benign skip (already_sent / not_pro), which is correct
+    # behaviour. Denominator = genuine delivery attempts (sent + hard
+    # skips), EXCLUDING benign skips so they can't dilute the ratio.
+    #
+    # During the outage this reads 100% (540/540). Healthy steady state
+    # is ~0%. Covers welcome + welcome-back (both route through
+    # dispatch_welcome → find_clerk_user_by_email). 24h window,
+    # min_denominator=3 (welcomes are low-volume; a single hard skip on a
+    # 2-attempt day shouldn't page).
+    "welcome_hard_skip_rate": {
+        "label": "Pro welcome hard-skip rate (dispatcher couldn't deliver — clerk_lookup_failed / ranked_missing / no_picks)",
+        "numerator_where": (
+            "event IN ('newsletter.welcome_skipped','newsletter.welcome_back_skipped') "
+            "AND JSONExtractString(properties, 'reason') IN "
+            "('clerk_lookup_failed','ranked_missing','no_picks_available')"
+        ),
+        "denominator_where": (
+            "event IN ('newsletter.welcome_sent','newsletter.welcome_back_sent') "
+            "OR (event IN ('newsletter.welcome_skipped','newsletter.welcome_back_skipped') "
+            "AND JSONExtractString(properties, 'reason') IN "
+            "('clerk_lookup_failed','ranked_missing','no_picks_available'))"
+        ),
+        "window_hours": 24.0,
+        "threshold": 0.20,               # >20% of genuine attempts hard-failing = broken
+        "min_denominator": 3,
+    },
+    # ── Free welcome HARD-SKIP rate ──────────────────────────────────
+    # Same class for the DB-free free dispatcher. It has no Clerk lookup,
+    # so `clerk_lookup_failed` can't occur — but `ranked_missing` /
+    # `no_picks_available` (a data-pipeline break) would silently zero out
+    # free welcomes exactly the same way. Same shape + thresholds.
+    "free_welcome_hard_skip_rate": {
+        "label": "Free welcome hard-skip rate (ranked_missing / no_picks)",
+        "numerator_where": (
+            "event IN ('newsletter.free_welcome_skipped','newsletter.free_welcome_back_skipped') "
+            "AND JSONExtractString(properties, 'reason') IN "
+            "('ranked_missing','no_picks_available')"
+        ),
+        "denominator_where": (
+            "event IN ('newsletter.free_welcome_sent','newsletter.free_welcome_back_sent') "
+            "OR (event IN ('newsletter.free_welcome_skipped','newsletter.free_welcome_back_skipped') "
+            "AND JSONExtractString(properties, 'reason') IN "
+            "('ranked_missing','no_picks_available'))"
+        ),
+        "window_hours": 24.0,
+        "threshold": 0.20,
+        "min_denominator": 3,
+    },
 }
 
 
@@ -434,6 +491,10 @@ def main() -> int:
     parser.add_argument("--max-age-hours", type=float, default=None,
                         help="Global override; if unset, per-family thresholds from FAMILIES apply.")
     parser.add_argument("--runbook-url", default=env("WEBHOOK_HEALTH_RUNBOOK_URL", DEFAULT_RUNBOOK))
+    parser.add_argument("--test-slack", action="store_true",
+                        help="Post ONE test ping to Slack and exit 0 — verifies the alert "
+                             "channel is wired. Needs no PostHog creds. Use --dry-run to "
+                             "print the message without posting.")
     args = parser.parse_args()
 
     # Legacy env var still respected for the workflow file's existing
@@ -445,6 +506,23 @@ def main() -> int:
     project = env("POSTHOG_PROJECT_ID")
     key = env("POSTHOG_PERSONAL_API_KEY")
     slack_url = env("SLACK_WEBHOOK_URL")
+
+    # Operator "is my alert channel wired?" path. Posts exactly one message
+    # and exits 0 — deliberately BEFORE the PostHog-cred requirement, since a
+    # Slack-wiring test needs no PostHog. slack() safely prints instead of
+    # posting when --dry-run is set or SLACK_WEBHOOK_URL is unset.
+    if args.test_slack:
+        slack(
+            slack_url,
+            ":white_check_mark: *Pulpo webhook-health — Slack test ping.* "
+            "Alert channel is live (manual test, not a real alert). "
+            + args.runbook_url,
+            args.dry_run,
+        )
+        print("test-slack: posted to Slack" if (slack_url and not args.dry_run)
+              else "test-slack: printed only (no SLACK_WEBHOOK_URL or --dry-run)")
+        return 0
+
     if not project or not key:
         raise SystemExit("POSTHOG_PROJECT_ID and POSTHOG_PERSONAL_API_KEY are required")
 

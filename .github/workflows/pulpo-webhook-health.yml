@@ -3,7 +3,12 @@ name: Pulpo webhook health
 on:
   schedule:
     - cron: "0 */6 * * *"
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      test_slack:
+        description: "Post a one-line test ping to Slack and exit (verify alert wiring). Skips the real checks."
+        type: boolean
+        default: false
 
 # Post-2026-06-02 (PRD P0-1 + P0-2): the heavy Clerk/Resend API calls
 # now run from the Vercel serverless function at
@@ -30,6 +35,7 @@ jobs:
       # alive AND surfaces a red badge when the per-monitor status is
       # `unavailable`.
       - name: Poll Vercel webhook-health endpoint
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.test_slack) }}
         env:
           PULPO_HEALTH_URL: ${{ secrets.PULPO_HEALTH_URL }}
           PULPO_CRON_SECRET: ${{ secrets.PULPO_CRON_SECRET }}
@@ -43,6 +49,7 @@ jobs:
       # resend_status, stripe_status}`. Missing sidecar → status="unknown"
       # so a crashed monitor is observable.
       - name: Check stuck activation invitations
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.test_slack) }}
         env:
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
           POSTHOG_HOST: ${{ secrets.POSTHOG_HOST }}
@@ -63,7 +70,7 @@ jobs:
           POSTHOG_PROJECT_TOKEN: ${{ secrets.POSTHOG_PROJECT_TOKEN }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           MONITOR_STATUS_DIR: ${{ runner.temp }}/pulpo_monitor_status
-        run: python3 scripts/check_webhook_health.py
+        run: python3 scripts/check_webhook_health.py ${{ (github.event_name == 'workflow_dispatch' && inputs.test_slack) && '--test-slack' || '' }}
 
       - name: Slack on webhook-health job failure
         if: failure() || cancelled()
