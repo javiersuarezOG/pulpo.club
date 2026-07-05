@@ -73,7 +73,14 @@ from ..types import Issue
 #       al mar" not "Ocean View" (enum-render trap fix, launch audit P0-4).
 #       Rendered Your Pulpo block changes for category-filtered recipients
 #       in BOTH locales (EN casing "Ocean View" -> "Ocean view" too).
-TEMPLATE_VERSION = "newsletter-v5.0-2026-07-05"
+#   v5.1 (2026-07-05) — two ES leaks fixed (launch audit D). (1) masthead
+#       date is locale-aware: the Spanish edition renders "5 ene 2026" not
+#       "5 Jan 2026" (_format_issue_date; strftime %b is English-only) —
+#       header + <title> change for months whose abbreviation differs EN↔ES
+#       (Jan/Apr/Aug/Dec, ...). (2) footer filter summary dropped the
+#       hardcoded English " OK" after "Terreno" and the literal "default"
+#       fallback (now "Todas las propiedades").
+TEMPLATE_VERSION = "newsletter-v5.1-2026-07-05"
 
 # Human-readable timestamp surfaced in component docs + the admin
 # widget so collaborators can see when the locked design was last
@@ -122,7 +129,7 @@ LAST_UPDATED = "2026-07-05"
 #       reservation. Welcome body carries listing cards, so its HTML changed.
 #   welcome-v2.6 (2026-07-05) — inherits the v5.0 Your Pulpo category
 #       localization (P0-4). Welcome body carries Your Pulpo.
-WELCOME_TEMPLATE_VERSION = "welcome-v2.6-2026-07-05"
+WELCOME_TEMPLATE_VERSION = "welcome-v2.7-2026-07-05"
 WELCOME_LAST_UPDATED = "2026-07-05"
 
 
@@ -155,7 +162,7 @@ WELCOME_LAST_UPDATED = "2026-07-05"
 #       height reservation. Welcome-back body carries listing cards.
 #   welcome-back-v1.6 (2026-07-05) — inherits the v5.0 Your Pulpo category
 #       localization (P0-4). Welcome-back body carries Your Pulpo.
-WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.6-2026-07-05"
+WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.7-2026-07-05"
 WELCOME_BACK_LAST_UPDATED = "2026-07-05"
 
 
@@ -184,7 +191,7 @@ WELCOME_BACK_LAST_UPDATED = "2026-07-05"
 #       (real-article spotlight artifact).
 #   free-general-v1.2 (2026-07-05) — inherits the v5.0 Your Pulpo category
 #       localization (P0-4). Free weekly carries Your Pulpo.
-FREE_GENERAL_TEMPLATE_VERSION = "free-general-v1.2-2026-07-05"
+FREE_GENERAL_TEMPLATE_VERSION = "free-general-v1.3-2026-07-05"
 FREE_GENERAL_LAST_UPDATED = "2026-07-05"
 
 
@@ -209,9 +216,9 @@ FREE_GENERAL_LAST_UPDATED = "2026-07-05"
 #       with the "Welcome back" / "next 10" rewrite.
 #   free-welcome-v1.2 / free-welcome-back-v1.2 (2026-07-05) — inherit the
 #       v5.0 Your Pulpo category localization (P0-4). Both carry Your Pulpo.
-FREE_WELCOME_TEMPLATE_VERSION = "free-welcome-v1.2-2026-07-05"
+FREE_WELCOME_TEMPLATE_VERSION = "free-welcome-v1.3-2026-07-05"
 FREE_WELCOME_LAST_UPDATED = "2026-07-05"
-FREE_WELCOME_BACK_TEMPLATE_VERSION = "free-welcome-back-v1.2-2026-07-05"
+FREE_WELCOME_BACK_TEMPLATE_VERSION = "free-welcome-back-v1.3-2026-07-05"
 FREE_WELCOME_BACK_LAST_UPDATED = "2026-07-05"
 
 

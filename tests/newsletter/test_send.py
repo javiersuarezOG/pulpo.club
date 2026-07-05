@@ -333,6 +333,31 @@ def test_html_to_text_strips_style_and_blocks():
     assert "<" not in text and ">" not in text
 
 
+def test_html_to_text_preserves_link_destinations():
+    """Plain-text MIME must keep the unsubscribe + CTA URLs (launch audit)."""
+    html = (
+        '<p>See <a href="https://pulpo.club/listing/42">this listing</a>.</p>'
+        '<a href="https://pulpo.club/api/unsubscribe?r=abc&amp;i=7&amp;t=xyz">Unsubscribe</a>'
+    )
+    text = send_mod.html_to_text(html)
+    assert "this listing (https://pulpo.club/listing/42)" in text
+    # unsubscribe URL survives + entity-decoded
+    assert "https://pulpo.club/api/unsubscribe?r=abc&i=7&t=xyz" in text
+
+
+def test_html_to_text_no_duplicate_when_text_is_the_url():
+    text = send_mod.html_to_text('<a href="https://pulpo.club">https://pulpo.club</a>')
+    assert text.count("https://pulpo.club") == 1
+
+
+def test_html_to_text_drops_mailto_and_anchor_hrefs():
+    text = send_mod.html_to_text(
+        '<a href="mailto:hi@pulpo.club">Email us</a> and <a href="#top">top</a>'
+    )
+    assert "Email us" in text and "mailto:" not in text
+    assert "top" in text and "#top" not in text
+
+
 def test_is_dry_run_explicit_off(monkeypatch):
     monkeypatch.setenv("PULPO_NEWSLETTER_DRY_RUN", "0")
     assert send_mod.is_dry_run() is False
