@@ -5,7 +5,20 @@ Uses the `post_override` test seam to bypass httpx entirely.
 
 from __future__ import annotations
 
+import pytest
+
 from automation.newsletter import send as send_mod
+
+
+@pytest.fixture(autouse=True)
+def _default_newsletter_salt(monkeypatch):
+    """A LIVE send now requires PULPO_NEWSLETTER_SALT (P0-1 fail-closed).
+
+    Every pre-existing test assumed a configured environment, so seed a
+    deterministic salt here. The two tests that assert the fail-closed
+    behaviour delenv it explicitly.
+    """
+    monkeypatch.setenv("PULPO_NEWSLETTER_SALT", "test-newsletter-salt")
 
 
 class _Resp:
@@ -121,6 +134,45 @@ def test_invalid_email_returns_error(monkeypatch):
     )
     assert out.ok is False
     assert out.error == "invalid_email"
+
+
+# ── salt fail-closed (P0-1) ───────────────────────────────────────────────
+def test_missing_salt_fails_closed_on_live_send(monkeypatch):
+    """A live send with no PULPO_NEWSLETTER_SALT must refuse — shipping an
+    unsubscribe link salted with the public dev salt is a broken/forgeable
+    unsubscribe. Must fail before any HTTP call."""
+    monkeypatch.setenv("PULPO_NEWSLETTER_DRY_RUN", "0")
+    monkeypatch.setenv("RESEND_API_KEY", "re_test")
+    monkeypatch.setenv("RESEND_FROM_EMAIL", "hello@mail.pulpo.club")
+    monkeypatch.delenv("PULPO_NEWSLETTER_SALT", raising=False)
+    poster = _make_post(lambda _i: _Resp(200, {"id": "should-not-be-called"}))
+    out = send_mod.send_issue(
+        to_email="ops@pulpo.club",
+        recipient_hash="abc123",
+        issue_number=2,
+        subject="Hi",
+        html="<p>hi</p>",
+        post_override=poster,
+    )
+    assert out.ok is False
+    assert out.error == "missing_newsletter_salt"
+    assert len(poster.calls) == 0   # never reached the network
+
+
+def test_dry_run_exempt_from_salt_guard(monkeypatch):
+    """Dry-run uses the dev salt on purpose (reproducible fixtures) and
+    makes no HTTP call — the salt guard must NOT block it."""
+    monkeypatch.setenv("PULPO_NEWSLETTER_DRY_RUN", "1")
+    monkeypatch.delenv("PULPO_NEWSLETTER_SALT", raising=False)
+    out = send_mod.send_issue(
+        to_email="ops@pulpo.club",
+        recipient_hash="abc123",
+        issue_number=1,
+        subject="Hi",
+        html="<p>hi</p>",
+    )
+    assert out.ok is True
+    assert out.dry_run is True
 
 
 # ── retries ──────────────────────────────────────────────────────────────

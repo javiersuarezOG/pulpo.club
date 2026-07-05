@@ -9,6 +9,7 @@ import handler, {
   verifyToken,
   hashEmail,
   recordResubscribe,
+  recordUnsubscribe,
 } from "../../api/unsubscribe.js";
 
 function mockRes() {
@@ -344,5 +345,53 @@ describe("recordResubscribe — welcome-back dispatch", () => {
     expect(out.resend_status).toBe("updated");
     // fireFreeWelcome catches its own fetch errors → returns fired:false.
     expect(out.welcome.fired).toBe(false);
+  });
+});
+
+describe("recordUnsubscribe — Resend mirror retry (P0-2)", () => {
+  const EMAIL = "unsub@example.com";
+
+  beforeEach(() => {
+    process.env.RESEND_AUDIENCE_ID = "aud_test";
+    process.env.RESEND_API_KEY = "re_test";
+    delete process.env.PULPO_NEWSLETTER_SALT; // dev-salt parity for hashEmail
+  });
+
+  function fakeResend({ updateBehaviour }) {
+    let updateCalls = 0;
+    const impl = {
+      contacts: {
+        list: async () => ({ data: [{ id: "c1", email: EMAIL, unsubscribed: false }] }),
+        update: async () => {
+          updateCalls += 1;
+          return updateBehaviour(updateCalls);
+        },
+      },
+    };
+    Object.defineProperty(impl, "updateCalls", { get: () => updateCalls });
+    return impl;
+  }
+
+  it("retries a transient update failure and reports success", async () => {
+    // Fail the first two attempts, succeed on the third.
+    const resend = fakeResend({
+      updateBehaviour: (n) => {
+        if (n < 3) throw new Error("503 upstream");
+        return { data: { id: "c1" } };
+      },
+    });
+    const out = await recordUnsubscribe(hashEmail(EMAIL), 7, { resendImpl: resend });
+    expect(out.resend_status).toBe("updated");
+    expect(out.attempts).toBe(3);
+    expect(resend.updateCalls).toBe(3);
+  });
+
+  it("returns update_failed (not a false success) after exhausting retries", async () => {
+    const resend = fakeResend({
+      updateBehaviour: () => { throw new Error("503 upstream"); },
+    });
+    const out = await recordUnsubscribe(hashEmail(EMAIL), 7, { resendImpl: resend });
+    expect(out.resend_status).toBe("update_failed");
+    expect(resend.updateCalls).toBe(3); // bounded, not infinite
   });
 });

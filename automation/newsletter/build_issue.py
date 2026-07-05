@@ -589,9 +589,18 @@ def _filter_summary_human(pref: Preference, locale: Locale, cohort: Cohort) -> s
             money = f"${cap}"
         parts.append(f"under {money}" if locale == "en" else f"menos de {money}")
 
-    # Categories last — they're usually editorial, not structural.
+    # Categories last — they're usually editorial, not structural. Look
+    # each up through the i18n table (filter.category.<slug>) so a Spanish
+    # reader never sees an English-humanized slug ("Ocean View") — the
+    # enum-render trap (CLAUDE.md). i18n.t returns the key on a miss, so a
+    # slug with no translation row falls back to the humanized form as a
+    # last resort; a valid category always has a row.
     for c in pref.categories[:2]:
-        parts.append(c.replace("_", " ").title())
+        key = f"filter.category.{c}"
+        label = i18n.t(key, locale)
+        if label == key:                         # not in the closed set
+            label = c.replace("_", " ").title()  # safety net; shouldn't be reached
+        parts.append(label)
 
     return " · ".join(parts) if parts else ""
 
