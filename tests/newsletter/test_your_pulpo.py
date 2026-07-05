@@ -4,7 +4,11 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from automation.newsletter.build_issue import _filter_summary_human, build_issue
+from automation.newsletter.build_issue import (
+    _filter_summary_human,
+    _format_issue_date,
+    build_issue,
+)
 from automation.newsletter.subscribers import _parse_clerk_user
 from automation.newsletter.types import Preference, Recipient, YourPulpoState
 from automation.newsletter.store import email_hash
@@ -14,6 +18,19 @@ ISSUE_DATE = datetime(2026, 5, 28, 14, 0, tzinfo=timezone.utc)
 
 
 # ── filter humanizer ──────────────────────────────────────────────────
+
+def test_issue_date_localizes_spanish_month(monkeypatch=None):
+    """The masthead date must not leak English month names into ES (audit)."""
+    from datetime import datetime
+    jan = datetime(2026, 1, 15)
+    assert _format_issue_date(jan, "en") == "15 Jan 2026"
+    assert _format_issue_date(jan, "es") == "15 ene 2026"
+    # Months whose abbreviation differs EN↔ES were the visible leak.
+    for month, es_abbr in [(1, "ene"), (4, "abr"), (8, "ago"), (12, "dic")]:
+        d = datetime(2026, month, 3)
+        assert _format_issue_date(d, "es").endswith(f"{es_abbr} 2026")
+        assert es_abbr not in _format_issue_date(d, "en").lower() or month == 5
+
 
 def test_filter_summary_full_combo_en():
     pref = Preference(

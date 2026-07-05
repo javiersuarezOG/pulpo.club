@@ -386,6 +386,27 @@ def _absolute_photo(listing: dict, site_root: str) -> str:
     return ""
 
 
+# Spanish abbreviated month names — strftime("%b") is English regardless of
+# locale (and locale-dependent strftime is unreliable/unavailable in CI), so
+# a Spanish edition showed "5 Jan 2026" instead of "5 ene 2026" in the header
+# + title (launch audit). July/June happen to coincide EN↔ES; Jan/Apr/Aug/Dec
+# do not, so the leak was real 4+ months a year.
+_ES_MONTHS_ABBR = (
+    "ene", "feb", "mar", "abr", "may", "jun",
+    "jul", "ago", "sep", "oct", "nov", "dic",
+)
+
+
+def _format_issue_date(issue_date, locale: Locale) -> str:
+    """Locale-aware short date for the masthead. EN: '5 Jul 2026' (strftime);
+    ES: '5 jul 2026' via the Spanish abbreviation table."""
+    if not hasattr(issue_date, "strftime"):
+        return ""
+    if locale == "es":
+        return f"{issue_date.day} {_ES_MONTHS_ABBR[issue_date.month - 1]} {issue_date.year}"
+    return issue_date.strftime("%-d %b %Y")
+
+
 def _location_line(listing: dict, locale: Locale) -> str:
     parts: list[str] = []
     if listing.get("municipality"):
@@ -1243,7 +1264,7 @@ def build_issue(
     return Issue(
         issue_id=issue_id,
         issue_number=issue_number,
-        issue_date_human=issue_date.strftime("%-d %b %Y") if hasattr(issue_date, "strftime") else "",
+        issue_date_human=_format_issue_date(issue_date, locale),
         recipient=recipient,
         cohort=cohort,
         locale=locale,

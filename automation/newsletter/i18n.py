@@ -209,6 +209,7 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "facts.beachfront":            {"en": "Beachfront",                                   "es": "Frente al mar"},
     "facts.airport":               {"en": f"{{km}} km · {{min}} min to {_primary_airport_code}" if _primary_airport_code else "{km} km · {min} min to airport",
                                      "es": f"{{km}} km · {{min}} min a {_primary_airport_code}" if _primary_airport_code else "{km} km · {min} min al aeropuerto"},
+    "filter.all_listings":         {"en": "All listings",                                 "es": "Todas las propiedades"},
     "facts.land":                  {"en": "Land",                                         "es": "Terreno"},
     "facts.house":                 {"en": "House",                                        "es": "Casa"},
     "facts.condo":                 {"en": "Condo",                                        "es": "Apartamento"},
@@ -354,12 +355,16 @@ def filter_summary(pref, locale: Locale = DEFAULT_LOCALE) -> str:
         else:
             parts.append(f"under ${int(pref.max_price_usd):,}")
     if pref.property_types:
+        # Was `t("facts.land") + " OK"` — the hardcoded English " OK" leaked
+        # into the Spanish footer ("Terreno OK"). Drop it (consistent with
+        # house/condo, which never had it). Launch audit D5.
         if "land" in pref.property_types:
-            parts.append(t("facts.land", locale) + " OK")
+            parts.append(t("facts.land", locale))
         if "house" in pref.property_types:
             parts.append(t("facts.house", locale))
         if "condo" in pref.property_types:
             parts.append(t("facts.condo", locale))
     if not parts:
-        return "default"
+        # Was the literal English word "default", rendered into the ES footer.
+        return t("filter.all_listings", locale)
     return " · ".join(parts)

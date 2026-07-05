@@ -1,14 +1,14 @@
 {
   "pulpo-pro-general": {
-    "content_sha256": "3418694b465e88ffd3f68d91e0e423d78d6dcf6f5d50825384b71ef9c5904d1a",
-    "version": "newsletter-v5.0-2026-07-05"
+    "content_sha256": "ae7411e79f4a3f4ecd37fc7874471cd71e171dc090fd76b6a9f9ad4a94c045ee",
+    "version": "newsletter-v5.1-2026-07-05"
   },
   "pulpo-pro-welcome": {
-    "content_sha256": "e5654a879efc9662efe01a22f4ff66d593cb4c188377bb611cc7a978540c5793",
-    "version": "welcome-v2.6-2026-07-05"
+    "content_sha256": "21cc1ae3a7577ea8125134b393982f67d89a3cb5d68db49bf4be323b86addbb7",
+    "version": "welcome-v2.7-2026-07-05"
   },
   "pulpo-pro-welcome-back": {
-    "content_sha256": "69338db366786fda09b478d446afdb49f6c2e9594adc88d93c49aa5eb6f36302",
-    "version": "welcome-back-v1.6-2026-07-05"
+    "content_sha256": "426ba8391dcfe6317d0110d204076260e7a9cec0ac545b351aef11586c7ef2e4",
+    "version": "welcome-back-v1.7-2026-07-05"
   }
 }

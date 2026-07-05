@@ -88,6 +88,25 @@ def list_unsubscribe_headers(recipient_hash: str, issue_number: int) -> dict[str
 _TAG_RE = re.compile(r"<[^>]+>")
 _WS_RE = re.compile(r"[ \t\r\f\v]+")
 _BLANK_LINES_RE = re.compile(r"\n{3,}")
+# Anchor → "text (url)" so the plain-text part keeps its destinations. The
+# naive tag-strip used to delete every <a href>, dropping the unsubscribe
+# link + all CTA URLs from the text/plain MIME part (launch audit) — a
+# recipient reading plain text was left with dead label text and, worse,
+# no way to unsubscribe (RFC 8058 also relies on the visible link).
+_ANCHOR_RE = re.compile(
+    r'<a\b[^>]*?\bhref\s*=\s*["\']([^"\']+)["\'][^>]*>(.*?)</a>', re.I | re.S
+)
+
+
+def _expand_anchor(m: "re.Match") -> str:
+    href = (m.group(1) or "").strip()
+    inner = _TAG_RE.sub("", m.group(2) or "").strip()
+    # Non-navigational hrefs (in-page anchors, mailto) — keep just the text.
+    if not href or href.startswith("#") or href.lower().startswith("mailto:"):
+        return inner or href
+    if inner and inner != href:
+        return f"{inner} ({href})"
+    return href
 
 
 def html_to_text(html: str) -> str:
@@ -98,6 +117,8 @@ def html_to_text(html: str) -> str:
     html = re.sub(r"<head\b.*?</head>", "", html, flags=re.S | re.I)
     html = re.sub(r"<style\b.*?</style>", "", html, flags=re.S | re.I)
     html = re.sub(r"<script\b.*?</script>", "", html, flags=re.S | re.I)
+    # Preserve link destinations BEFORE the blanket tag-strip below.
+    html = _ANCHOR_RE.sub(_expand_anchor, html)
     # Block-level tags → newlines so paragraphs separate.
     html = re.sub(r"</(p|tr|li|h1|h2|h3|h4|div|br|table)>", "\n", html, flags=re.I)
     html = re.sub(r"<br\s*/?>", "\n", html, flags=re.I)
