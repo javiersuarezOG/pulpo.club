@@ -153,19 +153,23 @@ describe("api/admin/newsletter write endpoints auth", () => {
     }
   });
 
-  it("the full-audience blast IS bearer-gated (deliberate carve-out from open admin)", () => {
-    // Operator decision (audit 2026-06-11): trigger-audience-send fires a
-    // LIVE blast to the ENTIRE Pro audience. The public SEND string + per-IP
-    // (cold-start-resettable) rate-limit are not sufficient for an unbounded
-    // consent/reputation surface, so this one endpoint is re-gated with
-    // requireAdminAuth while the single-recipient triggers stay open.
-    expect(sendSrc).toMatch(/requireAdminAuth/);
+  it("the full-audience blast is open end-to-end — no requireAdminAuth gate (Batch B)", () => {
+    // Operator decision 2026-06-10, completed in Batch B: the whole /admin
+    // surface is open, and trigger-audience-send was the last holdout. The
+    // guardrails on this high-blast path are the server-side type-to-confirm
+    // "SEND" string, the 1/hour per-IP rate-limit, and the GitHub PAT that
+    // never leaves the server — NOT bearer auth. This test pins the ungated
+    // posture so a future re-introduction of the gate is a deliberate,
+    // visible change.
+    expect(sendSrc).not.toMatch(/requireAdminAuth/);
+    expect(sendSrc).not.toMatch(/_admin_auth/);
   });
 
-  it("the high-blast audience send keeps its type-to-confirm SEND gate", () => {
-    // Removing auth does NOT remove the guardrail on the one path that
-    // emails every Pro subscriber — the literal "SEND" confirm must stay.
-    expect(sendSrc).toMatch(/SEND/);
+  it("the high-blast audience send keeps its type-to-confirm SEND gate + rate-limit", () => {
+    // Ungating does NOT remove the guardrails on the one path that emails
+    // every Pro subscriber — the literal "SEND" confirm + rate-limit stay.
+    expect(sendSrc).toMatch(/REQUIRED_CONFIRM_STRING = "SEND"/);
+    expect(sendSrc).toMatch(/makeRateLimiter/);
   });
 
   it("free welcome tests use the dedicated synchronous endpoint, not the weekly preview workflow", () => {

@@ -146,6 +146,25 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "yp.saved.cta":                {"en": "Open your favorites",                          "es": "Abrir tus favoritos"},
     "yp.filter.label":             {"en": "Filter: {filter}",                             "es": "Filtro: {filter}"},
     "yp.filter.cta":               {"en": "Edit your filter",                             "es": "Editar tu filtro"},
+    # Category filter tokens — the compact per-slug labels the filter
+    # summary renders. Closed set = CATEGORY_KEYS (web/app/lib/categories.ts).
+    # These MUST exist for both locales or a Spanish reader sees an
+    # English-humanized slug ("Ocean View") — the enum-render trap. Kept
+    # terse to match the "·"-joined summary tone (not the account chips).
+    "filter.category.new_this_week":   {"en": "New this week",     "es": "Nuevas esta semana"},
+    "filter.category.price_drops":     {"en": "Price drops",       "es": "Rebajas de precio"},
+    "filter.category.off_market":      {"en": "Off-market",        "es": "Fuera de mercado"},
+    "filter.category.best_documented": {"en": "Best documented",   "es": "Mejor documentado"},
+    "filter.category.beachfront":      {"en": "Beachfront",        "es": "Frente al mar"},
+    "filter.category.ocean_view":      {"en": "Ocean view",        "es": "Vista al mar"},
+    "filter.category.mountain_view":   {"en": "Mountain view",     "es": "Vista a la montaña"},
+    "filter.category.water_features":  {"en": "Near water",        "es": "Cerca del agua"},
+    "filter.category.flat_buildable":  {"en": "Flat & buildable",  "es": "Plano y construible"},
+    "filter.category.build_ready":     {"en": "Build-ready",       "es": "Listo para construir"},
+    "filter.category.commercial":      {"en": "Commercial",        "es": "Comercial"},
+    "filter.category.under_50k":       {"en": "Under $50k",        "es": "Menos de $50k"},
+    "filter.category.under_100k":      {"en": "Under $100k",       "es": "Menos de $100k"},
+    "filter.category.motivated_sellers": {"en": "Motivated sellers", "es": "Vendedor motivado"},
     "yp.browse.label":             {"en": "{n} listings match",                           "es": "{n} propiedades coinciden"},
     "yp.browse.cta":               {"en": "Browse them all",                              "es": "Verlas todas"},
     # Anonymous-cohort-only welcome card.

@@ -139,19 +139,48 @@ async function lookupContactByHash(client, audienceId, recipientHash) {
   return null;
 }
 
+// Bounded retry for the Resend mirror write (P0-2). The PostHog
+// suppression event — fired + flushed by the caller — is the durable
+// source of truth that excludes the reader from future Pulpo sends; this
+// update only keeps Resend's own `unsubscribed` flag in sync. A single
+// transient 5xx / network blip used to leave that mirror stale forever;
+// retry the transient failures so a hiccup self-heals within the request.
+const RESEND_UPDATE_MAX_ATTEMPTS = 3;
+const RESEND_UPDATE_BACKOFF_MS = 300;
+
+async function updateContactWithRetry(client, { audienceId, email, unsubscribed }) {
+  let lastErr;
+  for (let attempt = 1; attempt <= RESEND_UPDATE_MAX_ATTEMPTS; attempt++) {
+    try {
+      await client.contacts.update({ audienceId, email, unsubscribed });
+      return { ok: true, attempts: attempt };
+    } catch (err) {
+      lastErr = err;
+      if (attempt < RESEND_UPDATE_MAX_ATTEMPTS) {
+        await new Promise((res) => setTimeout(res, RESEND_UPDATE_BACKOFF_MS * attempt));
+      }
+    }
+  }
+  return { ok: false, attempts: RESEND_UPDATE_MAX_ATTEMPTS, error: lastErr && lastErr.message };
+}
+
 // Two side effects per unsubscribe:
 //   1. PostHog event — the durable signal the next-issue cron filters on.
 //      Fires unconditionally so a Resend hiccup never silently re-includes
 //      the user in the next blast.
 //   2. Resend audience update — the user's expectation when they click
-//      "unsubscribe." Without this, our confirmation page lies. Best
-//      effort: if Resend can't be reached or the contact isn't in the
-//      audience (already-unsubscribed, deleted, etc.), we still 200 the
-//      user with the confirmation copy and the PostHog event covers it.
+//      "unsubscribe." Retried (updateContactWithRetry); if it still can't
+//      be synced (Resend down, contact missing), we surface a
+//      `newsletter.unsubscribe_resend_unsynced` telemetry event so the
+//      drift is observable + reconcilable instead of silently swallowed.
+//      The reader is already suppressed via side-effect (1), so we still
+//      200 the confirmation page — it is honest about the outcome that
+//      matters (no future Pulpo mail), and honest in telemetry about the
+//      mirror.
 //
 // Returns the resolution shape so the response can be honest about
 // whether the Resend mutation actually happened.
-async function recordUnsubscribe(recipientHash, issueNumber) {
+async function recordUnsubscribe(recipientHash, issueNumber, { resendImpl } = {}) {
   capture(`user:${recipientHash}`, "newsletter.unsubscribed", {
     recipient_hash: recipientHash,
     issue_number: issueNumber,
@@ -160,35 +189,50 @@ async function recordUnsubscribe(recipientHash, issueNumber) {
 
   const apiKey     = process.env[RESEND_API_KEY_ENV];
   const audienceId = process.env[RESEND_AUDIENCE_ID_ENV];
-  if (!apiKey || !audienceId) {
+  if (!resendImpl && (!apiKey || !audienceId)) {
     return { resend_status: "not_configured" };
   }
 
-  const client = new Resend(apiKey);
+  const client = resendImpl || new Resend(apiKey);
   let contact;
   try {
     contact = await lookupContactByHash(client, audienceId, recipientHash);
   } catch (err) {
+    // Transient Resend list failure — the mirror is unsynced. Suppression
+    // is durable via the flushed PostHog event; make the drift observable.
+    capture(`user:${recipientHash}`, "newsletter.unsubscribe_resend_unsynced", {
+      recipient_hash: recipientHash,
+      issue_number: issueNumber,
+      resend_status: "lookup_failed",
+    });
     return { resend_status: "lookup_failed", error: err && err.message };
   }
   if (!contact) {
     return { resend_status: "not_in_audience" };
   }
 
-  try {
-    await client.contacts.update({
-      audienceId,
-      email: contact.email,
-      unsubscribed: true,
-    });
-    return { resend_status: "updated", contact_id: contact.contactId };
-  } catch (err) {
-    return {
-      resend_status: "update_failed",
-      contact_id: contact.contactId,
-      error: err && err.message,
-    };
+  const upd = await updateContactWithRetry(client, {
+    audienceId,
+    email: contact.email,
+    unsubscribed: true,
+  });
+  if (upd.ok) {
+    return { resend_status: "updated", contact_id: contact.contactId, attempts: upd.attempts };
   }
+  // Retries exhausted — Resend mirror stale. The reader IS suppressed from
+  // Pulpo's own sends via the flushed PostHog event; emit an observable
+  // signal so provider-side drift can be reconciled rather than swallowed.
+  capture(`user:${recipientHash}`, "newsletter.unsubscribe_resend_unsynced", {
+    recipient_hash: recipientHash,
+    issue_number: issueNumber,
+    resend_status: "update_failed",
+    attempts: upd.attempts,
+  });
+  return {
+    resend_status: "update_failed",
+    contact_id: contact.contactId,
+    error: upd.error,
+  };
 }
 
 // Pro reader re-enabling the weekly digest → Pulpo Pro welcome-back
@@ -648,3 +692,4 @@ module.exports.verifyToken = verifyToken;
 module.exports.hashEmail = hashEmail;
 module.exports.lookupContactByHash = lookupContactByHash;
 module.exports.recordResubscribe = recordResubscribe;
+module.exports.recordUnsubscribe = recordUnsubscribe;

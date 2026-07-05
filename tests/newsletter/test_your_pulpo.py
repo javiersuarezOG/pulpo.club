@@ -46,6 +46,25 @@ def test_filter_summary_zone_only_when_no_department():
     assert "Beachfront" in s
 
 
+def test_filter_summary_category_localizes_to_spanish():
+    """P0-4 — category slugs must render through i18n, never as an
+    English-humanized slug in a Spanish email (the enum-render trap)."""
+    pref = Preference(zones=["el-zonte"], categories=["ocean_view"])
+    es = _filter_summary_human(pref, "es", cohort="pro_prefs")
+    assert "Vista al mar" in es
+    assert "Ocean" not in es          # no English leak into the ES email
+    en = _filter_summary_human(pref, "en", cohort="pro_prefs")
+    assert "Ocean view" in en
+
+
+def test_filter_summary_unknown_category_falls_back_gracefully():
+    """A slug with no i18n row must not crash — humanize as a last resort
+    (the safety net; a valid category always has a translation row)."""
+    pref = Preference(categories=["some_future_slug"])
+    s = _filter_summary_human(pref, "es", cohort="pro_prefs")
+    assert "Some Future Slug" in s
+
+
 def test_filter_summary_price_compact_format():
     """The mockup uses '$500k' / '$1M', not '$500,000' or '$1,000,000'."""
     pref_500 = Preference(max_price_usd=500000)

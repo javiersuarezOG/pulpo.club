@@ -25,6 +25,7 @@ function rowOf(res, id) {
 
 const SECRET_KEYS = [
   "GITHUB_DISPATCH_TOKEN", "RESEND_API_KEY", "RESEND_AUDIENCE_ID",
+  "RESEND_FROM_EMAIL", "PULPO_NEWSLETTER_SALT", "PULPO_UNSUBSCRIBE_SECRET",
   "CLERK_SECRET_KEY", "PULPO_INTERNAL_TOKEN",
   "POSTHOG_PERSONAL_API_KEY", "POSTHOG_PROJECT_ID",
   "PULPO_NEWSLETTER_DRY_RUN", "GITHUB_DISPATCH_REPO", "GITHUB_DISPATCH_REF",
@@ -56,6 +57,7 @@ describe("/api/admin/newsletter/config-status", () => {
     expect(res.statusCode).toBe(200);
     expect(rowOf(res, "github_dispatch").status).toBe("bad");
     expect(rowOf(res, "resend").status).toBe("bad");
+    expect(rowOf(res, "unsubscribe").status).toBe("bad");
     expect(rowOf(res, "clerk").status).toBe("bad");
     // Optional-but-recommended → warn, not bad.
     expect(rowOf(res, "internal_welcome").status).toBe("warn");
@@ -67,6 +69,9 @@ describe("/api/admin/newsletter/config-status", () => {
     process.env.GITHUB_DISPATCH_TOKEN = "ghd_secret";
     process.env.RESEND_API_KEY = "re_secret";
     process.env.RESEND_AUDIENCE_ID = "aud_123";
+    process.env.RESEND_FROM_EMAIL = "hello@mail.pulpo.club";
+    process.env.PULPO_NEWSLETTER_SALT = "salt_secret";
+    process.env.PULPO_UNSUBSCRIBE_SECRET = "unsub_secret";
     process.env.CLERK_SECRET_KEY = "sk_secret";
     process.env.PULPO_INTERNAL_TOKEN = "int_secret";
     process.env.POSTHOG_PERSONAL_API_KEY = "phk_secret";
@@ -75,6 +80,7 @@ describe("/api/admin/newsletter/config-status", () => {
     await configStatus(mockReq(), res);
     expect(rowOf(res, "github_dispatch").status).toBe("ok");
     expect(rowOf(res, "resend").status).toBe("ok");
+    expect(rowOf(res, "unsubscribe").status).toBe("ok");
     expect(rowOf(res, "clerk").status).toBe("ok");
     expect(rowOf(res, "internal_welcome").status).toBe("ok");
     expect(rowOf(res, "posthog_read").status).toBe("ok");
@@ -109,7 +115,7 @@ describe("/api/admin/newsletter/config-status", () => {
     // Neither Resend var set → both named.
     const res = mockRes();
     await configStatus(mockReq(), res);
-    expect(rowOf(res, "resend").detail).toBe("RESEND_API_KEY + RESEND_AUDIENCE_ID missing");
+    expect(rowOf(res, "resend").detail).toBe("RESEND_API_KEY + RESEND_AUDIENCE_ID + RESEND_FROM_EMAIL missing");
   });
 
   it("echoes the dispatch repo/ref but NEVER a secret value", async () => {
