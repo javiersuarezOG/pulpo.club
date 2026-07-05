@@ -1030,6 +1030,19 @@ jobs:
           node scripts/snapshot_ranked_json.mjs
           node scripts/snapshot_ranked_json.mjs --prune-older-than 90
 
+      - name: Advance newsletter issue counter (weekly)
+        # Authoritative issue-number counter (launch audit P1). Bumps
+        # web/data/newsletter_issue_state.json by 1 on the FIRST nightly of a
+        # new ISO week; a no-op every other day. The Pro + Free Sunday sends
+        # read this file (fail-closed) so both editions share one number and
+        # never fall back to a guessed Issue 1. Runs here so the bump lands in
+        # the same web/data commit below. Best-effort: a bad file warns (the
+        # send-side fail-closed + the Free-liveness page are the real guards)
+        # rather than crashing the whole nightly.
+        run: |
+          python3 -m automation.newsletter.issue_state --advance \
+            || echo "::warning::issue-state advance failed — check web/data/newsletter_issue_state.json; the Sunday send will fail-closed if it stays broken"
+
       - name: Commit refreshed data via PR
         id: commit
         env:
@@ -1037,6 +1050,7 @@ jobs:
         run: |
           git config user.name "pulpo-bot"
           git config user.email "bot@pulpo.club"
+          git add web/data/newsletter_issue_state.json 2>/dev/null || true
           git add web/data/ranked.json \
                   web/data/ranked.list.json \
                   web/data/last_updated.json web/data/run_history.json \

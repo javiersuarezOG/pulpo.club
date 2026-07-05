@@ -170,6 +170,23 @@ function pickRecipientEmail(body) {
   return null;
 }
 
+// PostHog person id for the recipient. The activation email stamps
+// recipient_hash = sha256(email)[:16] — byte-identical to
+// api/_posthog.js#emailDistinctId — so its lifecycle events (sent/opened/
+// clicked) belong on the SAME person as the post-Stripe conversion funnel
+// (webhook.checkout_completed, welcome_modal.shown, signin.completed). Emit
+// them under the canonical `email:` prefix so they actually stitch; the
+// previous unconditional `user:` prefix orphaned activation events on a
+// SEPARATE person despite the identical hash — the activation email → activation
+// funnel was unmeasurable (2026-06-30 audit P1-4). Newsletter uses a SALTED,
+// 24-char recipient_hash (automation/newsletter/store.py) — a different id
+// space that can't be reversed to the funnel person here — so it stays `user:`.
+function distinctIdFor(props) {
+  if (!props || !props.recipient_hash) return "server:resend_webhook";
+  if (props.email_type === "activation") return `email:${props.recipient_hash}`;
+  return `user:${props.recipient_hash}`;
+}
+
 module.exports = async (req, res) => {
   const t0 = Date.now();
   if (req.method !== "POST") {
@@ -214,7 +231,7 @@ module.exports = async (req, res) => {
 
   const eventType = typeof body.type === "string" ? body.type : "";
   const props = pickPostHogProps(eventType, body);
-  const distinctId = props.recipient_hash ? `user:${props.recipient_hash}` : "server:resend_webhook";
+  const distinctId = distinctIdFor(props);
 
   // Audit 2026-06-02 (PRD P0-4): emit a dedicated, always-on heartbeat
   // event for *every* verified Resend webhook delivery, independent of
@@ -296,6 +313,7 @@ module.exports.config = { api: { bodyParser: false } };
 module.exports.verifySvixSignature = verifySvixSignature;
 module.exports.pickPostHogProps = pickPostHogProps;
 module.exports.EVENT_MAP = EVENT_MAP;
+module.exports.distinctIdFor = distinctIdFor;
 // KNOWN_EMAIL_TYPES is the single source of truth for the discriminator
 // allowlist. The producer-tag contract test (tests/api/email_type_contract.test.js)
 // imports this and asserts every literal stamped by an outbound sender
