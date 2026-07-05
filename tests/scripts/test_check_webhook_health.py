@@ -54,6 +54,41 @@ def test_rate_checks_registered():
         assert "email_type" in cfg["numerator_where"]
 
 
+def test_welcome_hard_skip_checks_registered():
+    """The 2026-07-04 blind spot: the Pro welcome broke for 7 days
+    (0 sent / 540 skipped, reason=clerk_lookup_failed) and NO alert
+    fired — every check was freshness-based and the reconcile cron ran
+    fine, it just skipped everyone. These two checks close that gap by
+    watching the SKIP reasons, not just `_failed`.
+
+    Contract:
+      • target the PATHOLOGICAL reasons (dispatcher wanted to deliver
+        but couldn't) — clerk_lookup_failed / ranked_missing / no_picks;
+      • must NOT include the BENIGN reasons (already_sent / not_pro),
+        which are correct behaviour and would make the alert noisy;
+      • denominator must EXCLUDE benign skips so they can't dilute the
+        ratio to below threshold during a real outage.
+    """
+    for name in ("welcome_hard_skip_rate", "free_welcome_hard_skip_rate"):
+        assert name in health.RATE_CHECKS, f"{name} missing from RATE_CHECKS"
+        cfg = health.RATE_CHECKS[name]
+        num = cfg["numerator_where"]
+        den = cfg["denominator_where"]
+        # Pathological reasons present.
+        assert "ranked_missing" in num and "no_picks_available" in num
+        # Benign reasons must never appear (either where clause).
+        assert "already_sent" not in num and "already_sent" not in den
+        assert "not_pro" not in num and "not_pro" not in den
+        # Denominator counts real delivery attempts (sent side present).
+        assert "_sent'" in den or "_sent" in den
+
+    # The Pro check specifically watches the clerk_lookup_failed reason
+    # (the exact 7-day-outage signal); the free dispatcher has no Clerk
+    # lookup so its check must NOT.
+    assert "clerk_lookup_failed" in health.RATE_CHECKS["welcome_hard_skip_rate"]["numerator_where"]
+    assert "clerk_lookup_failed" not in health.RATE_CHECKS["free_welcome_hard_skip_rate"]["numerator_where"]
+
+
 def test_rate_thresholds_match_industry_norms():
     """Bounce > 2%, complaint > 0.1% — the ESP-throttling / domain-
     blacklist thresholds. If these change, dashboards downstream
