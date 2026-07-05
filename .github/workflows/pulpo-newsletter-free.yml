@@ -72,6 +72,13 @@ jobs:
       RESEND_AUDIENCE_ID: "${{ secrets.RESEND_AUDIENCE_ID }}"
       RESEND_REPLY_TO_EMAIL: "${{ vars.RESEND_REPLY_TO_EMAIL }}"
       PULPO_UNSUBSCRIBE_SECRET: "${{ secrets.PULPO_UNSUBSCRIBE_SECRET }}"
+      # Salts the recipient_hash that becomes the unsubscribe `r=` param
+      # (store.email_hash). MUST match the salt /api/unsubscribe uses on
+      # Vercel, or the click can't find the contact and the unsubscribe
+      # silently no-ops. Absent here, the pipeline falls back to the
+      # PUBLIC dev salt and send.send_issue fails the live send closed
+      # (error=missing_newsletter_salt). See P0-1, email launch audit.
+      PULPO_NEWSLETTER_SALT: "${{ secrets.PULPO_NEWSLETTER_SALT }}"
       PULPO_SITE_ROOT: "${{ vars.PULPO_SITE_ROOT || 'https://pulpo.club' }}"
       CLERK_SECRET_KEY: "${{ secrets.CLERK_SECRET_KEY }}"
 

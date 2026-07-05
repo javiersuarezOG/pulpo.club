@@ -37,6 +37,7 @@ API_KEY_ENV = "RESEND_API_KEY"
 FROM_EMAIL_ENV = "RESEND_FROM_EMAIL"
 REPLY_TO_ENV = "RESEND_REPLY_TO_EMAIL"          # optional
 UNSUBSCRIBE_SECRET_ENV = "PULPO_UNSUBSCRIBE_SECRET"
+SALT_ENV = "PULPO_NEWSLETTER_SALT"              # salts recipient_hash → unsubscribe r=
 SITE_ROOT_ENV = "PULPO_SITE_ROOT"               # defaults to https://pulpo.club
 
 RESEND_API_BASE = "https://api.resend.com"
@@ -162,6 +163,19 @@ def send_issue(
         ).hexdigest()[:24]
         return SendResult(True, True, fake_id, None, None,
                           int((time.monotonic() - t0) * 1000), 1)
+
+    # Fail-closed on the salt. `recipient_hash` was derived upstream by
+    # store.email_hash(), which silently falls back to a PUBLIC dev salt
+    # when PULPO_NEWSLETTER_SALT is unset. On a LIVE send that produces an
+    # unsubscribe `r=` hash that /api/unsubscribe (real salt on Vercel)
+    # can never match — the click no-ops and the user keeps getting mail
+    # (CAN-SPAM breach), and a public salt makes any recipient's hash
+    # forgeable. Refuse rather than ship a broken/forgeable unsubscribe
+    # link. Dry-run is exempt above: it uses the dev salt on purpose for
+    # reproducible fixtures and makes no HTTP call. See P0-1, launch audit.
+    if not os.environ.get(SALT_ENV, "").strip():
+        return SendResult(False, False, None, "missing_newsletter_salt", None,
+                          int((time.monotonic() - t0) * 1000), 0)
 
     api_key = os.environ.get(API_KEY_ENV, "").strip()
     from_email = os.environ.get(FROM_EMAIL_ENV, "").strip()
