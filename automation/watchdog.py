@@ -1,13 +1,25 @@
 """
 Pipeline watchdog — validates that the nightly run produced sane output.
 
-Checks (all must pass):
-  1. Freshness     — last_updated.json timestamp within 36 hours
+Fatal checks (any FAIL exits 1 and pages — these define a data *freeze*):
+  1. Freshness     — last_updated.json timestamp within 24 hours
   2. Volume        — ranked.json count within ±VOLUME_TOLERANCE of 7-day rolling median
   3. Parser errors — parser_errors.log has no non-comment content if recently written
   4. Public deploy — https://pulpo.club/data/ranked.json returns 200 + valid JSON
 
-Exit 0 on success, 1 on any failure. Prints diagnostic lines to stdout.
+Advisory checks (surfaced as WARN, NEVER page — a single degraded/dead source
+is not a freeze; the nightly's own pre-canary source-health Slack owns paging):
+  5. Source consecutive-red    — a source status=red for ≥2 runs
+  6. Source latency regression — a source >LATENCY_REGRESSION_RATIO× its rolling median
+
+Exit 0 unless a FATAL check fails. Prints diagnostic lines to stdout.
+
+Fatal/advisory split (2026-06-30 audit): the two source-level checks were
+firing every night on two known-dead scrapers (agentiz + jamesedition, both
+returning ZeroRecords), turning the whole freeze-watchdog red daily. A watchdog
+that is red every day cannot signal a *real* freeze — the page is worthless.
+Decoupling freeze detection (fatal) from source-health degradation (advisory)
+restores "red means the site is frozen", which is this watchdog's actual job.
 """
 from __future__ import annotations
 import json
@@ -340,19 +352,44 @@ def check_source_latency_regression(data_dir: Path) -> tuple[bool, str]:
     return True, "OK   latency: no source >3× rolling median"
 
 
+def _advisory(result: tuple[bool, str]) -> str:
+    """Downgrade an advisory check's FAIL line to a non-paging WARN line.
+
+    The check functions still return ``(False, "FAIL ...")`` so their unit
+    tests (tests/test_watchdog_v2.py) are unchanged — the fatal/advisory
+    policy lives here at the aggregation layer, not inside the checks. An OK
+    line passes through untouched.
+    """
+    ok, msg = result
+    if ok:
+        return msg
+    return "WARN" + msg[4:] if msg.startswith("FAIL") else msg
+
+
 def run(data_dir: Path | None = None, skip_deploy: bool = False) -> list[str]:
-    """Run all checks. Returns list of result strings; any starting with 'FAIL' is a failure."""
+    """Run all checks. Returns list of result strings.
+
+    A line starting with ``FAIL`` is a fatal failure (data freeze — pages).
+    A line starting with ``WARN`` is an advisory degradation (surfaced, never
+    pages). See the module docstring for the fatal/advisory split.
+    """
     if data_dir is None:
         data_dir = REPO / "web" / "data"
 
     results = []
+    # ── Fatal: these define a data freeze. Any FAIL exits 1 and pages. ──
     results.append(check_freshness(data_dir)[1])
     results.append(check_volume(data_dir)[1])
     results.append(check_parser_errors(data_dir)[1])
-    results.append(check_source_consecutive_red(data_dir)[1])
-    results.append(check_source_latency_regression(data_dir)[1])
     if not skip_deploy:
         results.append(check_public_deploy()[1])
+    # ── Advisory: source-level degradation, surfaced as WARN, never pages.
+    # A single dead/slow source is not a freeze — ~17 other sources carry the
+    # inventory and the nightly's pre-canary source-health Slack alerts during
+    # the run. Two known-dead scrapers (agentiz, jamesedition) were turning the
+    # freeze-watchdog red every night before this split (2026-06-30 audit).
+    results.append(_advisory(check_source_consecutive_red(data_dir)))
+    results.append(_advisory(check_source_latency_regression(data_dir)))
     return results
 
 
@@ -360,15 +397,19 @@ def main() -> int:
     skip_deploy = "--skip-deploy" in sys.argv
     results = run(skip_deploy=skip_deploy)
     failures = [r for r in results if r.startswith("FAIL")]
+    warnings = [r for r in results if r.startswith("WARN")]
 
     for r in results:
         print(r)
 
+    if warnings:
+        print(f"\n{len(warnings)} advisory warning(s) — non-paging (see module docstring).")
+
     if failures:
-        print(f"\nWATCHDOG FAILED: {len(failures)} check(s) failed")
+        print(f"\nWATCHDOG FAILED: {len(failures)} fatal check(s) failed")
         return 1
 
-    print("\nWATCHDOG OK: all checks passed")
+    print("\nWATCHDOG OK: all fatal checks passed")
     return 0
 
 

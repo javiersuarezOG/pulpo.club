@@ -19,6 +19,7 @@ sys.path.insert(0, str(REPO))
 from automation.watchdog import (   # noqa: E402
     check_source_consecutive_red,
     check_source_latency_regression,
+    run as watchdog_run,
     SOURCE_CONSECUTIVE_RED_THRESHOLD,
     SOURCE_STALENESS_HOURS,
     LATENCY_REGRESSION_RATIO,
@@ -344,3 +345,56 @@ def test_latency_skips_zero_or_missing_duration(tmp_path):
     _write_health(rows, tmp_path)
     ok, _ = check_source_latency_regression(tmp_path)
     assert ok   # 12s vs 10s baseline — well within ratio
+
+
+# ── fatal vs advisory split (2026-06-30 audit) ────────────────────────
+# The two source-level checks above are ADVISORY: they surface a WARN but must
+# NEVER fail the watchdog on their own. Freeze detection (freshness / volume /
+# parser / public-deploy) is the only thing that pages. Regression guard for
+# the daily false-red where agentiz + jamesedition (ZeroRecords) turned the
+# freeze-watchdog red every night and buried a real freeze in the noise.
+
+def _fresh_data_dir(tmp_path, *, age_hours: float = 2.0, count: int = 800):
+    """A data dir the fatal checks consider healthy: fresh + sane volume."""
+    d = tmp_path / "data"
+    d.mkdir()
+    ts = datetime.now(timezone.utc) - timedelta(hours=age_hours)
+    (d / "last_updated.json").write_text(json.dumps({
+        "last_updated": ts.isoformat(), "total_listings": count,
+    }))
+    (d / "ranked.json").write_text(json.dumps([{"id": i} for i in range(count)]))
+    return d
+
+
+def _real_now_iso(hours_ago: float) -> str:
+    return (datetime.now(timezone.utc) - timedelta(hours=hours_ago)).isoformat()
+
+
+def test_dead_sources_are_advisory_not_fatal(tmp_path):
+    """Two dead scrapers (consecutive-red, fresh rows) must NOT fatally fail
+    the watchdog — they downgrade to a non-paging WARN line."""
+    d = _fresh_data_dir(tmp_path)
+    _write_health([
+        _row("agentiz",      _real_now_iso(28), "red", count=0, error_class="ZeroRecords"),
+        _row("agentiz",      _real_now_iso(2),  "red", count=0, error_class="ZeroRecords"),
+        _row("jamesedition", _real_now_iso(28), "red", count=0, error_class="ZeroRecords"),
+        _row("jamesedition", _real_now_iso(2),  "red", count=0, error_class="ZeroRecords"),
+    ], d)
+    results = watchdog_run(data_dir=d, skip_deploy=True)
+    fatal = [r for r in results if r.startswith("FAIL")]
+    warns = [r for r in results if r.startswith("WARN")]
+    assert not fatal, f"dead sources must not fatally fail the watchdog: {fatal}"
+    assert any("agentiz" in w for w in warns), f"expected a source_health WARN: {warns}"
+
+
+def test_real_freeze_still_pages(tmp_path):
+    """The trip-wire is NOT decorative: stale data (a freeze) still produces a
+    fatal FAIL even when the same run has dead sources."""
+    d = _fresh_data_dir(tmp_path, age_hours=48)   # 48h old = stale = freeze
+    _write_health([
+        _row("agentiz", _real_now_iso(28), "red", count=0, error_class="ZeroRecords"),
+        _row("agentiz", _real_now_iso(2),  "red", count=0, error_class="ZeroRecords"),
+    ], d)
+    results = watchdog_run(data_dir=d, skip_deploy=True)
+    fatal = [r for r in results if r.startswith("FAIL")]
+    assert any("freshness" in r for r in fatal), f"stale data must fatally fail: {results}"
