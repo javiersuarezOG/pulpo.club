@@ -995,23 +995,16 @@ def _favorites_html(issue: Issue) -> str:
         return ""
 
     locale = issue.locale
-    en = locale == "en"
 
     count = len(favorites)
-    eyebrow = (
-        "Your favorites · this week" if en
-        else "Tus favoritos · esta semana"
-    )
+    eyebrow = i18n.t("favorites.eyebrow", locale)
     # v4 (2026-05-31): numeric headline per the locked mockup —
     # "3 you're following." not "Three you're following." Spelled-out
     # numerals read editorial in body copy but slow the eye in an H2.
     if count == 1:
-        headline = "1 you're following." if en else "1 que seguís."
+        headline = i18n.t("favorites.headline.one", locale)
     else:
-        headline = (
-            f"{count} you're following." if en
-            else f"{count} que seguís."
-        )
+        headline = i18n.t("favorites.headline.many", locale, count=count)
 
     summary = _favorites_editorial_summary(favorites, locale)
 
@@ -1020,7 +1013,7 @@ def _favorites_html(issue: Issue) -> str:
     site = (issue.settings_url.split("/account")[0] if "/account" in issue.settings_url else "https://pulpo.club")
     ref = f"?ref=newsletter_issue_{issue.issue_number:02d}"
     saved_url = f"{site}/saved{ref}&from=favorites"
-    open_all = "Open all favorites" if en else "Abrir todos los favoritos"
+    open_all = i18n.t("favorites.open_all", locale)
 
     return f"""
     <tr><td class="pad-h" style="padding:16px 24px 16px;background:#F8F4EC;">
@@ -1099,25 +1092,23 @@ def _favorite_card_html(u, locale: str) -> str:
     email-safe. CSS classes carry the visual style; inline `style`
     used only for fallback thumbnail color (variable per state).
     """
-    en = locale == "en"
 
     # Change chip — one per state, kept terse so the card scans fast.
     if u.state == "price_dropped":
         amount = _format_price_compact(u.delta_usd or 0)
-        chip_text = (f"&darr; Price dropped {amount} since you saved it" if en
-                     else f"&darr; Bajó {amount} desde que la guardaste")
+        chip_text = i18n.t("favorites.chip.price_dropped", locale, amount=amount)
         chip_class = "change-chip change-chip-warm"
     elif u.state == "price_up":
         amount = _format_price_compact(u.delta_usd or 0)
-        chip_text = (f"&uarr; Price moved up {amount} since you saved it" if en
-                     else f"&uarr; Subió {amount} desde que la guardaste")
+        chip_text = i18n.t("favorites.chip.price_up", locale, amount=amount)
         chip_class = "change-chip change-chip-up"
     else:  # no_change
         if u.days_listed is not None:
-            chip_text = (f"Still on market &middot; {u.days_listed} day{'s' if u.days_listed != 1 else ''} listed" if en
-                         else f"Sigue en el mercado &middot; {u.days_listed} día{'s' if u.days_listed != 1 else ''} listada")
+            key = ("favorites.chip.still_listed.one" if u.days_listed == 1
+                   else "favorites.chip.still_listed.many")
+            chip_text = i18n.t(key, locale, days=u.days_listed)
         else:
-            chip_text = "Still on market" if en else "Sigue en el mercado"
+            chip_text = i18n.t("favorites.chip.still_on_market", locale)
         chip_class = "change-chip change-chip-calm"
 
     # Price line — varies by state.
@@ -1133,7 +1124,7 @@ def _favorite_card_html(u, locale: str) -> str:
     else:
         price_line = "&mdash;"
 
-    cta_text = "See on Pulpo &rarr;" if en else "Verla en Pulpo &rarr;"
+    cta_text = i18n.t("favorites.card_cta", locale)
 
     # Fixed 96x84 crop box (.save-thumb-cell img { width:96px;height:84px;
     # object-fit:cover }), so the attribute pair is an exact reservation.
@@ -1496,7 +1487,6 @@ def _pick_state_pill_html(pick: IssuePick, locale: Locale) -> str:
       3. Repriced this week           → "Price moved" pill
       4. None of the above                 → no pill
     """
-    en = locale == "en"
 
     # Keytable carries pre-formatted "vs zone -78%" / "·" rows from build_issue.
     # Look for a negative percentage on the value/zone row.
@@ -1512,7 +1502,7 @@ def _pick_state_pill_html(pick: IssuePick, locale: Locale) -> str:
                 pass
             break
     if zone_pct is not None and zone_pct <= -25:
-        text = f"−{abs(zone_pct)}% under area avg" if en else f"−{abs(zone_pct)}% bajo el promedio"
+        text = i18n.t("pick.pill.under_area_avg", locale, pct=abs(zone_pct))
         return _state_pill_html(text, bg="#C9DEC6", color="#1F3D31")
 
     if pick.is_new_this_fortnight:
@@ -1742,20 +1732,11 @@ def _preheader_html(issue: Issue) -> str:
     top = issue.picks_top[0].title if issue.picks_top else ""
     n_rest = len(issue.picks_shortlist)
     if top and n_rest:
-        if locale == "es":
-            text = f"{top} — y {n_rest} más esta semana."
-        else:
-            text = f"{top} — plus {n_rest} more picks this week."
+        text = i18n.t("preheader.with_rest", locale, top=top, n_rest=n_rest)
     elif top:
-        if locale == "es":
-            text = top
-        else:
-            text = top
+        text = top
     else:
-        if locale == "es":
-            text = "10 propiedades seleccionadas de El Salvador, esta semana."
-        else:
-            text = "10 hand-picked listings from El Salvador, this week."
+        text = i18n.t("preheader.fallback", locale)
     # Belt-and-braces hide chain: every property here covers a real
     # client. `mso-hide:all` covers Outlook; `display:none + opacity:0`
     # covers Gmail web + Apple Mail; the zeroed font/line/max-height
@@ -1812,7 +1793,6 @@ def _weekly_news_spotlight_html(issue: Issue, *, free: bool = False) -> str:
     is omitted entirely rather than fabricating a citation.
     """
     locale = issue.locale
-    en = locale == "en"
     eyebrow = i18n.t("spotlight.eyebrow", locale)
 
     spot = getattr(issue, "news_spotlight", None)
@@ -1843,7 +1823,7 @@ def _weekly_news_spotlight_html(issue: Issue, *, free: bool = False) -> str:
     # fallback's self-attribution).
     source_line_html = ""
     if source_name:
-        reported_by = "Reported by" if en else "Reportado por"
+        reported_by = i18n.t("spotlight.reported_by", locale)
         if source_url:
             src_html = (
                 f'<a href="{_e(source_url)}" target="_blank" rel="noopener" '
@@ -1935,24 +1915,18 @@ def _favorites_editorial_summary(favorites: list, locale: str) -> str:
     total_word = (total_en.get(total) or str(total)) if en else (total_es.get(total) or str(total))
 
     if moved == 0:
-        return (
-            "<strong style='font-style:normal;'>None moved on price this week</strong> — your watchlist held flat."
-            if en else
-            "<strong style='font-style:normal;'>Ninguno se movió en precio esta semana</strong> — tu lista quedó plana."
-        )
+        return i18n.t("favorites.summary.none_moved", locale)
 
     # Busy vs quiet read — "busy" when most/all moved.
     busy = moved >= max(2, total - 1)
-    if en:
-        tail = "busier than a typical week on your watchlist" if busy else "fewer moves than usual on your watchlist"
-        return (
-            f"<strong style='font-style:normal;'>{moved_word} of {total_word} moved on price this week</strong> — {tail}."
-        )
-    else:
-        tail = "más actividad que una semana típica en tu lista" if busy else "menos actividad de la habitual en tu lista"
-        return (
-            f"<strong style='font-style:normal;'>{moved_word} de {total_word} se movieron en precio esta semana</strong> — {tail}."
-        )
+    tail = i18n.t(
+        "favorites.summary.tail_busy" if busy else "favorites.summary.tail_quiet",
+        locale,
+    )
+    return i18n.t(
+        "favorites.summary.some_moved", locale,
+        moved_word=moved_word, total_word=total_word, tail=tail,
+    )
 
 
 def _general_hero_html(issue: Issue) -> str:
