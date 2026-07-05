@@ -120658,5 +120658,388 @@
     "cost_usd": 0.00135581,
     "finish_reason": "stop",
     "latency_ms": 5021
+  },
+  "encuentra24|32629953": {
+    "ts": "2026-07-05T07:02:37.149583+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Condo, Costa del Sol, Private Complex",
+      "es": "Apartamento frente al mar, Costa del Sol, Complejo Privado"
+    },
+    "short_description_canonical": {
+      "en": "135 m² beachfront condo in a private complex on Costa del Sol, La Paz. 3 bedrooms, 2 bathrooms, private pool, 2 parking spaces, fully furnished with modern finishes. Turnkey Airbnb-ready unit with 24/7 security and pet-friendly complex.",
+      "es": "Apartamento frente al mar de 135 m² en complejo privado en Costa del Sol, La Paz. 3 habitaciones, 2 baños, piscina privada, 2 estacionamientos, completamente amueblado con acabados modernos. Listo para Airbnb, con seguridad 24/7 y complejo pet-friendly."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront first row",
+        "es": "Primera fila frente al mar"
+      },
+      {
+        "en": "Private pool in unit",
+        "es": "Piscina privada en la unidad"
+      },
+      {
+        "en": "Fully furnished, turnkey",
+        "es": "Completamente amueblado, listo para usar"
+      },
+      {
+        "en": "Longest adult pool in El Salvador",
+        "es": "Piscina para adultos más larga de El Salvador"
+      },
+      {
+        "en": "24/7 security, pet-friendly",
+        "es": "Seguridad 24/7, pet-friendly"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 135.0,
+      "parking_spaces": 2,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 3506,
+    "tokens_out": 503,
+    "cost_usd": 0.00149992,
+    "finish_reason": "stop",
+    "latency_ms": 4193
+  },
+  "bienesraices|2426": {
+    "ts": "2026-07-05T07:02:37.301711+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Lot 1,546 v² Surf City 2",
+      "es": "Terreno frente al mar 1,546 v² Surf City 2"
+    },
+    "short_description_canonical": {
+      "en": "Flat 1,080.79 m² (1,546.42 v²) lot at Playa La Ventana, Surf City 2, Jucuarán. First lot inside the security gate with private beach access and beach club with 2 pools. Priced at $100 per v² ($154,600 total).",
+      "es": "Terreno plano de 1,080.79 m² (1,546.42 v²) en Playa La Ventana, Surf City 2, Jucuarán. Primer lote al ingresar al portón de seguridad con acceso a playa privada y club de playa con 2 piscinas. Precio de $100 por v² ($154,600 total)."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "First lot inside security gate",
+        "es": "Primer lote dentro del portón de seguridad"
+      },
+      {
+        "en": "Private beach and beach club",
+        "es": "Playa privada y club de playa"
+      },
+      {
+        "en": "Two swimming pools on site",
+        "es": "Dos piscinas en el lugar"
+      },
+      {
+        "en": "Priced at $100 per square v²",
+        "es": "Precio de $100 por v²"
+      }
+    ],
+    "lat": 13.1894,
+    "lng": -88.3858,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Cuco (nearest named beach in table)",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3180,
+    "tokens_out": 498,
+    "cost_usd": 0.0014064,
+    "finish_reason": "stop",
+    "latency_ms": 4346
+  },
+  "oceanside|15701": {
+    "ts": "2026-07-05T07:02:37.910921+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Premium 665 m² lot with ocean views in Solimar, El Sunzal",
+      "es": "Lote premium de 665 m² con vista al mar en Solimar, El Sunzal"
+    },
+    "short_description_canonical": {
+      "en": "Flat 665.01 m² (951.64 v²) residential lot in Solimar community, Tamanique, La Libertad. Elevated position with panoramic ocean views of El Sunzal surf break, 3-minute drive to El Tunco. Community features high-end modern residences; ideal for multi-unit project or private villa.",
+      "es": "Lote residencial plano de 665.01 m² (951.64 v²) en comunidad Solimar, Tamanique, La Libertad. Posición elevada con vista panorámica al mar y al punto de surf El Sunzal, a 3 minutos en auto de El Tunco. La comunidad cuenta con residencias modernas de alta gama; ideal para proyecto de unidades múltiples o villa privada."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Ocean view of El Sunzal surf break",
+        "es": "Vista al mar del punto de surf El Sunzal"
+      },
+      {
+        "en": "3-minute drive to El Tunco",
+        "es": "A 3 minutos en auto de El Tunco"
+      },
+      {
+        "en": "665 m² buildable lot in growing community",
+        "es": "Lote edificable de 665 m² en comunidad en crecimiento"
+      },
+      {
+        "en": "10 minutes from El Zonte surf break",
+        "es": "A 10 minutos del punto de surf El Zonte"
+      },
+      {
+        "en": "15 minutes from La Libertad Port",
+        "es": "A 15 minutos del Puerto de La Libertad"
+      }
+    ],
+    "lat": 13.4844,
+    "lng": -89.6322,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Sunzal beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3381,
+    "tokens_out": 549,
+    "cost_usd": 0.00151677,
+    "finish_reason": "stop",
+    "latency_ms": 4954
+  },
+  "remax|003093331050": {
+    "ts": "2026-07-05T07:02:39.785864+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots in Los Cañales, Juayúa",
+      "es": "Lotes Planos Residenciales en Los Cañales, Juayúa"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 652 m² in Los Cañales, 8 min from Juayúa. Easy vehicle access, basic utilities available, near Los Chorros de La Calera and Río Monterrey. Starting at $45,000.",
+      "es": "Lotes planos residenciales desde 652 m² en Los Cañales, a 8 min de Juayúa. Acceso vehicular fácil, servicios básicos disponibles, cerca de Los Chorros de La Calera y Río Monterrey. Desde $45,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "8 minutes from downtown Juayúa",
+        "es": "8 minutos del centro de Juayúa"
+      },
+      {
+        "en": "Flat topography, easy access",
+        "es": "Topografía plana, fácil acceso"
+      },
+      {
+        "en": "Basic utilities available",
+        "es": "Servicios básicos disponibles"
+      },
+      {
+        "en": "Near natural attractions",
+        "es": "Cerca de atractivos naturales"
+      },
+      {
+        "en": "Starting at $45,000",
+        "es": "Desde $45,000"
+      }
+    ],
+    "lat": 13.8436,
+    "lng": -89.7453,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Juayúa, Sonsonate, SV",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3350,
+    "tokens_out": 462,
+    "cost_usd": 0.0014127,
+    "finish_reason": "stop",
+    "latency_ms": 3752
+  },
+  "remax|003093331049": {
+    "ts": "2026-07-05T07:02:40.507707+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "760 m² Lot in Cumbres de Zaragoza, Gated Community",
+      "es": "Lote de 760 m² en Cumbres de Zaragoza, Comunidad Cerrada"
+    },
+    "short_description_canonical": {
+      "en": "Flat 760 m² residential lot in Cumbres de Zaragoza, La Libertad. Gently sloping, 20 m frontage, 38 m depth, with gated access and basic utilities. No HOA restrictions; ideal for a home or Airbnb.",
+      "es": "Lote residencial plano de 760 m² en Cumbres de Zaragoza, La Libertad. Suavemente inclinado, 20 m de frente, 38 m de fondo, con acceso controlado y servicios básicos. Sin restricciones de condominio; ideal para casa o Airbnb."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "760 m² lot, 20 m frontage",
+        "es": "Lote de 760 m², 20 m de frente"
+      },
+      {
+        "en": "Gated community with remote access",
+        "es": "Comunidad cerrada con acceso remoto"
+      },
+      {
+        "en": "No HOA restrictions",
+        "es": "Sin restricciones de condominio"
+      },
+      {
+        "en": "Near Surf City and La Libertad beaches",
+        "es": "Cerca de Surf City y playas de La Libertad"
+      },
+      {
+        "en": "Bank financing available",
+        "es": "Financiamiento bancario disponible"
+      }
+    ],
+    "lat": 13.5894,
+    "lng": -89.2883,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Zaragoza, La Libertad, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3355,
+    "tokens_out": 508,
+    "cost_usd": 0.00146465,
+    "finish_reason": "stop",
+    "latency_ms": 4287
+  },
+  "encuentra24|32553811": {
+    "ts": "2026-07-05T07:42:39.038594+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in Chame, Colinas Brisas del Celaje",
+      "es": "Casa en Venta en Chame, Colinas Brisas del Celaje"
+    },
+    "short_description_canonical": {
+      "en": "House of 208 m² built on a 627 m² lot in Chame, Colinas Brisas del Celaje. It has 3 bedrooms, 2 bathrooms, pool, and community amenities. Includes parking and security booth.",
+      "es": "Casa de 208 m² construida en un terreno de 627 m² en Chame, Colinas Brisas del Celaje. Tiene 3 habitaciones, 2 baños, piscina y amenidades comunitarias. Incluye estacionamiento y garita de seguridad."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "627 m² lot with pool",
+        "es": "Terreno de 627 m² con piscina"
+      },
+      {
+        "en": "Community amenities: clubhouse, playground",
+        "es": "Amenidades comunitarias: casa club, juegos"
+      },
+      {
+        "en": "Security booth and paved roads",
+        "es": "Garita de seguridad y cunetas pavimentadas"
+      }
+    ],
+    "lat": 8.5767,
+    "lng": -79.8856,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Chame, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 208.18,
+      "parking_spaces": 1,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2369,
+    "tokens_out": 433,
+    "cost_usd": 0.00111593,
+    "finish_reason": "stop",
+    "latency_ms": 3957
+  },
+  "encuentra24|31922843": {
+    "ts": "2026-07-05T07:42:39.605381+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3BR House Near Beach, Las Uvas, San Carlos",
+      "es": "Casa 3 hab cerca de playa, Las Uvas, San Carlos"
+    },
+    "short_description_canonical": {
+      "en": "House on 1,001 m² lot in Las Uvas, San Carlos, near beaches and Pan-American Highway. 3 bedrooms, 3 bathrooms, large pool, gazebo with A/C, barbecue area, fruit trees. Ideal for permanent living or vacation rental investment.",
+      "es": "Casa en terreno de 1,001 m² en Las Uvas, San Carlos, cerca de playas y Vía Panamericana. 3 recámaras, 3 baños, piscina amplia, gazebo con A/A, área de barbacoa, árboles frutales. Ideal para vivienda permanente o inversión de alquiler vacacional."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1,001 m² lot with pool",
+        "es": "Terreno de 1,001 m² con piscina"
+      },
+      {
+        "en": "3 bedrooms, 3 bathrooms",
+        "es": "3 recámaras, 3 baños"
+      },
+      {
+        "en": "Near beaches and highway",
+        "es": "Cerca de playas y autopista"
+      },
+      {
+        "en": "Gazebo with A/C, barbecue",
+        "es": "Gazebo con A/A, barbacoa"
+      }
+    ],
+    "lat": 8.4833,
+    "lng": -80.0,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Las Uvas, San Carlos, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": 1001.0,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2452,
+    "tokens_out": 491,
+    "cost_usd": 0.00120214,
+    "finish_reason": "stop",
+    "latency_ms": 4524
   }
 }
