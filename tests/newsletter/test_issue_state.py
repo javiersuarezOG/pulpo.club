@@ -102,3 +102,81 @@ def test_returns_default_on_non_integer_max(monkeypatch):
     monkeypatch.setenv("POSTHOG_PERSONAL_API_KEY", "phx_test")
     with patch.object(issue_state.urllib.request, "urlopen", return_value=_ok_response("not-a-number")):
         assert issue_state.next_issue_number(default=1) == 1
+
+
+# ── authoritative committed counter (P1) — all use tmp files ───────────
+# NOTE: these MUST pass an explicit tmp path; never touch the real
+# web/data/newsletter_issue_state.json (a default-path call would mutate
+# the committed seed).
+
+import json as _json  # noqa: E402
+from datetime import date  # noqa: E402
+
+
+def _seed(tmp_path, issue_number=13, iso_week="2026-W27"):
+    p = tmp_path / "issue_state.json"
+    p.write_text(_json.dumps({"issue_number": issue_number, "iso_week": iso_week}))
+    return p
+
+
+def test_current_issue_number_reads_committed_file(tmp_path):
+    assert issue_state.current_issue_number(_seed(tmp_path, 13)) == 13
+
+
+def test_read_is_fail_closed_when_missing(tmp_path):
+    missing = tmp_path / "nope.json"
+    with pytest.raises(issue_state.IssueStateError):
+        issue_state.current_issue_number(missing)
+
+
+def test_read_is_fail_closed_on_corrupt_json(tmp_path):
+    p = tmp_path / "bad.json"
+    p.write_text("{{{ not json")
+    with pytest.raises(issue_state.IssueStateError):
+        issue_state.current_issue_number(p)
+
+
+@pytest.mark.parametrize("bad", [0, -3, "5", 1.5, True, None])
+def test_read_is_fail_closed_on_invalid_issue_number(tmp_path, bad):
+    p = tmp_path / "bad.json"
+    p.write_text(_json.dumps({"issue_number": bad, "iso_week": "2026-W27"}))
+    with pytest.raises(issue_state.IssueStateError):
+        issue_state.current_issue_number(p)
+
+
+def test_advance_is_noop_within_same_iso_week(tmp_path):
+    p = _seed(tmp_path, 13, "2026-W27")
+    state, changed = issue_state.advance_issue_state_for_week(p, today=date(2026, 7, 5))  # Sun W27
+    assert changed is False
+    assert state["issue_number"] == 13
+    # file unchanged
+    assert issue_state.current_issue_number(p) == 13
+
+
+def test_advance_bumps_once_on_new_iso_week(tmp_path):
+    p = _seed(tmp_path, 13, "2026-W27")
+    state, changed = issue_state.advance_issue_state_for_week(p, today=date(2026, 7, 6))  # Mon W28
+    assert changed is True
+    assert state["issue_number"] == 14
+    assert state["iso_week"] == "2026-W28"
+    assert issue_state.current_issue_number(p) == 14
+
+
+def test_advance_is_idempotent_across_the_week(tmp_path):
+    """Mon advances; Tue–Sun of the same week are no-ops — the number never
+    double-advances even though the nightly runs daily."""
+    p = _seed(tmp_path, 13, "2026-W27")
+    issue_state.advance_issue_state_for_week(p, today=date(2026, 7, 6))   # Mon W28 → 14
+    for d in (date(2026, 7, 7), date(2026, 7, 10), date(2026, 7, 12)):    # Tue, Fri, Sun
+        _, changed = issue_state.advance_issue_state_for_week(p, today=d)
+        assert changed is False
+    assert issue_state.current_issue_number(p) == 14
+
+
+def test_pro_and_free_read_the_same_number(tmp_path):
+    """The core 'shared Pro/Free' guarantee: two independent reads of the
+    same committed file that week return the identical number."""
+    p = _seed(tmp_path, 13, "2026-W27")
+    pro = issue_state.current_issue_number(p)
+    free = issue_state.current_issue_number(p)  # 1h later, same file
+    assert pro == free == 13
