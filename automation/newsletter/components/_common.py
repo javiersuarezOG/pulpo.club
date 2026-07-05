@@ -80,7 +80,14 @@ from ..types import Issue
 #       (Jan/Apr/Aug/Dec, ...). (2) footer filter summary dropped the
 #       hardcoded English " OK" after "Terreno" and the literal "default"
 #       fallback (now "Todas las propiedades").
-TEMPLATE_VERSION = "newsletter-v5.1-2026-07-05"
+#   v5.2 (2026-07-05) — internal-only: ~18 inline EN/ES ternaries in
+#       render_html.py + build_issue.py (favorites section, preheader,
+#       spotlight byline, pick pill, filter-summary property types) moved
+#       into the i18n STRINGS table so they fall under the EN/ES parity
+#       guard. Rendered output is BYTE-IDENTICAL (verified by a before/after
+#       dry-run diff across all cohorts incl. favorites + ES); the bump only
+#       satisfies the render-file-change guard. No recipient-visible change.
+TEMPLATE_VERSION = "newsletter-v5.2-2026-07-05"
 
 # Human-readable timestamp surfaced in component docs + the admin
 # widget so collaborators can see when the locked design was last

@@ -165,6 +165,33 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "filter.category.under_50k":       {"en": "Under $50k",        "es": "Menos de $50k"},
     "filter.category.under_100k":      {"en": "Under $100k",       "es": "Menos de $100k"},
     "filter.category.motivated_sellers": {"en": "Motivated sellers", "es": "Vendedor motivado"},
+    # ── Migrated from inline render_html.py / build_issue.py ternaries so
+    #    they fall under the EN/ES parity guard (launch-audit follow-up).
+    #    Strings are byte-identical to what the renderer produced inline;
+    #    HTML entities (&darr; &middot; &rarr;) + inline <strong> are stored
+    #    verbatim because the render sites interpolate them raw (no _e()).
+    "favorites.eyebrow":           {"en": "Your favorites · this week",                   "es": "Tus favoritos · esta semana"},
+    "favorites.headline.one":      {"en": "1 you're following.",                          "es": "1 que seguís."},
+    "favorites.headline.many":     {"en": "{count} you're following.",                    "es": "{count} que seguís."},
+    "favorites.open_all":          {"en": "Open all favorites",                           "es": "Abrir todos los favoritos"},
+    "favorites.chip.price_dropped": {"en": "&darr; Price dropped {amount} since you saved it", "es": "&darr; Bajó {amount} desde que la guardaste"},
+    "favorites.chip.price_up":     {"en": "&uarr; Price moved up {amount} since you saved it", "es": "&uarr; Subió {amount} desde que la guardaste"},
+    "favorites.chip.still_listed.one":  {"en": "Still on market &middot; {days} day listed",  "es": "Sigue en el mercado &middot; {days} día listada"},
+    "favorites.chip.still_listed.many": {"en": "Still on market &middot; {days} days listed", "es": "Sigue en el mercado &middot; {days} días listada"},
+    "favorites.chip.still_on_market": {"en": "Still on market",                            "es": "Sigue en el mercado"},
+    "favorites.card_cta":          {"en": "See on Pulpo &rarr;",                          "es": "Verla en Pulpo &rarr;"},
+    "favorites.summary.none_moved": {"en": "<strong style='font-style:normal;'>None moved on price this week</strong> — your watchlist held flat.", "es": "<strong style='font-style:normal;'>Ninguno se movió en precio esta semana</strong> — tu lista quedó plana."},
+    "favorites.summary.tail_busy": {"en": "busier than a typical week on your watchlist", "es": "más actividad que una semana típica en tu lista"},
+    "favorites.summary.tail_quiet": {"en": "fewer moves than usual on your watchlist",    "es": "menos actividad de la habitual en tu lista"},
+    "favorites.summary.some_moved": {"en": "<strong style='font-style:normal;'>{moved_word} of {total_word} moved on price this week</strong> — {tail}.", "es": "<strong style='font-style:normal;'>{moved_word} de {total_word} se movieron en precio esta semana</strong> — {tail}."},
+    "preheader.with_rest":         {"en": "{top} — plus {n_rest} more picks this week.",  "es": "{top} — y {n_rest} más esta semana."},
+    "preheader.fallback":          {"en": "10 hand-picked listings from El Salvador, this week.", "es": "10 propiedades seleccionadas de El Salvador, esta semana."},
+    "spotlight.reported_by":       {"en": "Reported by",                                  "es": "Reportado por"},
+    "pick.pill.under_area_avg":    {"en": "−{pct}% under area avg",                       "es": "−{pct}% bajo el promedio"},
+    "filter.summary.land":         {"en": "land",                                         "es": "terreno"},
+    "filter.summary.house":        {"en": "house",                                        "es": "casa"},
+    "filter.summary.condo":        {"en": "condo",                                        "es": "condo"},
+    "filter.summary.under_price":  {"en": "under {money}",                                "es": "menos de {money}"},
     "yp.browse.label":             {"en": "{n} listings match",                           "es": "{n} propiedades coinciden"},
     "yp.browse.cta":               {"en": "Browse them all",                              "es": "Verlas todas"},
     # Anonymous-cohort-only welcome card.

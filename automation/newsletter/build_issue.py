@@ -592,11 +592,11 @@ def _filter_summary_human(pref: Preference, locale: Locale, cohort: Cohort) -> s
 
     # Property type — single most expected token.
     if "land" in pref.property_types:
-        parts.append("land" if locale == "en" else "terreno")
+        parts.append(i18n.t("filter.summary.land", locale))
     elif "house" in pref.property_types:
-        parts.append("house" if locale == "en" else "casa")
+        parts.append(i18n.t("filter.summary.house", locale))
     elif "condo" in pref.property_types:
-        parts.append("condo" if locale == "en" else "condo")
+        parts.append(i18n.t("filter.summary.condo", locale))
 
     # Price cap — present only when it bites. Compact dollar format
     # ("$500k", not "$500,000") matches the mockup tone.
@@ -608,7 +608,7 @@ def _filter_summary_human(pref: Preference, locale: Locale, cohort: Cohort) -> s
             money = f"${cap // 1_000}k"
         else:
             money = f"${cap}"
-        parts.append(f"under {money}" if locale == "en" else f"menos de {money}")
+        parts.append(i18n.t("filter.summary.under_price", locale, money=money))
 
     # Categories last — they're usually editorial, not structural. Look
     # each up through the i18n table (filter.category.<slug>) so a Spanish
