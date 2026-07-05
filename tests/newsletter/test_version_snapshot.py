@@ -71,8 +71,13 @@ def _recipient(locale: str) -> Recipient:
         locale=locale,
         tier="pro",
         has_account=True,
+        # Categories included so the snapshot exercises the Your Pulpo
+        # filter-summary category rendering (localized via i18n as of
+        # TEMPLATE_VERSION v5.0 / P0-4) — otherwise a change to that path is
+        # invisible to this guard.
         preference=Preference(
-            departments=["La Libertad"], property_types=["land"], max_price_usd=500_000
+            departments=["La Libertad"], property_types=["land"], max_price_usd=500_000,
+            categories=["ocean_view", "price_drops"],
         ),
     )
 
