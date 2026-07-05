@@ -78,6 +78,10 @@ const NON_RENDER_MODULES = new Set([
   // template version. The HTML + version constants live in components/ +
   // templates/ + _common.py, which stay guarded.
   "automation/newsletter/send.py",
+  // Issue-number counter — reads/advances the committed
+  // newsletter_issue_state.json and (legacy) queries PostHog. Produces an
+  // integer, zero HTML; changing it can't stale a template version.
+  "automation/newsletter/issue_state.py",
 ]);
 
 function isNewsletterRenderChange(file) {
