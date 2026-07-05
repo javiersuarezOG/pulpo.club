@@ -524,6 +524,11 @@ def main() -> int:
                 "issue_number": args.issue_number,
                 "recipient_hash": recipient.email_hash,
                 "cohort": issue.cohort,
+                # tier MUST be stamped here (it is on send_succeeded too):
+                # the health endpoint splits weekly failures Pro-vs-Free by
+                # this prop, and a missing tier used to bucket the failure as
+                # Free — hiding a failed Pro campaign (launch audit P1).
+                "tier": recipient.tier,
                 "error": result.error,
                 "error_detail": result.error_detail,
                 "attempt": result.attempt,

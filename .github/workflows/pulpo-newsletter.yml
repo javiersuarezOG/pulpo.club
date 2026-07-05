@@ -77,13 +77,19 @@ concurrency:
   # a UNIQUE per-run group, so firing several test-sends in quick
   # succession no longer cancels each other mid-run (the bug: two weekly
   # tests → one cancelled → only one email arrived). Everything else — the
-  # real audience send, scheduled runs — shares one `…-audience` group with
-  # cancel-in-progress, so two live blasts can never overlap.
+  # real audience send, scheduled runs — shares one `…-audience` group.
   group: >-
     ${{ (github.event_name == 'workflow_dispatch' && github.event.inputs.preview_cohorts != '')
         && format('pulpo-newsletter-preview-{0}', github.run_id)
         || 'pulpo-newsletter-audience' }}
-  cancel-in-progress: ${{ !(github.event_name == 'workflow_dispatch' && github.event.inputs.preview_cohorts != '') }}
+  # QUEUE live blasts, never cancel (launch audit P1). cancel-in-progress
+  # on the live group meant a second live send KILLED the first mid-blast —
+  # recipients already sent got a second copy on the rerun, the rest got
+  # none. false = the second run waits for the first to finish. Combined
+  # with the deterministic Resend idempotency key, a genuine rerun of the
+  # SAME issue can't double-send either. Previews use a unique per-run
+  # group so they never queue behind each other regardless.
+  cancel-in-progress: false
 
 jobs:
   build:
