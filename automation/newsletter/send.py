@@ -211,6 +211,14 @@ def send_issue(
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
+        # Deterministic per (issue, recipient). A workflow rerun/cancel, or
+        # an in-call retry after a lost response (the send may have landed
+        # before the network error), reuses the SAME key — Resend returns
+        # the original result instead of sending a second copy. Combined
+        # with concurrency:queued on the send workflow, this closes the
+        # double-send window (launch audit P1). recipient_hash is already
+        # opaque + collision-safe; issue_number scopes it to this edition.
+        "Idempotency-Key": f"pulpo-nl-{issue_number}-{recipient_hash}",
     }
     poster = post_override or _post_json
     last_error: Optional[str] = None

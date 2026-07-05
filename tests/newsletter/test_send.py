@@ -175,6 +175,29 @@ def test_dry_run_exempt_from_salt_guard(monkeypatch):
     assert out.dry_run is True
 
 
+# ── idempotency key (P1 double-send guard) ────────────────────────────────
+def test_idempotency_key_deterministic_per_issue_and_recipient(monkeypatch):
+    monkeypatch.setenv("PULPO_NEWSLETTER_DRY_RUN", "0")
+    monkeypatch.setenv("RESEND_API_KEY", "re_test")
+    monkeypatch.setenv("RESEND_FROM_EMAIL", "hello@mail.pulpo.club")
+
+    def _key(recipient_hash, issue):
+        poster = _make_post(lambda _i: _Resp(200, {"id": "ok"}))
+        send_mod.send_issue(
+            to_email="ops@pulpo.club", recipient_hash=recipient_hash,
+            issue_number=issue, subject="x", html="<p>x</p>", post_override=poster,
+        )
+        return poster.calls[0]["headers"]["Idempotency-Key"]
+
+    same_a = _key("abc", 7)
+    same_b = _key("abc", 7)           # rerun: same recipient + issue → same key
+    other_issue = _key("abc", 8)
+    other_recipient = _key("xyz", 7)
+    assert same_a == same_b == "pulpo-nl-7-abc"
+    assert same_a != other_issue      # scoped by issue
+    assert same_a != other_recipient  # scoped by recipient
+
+
 # ── retries ──────────────────────────────────────────────────────────────
 def test_retries_on_429_then_success(monkeypatch):
     monkeypatch.setenv("PULPO_NEWSLETTER_DRY_RUN", "0")

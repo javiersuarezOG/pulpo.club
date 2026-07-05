@@ -39,10 +39,13 @@ on:
         default: ""
 
 concurrency:
-  # Own group, separate from the Pro weekly, with cancel-in-progress so two
-  # free blasts can never overlap. (The Pro workflow has its own group.)
+  # Own group, separate from the Pro weekly. (The Pro workflow has its own.)
+  # QUEUE, never cancel (launch audit P1): cancel-in-progress killed a
+  # free blast mid-send when a second run started — partial recipients got
+  # a duplicate on the rerun. false = the second run waits. The
+  # deterministic Resend idempotency key covers same-issue reruns too.
   group: pulpo-newsletter-free-audience
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -128,3 +131,43 @@ jobs:
           path: newsletter-drafts/sent-free/*.html
           retention-days: 30
           if-no-files-found: ignore
+
+      - name: Free-weekly liveness page (scheduled but not live)
+        # S2 (launch audit): a scheduled Free weekly silently drops to
+        # dry-run when FREE_NEWSLETTER_LIVE != 'true' — ZERO real Free
+        # emails go out, yet the job is green and the shared newsletter_cron
+        # heartbeat stays green off the PRO Sunday send, so the Free tier can
+        # go dark invisibly. Page whenever a SCHEDULED run resolved to
+        # dry-run so a reverted/dropped repo variable is caught the same day.
+        if: github.event_name == 'schedule' && vars.FREE_NEWSLETTER_LIVE != 'true'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL unset — skipping"
+            exit 0
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            "$SLACK_WEBHOOK_URL" \
+            -d "$(printf '{"text":"*Pulpo Free weekly ran DRY on a scheduled Sunday* — FREE_NEWSLETTER_LIVE is not set to '\''true'\'', so NO real Free emails went out. Set the repo variable to resume live sends. <%s|view run>"}' "$RUN_URL")" \
+            >/dev/null || true
+
+      - name: Slack on job failure
+        # S3 (launch audit): the Free weekly had NO failure-Slack (the Pro
+        # weekly has one). A total Free send failure (e.g. RESEND_API_KEY
+        # unset while live → every recipient errors → exit 1) failed the job
+        # but paged nobody. Non-blocking when SLACK_WEBHOOK_URL is unset.
+        if: failure() || cancelled()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL unset — skipping"
+            exit 0
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            "$SLACK_WEBHOOK_URL" \
+            -d "$(printf '{"text":"*Pulpo Free weekly JOB CRASHED* — the Free Sunday send failed. <%s|view run>"}' "$RUN_URL")" \
+            >/dev/null || true

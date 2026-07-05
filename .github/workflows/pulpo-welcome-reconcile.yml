@@ -99,3 +99,22 @@ jobs:
           python3 -m automation.newsletter.welcome_reconcile \
             --send-mode "$SEND_MODE" \
             --max-users "$MAX_USERS"
+
+      - name: Slack on job failure
+        # Mirror of the free-welcome reconcile page (CLAUDE.md: NEVER let a
+        # webhook go silent). The Pro welcome backstop had NO failure-Slack —
+        # a crash-looping reconcile paged nobody while Pro members silently
+        # missed their welcome (launch audit S1). Non-blocking when unset.
+        if: failure() || cancelled()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          if [ -z "$SLACK_WEBHOOK_URL" ]; then
+            echo "SLACK_WEBHOOK_URL unset — skipping"
+            exit 0
+          fi
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          curl -sS -X POST -H 'Content-Type: application/json' \
+            "$SLACK_WEBHOOK_URL" \
+            -d "$(printf '{"text":"*Pulpo Pro welcome reconcile JOB CRASHED* — Pro welcome backstop is silent. <%s|view run>"}' "$RUN_URL")" \
+            >/dev/null || true
