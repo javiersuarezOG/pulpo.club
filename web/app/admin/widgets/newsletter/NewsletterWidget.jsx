@@ -156,29 +156,11 @@ async function fetchServerLog() {
 const LOG_LS_KEY = "pulpo-admin-newsletter-trigger-log";
 const LOG_CAP = 20;
 
-// The full-audience blast endpoint is bearer-gated server-side with
-// PULPO_ADMIN_DEBUG_TOKEN (requireAdminAuth). The single-recipient test
-// sends stay open. The token is NEVER bundled — the operator pastes it
-// once (sourced from the Vercel env var) and it lives only in this
-// browser's localStorage, so loading the open /admin page reveals nothing.
-const ADMIN_TOKEN_LS_KEY = "pulpo-admin-token";
-function getAdminToken() {
-  try {
-    let t = window.localStorage.getItem(ADMIN_TOKEN_LS_KEY);
-    if (!t) {
-      t = window.prompt(
-        "Admin token required for the full-audience send.\n\n" +
-        "Paste the value of PULPO_ADMIN_DEBUG_TOKEN (Vercel → Settings → " +
-        "Environment Variables). It's stored only in this browser.",
-      );
-      if (t && t.trim()) window.localStorage.setItem(ADMIN_TOKEN_LS_KEY, t.trim());
-    }
-    return t ? t.trim() : "";
-  } catch { return ""; }
-}
-function clearAdminToken() {
-  try { window.localStorage.removeItem(ADMIN_TOKEN_LS_KEY); } catch { /* ignore */ }
-}
+// The full-audience blast endpoint is open end-to-end like the rest of
+// the /admin surface (operator decision 2026-06-10; the endpoint was the
+// last holdout, ungated in Batch B). No token dance — the server-side
+// guardrails are the type-to-confirm "SEND" string, a 1/hour rate-limit,
+// and the GitHub PAT that never leaves the server.
 
 function readLog() {
   if (typeof window === "undefined") return [];
@@ -608,18 +590,14 @@ export function NewsletterWidget() {
   const submitAudienceConfirm = useCallback(async () => {
     const snap = audienceConfirm;
     if (!snap) return;
-    // Bearer-gated server-side; prompt for the token once if not stored.
-    const adminToken = getAdminToken();
-    if (!adminToken) {
-      setAudienceConfirm((p) => p ? { ...p, phase: "error", errorMessage: "Admin token required — set PULPO_ADMIN_DEBUG_TOKEN in Vercel, then paste it when prompted." } : p);
-      return;
-    }
+    // Open endpoint — the server-side type-to-confirm "SEND" gate + the
+    // 1/hour rate-limit are the guardrails; no admin token needed.
     setAudienceConfirm((p) => p ? { ...p, phase: "submitting", errorMessage: null } : p);
     const operatorEmail = readOperatorEmail();
     try {
       const r = await fetch("/api/admin/newsletter/trigger-audience-send", {
         method: "POST",
-        headers: { "content-type": "application/json", "authorization": `Bearer ${adminToken}` },
+        headers: { "content-type": "application/json" },
         body: JSON.stringify({
           confirm: snap.typedConfirm,
           issue_number: Number(snap.issueInput),
@@ -629,9 +607,7 @@ export function NewsletterWidget() {
       });
       const body = await r.json().catch(() => ({}));
       if (!r.ok) {
-        // Wrong/expired token → drop it so the operator is re-prompted.
-        if (r.status === 401) clearAdminToken();
-        const hint = body.hint ? ` — ${body.hint}` : (r.status === 401 ? " — check the token matches PULPO_ADMIN_DEBUG_TOKEN" : r.status === 503 ? " — PULPO_ADMIN_DEBUG_TOKEN is not set in Vercel" : "");
+        const hint = body.hint ? ` — ${body.hint}` : "";
         setAudienceConfirm((p) => p ? { ...p, phase: "error", errorMessage: `${body.error || `HTTP ${r.status}`}${hint}` } : p);
         return;
       }
