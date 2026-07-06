@@ -1534,7 +1534,15 @@ function App() {
     // inline "already a member" acknowledgment; only a genuine first join
     // gets the celebration.
     if (!returning) setCelebration({ returning: false });
-  }, [user]);
+    // Bind the free member to a stable email-derived PostHog Person — the
+    // SAME sha256→16-hex id the conversion funnel + Stripe webhook use — so
+    // their events stop attributing to the throwaway anonymous distinct_id.
+    // Free members were never identified before (identifyByEmail only ran on
+    // Clerk sign-in), so the email-first top of the funnel had no Person to
+    // hang campaign attribution on. First-touch acquisition_utm_* props are
+    // stamped server-side ($set_once) by /api/newsletter. (2026-06-30 audit P1-3.)
+    identifyByEmail(email, { plan: "free", provider: "email", locale });
+  }, [user, locale]);
 
   // Unified "they want more access" gate: anonymous → start-free email
   // capture; free member → Go-Pro modal; Pro → no-op. Used by the hero lock
