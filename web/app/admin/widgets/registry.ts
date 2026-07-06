@@ -13,7 +13,7 @@
 import type { ComponentType } from "react";
 import { NewsletterWidget } from "./newsletter/NewsletterWidget.jsx";
 import { SourcesHealthWidget, SourcesHealthPreview } from "./sources/SourcesHealthWidget.jsx";
-import { IgReviewWidget, IgReviewPreview } from "./ig-review/IgReviewWidget.jsx";
+import { IgConsoleWidget, IgConsolePreview } from "./ig-console/IgConsoleWidget.jsx";
 
 // Widget-author contract. Components take no props — they own their own
 // state. AdminShell renders them inside a consistent card layout (title
@@ -56,13 +56,13 @@ export const ADMIN_WIDGETS: readonly AdminWidget[] = [
     Preview: SourcesHealthPreview,
   },
   {
-    slug: "ig-review",
-    label: "IG batch review",
+    slug: "ig",
+    label: "Instagram console",
     description:
-      "Read-only review of the 14-post IG drop assembled by automation/ig_queue_builder.py. Approve/skip decisions persist in local storage until PR-4 wires the workflow_dispatch submission flow.",
+      "Operator console for Instagram: the next post about to go out (Post now / Approve), the upcoming queue with inline approve/skip, and a real activity log of what was published (posted / failed) with links to IG.",
     category: "comms",
-    Component: IgReviewWidget,
-    Preview: IgReviewPreview,
+    Component: IgConsoleWidget,
+    Preview: IgConsolePreview,
   },
 ] as const;
 
