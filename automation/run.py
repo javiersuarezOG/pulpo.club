@@ -2258,6 +2258,50 @@ def main() -> int:
     fb_count = sum(1 for li in listings if _ai_fallback(li))
     print(f"[llm_enrich] fallback_templates_applied={fb_count}")
 
+    # Bilingual translate-fill (post-2026-07-06). Guarantee every served
+    # listing carries BOTH en + es on title/description/usps. The
+    # deterministic fallback above already upgrades monolingual template
+    # strings to bilingual for free; this pass is the safety net for
+    # genuine broker natural-language text (a raw title/description on a
+    # listing the LLM enrichment skipped — e.g. grandfathered-geocoded
+    # listings that _present_latlong makes ineligible). It translates the
+    # missing side via DeepSeek and persists to a reusable cache so it's
+    # never recomputed. Soft-fail + deadline-aware: never blocks the run,
+    # never raises. When DEEPSEEK_API_TOKEN is unset the pass is a graceful
+    # no-op (the frontend adapter renders the single-language string
+    # honestly). See automation/ensure_bilingual.py.
+    _bilingual_deadline_s = _env_float("PULPO_BILINGUAL_DEADLINE_SECONDS", 0.0)
+    _bilingual_deadline = (
+        _time.monotonic() + _bilingual_deadline_s if _bilingual_deadline_s > 0 else None
+    )
+    try:
+        from automation.ensure_bilingual import ensure_bilingual as _ensure_bilingual
+        bilingual_metrics = _ensure_bilingual(
+            listings,
+            cache_path=web_data_dir / "bilingual_fill.json",
+            log_path=web_data_dir / "bilingual_fill_log.jsonl",
+            deadline=_bilingual_deadline,
+        )
+        print(f"[bilingual_fill] needed={bilingual_metrics['needed']} "
+              f"filled={bilingual_metrics['filled']} "
+              f"cache_hits={bilingual_metrics['cache_hits']} "
+              f"failed={bilingual_metrics['failed']} "
+              f"api_calls={bilingual_metrics['api_calls']}")
+        if bilingual_metrics.get("failure_reasons"):
+            print(f"[bilingual_fill] failure_reasons={bilingual_metrics['failure_reasons']}")
+        _ph_capture("bilingual_fill_completed", {
+            "needed":          bilingual_metrics.get("needed"),
+            "filled":          bilingual_metrics.get("filled"),
+            "cache_hits":      bilingual_metrics.get("cache_hits"),
+            "failed":          bilingual_metrics.get("failed"),
+            "api_calls":       bilingual_metrics.get("api_calls"),
+            "deadline_skipped": bilingual_metrics.get("deadline_skipped"),
+            "skipped_no_token": bool(bilingual_metrics.get("skipped_no_token")),
+            "global_error_seen": bool(bilingual_metrics.get("global_error_seen")),
+        })
+    except Exception as _bfe:  # noqa: BLE001 — never let the fill kill the run
+        print(f"[bilingual_fill] non-fatal error: {_bfe!r}")
+
     # PR-8.5 — OSM Nominatim geocoding fallback for listings still
     # missing lat/lng after the LLM enrichment pass. Free, rate-limited
     # to 1 req/sec, results cached in web/data/geocoding_nominatim.json
