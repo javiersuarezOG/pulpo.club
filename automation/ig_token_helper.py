@@ -29,8 +29,12 @@ Inputs (env vars; CLI flags override):
   IG_SHORT_TOKEN      Short-lived user token from
                       developers.facebook.com/tools/explorer
                       (with permissions: instagram_basic,
-                      instagram_content_publish, pages_show_list,
-                      pages_read_engagement)
+                      instagram_content_publish, instagram_manage_comments,
+                      pages_show_list, pages_read_engagement)
+                      NOTE: instagram_manage_comments is REQUIRED for the
+                      publisher's first-comment step (the full listing spec
+                      + hashtags). Without it the post still publishes but
+                      the first comment is skipped.
   IG_PAGE_HINT        (optional) Substring of the Pulpo page name to
                       auto-select when the user has multiple pages.
 
