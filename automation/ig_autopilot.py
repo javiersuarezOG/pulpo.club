@@ -21,7 +21,7 @@ surface ig_queue_builder uses — without the selector/plan machinery.
 Renderers are injectable so tests run offline with skip_render.
 
 CLI (run by .github/workflows/ig-autopilot.yml on a daily cron):
-    python3 -m automation.ig_autopilot --lookahead 3 --cadence-days 2
+    python3 -m automation.ig_autopilot --lookahead 3 --cadence-days 1
 
 Autopilot NEVER flips IG_PAUSED and NEVER posts — it only queues.
 Posting stays with the publisher cron, which the operator gates with
@@ -388,7 +388,7 @@ def main(argv: Optional[list] = None) -> int:
     p.add_argument("--ranked", type=Path, default=DEFAULT_RANKED)
     p.add_argument("--assets-root", type=Path, default=DEFAULT_ASSETS_ROOT)
     p.add_argument("--lookahead", type=int, default=3, help="Keep this many future posts queued.")
-    p.add_argument("--cadence-days", type=int, default=2)
+    p.add_argument("--cadence-days", type=int, default=1)
     p.add_argument("--skip-render", action="store_true", help="Skip Playwright (queue only).")
     p.add_argument("--now", default=None, help="ISO 'now' override (tests).")
     args = p.parse_args(argv)
