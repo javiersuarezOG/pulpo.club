@@ -41,19 +41,26 @@ from automation.ig_poster import render_poster as _render_poster
 from automation.ig_poster import TYPO_MAX, STICKER
 from automation.ig_caption import generate_caption as _generate_caption
 from automation.ig_caption_lint import check as _lint_check
+from pulpo.countries import active as _active_country
+
+# Country name comes from the active-country manifest, never a hardcoded
+# literal — so the copy follows the platform when a new country is added
+# (and satisfies scripts/check_country_hardcodes.py).
+_COUNTRY = _active_country().name_en  # the active country's display name
 
 # ── evergreen brand messages (slide 1 of brand-led posts) ─────────────
 #
 # Each drives a TYPO_MAX poster (eyebrow/hook/hero/punch) + a complete,
 # lint-clean caption.  Cycled in order; when exhausted it wraps.  Keep
 # every caption through ig_caption_lint (no banned words, no `!`).
+# `{_COUNTRY}` is interpolated from the manifest (see above).
 
 BRAND_MESSAGES: tuple[dict, ...] = (
     {
-        "eyebrow": "EL SALVADOR", "hook": "Todos los terrenos de El Salvador,",
+        "eyebrow": _COUNTRY.upper(), "hook": f"Todos los terrenos de {_COUNTRY},",
         "hero": "rankeados.", "punch": "Cada semana.",
         "caption": (
-            "**Todos los terrenos de El Salvador, rankeados cada semana.**\n\n"
+            f"**Todos los terrenos de {_COUNTRY}, rankeados cada semana.**\n\n"
             "Un solo lugar para ver lo que de verdad vale la pena. Sin listas infinitas.\n\n"
             "pulpo.club · link en bio"
         ),
@@ -78,9 +85,9 @@ BRAND_MESSAGES: tuple[dict, ...] = (
     },
     {
         "eyebrow": "TODO EL PAÍS", "hook": "De la playa a la montaña,",
-        "hero": "todo El Salvador.", "punch": "En un solo lugar.",
+        "hero": f"todo {_COUNTRY}.", "punch": "En un solo lugar.",
         "caption": (
-            "**De la playa a la montaña, todo El Salvador.**\n\n"
+            f"**De la playa a la montaña, todo {_COUNTRY}.**\n\n"
             "Surf City, oriente, occidente — cada terreno a la venta, en un solo lugar.\n\n"
             "pulpo.club · link en bio"
         ),
@@ -99,7 +106,7 @@ BRAND_MESSAGES: tuple[dict, ...] = (
         "hero": "sin parar.", "punch": "Para traerte lo mejor.",
         "caption": (
             "**Un pulpo revisa cada terreno a la venta.**\n\n"
-            "Buscamos en todo El Salvador, todos los días, para traerte los mejores terrenos.\n\n"
+            f"Buscamos en todo {_COUNTRY}, todos los días, para traerte los mejores terrenos.\n\n"
             "pulpo.club · link en bio"
         ),
     },
