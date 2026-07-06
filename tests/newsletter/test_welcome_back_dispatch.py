@@ -193,3 +193,43 @@ def test_not_pro_still_skips_before_variant_decision(harness):
     assert res.status == "skipped"
     assert res.reason == "not_pro"
     assert harness["sent"] == {}
+
+
+def test_forced_send_preserves_existing_welcome_stamp(harness):
+    """Regression guard for the Issue-13 suppression (2026-07-05).
+
+    An admin welcome-TEST (force=True) aimed at an already-welcomed
+    subscriber must SEND the email but NOT overwrite their existing
+    `welcome_newsletter_sent_at`. Moving the stamp forward re-arms the
+    weekly cron's 96h first-Sunday skip and silently drops that
+    subscriber's next weekly. The send goes out; the stamp is preserved;
+    the result + telemetry flag it so the admin UI can warn."""
+    harness["user"] = _clerk_user(welcome_sent_at="2026-01-01T00:00:00+00:00")
+    res = wd.dispatch_welcome(
+        email="returning@test.local", source="admin", force=True,
+    )
+    assert res.status == "sent"
+    # Email actually sent (force bypassed the already_sent skip)…
+    assert harness["sent"]["html"] == "WELCOME_HTML"
+    # …but the prod welcome stamp was left untouched.
+    assert harness["stamps"] == []
+    assert res.stamp_preserved is True
+    sent_props = dict(harness["events"])["newsletter.welcome_sent"]
+    assert sent_props["stamp_preserved"] is True
+    assert sent_props["stamped_clerk"] is False
+
+
+def test_forced_send_to_unwelcomed_pro_still_stamps(harness):
+    """The preservation is scoped to an EXISTING stamp. A forced send to a
+    Pro who has never been welcomed still writes the first-time stamp — we
+    only decline to MOVE a stamp that already exists, never to create one."""
+    harness["user"] = _clerk_user(welcome_sent_at=None)
+    res = wd.dispatch_welcome(
+        email="returning@test.local", source="admin", force=True,
+    )
+    assert res.status == "sent"
+    assert res.stamp_preserved is False
+    assert harness["stamps"] == [("welcome", "user_123", harness["stamps"][0][2])]
+    sent_props = dict(harness["events"])["newsletter.welcome_sent"]
+    assert sent_props["stamp_preserved"] is False
+    assert sent_props["stamped_clerk"] is True
