@@ -32,6 +32,7 @@ def _cand(lid, rank=50.0, zone="el-tunco"):
         "listing_id": lid, "source": src, "source_id": sid,
         "rank": rank, "rank_score": rank, "zone": zone,
         "area_m2": 1500.0, "price_usd": 200000.0, "palette_suggested": "ink",
+        "hero_photo_quality_score": 100,
     }
 
 
@@ -186,3 +187,34 @@ def test_every_generated_item_carries_a_comment():
     for it in added:
         assert it.get("comment"), "every autopilot item needs a first comment"
         assert "#" in it["comment"], "comment must carry hashtags"
+
+
+# ── photo-quality gate (brand safety) ─────────────────────────────────
+
+def test_pick_candidate_quality_gate_beats_rank():
+    cands = [
+        {"listing_id": "a__1", "hero_photo_quality_score": 80, "rank": 99},   # bad photo, top rank
+        {"listing_id": "a__2", "hero_photo_quality_score": 100, "rank": 40},  # clean photo
+    ]
+    # The quality floor excludes the 80 (Google-Maps/billboard class) even
+    # though it out-ranks the clean one.
+    assert _pick_candidate(cands, set())["listing_id"] == "a__2"
+
+
+def test_pick_candidate_never_strands_when_no_top_quality():
+    cands = [{"listing_id": "a__1", "hero_photo_quality_score": 80, "rank": 99}]
+    assert _pick_candidate(cands, set())["listing_id"] == "a__1"
+
+
+def test_generated_week_all_top_quality():
+    # every autopilot pick from a mixed pool has a top-quality photo
+    good = [_cand(f"g__{i}", rank=90 - i) for i in range(10)]           # q=100
+    bad = [{**_cand(f"b__{i}", rank=100), "hero_photo_quality_score": 80} for i in range(3)]
+    pool = bad + good
+    added = topup(
+        {"items": []}, pool, {c["listing_id"]: {} for c in pool},
+        now=NOW, lookahead=5, cadence_days=1, assets_root=Path("/tmp/x"),
+        skip_render=True, poster_renderer=_fake_render, caption_generator=_fake_caption,
+    )
+    for it in added:
+        assert not it["primary_listing_id"].startswith("b__"), "bad-photo listing leaked in"
