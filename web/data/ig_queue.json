@@ -693,6 +693,37 @@
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
+    },
+    {
+      "day": 100,
+      "shelf": "announce_intro_1",
+      "selector": "manual:announcement",
+      "poster_type": "typo_max",
+      "palette": "cream",
+      "scheduled_for": "2026-07-06T00:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/announce_01",
+      "poster_path": "web/data/ig_assets/announce_01/slide1_hook.png",
+      "poster_overrides": {
+        "eyebrow": "EL SALVADOR",
+        "hook": "Todos los terrenos de El Salvador,",
+        "hero": "rankeados.",
+        "punch": "Cada semana.",
+        "price": "pulpo.club",
+        "loc": "link en bio"
+      },
+      "caption": "**Todos los terrenos de El Salvador, rankeados cada semana.**\n\nUn solo lugar para ver lo que de verdad vale la pena. Sin listas infinitas.\n\npulpo.club · link en bio",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/announce_01/slide2_how.png"
+      ],
+      "listing_ids": [],
+      "primary_listing_id": null,
+      "status": "approved",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
