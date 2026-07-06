@@ -270,7 +270,8 @@ def test_publish_item_full_flow_mutates_item():
     assert client.create_carousel.call_count == 1
     children = client.create_carousel.call_args[0][0]
     assert len(children) == 3
-    assert client.create_carousel.call_args[0][1] == "**Caption.**"
+    # Markdown bold markers are stripped for the plain-text IG caption.
+    assert client.create_carousel.call_args[0][1] == "Caption."
     # Published once
     assert client.publish.call_count == 1
     # Waiter called for each child + once for the carousel = 4 calls
@@ -529,3 +530,44 @@ def test_ig_client_extract_id_raises_on_missing_id():
     r.json.return_value = {"weird": "shape"}
     with pytest.raises(IgApiError, match="no id"):
         IgClient._extract_id(r, ctx="upload")
+
+
+# ── caption sanitizer (bold markers must not leak to IG) ─────────────
+
+def test_caption_for_ig_strips_bold_markers():
+    from automation.ig_publish import _caption_for_ig
+    stored = (
+        "**Todos los terrenos de El Salvador, rankeados cada semana.**\n\n"
+        "Un solo lugar para ver lo que de verdad vale la pena.\n\n"
+        "pulpo.club · link en bio"
+    )
+    out = _caption_for_ig(stored)
+    assert "**" not in out
+    assert out.startswith("Todos los terrenos")
+    # body + CTA preserved verbatim
+    assert "pulpo.club · link en bio" in out
+    assert "de verdad vale la pena" in out
+
+
+def test_caption_for_ig_leaves_single_asterisk_alone():
+    from automation.ig_publish import _caption_for_ig
+    assert _caption_for_ig("3 * 4 metros") == "3 * 4 metros"
+
+
+def test_publish_item_sends_clean_caption(monkeypatch):
+    """The caption handed to create_carousel carries no `**`."""
+    from automation import ig_publish
+    client = MagicMock()
+    client.upload_carousel_item.side_effect = ["c1", "c2"]
+    client.create_carousel.return_value = "car1"
+    client.publish.return_value = "media123"
+    item = {
+        "day": 100,
+        "caption": "**Bold hook.**\n\nbody.",
+        "poster_path": "web/data/ig_assets/x/slide1.png",
+        "carousel_photo_paths": ["web/data/ig_assets/x/slide2.png"],
+    }
+    ig_publish.publish_item(client, item, "https://pulpo.club", waiter=lambda *_: None)
+    sent_caption = client.create_carousel.call_args.args[1]
+    assert "**" not in sent_caption
+    assert sent_caption.startswith("Bold hook.")

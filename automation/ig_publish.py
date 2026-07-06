@@ -98,6 +98,21 @@ def _public_url(local_path: str, base_url: str) -> str:
     return base_url.rstrip("/") + stripped
 
 
+def _caption_for_ig(caption: str) -> str:
+    """Strip the ``**bold**`` markdown markers before the caption reaches
+    the Graph API.
+
+    Instagram captions are PLAIN TEXT — they do not render markdown, so a
+    stored ``**hook**`` shows the literal asterisks in the published post.
+    We keep the markers in the stored/queued caption because the admin
+    review UI (`_renderCaption` in IgReviewWidget) renders them as real
+    bold for preview; this function is the wire-level transform that makes
+    the public caption clean.  Only ``**`` is used by ig_caption.py, so
+    that's all we strip (single ``*`` is left alone — it can be a literal
+    asterisk in copy)."""
+    return caption.replace("**", "")
+
+
 def _slide_urls(item: dict, base_url: str) -> list[str]:
     """Poster first, then carousel photos.  Hard-cap at 10 slides
     (Instagram carousel max)."""
@@ -324,7 +339,9 @@ def publish_item(
         waiter(client, cid)
 
     # Step 4: create the carousel container with the caption.
-    caption = (item.get("caption") or "").strip()
+    # Strip markdown: IG captions are plain text, so `**bold**` would
+    # otherwise publish with literal asterisks (the admin UI keeps them).
+    caption = _caption_for_ig((item.get("caption") or "").strip())
     carousel_id = client.create_carousel(children, caption)
     print(f"  carousel container created → {carousel_id}")
 
