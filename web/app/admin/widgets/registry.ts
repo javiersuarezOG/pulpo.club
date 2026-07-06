@@ -59,7 +59,7 @@ export const ADMIN_WIDGETS: readonly AdminWidget[] = [
     slug: "ig",
     label: "Instagram console",
     description:
-      "Monitor for the self-running Instagram autopilot: the next post about to auto-publish, the upcoming queue, and a real activity log of what was posted (posted / failed). Posts go out on their own every 2 days — your only lever is Skip.",
+      "Monitor for the self-running Instagram autopilot: the next post about to auto-publish, the upcoming queue, and a real activity log of what was posted (posted / failed). Posts go out on their own daily — your only lever is Skip.",
     category: "comms",
     Component: IgConsoleWidget,
     Preview: IgConsolePreview,

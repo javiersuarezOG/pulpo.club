@@ -48,7 +48,7 @@ def _fake_caption(candidate, listing, *, poster_type=None, client=None, override
     return f"**{candidate['area_m2']:.0f} m2 en {candidate['zone']}.**\n\npulpo.club · link en bio"
 
 
-def _run(queue, lookahead=4, cadence=2):
+def _run(queue, lookahead=4, cadence=1):
     return topup(
         queue, CANDS, RANKED_INDEX, now=NOW, lookahead=lookahead, cadence_days=cadence,
         assets_root=Path("/tmp/x"), skip_render=True,
@@ -101,12 +101,17 @@ def test_showcase_slide1_is_listing_brand_slide2_is_listing():
 
 # ── scheduling + dedup ────────────────────────────────────────────────
 
-def test_two_day_spacing_and_future_only():
-    added = _run({"items": []}, lookahead=3, cadence=2)
+def test_cadence_spacing_and_future_only():
+    # daily (default) spacing
+    added = _run({"items": []}, lookahead=3)
     days = [datetime.fromisoformat(it["scheduled_for"]).date() for it in added]
-    assert (days[1] - days[0]).days == 2
-    assert (days[2] - days[1]).days == 2
+    assert (days[1] - days[0]).days == 1
+    assert (days[2] - days[1]).days == 1
     assert all(datetime.fromisoformat(it["scheduled_for"]) > NOW for it in added)
+    # cadence is parameterized — still honors a wider spacing
+    wide = _run({"items": []}, lookahead=2, cadence=3)
+    wdays = [datetime.fromisoformat(it["scheduled_for"]).date() for it in wide]
+    assert (wdays[1] - wdays[0]).days == 3
 
 
 def test_does_not_refeature_recent_listings():

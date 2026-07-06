@@ -79,7 +79,7 @@ jobs:
         env:
           LOOKAHEAD: ${{ github.event.inputs.lookahead || '3' }}
         run: |
-          python3 -m automation.ig_autopilot --lookahead "$LOOKAHEAD" --cadence-days 2
+          python3 -m automation.ig_autopilot --lookahead "$LOOKAHEAD" --cadence-days 1
 
       - name: Commit queue + rendered posters
         if: github.event.inputs.dry_run != 'true'
