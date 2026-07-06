@@ -240,6 +240,20 @@ class IgClient:
         )
         return self._extract_id(r, ctx="publish")
 
+    def post_comment(self, media_id: str, message: str) -> str:
+        """Post the first comment on a published media.  Requires the
+        token to carry the `instagram_manage_comments` scope (the
+        content-publish scope alone is NOT enough — see ig_token_helper).
+        Returns the comment id."""
+        r = self._client.post(
+            f"{GRAPH_BASE}/{media_id}/comments",
+            params={
+                "message":      message,
+                "access_token": self.access_token,
+            },
+        )
+        return self._extract_id(r, ctx="post_comment")
+
     def container_status(self, container_id: str) -> str:
         """Graph returns one of {IN_PROGRESS, FINISHED, ERROR, PUBLISHED,
         EXPIRED}.  Used by wait_for_ready below."""
@@ -355,6 +369,26 @@ def publish_item(
     item["posted"] = True
     item["posted_at"] = datetime.now(timezone.utc).isoformat()
     item["posted_media_id"] = media_id
+
+    # Step 7 (best-effort): post the first comment — the full listing spec
+    # + discovery hashtags.  A comment failure (e.g. token missing the
+    # instagram_manage_comments scope) must NOT fail the post, which is
+    # already live; we record the outcome on the item and move on.
+    comment = (item.get("comment") or "").strip()
+    if comment:
+        try:
+            comment_id = client.post_comment(media_id, comment)
+            item["comment_posted"] = True
+            item["comment_id"] = comment_id
+            print(f"  first comment posted → {comment_id}")
+        except IgApiError as e:
+            item["comment_posted"] = False
+            item["comment_error"] = str(e)[:300]
+            print(
+                f"  WARN first comment failed (post is live): {e} — "
+                f"token may need the instagram_manage_comments scope",
+                file=sys.stderr,
+            )
     return item
 
 
