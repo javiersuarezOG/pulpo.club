@@ -21,7 +21,7 @@ surface ig_queue_builder uses — without the selector/plan machinery.
 Renderers are injectable so tests run offline with skip_render.
 
 CLI (run by .github/workflows/ig-autopilot.yml on a daily cron):
-    python3 -m automation.ig_autopilot --lookahead 3 --cadence-days 1
+    python3 -m automation.ig_autopilot --lookahead 7 --cadence-days 1
 
 Autopilot NEVER flips IG_PAUSED and NEVER posts — it only queues.
 Posting stays with the publisher cron, which the operator gates with
@@ -179,11 +179,26 @@ def _next_slot(items: list, now: datetime, cadence_days: int) -> datetime:
     return nxt.replace(hour=DEFAULT_PUBLISH_HOUR_UTC, minute=0, second=0, microsecond=0)
 
 
+# Hero-photo quality floor. Brand-safety + quality gate: the photo-gate
+# (ig_photo_gate) filters broker watermarks but NOT Google-Maps satellite
+# screenshots or third-party billboards in the scene. Empirically those
+# score BELOW 100 on hero_photo_quality_score (a Google-Maps screenshot
+# scored 80, a Davivienda-billboard shot 90) while clean land photos score
+# 100. Gating to 100 keeps the autonomous feed brand-safe without a
+# per-listing blocklist. The human Skip in /admin/ig is the backstop for
+# anything that still slips through.
+MIN_PHOTO_QUALITY = 100
+
+
 def _pick_candidate(candidates: list, used: set) -> Optional[dict]:
-    """Highest-rank photo-gated candidate not featured recently."""
-    pool = [c for c in candidates if c.get("listing_id") not in used]
-    if not pool:
-        pool = candidates[:]   # everyone's been used recently → allow repeats
+    """Highest-rank candidate with a top-quality hero photo, not featured
+    recently."""
+    quality = [
+        c for c in candidates
+        if (c.get("hero_photo_quality_score") or 0) >= MIN_PHOTO_QUALITY
+    ]
+    base = quality or candidates          # never strand the generator
+    pool = [c for c in base if c.get("listing_id") not in used] or base
     if not pool:
         return None
     return max(pool, key=lambda c: c.get("rank_score") or c.get("rank") or 0)
@@ -387,7 +402,7 @@ def main(argv: Optional[list] = None) -> int:
     p.add_argument("--candidates", type=Path, default=DEFAULT_CANDIDATES)
     p.add_argument("--ranked", type=Path, default=DEFAULT_RANKED)
     p.add_argument("--assets-root", type=Path, default=DEFAULT_ASSETS_ROOT)
-    p.add_argument("--lookahead", type=int, default=3, help="Keep this many future posts queued.")
+    p.add_argument("--lookahead", type=int, default=7, help="Keep this many future posts queued (a week at daily cadence).")
     p.add_argument("--cadence-days", type=int, default=1)
     p.add_argument("--skip-render", action="store_true", help="Skip Playwright (queue only).")
     p.add_argument("--now", default=None, help="ISO 'now' override (tests).")

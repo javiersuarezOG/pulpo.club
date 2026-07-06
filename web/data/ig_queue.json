@@ -170,6 +170,87 @@
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
+    },
+    {
+      "day": 105,
+      "shelf": "autopilot_brand",
+      "selector": "autopilot",
+      "poster_type": "typo_max",
+      "palette": "paper",
+      "scheduled_for": "2026-07-11T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d105__brand",
+      "poster_path": "web/data/ig_assets/autopilot/d105__brand/poster_typo_max_cream.png",
+      "poster_overrides": {},
+      "caption": "**Cada domingo, los mejores terrenos en tu correo.**\n\nGratis. Un resumen tranquilo de lo mejor de la semana, sin prisa.\n\npulpo.club · link en bio",
+      "comment": "3,000 m² en La Libertad.\n$160,000 · $53.33/m²\nA 670 m del mar.\n\nLos mejores terrenos de El Salvador, rankeados cada semana.\nTodos los detalles en pulpo.club — link en bio.\n\n#ElSalvador #Terrenos #BienesRaices #TerrenosEnElSalvador #InvertirEnElSalvador #InversionInmobiliaria #TerrenoEnVenta #SurfCity #LaLibertad #PlayasDeElSalvador #SalvadorenosPorElMundo #BitcoinCountry",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d105__brand/poster_sticker_paper.png"
+      ],
+      "listing_ids": [
+        "bienesraices__2258"
+      ],
+      "primary_listing_id": "bienesraices__2258",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 106,
+      "shelf": "autopilot_showcase",
+      "selector": "autopilot",
+      "poster_type": "sticker",
+      "palette": "ink",
+      "scheduled_for": "2026-07-12T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d106__showcase",
+      "poster_path": "web/data/ig_assets/autopilot/d106__showcase/poster_sticker_ink.png",
+      "poster_overrides": {},
+      "caption": "**3,204 m² en El Tunco.**\n\n3,204 m² en El Tunco, sin construir.\n\n$550,000 · a 0 m del mar\n\npulpo.club · listing N° 065",
+      "comment": "3,204 m² en El Tunco.\n$550,000 · $171.67/m²\nFrente al mar.\n\nLos mejores terrenos de El Salvador, rankeados cada semana.\nTodos los detalles en pulpo.club — link en bio.\n\n#ElSalvador #Terrenos #BienesRaices #TerrenosEnElSalvador #InvertirEnElSalvador #InversionInmobiliaria #TerrenoEnVenta #SurfCity #ElTunco #PlayasDeElSalvador #SalvadorenosPorElMundo #BitcoinCountry",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/photos/bienesraices_2135.hero.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__2135"
+      ],
+      "primary_listing_id": "bienesraices__2135",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 107,
+      "shelf": "autopilot_brand",
+      "selector": "autopilot",
+      "poster_type": "typo_max",
+      "palette": "ink",
+      "scheduled_for": "2026-07-13T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d107__brand",
+      "poster_path": "web/data/ig_assets/autopilot/d107__brand/poster_typo_max_cream.png",
+      "poster_overrides": {},
+      "caption": "**Todos los terrenos de El Salvador, rankeados cada semana.**\n\nUn solo lugar para ver lo que de verdad vale la pena. Sin listas infinitas.\n\npulpo.club · link en bio",
+      "comment": "32,000 m² en El Zonte.\n$3.2M · $100.16/m²\nFrente al mar.\n\nLos mejores terrenos de El Salvador, rankeados cada semana.\nTodos los detalles en pulpo.club — link en bio.\n\n#ElSalvador #Terrenos #BienesRaices #TerrenosEnElSalvador #InvertirEnElSalvador #InversionInmobiliaria #TerrenoEnVenta #SurfCity #ElZonte #PlayasDeElSalvador #SalvadorenosPorElMundo #BitcoinCountry",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d107__brand/poster_sticker_ink.png"
+      ],
+      "listing_ids": [
+        "bienesraices__2296"
+      ],
+      "primary_listing_id": "bienesraices__2296",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }

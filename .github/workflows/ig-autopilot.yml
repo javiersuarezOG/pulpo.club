@@ -27,7 +27,7 @@ on:
       lookahead:
         description: 'Keep this many future posts queued'
         required: false
-        default: '3'
+        default: '7'
       dry_run:
         description: 'Generate + log without committing'
         required: false
@@ -77,7 +77,7 @@ jobs:
 
       - name: Top up the queue
         env:
-          LOOKAHEAD: ${{ github.event.inputs.lookahead || '3' }}
+          LOOKAHEAD: ${{ github.event.inputs.lookahead || '7' }}
         run: |
           python3 -m automation.ig_autopilot --lookahead "$LOOKAHEAD" --cadence-days 1
 
