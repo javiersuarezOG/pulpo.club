@@ -721,9 +721,9 @@
       "primary_listing_id": null,
       "status": "approved",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-07-06T08:26:42.386342+00:00",
+      "posted_media_id": "17874500610528882"
     }
   ]
 }
