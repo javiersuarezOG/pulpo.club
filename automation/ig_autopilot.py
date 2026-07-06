@@ -189,6 +189,72 @@ def _pick_candidate(candidates: list, used: set) -> Optional[dict]:
     return max(pool, key=lambda c: c.get("rank_score") or c.get("rank") or 0)
 
 
+# ── first comment (posted under each post) ────────────────────────────
+#
+# IG feed captions stay clean/editorial; the discovery hashtags + the full
+# listing spec live in the FIRST COMMENT so the caption reads well and the
+# comment carries everything the post is about.  `_C` (no-space country)
+# keeps country hashtags off the check_country_hardcodes.py radar and lets
+# them follow the manifest.
+
+_C = _COUNTRY.replace(" ", "")
+
+_CORE_HASHTAGS: tuple[str, ...] = (
+    f"#{_C}", "#Terrenos", "#BienesRaices", f"#TerrenosEn{_C}",
+    f"#InvertirEn{_C}", "#InversionInmobiliaria", "#TerrenoEnVenta",
+    "#SurfCity", f"#PlayasDe{_C}", "#SalvadorenosPorElMundo", "#BitcoinCountry",
+)
+
+
+def _zone_title(zone: Optional[str]) -> str:
+    """"el-tunco" → "El Tunco"."""
+    if not zone:
+        return _COUNTRY
+    return " ".join(w.capitalize() for w in str(zone).replace("_", "-").split("-"))
+
+
+def _zone_hashtag(zone: Optional[str]) -> str:
+    if not zone:
+        return ""
+    return "#" + "".join(w.capitalize() for w in str(zone).replace("_", "-").split("-"))
+
+
+def build_comment(candidate: dict, listing: dict) -> str:
+    """The first comment for a post — references ALL the post's info
+    (size, location, price, price/m², distance to sea) + the CTA +
+    discovery hashtags.  Kept out of the caption so the caption stays
+    clean; this is what the publisher posts as comment #1."""
+    from automation.ig_units import (
+        format_area_m2, format_price_usd, format_price_per_m2, format_distance,
+    )
+    zone = _zone_title(candidate.get("zone"))
+    lines = [f"{format_area_m2(candidate.get('area_m2'))} en {zone}."]
+
+    spec = f"{format_price_usd(candidate.get('price_usd'))}"
+    ppm = candidate.get("price_per_m2")
+    if ppm is not None:
+        spec += f" · {format_price_per_m2(ppm)}"
+    lines.append(spec)
+
+    dist = candidate.get("dist_beach_km")
+    if dist is not None:
+        lines.append("Frente al mar." if dist <= 0.05 else f"A {format_distance(dist)} del mar.")
+
+    lines += [
+        "",
+        f"Los mejores terrenos de {_COUNTRY}, rankeados cada semana.",
+        "Todos los detalles en pulpo.club — link en bio.",
+        "",
+    ]
+
+    tags = list(_CORE_HASHTAGS)
+    zt = _zone_hashtag(candidate.get("zone"))
+    if zt and zt not in tags:
+        tags.insert(8, zt)
+    lines.append(" ".join(tags))
+    return "\n".join(lines)
+
+
 # ── item construction ─────────────────────────────────────────────────
 
 def build_item(
@@ -249,6 +315,7 @@ def build_item(
         "poster_path": poster_path,
         "poster_overrides": {},
         "caption": caption,
+        "comment": build_comment(candidate, listing),
         "lint_violations": violations,
         "caption_status": "clean" if not violations else "lint_failed",
         "carousel_photo_paths": carousel,

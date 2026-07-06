@@ -148,3 +148,36 @@ def test_skipped_items_dont_count_as_future():
 def test_next_day_increments():
     assert _next_day([]) == 101
     assert _next_day([{"day": 105}, {"day": 100}]) == 106
+
+
+# ── first comment (references all post info + hashtags) ───────────────
+
+def test_build_comment_references_all_info_and_hashtags():
+    from automation.ig_autopilot import build_comment
+    c = {"zone": "el-tunco", "area_m2": 1580.9, "price_usd": 225000.0,
+         "price_per_m2": 142.32, "dist_beach_km": 0.0}
+    out = build_comment(c, {})
+    assert "El Tunco" in out                 # location
+    assert "m²" in out                        # size
+    assert "$225,000" in out                  # price
+    assert "/m²" in out                       # price per m2
+    assert "Frente al mar" in out             # coastal distance
+    assert "pulpo.club" in out                # CTA
+    assert "#Terrenos" in out                 # core hashtag
+    assert "#ElTunco" in out                  # zone-specific hashtag
+
+
+def test_build_comment_inland_shows_distance():
+    from automation.ig_autopilot import build_comment
+    c = {"zone": "chalchuapa", "area_m2": 5000.0, "price_usd": 90000.0,
+         "price_per_m2": 18.0, "dist_beach_km": 51.5}
+    out = build_comment(c, {})
+    assert "del mar" in out and "Frente al mar" not in out
+    assert "#Chalchuapa" in out
+
+
+def test_every_generated_item_carries_a_comment():
+    added = _run({"items": []}, lookahead=4)
+    for it in added:
+        assert it.get("comment"), "every autopilot item needs a first comment"
+        assert "#" in it["comment"], "comment must carry hashtags"

@@ -637,3 +637,46 @@ def test_run_publish_appends_failure_to_attempt_log(pub):
     assert len(attempts) == 1
     assert attempts[0]["status"] == "failed"
     assert "boom" in attempts[0]["error"]
+
+
+# ── first comment posting (best-effort) ───────────────────────────────
+
+def test_publish_item_posts_first_comment():
+    from automation import ig_publish
+    client = MagicMock()
+    client.upload_carousel_item.side_effect = ["c1", "c2"]
+    client.create_carousel.return_value = "car1"
+    client.publish.return_value = "media123"
+    client.post_comment.return_value = "cmt1"
+    item = {
+        "day": 101, "caption": "**Hook.**\n\nbody.",
+        "comment": "1,581 m² en El Tunco.\n\n#ElSalvador #ElTunco",
+        "poster_path": "web/data/ig_assets/x/p.png",
+        "carousel_photo_paths": ["web/data/ig_assets/x/s.png"],
+    }
+    ig_publish.publish_item(client, item, "https://pulpo.club", waiter=lambda *_: None)
+    client.post_comment.assert_called_once()
+    assert client.post_comment.call_args.args[0] == "media123"
+    assert "#ElTunco" in client.post_comment.call_args.args[1]
+    assert item["comment_posted"] is True
+    assert item["comment_id"] == "cmt1"
+
+
+def test_comment_failure_does_not_fail_the_post():
+    from automation import ig_publish
+    client = MagicMock()
+    client.upload_carousel_item.side_effect = ["c1", "c2"]
+    client.create_carousel.return_value = "car1"
+    client.publish.return_value = "media123"
+    client.post_comment.side_effect = ig_publish.IgApiError("post_comment", "no scope")
+    item = {
+        "day": 101, "caption": "x", "comment": "hi #ElSalvador",
+        "poster_path": "web/data/ig_assets/x/p.png",
+        "carousel_photo_paths": ["web/data/ig_assets/x/s.png"],
+    }
+    # Must NOT raise — the post is already live.
+    ig_publish.publish_item(client, item, "https://pulpo.club", waiter=lambda *_: None)
+    assert item["posted"] is True
+    assert item["posted_media_id"] == "media123"
+    assert item["comment_posted"] is False
+    assert "no scope" in item["comment_error"]
