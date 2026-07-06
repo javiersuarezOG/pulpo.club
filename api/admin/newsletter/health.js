@@ -172,7 +172,20 @@ module.exports = async (req, res) => {
     // Resolve the family + bucket.
     let famId = null, bucket = null;
     if (event === "newsletter.send_succeeded" || event === "newsletter.send_failed") {
-      famId = (tier === "pro" || tier === "agency") ? "pro-weekly" : "free-weekly";
+      if (tier === "pro" || tier === "agency") {
+        famId = "pro-weekly";
+      } else if (tier === "free" || tier === "anon" || tier === "anonymous") {
+        famId = "free-weekly";
+      } else {
+        // Unknown / missing tier — do NOT silently default to Free. That
+        // bucketed tier-less send_failed events under Free · Weekly and hid
+        // failed Pro campaigns (launch audit P1). Attribute the ambiguous
+        // event to Pro · Weekly so a mis-tagged failure surfaces on the
+        // high-stakes family instead of vanishing. The producer now always
+        // stamps tier (scripts/send_newsletter.py), so this branch is a
+        // belt-and-suspenders for legacy/malformed events only.
+        famId = "pro-weekly";
+      }
       bucket = event === "newsletter.send_failed" ? FAILED : SENT;
     } else {
       const m = EVENT_MAP[event];

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "batch": "drop_01",
+  "batch": "autopilot",
   "computed_at": "2026-05-28T12:48:07.499039+00:00",
   "config": {
     "plan_length": 14,
@@ -33,401 +33,77 @@
   },
   "items": [
     {
-      "day": 1,
-      "shelf": "intro",
-      "selector": "multi:intro",
+      "day": 100,
+      "shelf": "announce_intro_1",
+      "selector": "manual:announcement",
       "poster_type": "typo_max",
       "palette": "cream",
-      "scheduled_for": "2026-05-30T01:00:00+00:00",
-      "assets_dir": "web/data/ig_assets/drop_01/d01__intro",
-      "poster_path": "web/data/ig_assets/drop_01/d01__intro/poster_typo_max_cream.png",
-      "poster_overrides": {},
-      "caption": "**1,581 m² en El Tunco.**\n\n1,581 m² en El Tunco, con vista al océano.\n\n$225,000 · a 0 m del mar\n\npulpo.club · listing N° 015",
+      "scheduled_for": "2026-07-06T00:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/announce_01",
+      "poster_path": "web/data/ig_assets/announce_01/slide1_hook.png",
+      "poster_overrides": {
+        "eyebrow": "EL SALVADOR",
+        "hook": "Todos los terrenos de El Salvador,",
+        "hero": "rankeados.",
+        "punch": "Cada semana.",
+        "price": "pulpo.club",
+        "loc": "link en bio"
+      },
+      "caption": "**Todos los terrenos de El Salvador, rankeados cada semana.**\n\nUn solo lugar para ver lo que de verdad vale la pena. Sin listas infinitas.\n\npulpo.club · link en bio",
       "lint_violations": [],
-      "caption_status": "ok",
+      "caption_status": "clean",
       "carousel_photo_paths": [
-        "web/photos/bienesraices_1529.hero.jpg",
-        "web/photos/bienesraices_1586.hero.jpg",
-        "web/photos/citymax_153112.hero.jpg",
-        "web/photos/bienesraices_2191.hero.jpg",
-        "web/photos/bienesraices_1059.hero.jpg",
-        "web/photos/bienesraices_1875.hero.jpg"
+        "web/data/ig_assets/announce_01/slide2_how.png"
       ],
-      "listing_ids": [
-        "bienesraices__1529",
-        "bienesraices__1586",
-        "citymax__153112",
-        "bienesraices__2191",
-        "bienesraices__1059",
-        "bienesraices__1875"
-      ],
-      "primary_listing_id": "bienesraices__1529",
-      "status": "pending",
-      "approved": false,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "listing_ids": [],
+      "primary_listing_id": null,
+      "status": "approved",
+      "approved": true,
+      "posted": true,
+      "posted_at": "2026-07-06T08:26:42.386342+00:00",
+      "posted_media_id": "17874500610528882"
     },
     {
-      "day": 2,
-      "shelf": "top_rank_1",
-      "selector": "by_rank_score",
-      "poster_type": "sticker",
-      "palette": "ink",
-      "scheduled_for": "2026-05-31T01:00:00+00:00",
-      "assets_dir": "web/data/ig_assets/drop_01/d02__top_rank_1",
-      "poster_path": "web/data/ig_assets/drop_01/d02__top_rank_1/poster_sticker_ink.png",
+      "day": 101,
+      "shelf": "autopilot_brand",
+      "selector": "autopilot",
+      "poster_type": "typo_max",
+      "palette": "paper",
+      "scheduled_for": "2026-07-08T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d101__brand",
+      "poster_path": "web/data/ig_assets/autopilot/d101__brand/poster_typo_max_cream.png",
       "poster_overrides": {},
-      "caption": "**1,581 m² en El Tunco.**\n\n1,581 m² en El Tunco, con vista al océano.\n\n$225,000 · a 0 m del mar\n\npulpo.club · listing N° 015",
+      "caption": "**Todos los terrenos de El Salvador, rankeados cada semana.**\n\nUn solo lugar para ver lo que de verdad vale la pena. Sin listas infinitas.\n\npulpo.club · link en bio",
+      "comment": "1,581 m² en El Tunco.\n$225,000 · $142.32/m²\nFrente al mar.\n\nLos mejores terrenos de El Salvador, rankeados cada semana.\nTodos los detalles en pulpo.club — link en bio.\n\n#ElSalvador #Terrenos #BienesRaices #TerrenosEnElSalvador #InvertirEnElSalvador #InversionInmobiliaria #TerrenoEnVenta #SurfCity #ElTunco #PlayasDeElSalvador #SalvadorenosPorElMundo #BitcoinCountry",
       "lint_violations": [],
-      "caption_status": "ok",
+      "caption_status": "clean",
       "carousel_photo_paths": [
-        "web/photos/bienesraices_1529.hero.jpg"
+        "web/data/ig_assets/autopilot/d101__brand/poster_sticker_paper.png"
       ],
       "listing_ids": [
         "bienesraices__1529"
       ],
       "primary_listing_id": "bienesraices__1529",
-      "status": "pending",
-      "approved": false,
+      "status": "scheduled",
+      "approved": true,
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
     },
     {
-      "day": 3,
-      "shelf": "bargain_1",
-      "selector": "by_bargain_pct",
-      "poster_type": "post_it",
-      "palette": "paper",
-      "scheduled_for": "2026-06-01T01:00:00+00:00",
-      "assets_dir": "web/data/ig_assets/drop_01/d03__bargain_1",
-      "poster_path": "web/data/ig_assets/drop_01/d03__bargain_1/poster_post_it_paper.png",
-      "poster_overrides": {},
-      "caption": "**El tentáculo de Chalchuapa encontró esto. −98% vs su zona.**\n\n77,000 m² en Chalchuapa, sin construir.\n\n$308,000 · a 51.5 km del mar\n\npulpo.club · listing N° 345",
-      "lint_violations": [],
-      "caption_status": "ok",
-      "carousel_photo_paths": [
-        "web/photos/bienesraices_1586.hero.jpg"
-      ],
-      "listing_ids": [
-        "bienesraices__1586"
-      ],
-      "primary_listing_id": "bienesraices__1586",
-      "status": "pending",
-      "approved": false,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
-    },
-    {
-      "day": 4,
-      "shelf": "top5_zone_surf_city",
-      "selector": "top5_zone:surf_city",
-      "poster_type": "receipt",
-      "palette": "cream",
-      "scheduled_for": "2026-06-02T01:00:00+00:00",
-      "assets_dir": "web/data/ig_assets/drop_01/d04__top5_zone_surf_city",
-      "poster_path": "web/data/ig_assets/drop_01/d04__top5_zone_surf_city/poster_receipt_cream.png",
-      "poster_overrides": {
-        "title": "Top5 Zone Surf City",
-        "subtitle": "5 TERRENOS · CURADOS POR RANKING",
-        "brand": "PULPO · TOP 5",
-        "items": [
-          {
-            "n": "01",
-            "desc": "El Tunco",
-            "sub": "1,580 m²",
-            "price": "$225K"
-          },
-          {
-            "n": "02",
-            "desc": "El Tunco",
-            "sub": "1,412 m²",
-            "price": "$230K"
-          },
-          {
-            "n": "03",
-            "desc": "El Zonte",
-            "sub": "36,595 m²",
-            "price": "$2.9M"
-          },
-          {
-            "n": "04",
-            "desc": "La Libertad",
-            "sub": "23,000 m²",
-            "price": "$550K"
-          },
-          {
-            "n": "05",
-            "desc": "La Libertad",
-            "sub": "31,450 m²",
-            "price": "$1.5M"
-          }
-        ],
-        "totals": [
-          {
-            "label": "RANGO",
-            "value": "$225K — $2.9M"
-          },
-          {
-            "label": "5 ITEMS",
-            "value": "CURADO"
-          }
-        ],
-        "footer": "pulpo.club · top5 zone surf city"
-      },
-      "caption": "**Cinco terrenos. Los cinco mejor rankeados de su banda esta semana.**\n\n1,581 m² en El Tunco, con vista al océano.\n\npulpo.club · link en bio",
-      "lint_violations": [],
-      "caption_status": "ok",
-      "carousel_photo_paths": [
-        "web/photos/bienesraices_1529.hero.jpg",
-        "web/photos/bienesraices_1783.hero.jpg",
-        "web/photos/bienesraices_1875.hero.jpg",
-        "web/photos/bienesraices_2191.hero.jpg",
-        "web/photos/bienesraices_2315.hero.jpg"
-      ],
-      "listing_ids": [
-        "bienesraices__1529",
-        "bienesraices__1783",
-        "bienesraices__1875",
-        "bienesraices__2191",
-        "bienesraices__2315"
-      ],
-      "primary_listing_id": "bienesraices__1529",
-      "status": "pending",
-      "approved": false,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
-    },
-    {
-      "day": 5,
-      "shelf": "diversify_oriente",
-      "selector": "diversify_region:oriente",
-      "poster_type": "typo_max",
-      "palette": "ink",
-      "scheduled_for": "2026-06-03T01:00:00+00:00",
-      "assets_dir": "web/data/ig_assets/drop_01/d05__diversify_oriente",
-      "poster_path": "web/data/ig_assets/drop_01/d05__diversify_oriente/poster_typo_max_ink.png",
-      "poster_overrides": {},
-      "caption": "**210,000 m² en El Cuco.**\n\n210,000 m² en El Cuco, sin construir.\n\n$2.5M · a 0 m del mar\n\npulpo.club · listing N° 049",
-      "lint_violations": [],
-      "caption_status": "ok",
-      "carousel_photo_paths": [
-        "web/photos/bienesraices_1059.hero.jpg"
-      ],
-      "listing_ids": [
-        "bienesraices__1059"
-      ],
-      "primary_listing_id": "bienesraices__1059",
-      "status": "pending",
-      "approved": false,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
-    },
-    {
-      "day": 6,
-      "shelf": "top5_band_below_300k",
-      "selector": "top5_band:0-300000",
-      "poster_type": "receipt",
-      "palette": "ink",
-      "scheduled_for": "2026-06-04T01:00:00+00:00",
-      "assets_dir": "web/data/ig_assets/drop_01/d06__top5_band_below_300k",
-      "poster_path": "web/data/ig_assets/drop_01/d06__top5_band_below_300k/poster_receipt_ink.png",
-      "poster_overrides": {
-        "title": "Top5 Band Below 300K",
-        "subtitle": "5 TERRENOS · CURADOS POR RANKING",
-        "brand": "PULPO · TOP 5",
-        "items": [
-          {
-            "n": "01",
-            "desc": "El Tunco",
-            "sub": "1,580 m²",
-            "price": "$225K"
-          },
-          {
-            "n": "02",
-            "desc": "El Tunco",
-            "sub": "1,412 m²",
-            "price": "$230K"
-          },
-          {
-            "n": "03",
-            "desc": "La Libertad",
-            "sub": "3,000 m²",
-            "price": "$160K"
-          },
-          {
-            "n": "04",
-            "desc": "La Libertad",
-            "sub": "1,083 m²",
-            "price": "$40K"
-          },
-          {
-            "n": "05",
-            "desc": "La Libertad",
-            "sub": "200 m²",
-            "price": "$22K"
-          }
-        ],
-        "totals": [
-          {
-            "label": "RANGO",
-            "value": "$22K — $230K"
-          },
-          {
-            "label": "5 ITEMS",
-            "value": "CURADO"
-          }
-        ],
-        "footer": "pulpo.club · top5 band below 300k"
-      },
-      "caption": "**Cinco terrenos. Los cinco mejor rankeados de su banda esta semana.**\n\n1,581 m² en El Tunco, con vista al océano.\n\npulpo.club · link en bio",
-      "lint_violations": [],
-      "caption_status": "ok",
-      "carousel_photo_paths": [
-        "web/photos/bienesraices_1529.hero.jpg",
-        "web/photos/bienesraices_1783.hero.jpg",
-        "web/photos/bienesraices_2258.hero.jpg",
-        "web/photos/bienesraices_1630.hero.jpg",
-        "web/photos/bienesraices_2101.hero.jpg"
-      ],
-      "listing_ids": [
-        "bienesraices__1529",
-        "bienesraices__1783",
-        "bienesraices__2258",
-        "bienesraices__1630",
-        "bienesraices__2101"
-      ],
-      "primary_listing_id": "bienesraices__1529",
-      "status": "pending",
-      "approved": false,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
-    },
-    {
-      "day": 7,
-      "shelf": "best_ppm",
-      "selector": "by_ppm_in_surf_city",
-      "poster_type": "big_number",
-      "palette": "gold",
-      "scheduled_for": "2026-06-05T01:00:00+00:00",
-      "assets_dir": "web/data/ig_assets/drop_01/d07__best_ppm",
-      "poster_path": "web/data/ig_assets/drop_01/d07__best_ppm/poster_big_number_gold.png",
-      "poster_overrides": {},
-      "caption": "**$23.91/m² por metro cuadrado en La Libertad.**\n\n23,000 m² en La Libertad, sin construir.\n\n$550,000 · a 25.9 km del mar\n\npulpo.club · listing N° 045",
-      "lint_violations": [],
-      "caption_status": "ok",
-      "carousel_photo_paths": [
-        "web/photos/bienesraices_2191.hero.jpg"
-      ],
-      "listing_ids": [
-        "bienesraices__2191"
-      ],
-      "primary_listing_id": "bienesraices__2191",
-      "status": "pending",
-      "approved": false,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
-    },
-    {
-      "day": 8,
-      "shelf": "top5_band_300_500k",
-      "selector": "top5_band:300000-500000",
-      "poster_type": "receipt",
-      "palette": "cream",
-      "scheduled_for": "2026-06-06T01:00:00+00:00",
-      "assets_dir": "web/data/ig_assets/drop_01/d08__top5_band_300_500k",
-      "poster_path": "web/data/ig_assets/drop_01/d08__top5_band_300_500k/poster_receipt_cream.png",
-      "poster_overrides": {
-        "title": "Top5 Band 300 500K",
-        "subtitle": "5 TERRENOS · CURADOS POR RANKING",
-        "brand": "PULPO · TOP 5",
-        "items": [
-          {
-            "n": "01",
-            "desc": "Santa Ana",
-            "sub": "13,978 m²",
-            "price": "$300K"
-          },
-          {
-            "n": "02",
-            "desc": "San Jose Villanueva",
-            "sub": "7,000 m²",
-            "price": "$340K"
-          },
-          {
-            "n": "03",
-            "desc": "Punta Mango",
-            "sub": "1,829 m²",
-            "price": "$300K"
-          },
-          {
-            "n": "04",
-            "desc": "La Libertad",
-            "sub": "2,563 m²",
-            "price": "$461K"
-          },
-          {
-            "n": "05",
-            "desc": "El Tunco",
-            "sub": "1,324 m²",
-            "price": "$372K"
-          }
-        ],
-        "totals": [
-          {
-            "label": "RANGO",
-            "value": "$300K — $461K"
-          },
-          {
-            "label": "5 ITEMS",
-            "value": "CURADO"
-          }
-        ],
-        "footer": "pulpo.club · top5 band 300 500k"
-      },
-      "caption": "**Cinco terrenos. Los cinco mejor rankeados de su banda esta semana.**\n\n14,000 m² en Santa Ana, frente al agua.\n\npulpo.club · link en bio",
-      "lint_violations": [],
-      "caption_status": "ok",
-      "carousel_photo_paths": [
-        "web/photos/bienesraices_2021.hero.jpg",
-        "web/photos/bienesraices_1244.hero.jpg",
-        "web/photos/bienesraices_1580.hero.jpg",
-        "web/photos/bienesraices_1817.hero.jpg",
-        "web/photos/bienesraices_2029.hero.jpg"
-      ],
-      "listing_ids": [
-        "bienesraices__2021",
-        "bienesraices__1244",
-        "bienesraices__1580",
-        "bienesraices__1817",
-        "bienesraices__2029"
-      ],
-      "primary_listing_id": "bienesraices__2021",
-      "status": "pending",
-      "approved": false,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
-    },
-    {
-      "day": 9,
-      "shelf": "top_rank_2",
-      "selector": "by_rank_score",
+      "day": 102,
+      "shelf": "autopilot_showcase",
+      "selector": "autopilot",
       "poster_type": "sticker",
-      "palette": "ink",
-      "scheduled_for": "2026-06-07T01:00:00+00:00",
-      "assets_dir": "web/data/ig_assets/drop_01/d09__top_rank_2",
-      "poster_path": "web/data/ig_assets/drop_01/d09__top_rank_2/poster_sticker_ink.png",
+      "palette": "paper",
+      "scheduled_for": "2026-07-10T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d102__showcase",
+      "poster_path": "web/data/ig_assets/autopilot/d102__showcase/poster_sticker_paper.png",
       "poster_overrides": {},
       "caption": "**1,412 m² en El Tunco.**\n\n1,412 m² en El Tunco, con vista al océano.\n\n$230,000 · a 5.8 km del mar\n\npulpo.club · listing N° 036",
+      "comment": "1,412 m² en El Tunco.\n$230,000 · $162.89/m²\nA 5.8 km del mar.\n\nLos mejores terrenos de El Salvador, rankeados cada semana.\nTodos los detalles en pulpo.club — link en bio.\n\n#ElSalvador #Terrenos #BienesRaices #TerrenosEnElSalvador #InvertirEnElSalvador #InversionInmobiliaria #TerrenoEnVenta #SurfCity #ElTunco #PlayasDeElSalvador #SalvadorenosPorElMundo #BitcoinCountry",
       "lint_violations": [],
-      "caption_status": "ok",
+      "caption_status": "clean",
       "carousel_photo_paths": [
         "web/photos/bienesraices_1783.hero.jpg"
       ],
@@ -435,261 +111,62 @@
         "bienesraices__1783"
       ],
       "primary_listing_id": "bienesraices__1783",
-      "status": "pending",
-      "approved": false,
+      "status": "scheduled",
+      "approved": true,
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
     },
     {
-      "day": 10,
-      "shelf": "top5_band_500k_1m",
-      "selector": "top5_band:500000-1000000",
-      "poster_type": "receipt",
-      "palette": "cream",
-      "scheduled_for": "2026-06-08T01:00:00+00:00",
-      "assets_dir": "web/data/ig_assets/drop_01/d10__top5_band_500k_1m",
-      "poster_path": "web/data/ig_assets/drop_01/d10__top5_band_500k_1m/poster_receipt_cream.png",
-      "poster_overrides": {
-        "title": "Top5 Band 500K 1M",
-        "subtitle": "5 TERRENOS · CURADOS POR RANKING",
-        "brand": "PULPO · TOP 5",
-        "items": [
-          {
-            "n": "01",
-            "desc": "La Libertad",
-            "sub": "23,000 m²",
-            "price": "$550K"
-          },
-          {
-            "n": "02",
-            "desc": "El Tunco",
-            "sub": "3,203 m²",
-            "price": "$550K"
-          },
-          {
-            "n": "03",
-            "desc": "El Cuco",
-            "sub": "48,923 m²",
-            "price": "$830K"
-          },
-          {
-            "n": "04",
-            "desc": "Lago Ilopango",
-            "sub": "237,571 m²",
-            "price": "$600K"
-          },
-          {
-            "n": "05",
-            "desc": "",
-            "sub": "27,955 m²",
-            "price": "$500K"
-          }
-        ],
-        "totals": [
-          {
-            "label": "RANGO",
-            "value": "$500K — $830K"
-          },
-          {
-            "label": "5 ITEMS",
-            "value": "CURADO"
-          }
-        ],
-        "footer": "pulpo.club · top5 band 500k 1m"
-      },
-      "caption": "**Cinco terrenos. Los cinco mejor rankeados de su banda esta semana.**\n\n23,000 m² en La Libertad, sin construir.\n\npulpo.club · link en bio",
-      "lint_violations": [],
-      "caption_status": "ok",
-      "carousel_photo_paths": [
-        "web/photos/bienesraices_2191.hero.jpg",
-        "web/photos/bienesraices_2135.hero.jpg",
-        "web/photos/bienesraices_2007.hero.jpg",
-        "web/photos/citymax_153112.hero.jpg",
-        "web/photos/bienesraices_2201.hero.jpg"
-      ],
-      "listing_ids": [
-        "bienesraices__2191",
-        "bienesraices__2135",
-        "bienesraices__2007",
-        "citymax__153112",
-        "bienesraices__2201"
-      ],
-      "primary_listing_id": "bienesraices__2191",
-      "status": "pending",
-      "approved": false,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
-    },
-    {
-      "day": 11,
-      "shelf": "bargain_2",
-      "selector": "by_bargain_pct",
-      "poster_type": "post_it",
-      "palette": "paper",
-      "scheduled_for": "2026-06-09T01:00:00+00:00",
-      "assets_dir": "web/data/ig_assets/drop_01/d11__bargain_2",
-      "poster_path": "web/data/ig_assets/drop_01/d11__bargain_2/poster_post_it_paper.png",
-      "poster_overrides": {},
-      "caption": "**El tentáculo de Lago Ilopango encontró esto. −97% vs su zona.**\n\n240,000 m² en Lago Ilopango, frente al agua.\n\n$600,000 · a 33.7 km del mar\n\npulpo.club · listing N° 184",
-      "lint_violations": [],
-      "caption_status": "ok",
-      "carousel_photo_paths": [
-        "web/photos/citymax_153112.hero.jpg"
-      ],
-      "listing_ids": [
-        "citymax__153112"
-      ],
-      "primary_listing_id": "citymax__153112",
-      "status": "pending",
-      "approved": false,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
-    },
-    {
-      "day": 12,
-      "shelf": "top5_zone_oriente",
-      "selector": "top5_zone:oriente",
-      "poster_type": "map_mark",
-      "palette": "cream",
-      "scheduled_for": "2026-06-10T01:00:00+00:00",
-      "region": "oriente",
-      "assets_dir": "web/data/ig_assets/drop_01/d12__top5_zone_oriente",
-      "poster_path": "web/data/ig_assets/drop_01/d12__top5_zone_oriente/poster_map_mark_cream.png",
-      "poster_overrides": {
-        "region": "oriente"
-      },
-      "caption": "**El tentáculo de El Cuco esta semana.**\n\n210,000 m² en El Cuco, sin construir.\n\npulpo.club · link en bio",
-      "lint_violations": [],
-      "caption_status": "ok",
-      "carousel_photo_paths": [
-        "web/photos/bienesraices_1059.hero.jpg",
-        "web/photos/bienesraices_1132.hero.jpg",
-        "web/photos/bienesraices_2007.hero.jpg",
-        "web/photos/bienesraices_1580.hero.jpg",
-        "web/photos/bienesraices_2030.hero.jpg"
-      ],
-      "listing_ids": [
-        "bienesraices__1059",
-        "bienesraices__1132",
-        "bienesraices__2007",
-        "bienesraices__1580",
-        "bienesraices__2030"
-      ],
-      "primary_listing_id": "bienesraices__1059",
-      "status": "pending",
-      "approved": false,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
-    },
-    {
-      "day": 13,
-      "shelf": "diversify_central",
-      "selector": "diversify_region:central",
+      "day": 103,
+      "shelf": "autopilot_brand",
+      "selector": "autopilot",
       "poster_type": "typo_max",
       "palette": "paper",
-      "scheduled_for": "2026-06-11T01:00:00+00:00",
-      "assets_dir": "web/data/ig_assets/drop_01/d13__diversify_central",
-      "poster_path": "web/data/ig_assets/drop_01/d13__diversify_central/poster_typo_max_paper.png",
+      "scheduled_for": "2026-07-12T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d103__brand",
+      "poster_path": "web/data/ig_assets/autopilot/d103__brand/poster_typo_max_cream.png",
       "poster_overrides": {},
-      "caption": "**37,000 m² en El Zonte.**\n\n37,000 m² en El Zonte, sin construir.\n\n$2.9M · a 0 m del mar\n\npulpo.club · listing N° 039",
+      "caption": "**Menos ruido, mejores terrenos.**\n\nNada de listas infinitas ni precios inflados. Filtramos el mercado y te mostramos lo que vale.\n\npulpo.club · link en bio",
+      "comment": "37,000 m² en El Zonte.\n$2.9M · $78.7/m²\nFrente al mar.\n\nLos mejores terrenos de El Salvador, rankeados cada semana.\nTodos los detalles en pulpo.club — link en bio.\n\n#ElSalvador #Terrenos #BienesRaices #TerrenosEnElSalvador #InvertirEnElSalvador #InversionInmobiliaria #TerrenoEnVenta #SurfCity #ElZonte #PlayasDeElSalvador #SalvadorenosPorElMundo #BitcoinCountry",
       "lint_violations": [],
-      "caption_status": "ok",
+      "caption_status": "clean",
       "carousel_photo_paths": [
-        "web/photos/bienesraices_1875.hero.jpg"
+        "web/data/ig_assets/autopilot/d103__brand/poster_sticker_paper.png"
       ],
       "listing_ids": [
         "bienesraices__1875"
       ],
       "primary_listing_id": "bienesraices__1875",
-      "status": "pending",
-      "approved": false,
+      "status": "scheduled",
+      "approved": true,
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
     },
     {
-      "day": 14,
-      "shelf": "wrap",
-      "selector": "multi:wrap",
-      "poster_type": "receipt",
-      "palette": "ink",
-      "scheduled_for": "2026-06-12T01:00:00+00:00",
-      "assets_dir": "web/data/ig_assets/drop_01/d14__wrap",
-      "poster_path": "web/data/ig_assets/drop_01/d14__wrap/poster_receipt_ink.png",
-      "poster_overrides": {
-        "title": "Wrap",
-        "subtitle": "5 TERRENOS · CURADOS POR RANKING",
-        "brand": "PULPO · TOP 5",
-        "items": [
-          {
-            "n": "01",
-            "desc": "El Tunco",
-            "sub": "1,580 m²",
-            "price": "$225K"
-          },
-          {
-            "n": "02",
-            "desc": "El Tunco",
-            "sub": "1,580 m²",
-            "price": "$225K"
-          },
-          {
-            "n": "03",
-            "desc": "El Tunco",
-            "sub": "1,580 m²",
-            "price": "$225K"
-          },
-          {
-            "n": "04",
-            "desc": "El Tunco",
-            "sub": "1,580 m²",
-            "price": "$225K"
-          },
-          {
-            "n": "05",
-            "desc": "El Tunco",
-            "sub": "1,412 m²",
-            "price": "$230K"
-          }
-        ],
-        "totals": [
-          {
-            "label": "RANGO",
-            "value": "$225K — $2.9M"
-          },
-          {
-            "label": "5 ITEMS",
-            "value": "CURADO"
-          }
-        ],
-        "footer": "pulpo.club · wrap"
-      },
-      "caption": "**Cinco terrenos. Los cinco mejor rankeados de su banda esta semana.**\n\n1,581 m² en El Tunco, con vista al océano.\n\npulpo.club · link en bio",
+      "day": 104,
+      "shelf": "autopilot_showcase",
+      "selector": "autopilot",
+      "poster_type": "sticker",
+      "palette": "paper",
+      "scheduled_for": "2026-07-14T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d104__showcase",
+      "poster_path": "web/data/ig_assets/autopilot/d104__showcase/poster_sticker_paper.png",
+      "poster_overrides": {},
+      "caption": "**23,000 m² en La Libertad.**\n\n23,000 m² en La Libertad, sin construir.\n\n$550,000 · a 25.9 km del mar\n\npulpo.club · listing N° 045",
+      "comment": "23,000 m² en La Libertad.\n$550,000 · $23.91/m²\nA 25.9 km del mar.\n\nLos mejores terrenos de El Salvador, rankeados cada semana.\nTodos los detalles en pulpo.club — link en bio.\n\n#ElSalvador #Terrenos #BienesRaices #TerrenosEnElSalvador #InvertirEnElSalvador #InversionInmobiliaria #TerrenoEnVenta #SurfCity #LaLibertad #PlayasDeElSalvador #SalvadorenosPorElMundo #BitcoinCountry",
       "lint_violations": [],
-      "caption_status": "ok",
+      "caption_status": "clean",
       "carousel_photo_paths": [
-        "web/photos/bienesraices_1529.hero.jpg",
-        "web/photos/bienesraices_1529.hero.jpg",
-        "web/photos/bienesraices_1529.hero.jpg",
-        "web/photos/bienesraices_1529.hero.jpg",
-        "web/photos/bienesraices_1783.hero.jpg",
-        "web/photos/bienesraices_1875.hero.jpg"
+        "web/photos/bienesraices_2191.hero.jpg"
       ],
       "listing_ids": [
-        "bienesraices__1529",
-        "bienesraices__1529",
-        "bienesraices__1529",
-        "bienesraices__1529",
-        "bienesraices__1783",
-        "bienesraices__1875"
+        "bienesraices__2191"
       ],
-      "primary_listing_id": "bienesraices__1529",
-      "status": "pending",
-      "approved": false,
+      "primary_listing_id": "bienesraices__2191",
+      "status": "scheduled",
+      "approved": true,
       "posted": false,
       "posted_at": null,
       "posted_media_id": null

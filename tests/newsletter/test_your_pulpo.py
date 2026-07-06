@@ -4,7 +4,11 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from automation.newsletter.build_issue import _filter_summary_human, build_issue
+from automation.newsletter.build_issue import (
+    _filter_summary_human,
+    _format_issue_date,
+    build_issue,
+)
 from automation.newsletter.subscribers import _parse_clerk_user
 from automation.newsletter.types import Preference, Recipient, YourPulpoState
 from automation.newsletter.store import email_hash
@@ -14,6 +18,19 @@ ISSUE_DATE = datetime(2026, 5, 28, 14, 0, tzinfo=timezone.utc)
 
 
 # ── filter humanizer ──────────────────────────────────────────────────
+
+def test_issue_date_localizes_spanish_month(monkeypatch=None):
+    """The masthead date must not leak English month names into ES (audit)."""
+    from datetime import datetime
+    jan = datetime(2026, 1, 15)
+    assert _format_issue_date(jan, "en") == "15 Jan 2026"
+    assert _format_issue_date(jan, "es") == "15 ene 2026"
+    # Months whose abbreviation differs EN↔ES were the visible leak.
+    for month, es_abbr in [(1, "ene"), (4, "abr"), (8, "ago"), (12, "dic")]:
+        d = datetime(2026, month, 3)
+        assert _format_issue_date(d, "es").endswith(f"{es_abbr} 2026")
+        assert es_abbr not in _format_issue_date(d, "en").lower() or month == 5
+
 
 def test_filter_summary_full_combo_en():
     pref = Preference(
@@ -44,6 +61,25 @@ def test_filter_summary_zone_only_when_no_department():
     s = _filter_summary_human(pref, "en", cohort="pro_prefs")
     assert "El Zonte" in s
     assert "Beachfront" in s
+
+
+def test_filter_summary_category_localizes_to_spanish():
+    """P0-4 — category slugs must render through i18n, never as an
+    English-humanized slug in a Spanish email (the enum-render trap)."""
+    pref = Preference(zones=["el-zonte"], categories=["ocean_view"])
+    es = _filter_summary_human(pref, "es", cohort="pro_prefs")
+    assert "Vista al mar" in es
+    assert "Ocean" not in es          # no English leak into the ES email
+    en = _filter_summary_human(pref, "en", cohort="pro_prefs")
+    assert "Ocean view" in en
+
+
+def test_filter_summary_unknown_category_falls_back_gracefully():
+    """A slug with no i18n row must not crash — humanize as a last resort
+    (the safety net; a valid category always has a translation row)."""
+    pref = Preference(categories=["some_future_slug"])
+    s = _filter_summary_human(pref, "es", cohort="pro_prefs")
+    assert "Some Future Slug" in s
 
 
 def test_filter_summary_price_compact_format():

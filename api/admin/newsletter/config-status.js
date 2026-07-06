@@ -79,7 +79,16 @@ module.exports = async (req, res) => {
   }
 
   const githubOk = present("GITHUB_DISPATCH_TOKEN");
-  const resendOk = present("RESEND_API_KEY") && present("RESEND_AUDIENCE_ID");
+  // Sender address (RESEND_FROM_EMAIL) is required for any real delivery —
+  // send.send_issue returns missing_from_email without it. Folded into the
+  // Resend readiness so the console can't show green while the From header
+  // is unset (Codex: "admin ready checks omit sender address").
+  const resendOk = present("RESEND_API_KEY") && present("RESEND_AUDIENCE_ID") && present("RESEND_FROM_EMAIL");
+  // Unsubscribe integrity — the salt that makes the `r=` lookup match on
+  // Vercel + the secret that signs the one-click token. A live send now
+  // FAILS CLOSED without the salt (P0-1); without the secret the token
+  // can't verify. Either missing = broken/forgeable unsubscribe (CAN-SPAM).
+  const unsubOk = present("PULPO_NEWSLETTER_SALT") && present("PULPO_UNSUBSCRIBE_SECRET");
   const clerkOk = present("CLERK_SECRET_KEY");
   const posthogOk = present("POSTHOG_PERSONAL_API_KEY") && present("POSTHOG_PROJECT_ID");
   const internalOk = present("PULPO_INTERNAL_TOKEN");
@@ -102,8 +111,15 @@ module.exports = async (req, res) => {
       id: "resend",
       label: "Resend",
       status: resendOk ? "ok" : "bad",
-      detail: resendOk ? "API key + audience set" : missingDetail("RESEND_API_KEY", "RESEND_AUDIENCE_ID"),
+      detail: resendOk ? "API key + audience + sender set" : missingDetail("RESEND_API_KEY", "RESEND_AUDIENCE_ID", "RESEND_FROM_EMAIL"),
       blocks: "All real email delivery + live audience count",
+    },
+    {
+      id: "unsubscribe",
+      label: "Unsubscribe links",
+      status: unsubOk ? "ok" : "bad",
+      detail: unsubOk ? "salt + signing secret set" : missingDetail("PULPO_NEWSLETTER_SALT", "PULPO_UNSUBSCRIBE_SECRET"),
+      blocks: "Working unsubscribe links + one-click List-Unsubscribe (live weekly send fails closed without the salt)",
     },
     {
       id: "clerk",

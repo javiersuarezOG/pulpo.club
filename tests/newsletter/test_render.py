@@ -74,10 +74,12 @@ def test_render_free_prefs_shows_paywall(free_with_prefs, ranked_pool):
     assert '<div class="paywall-banner">' in html
     # v4: per-pick locked CTA was dropped — the paywall banner one row up
     # carries the price-anchored upsell instead. The banner's CTA text
-    # comes from `paywall.cta` ("Go Pro — $9.99/month →") and links to
-    # the same Stripe checkout endpoint.
+    # comes from `paywall.cta` ("Go Pro — $9.99/month →") and links to the
+    # /start PAGE — NOT /api/stripe/start-checkout, which is POST-only and
+    # 405s on a browser GET (fixed 2026-07-04).
     assert "Go Pro — $9.99/month →" in html
-    assert "stripe/start-checkout" in html
+    assert "/start?ref=newsletter_issue_" in html
+    assert "api/stripe/start-checkout" not in html
 
 
 def test_unsubscribe_link_edition_matches_email_edition(

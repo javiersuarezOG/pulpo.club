@@ -76,7 +76,14 @@ _EMAIL_RE = __import__("re").compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
 _VALID_SOURCES = {"stripe", "stripe.checkout.auth_gated",
                   "stripe.checkout.anonymous_existing_user",
                   "stripe.checkout.anonymous_invitation",
-                  "clerk.user_created", "admin", "test"}
+                  "clerk.user_created",
+                  # Pro reader re-enabling the weekly digest via the
+                  # one-click Resubscribe link (api/unsubscribe.js
+                  # fireProWelcomeBack, variant=welcome_back). A new caller
+                  # source MUST be listed here or the endpoint 400s
+                  # invalid_source and the email silently never sends.
+                  "unsubscribe_page_resub",
+                  "admin", "test"}
 
 
 def _log(fields: dict) -> None:

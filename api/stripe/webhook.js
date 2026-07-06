@@ -1296,6 +1296,30 @@ module.exports = async (req, res) => {
             );
           }
         }
+        // Self-heal Resend audience membership for active Pro subs. The
+        // ONLY other enrollment path is checkout.session.completed, whose
+        // enrollPaidUserInAudience call is best-effort + NON-retried: a
+        // transient Resend failure (or any non-checkout route to Pro —
+        // e.g. a 100%-off friend-coupon redemption that hiccuped at
+        // enroll time) leaves a paying user plan=pro in Clerk but absent
+        // from the newsletter audience, so they silently never receive the
+        // Pro weekly. subscription.updated fires on the original checkout
+        // AND on every renewal/recovery, so enrolling here gives every
+        // active Pro repeated, idempotent chances to land in the audience.
+        // enrollPaidUserInAudience dedups on "already exists" (flipping
+        // unsubscribed=false as a side effect) and is best-effort, so this
+        // is safe to run on every redelivery and never blocks the webhook.
+        let audienceEnroll = "skipped";
+        if (isActive && subEmail) {
+          const enrolled = await enrollPaidUserInAudience({
+            email: subEmail,
+            locale: (sub.metadata && sub.metadata.locale) || "en",
+            source: "stripe.subscription.active_self_heal",
+          });
+          audienceEnroll = enrolled.ok
+            ? (enrolled.dedup ? "dedup" : "ok")
+            : (enrolled.reason || "fail");
+        }
         posthog.capture(posthog.emailDistinctId(subEmail), "webhook.subscription_changed", {
           event_id: event.id,
           subscription_id: sub.id,
@@ -1307,6 +1331,11 @@ module.exports = async (req, res) => {
           clerk_user_id: userId || "",
           grace_period_ends_at: patch.grace_period_ends_at || 0,
           source: (sub.metadata && sub.metadata.source) ? String(sub.metadata.source) : "",
+          // ok = a Pro who was MISSING from the audience just got enrolled
+          // (a silently-dropped user healed); dedup = already present.
+          // A stream of `ok` on renewals is the signal that the
+          // checkout-time enroll is dropping users — investigate upstream.
+          audience_enroll: audienceEnroll,
           ms: Date.now() - t0,
         });
         break;
@@ -1401,6 +1430,26 @@ module.exports = async (req, res) => {
             payment_failed_at: undefined,
             grace_period_ends_at: undefined,
           });
+          // Second self-heal surface for Resend audience membership.
+          // invoice.payment_succeeded fires on the FIRST invoice at signup
+          // (billing_reason=subscription_create) AND on every renewal — so
+          // enrolling here gives an immediate, independent retry of the
+          // best-effort checkout-time enroll (no waiting for a renewal),
+          // plus a recurring one. Together with the subscription.updated
+          // site this makes enrollment fully self-healing through the
+          // webhook path — no reconcile cron needed. Idempotent (dedups on
+          // "already exists"), best-effort, never blocks the webhook.
+          let audienceEnroll = "skipped";
+          if (fallbackEmail) {
+            const enrolled = await enrollPaidUserInAudience({
+              email: fallbackEmail,
+              locale: (subMeta && subMeta.locale) || "en",
+              source: "stripe.invoice.payment_succeeded_self_heal",
+            });
+            audienceEnroll = enrolled.ok
+              ? (enrolled.dedup ? "dedup" : "ok")
+              : (enrolled.reason || "fail");
+          }
           posthog.capture(posthog.emailDistinctId(fallbackEmail), "webhook.invoice_payment_succeeded", {
             event_id: event.id,
             invoice_id: inv.id,
@@ -1410,6 +1459,8 @@ module.exports = async (req, res) => {
             // by checkout.session.completed) from a recovery — useful
             // for funnel attribution.
             billing_reason: typeof inv.billing_reason === "string" ? inv.billing_reason : "",
+            // ok = a Pro who was MISSING from the audience just got enrolled.
+            audience_enroll: audienceEnroll,
             ms: Date.now() - t0,
           });
         }

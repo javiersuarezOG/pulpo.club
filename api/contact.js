@@ -83,6 +83,18 @@ function truncate(s, max) {
   return s.length > max ? s.slice(0, max) : s;
 }
 
+// The subject feeds the email Subject header. Strip CR/LF + other control
+// characters (and collapse the resulting whitespace) so a crafted
+// submission can't smuggle newlines that inject additional email headers
+// (header injection — launch audit).
+function stripHeaderChars(s) {
+  // eslint-disable-next-line no-control-regex
+  return String(s)
+    .replace(/[\u0000-\u001f\u007f]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function resolveInbox(topic) {
   const envKey = TOPIC_INBOX_ENV[topic];
   const raw = (envKey && process.env[envKey]) || "";
@@ -197,7 +209,7 @@ module.exports = withTiming(async (req, res) => {
   const topic = safeStr(body.topic).toLowerCase();
   const email = truncate(safeStr(body.email).trim().toLowerCase(), MAX_EMAIL_LEN);
   const name = truncate(safeStr(body.name).trim(), MAX_NAME_LEN);
-  const subject = truncate(safeStr(body.subject).trim(), MAX_SUBJECT_LEN);
+  const subject = truncate(stripHeaderChars(safeStr(body.subject)), MAX_SUBJECT_LEN);
   const message = truncate(safeStr(body.message).trim(), MAX_MESSAGE_LEN);
 
   // Validation.
@@ -287,3 +299,6 @@ module.exports = withTiming(async (req, res) => {
 
   return res.status(200).json({ ok: true });
 });
+
+// Exposed for unit tests — the handler wrapper is the production entrypoint.
+module.exports.stripHeaderChars = stripHeaderChars;

@@ -1,11 +1,11 @@
 {
-  "last_updated": "2026-06-30T07:46:44.954244+00:00",
-  "started_at": "2026-06-30T07:12:59.700986+00:00",
-  "duration_seconds": 2025.25,
+  "last_updated": "2026-07-05T07:42:59.491586+00:00",
+  "started_at": "2026-07-05T07:08:09.762638+00:00",
+  "duration_seconds": 2089.73,
   "total_listings": 34,
-  "dropped": 0,
+  "dropped": 1,
   "per_source_raw": {
-    "encuentra24": 34
+    "encuentra24": 35
   },
   "source_status": {
     "encuentra24": "green"
@@ -13,7 +13,7 @@
   "coverage": {
     "encuentra24": {
       "supplier": null,
-      "pulled": 34,
+      "pulled": 35,
       "max_pages_hit": false
     }
   },
@@ -24,10 +24,10 @@
     "beachfront_tier_on_beach": 0.2647,
     "beachfront_tier_walk_to_beach": 0.0294,
     "beachfront_tier_near_beach": 0.0,
-    "land_type_commercial": 0.0588,
-    "land_type_tourist": 0.2059,
+    "land_type_commercial": 0.0294,
+    "land_type_tourist": 0.2353,
     "land_type_residential": 0.7353,
-    "is_motivated": 0.1471
+    "is_motivated": 0.1176
   },
   "field_completeness": {
     "encuentra24": {
@@ -35,16 +35,16 @@
       "fields": {
         "price_usd": 1.0,
         "area_m2": 0.0,
-        "zone": 0.15,
-        "municipality": 0.15,
-        "department": 0.15,
+        "zone": 0.24,
+        "municipality": 0.24,
+        "department": 0.24,
         "location_text": 1.0,
-        "lat": 0.65,
-        "lng": 0.65,
+        "lat": 0.74,
+        "lng": 0.74,
         "is_beachfront": 0.26,
-        "has_paved_access": 0.18,
-        "has_water": 0.32,
-        "has_power": 0.21,
+        "has_paved_access": 0.12,
+        "has_water": 0.26,
+        "has_power": 0.12,
         "is_repriced": 0.03,
         "days_listed": 1.0,
         "photos_count": 1.0,
@@ -61,8 +61,8 @@
   },
   "validation_by_type": {
     "house": {
-      "pass": 5,
-      "flag": 29,
+      "pass": 8,
+      "flag": 26,
       "drop": 0
     }
   },

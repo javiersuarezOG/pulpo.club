@@ -99,13 +99,13 @@ jobs:
           fi
           python3 -m automation.ig_publish $ARGS
 
-      - name: Commit queue mutation
+      - name: Commit queue mutation + activity log
         if: github.event.inputs.dry_run != 'true'
         run: |
-          if git diff --quiet web/data/ig_queue.json; then
-            echo "[ig-publish] queue unchanged — nothing to commit"
+          git add web/data/ig_queue.json web/data/ig_post_log.jsonl
+          if git diff --cached --quiet; then
+            echo "[ig-publish] queue + log unchanged — nothing to commit"
             exit 0
           fi
-          git add web/data/ig_queue.json
-          git commit -m "chore(ig): publisher marked next item as posted"
+          git commit -m "chore(ig): publisher posted next item + activity log"
           git push origin main

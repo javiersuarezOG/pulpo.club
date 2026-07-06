@@ -24,6 +24,7 @@ import {
 import { FreeMonthModal } from "./components/FreeMonthModal.jsx";
 import { EmailCaptureModal } from "./components/EmailCaptureModal.jsx";
 import { AccessModal } from "./components/AccessModal.jsx";
+import { JoinCelebration } from "./components/JoinCelebration.jsx";
 import { NewHomePage } from "./home";
 // PR-perf-3a — route-level code split. AccountPage (44KB) and AdminPage
 // + its child widgets only render for users on /account or /admin, which
@@ -534,8 +535,8 @@ function App() {
   // above is one-shot and can land before the metadata catches up (esp. on
   // a Clerk cold start), leaving isPaid(user)=false and the next listing
   // click reopening the upgrade modal. Mirrors the /account ?from=portal
-  // poll: wait for clerkActions, then reload up to 5×1.5s until the plan
-  // flips. `userRef` gives the polling closure a live read of user state
+  // poll: wait for clerkActions, then reload up to 8×1.5s (~12s) until the
+  // plan flips. `userRef` gives the polling closure a live read of user state
   // (the captured `user` would be stale). Captured via ref at first render
   // because the toast effect strips ?upgrade before this effect settles.
   const sawCheckoutSuccessRef = useRef(
@@ -553,8 +554,15 @@ function App() {
       : null;
     if (!reload || isPaid(userRef.current)) return undefined; // nothing to wait for
     let cancelled = false;
+    // 8×1.5s ≈ 12s. Was 5 (≈7.5s), but the webhook can land 1–10s after the
+    // redirect (see the comment above) — a webhook at 8–10s timed out the poll
+    // and the next listing click re-paywalled a user who had ALREADY paid. 12s
+    // covers the documented window with margin; the stale event still fires if
+    // the webhook genuinely never lands, so we keep observability on the true
+    // failure rather than masking it with a longer wait. (2026-06-30 audit P1-5.)
+    const MAX_PLAN_REFRESH_ATTEMPTS = 8;
     (async () => {
-      for (let i = 0; i < 5 && !cancelled; i += 1) {
+      for (let i = 0; i < MAX_PLAN_REFRESH_ATTEMPTS && !cancelled; i += 1) {
         try { await reload(); } catch { /* transient — keep polling */ }
         await new Promise((r) => setTimeout(r, 1500));
         if (isPaid(userRef.current)) {
@@ -562,7 +570,7 @@ function App() {
           return;
         }
       }
-      if (!cancelled) track("upgrade.plan_refresh_stale", { attempts: 5 });
+      if (!cancelled) track("upgrade.plan_refresh_stale", { attempts: MAX_PLAN_REFRESH_ATTEMPTS });
     })();
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1504,15 +1512,23 @@ function App() {
   // membership lands — see the effect below (setUser is async, so the
   // modal can't call openListing directly without a stale-user race).
   const pendingOpenAfterJoinRef = useRef(null);
-  const becomeFreeMember = useCallback(({ email, openListingId } = {}) => {
+  // The branded "you're in" octopus reveal. Fired here — the single choke
+  // point every free-signup passes through — so it plays on EVERY surface
+  // (hero, favorites/discover/save gates, listing deep-links) and can never
+  // be missed by a flow or need re-wiring per component.
+  const [celebration, setCelebration] = useState(null);
+  const becomeFreeMember = useCallback(({ email, openListingId, returning } = {}) => {
     if (!email) return;
+    // Paid/Clerk users never see the free gate — no state change, no reveal.
+    if (isPaid(user)) return;
     if (openListingId) pendingOpenAfterJoinRef.current = openListingId;
     setUser((prev) => {
       // Never downgrade a paid/Clerk user to free-member.
       if (prev && isPaid(prev)) return prev;
       return hydrateUser({ email, provider: "email", plan: "free", email_member: true, joined: Date.now() });
     });
-  }, []);
+    setCelebration({ returning: !!returning });
+  }, [user]);
 
   // Unified "they want more access" gate: anonymous → start-free email
   // capture; free member → Go-Pro modal; Pro → no-op. Used by the hero lock
@@ -1772,6 +1788,13 @@ function App() {
           locale={locale}
           cfg={accessModal}
           onClose={closeAccessModal}
+        />
+      )}
+      {celebration && (
+        <JoinCelebration
+          locale={locale}
+          returning={celebration.returning}
+          onDone={() => setCelebration(null)}
         />
       )}
       <ToastHost app={app} />

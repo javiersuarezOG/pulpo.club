@@ -1,0 +1,10 @@
+{
+  "_comment": "Cross-runtime parity vectors for the recipient email hash. Consumed by BOTH tests/newsletter/test_hash_parity.py (Python: store.email_hash) AND tests/api/hash_parity.test.js (JS: unsubscribe.js hashEmail). If either implementation drifts on salt / normalization / algorithm / truncation, that side's test fails against the shared `expected`. This is the guard for the known landmine: a one-sided change to the hash silently breaks every unsubscribe/resubscribe link (sha256(salt:email.strip().lower())[:24]). To add a vector, compute `expected` from the reference formula and add both sides re-run green.",
+  "vectors": [
+    { "email": "test@example.com",               "salt": "pulpo-newsletter-dev-salt", "expected": "402d0067182b8a07b852cf22" },
+    { "email": "  Mixed@Case.COM  ",              "salt": "prod-salt-abc123",          "expected": "1948fc4d59bb5180e5769131" },
+    { "email": "josé+news@correo.es",             "salt": "prod-salt-abc123",          "expected": "9cfc310b6835c7d79e8b8732" },
+    { "email": "a@b.io",                          "salt": "another_salt",              "expected": "e65e44eea817294d81a29de1" },
+    { "email": "LONG.name+tag@sub.domain.co.uk",  "salt": "ee767881bbfcf144",          "expected": "f9d1727b9ae3a975be0c8ef1" }
+  ]
+}

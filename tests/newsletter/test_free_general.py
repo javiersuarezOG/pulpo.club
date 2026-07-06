@@ -82,7 +82,7 @@ def test_free_general_has_no_paywall_banner(free_with_prefs, ranked_pool):
 def test_free_general_version_stamp(free_with_prefs, ranked_pool):
     issue = _free_issue(free_with_prefs, ranked_pool)
     html = render_html(issue, variant="free_general")
-    assert 'name="x-pulpo-template" content="free-general-v1.0' in html
+    assert 'name="x-pulpo-template" content="free-general-v1.3' in html
 
 
 def test_free_general_spotlight_is_pro_locked_real_data(free_with_prefs, ranked_pool):
@@ -139,7 +139,7 @@ def test_free_welcome_hero_is_plain_pulpo_on_free_body(free_with_prefs, ranked_p
     assert html.count("See on Pulpo →") == len(issue.picks_top)
     assert html.count("Sign up to Pro →") == len(issue.picks_shortlist)
     assert "Pro analysis" in html                          # spotlight still locked
-    assert 'name="x-pulpo-template" content="free-welcome-v1.0' in html
+    assert 'name="x-pulpo-template" content="free-welcome-v1.3' in html
 
 
 def test_free_welcome_back_derives_greeting(free_with_prefs, ranked_pool):
@@ -153,7 +153,7 @@ def test_free_welcome_back_derives_greeting(free_with_prefs, ranked_pool):
     assert "first 10" not in html
     assert ">PRO</span>" not in html
     assert html.count("Sign up to Pro →") == len(issue.picks_shortlist)
-    assert 'name="x-pulpo-template" content="free-welcome-back-v1.0' in html
+    assert 'name="x-pulpo-template" content="free-welcome-back-v1.3' in html
 
 
 def test_free_welcome_pair_renders_through_registry(free_with_prefs, ranked_pool):

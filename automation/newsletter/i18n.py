@@ -146,6 +146,52 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "yp.saved.cta":                {"en": "Open your favorites",                          "es": "Abrir tus favoritos"},
     "yp.filter.label":             {"en": "Filter: {filter}",                             "es": "Filtro: {filter}"},
     "yp.filter.cta":               {"en": "Edit your filter",                             "es": "Editar tu filtro"},
+    # Category filter tokens — the compact per-slug labels the filter
+    # summary renders. Closed set = CATEGORY_KEYS (web/app/lib/categories.ts).
+    # These MUST exist for both locales or a Spanish reader sees an
+    # English-humanized slug ("Ocean View") — the enum-render trap. Kept
+    # terse to match the "·"-joined summary tone (not the account chips).
+    "filter.category.new_this_week":   {"en": "New this week",     "es": "Nuevas esta semana"},
+    "filter.category.price_drops":     {"en": "Price drops",       "es": "Rebajas de precio"},
+    "filter.category.off_market":      {"en": "Off-market",        "es": "Fuera de mercado"},
+    "filter.category.best_documented": {"en": "Best documented",   "es": "Mejor documentado"},
+    "filter.category.beachfront":      {"en": "Beachfront",        "es": "Frente al mar"},
+    "filter.category.ocean_view":      {"en": "Ocean view",        "es": "Vista al mar"},
+    "filter.category.mountain_view":   {"en": "Mountain view",     "es": "Vista a la montaña"},
+    "filter.category.water_features":  {"en": "Near water",        "es": "Cerca del agua"},
+    "filter.category.flat_buildable":  {"en": "Flat & buildable",  "es": "Plano y construible"},
+    "filter.category.build_ready":     {"en": "Build-ready",       "es": "Listo para construir"},
+    "filter.category.commercial":      {"en": "Commercial",        "es": "Comercial"},
+    "filter.category.under_50k":       {"en": "Under $50k",        "es": "Menos de $50k"},
+    "filter.category.under_100k":      {"en": "Under $100k",       "es": "Menos de $100k"},
+    "filter.category.motivated_sellers": {"en": "Motivated sellers", "es": "Vendedor motivado"},
+    # ── Migrated from inline render_html.py / build_issue.py ternaries so
+    #    they fall under the EN/ES parity guard (launch-audit follow-up).
+    #    Strings are byte-identical to what the renderer produced inline;
+    #    HTML entities (&darr; &middot; &rarr;) + inline <strong> are stored
+    #    verbatim because the render sites interpolate them raw (no _e()).
+    "favorites.eyebrow":           {"en": "Your favorites · this week",                   "es": "Tus favoritos · esta semana"},
+    "favorites.headline.one":      {"en": "1 you're following.",                          "es": "1 que seguís."},
+    "favorites.headline.many":     {"en": "{count} you're following.",                    "es": "{count} que seguís."},
+    "favorites.open_all":          {"en": "Open all favorites",                           "es": "Abrir todos los favoritos"},
+    "favorites.chip.price_dropped": {"en": "&darr; Price dropped {amount} since you saved it", "es": "&darr; Bajó {amount} desde que la guardaste"},
+    "favorites.chip.price_up":     {"en": "&uarr; Price moved up {amount} since you saved it", "es": "&uarr; Subió {amount} desde que la guardaste"},
+    "favorites.chip.still_listed.one":  {"en": "Still on market &middot; {days} day listed",  "es": "Sigue en el mercado &middot; {days} día listada"},
+    "favorites.chip.still_listed.many": {"en": "Still on market &middot; {days} days listed", "es": "Sigue en el mercado &middot; {days} días listada"},
+    "favorites.chip.still_on_market": {"en": "Still on market",                            "es": "Sigue en el mercado"},
+    "favorites.card_cta":          {"en": "See on Pulpo &rarr;",                          "es": "Verla en Pulpo &rarr;"},
+    "favorites.summary.none_moved": {"en": "<strong style='font-style:normal;'>None moved on price this week</strong> — your watchlist held flat.", "es": "<strong style='font-style:normal;'>Ninguno se movió en precio esta semana</strong> — tu lista quedó plana."},
+    "favorites.summary.tail_busy": {"en": "busier than a typical week on your watchlist", "es": "más actividad que una semana típica en tu lista"},
+    "favorites.summary.tail_quiet": {"en": "fewer moves than usual on your watchlist",    "es": "menos actividad de la habitual en tu lista"},
+    "favorites.summary.some_moved": {"en": "<strong style='font-style:normal;'>{moved_word} of {total_word} moved on price this week</strong> — {tail}.", "es": "<strong style='font-style:normal;'>{moved_word} de {total_word} se movieron en precio esta semana</strong> — {tail}."},
+    "preheader.with_rest":         {"en": "{top} — plus {n_rest} more picks this week.",  "es": "{top} — y {n_rest} más esta semana."},
+    "preheader.fallback":          {"en": "10 hand-picked listings from El Salvador, this week.", "es": "10 propiedades seleccionadas de El Salvador, esta semana."},
+    "spotlight.reported_by":       {"en": "Reported by",                                  "es": "Reportado por"},
+    "pick.pill.under_area_avg":    {"en": "−{pct}% under area avg",                       "es": "−{pct}% bajo el promedio"},
+    "filter.summary.land":         {"en": "land",                                         "es": "terreno"},
+    "filter.summary.house":        {"en": "house",                                        "es": "casa"},
+    "filter.summary.condo":        {"en": "condo",                                        "es": "condo"},
+    "filter.summary.under_price":  {"en": "under {money}",                                "es": "menos de {money}"},
     "yp.browse.label":             {"en": "{n} listings match",                           "es": "{n} propiedades coinciden"},
     "yp.browse.cta":               {"en": "Browse them all",                              "es": "Verlas todas"},
     # Anonymous-cohort-only welcome card.
@@ -190,6 +236,7 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "facts.beachfront":            {"en": "Beachfront",                                   "es": "Frente al mar"},
     "facts.airport":               {"en": f"{{km}} km · {{min}} min to {_primary_airport_code}" if _primary_airport_code else "{km} km · {min} min to airport",
                                      "es": f"{{km}} km · {{min}} min a {_primary_airport_code}" if _primary_airport_code else "{km} km · {min} min al aeropuerto"},
+    "filter.all_listings":         {"en": "All listings",                                 "es": "Todas las propiedades"},
     "facts.land":                  {"en": "Land",                                         "es": "Terreno"},
     "facts.house":                 {"en": "House",                                        "es": "Casa"},
     "facts.condo":                 {"en": "Condo",                                        "es": "Apartamento"},
@@ -335,12 +382,16 @@ def filter_summary(pref, locale: Locale = DEFAULT_LOCALE) -> str:
         else:
             parts.append(f"under ${int(pref.max_price_usd):,}")
     if pref.property_types:
+        # Was `t("facts.land") + " OK"` — the hardcoded English " OK" leaked
+        # into the Spanish footer ("Terreno OK"). Drop it (consistent with
+        # house/condo, which never had it). Launch audit D5.
         if "land" in pref.property_types:
-            parts.append(t("facts.land", locale) + " OK")
+            parts.append(t("facts.land", locale))
         if "house" in pref.property_types:
             parts.append(t("facts.house", locale))
         if "condo" in pref.property_types:
             parts.append(t("facts.condo", locale))
     if not parts:
-        return "default"
+        # Was the literal English word "default", rendered into the ES footer.
+        return t("filter.all_listings", locale)
     return " · ".join(parts)

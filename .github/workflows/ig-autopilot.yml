@@ -1,0 +1,99 @@
+# Self-running IG post generator.
+#
+# Tops up web/data/ig_queue.json with APPROVED, scheduled posts so the
+# ig-publish cron can post on its own.  Every post shows a real listing
+# (photo-gated) and the feed mixes brand-led + listing-showcase posts.
+#
+# This workflow NEVER posts and NEVER flips IG_PAUSED — it only queues.
+# Publishing stays with ig-publish.yml, which the operator gates with the
+# IG_PAUSED kill switch.
+#
+# Gated by the repo variable IG_AUTOPILOT_ENABLED (default 'false') so the
+# queue is staged manually first and the operator turns autonomy on when
+# ready — same "stage first, then flip the switch" posture as IG_PAUSED.
+#
+#   Turn on:  Settings → Variables → Actions → IG_AUTOPILOT_ENABLED = true
+#             (and IG_PAUSED = 0 to let the publisher actually post)
+
+name: pulpo-ig-autopilot
+
+on:
+  schedule:
+    # Daily at 08:20 UTC. Idempotent: only adds posts when the queue has
+    # fewer than --lookahead future ones, so a daily run self-limits.
+    - cron: '20 8 * * *'
+  workflow_dispatch:
+    inputs:
+      lookahead:
+        description: 'Keep this many future posts queued'
+        required: false
+        default: '3'
+      dry_run:
+        description: 'Generate + log without committing'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ig-autopilot
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Skip entirely unless the operator has enabled autonomy.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      vars.IG_AUTOPILOT_ENABLED == 'true'
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.PULPO_BOT_TOKEN }}
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install Playwright Chromium
+        run: |
+          pip install playwright==1.49.1
+          playwright install chromium --with-deps
+
+      - name: Configure git identity
+        run: |
+          git config user.name  "pulpo-bot"
+          git config user.email "pulpo-bot@users.noreply.github.com"
+
+      - name: Top up the queue
+        env:
+          LOOKAHEAD: ${{ github.event.inputs.lookahead || '3' }}
+        run: |
+          python3 -m automation.ig_autopilot --lookahead "$LOOKAHEAD" --cadence-days 2
+
+      - name: Commit queue + rendered posters
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          git add web/data/ig_queue.json web/data/ig_assets/autopilot
+          if git diff --cached --quiet; then
+            echo "[ig-autopilot] queue already full — nothing to commit"
+            exit 0
+          fi
+          # Rebase onto any mid-run main movement (mirrors the nightly).
+          git commit -m "chore(ig): autopilot topped up the queue"
+          git fetch origin main
+          git rebase --autostash origin/main || {
+            echo "::warning::rebase failed; aborting and pushing as-is"
+            git rebase --abort || true
+          }
+          git push origin main

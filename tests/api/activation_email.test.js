@@ -96,6 +96,15 @@ describe("TEMPLATES", () => {
     expect(html).toContain("/assets/email-logo-32@2x.png");
     expect(html).not.toContain("<svg");
   });
+
+  it("sets the lang attribute and renders the preheader (launch audit D)", () => {
+    const en = TEMPLATES.en.html("https://x", "https://y");
+    expect(en).toContain('<html lang="en"');
+    expect(en).toContain("One step left: set your password");
+    const es = TEMPLATES.es.html("https://x", "https://y");
+    expect(es).toContain('<html lang="es"');
+    expect(es).toContain("Solo falta un paso");
+  });
 });
 
 describe("sendActivationEmail — auth + validation", () => {
@@ -120,6 +129,30 @@ describe("sendActivationEmail — auth + validation", () => {
       email: "a@example.com", locale: "en", actionUrl: "",
     });
     expect(out.ok).toBe(false);
+  });
+
+  it("rejects a non-http(s) actionUrl WITHOUT sending (launch audit D)", async () => {
+    mockFetch(async () => ({ ok: true, status: 200, json: async () => ({ id: "x" }) }));
+    const out = await sendActivationEmail({
+      email: "a@example.com", locale: "en", actionUrl: "javascript:alert(1)",
+    });
+    expect(out.ok).toBe(false);
+    expect(out.error).toContain("invalid actionUrl");
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it("HTML-escapes the actionUrl in the href but keeps it raw in text", async () => {
+    let sent;
+    mockFetch(async (_url, opts) => {
+      sent = JSON.parse(opts.body);
+      return { ok: true, status: 200, json: async () => ({ id: "msg_1" }) };
+    });
+    await sendActivationEmail({
+      email: "a@example.com", locale: "en",
+      actionUrl: "https://accounts.pulpo.club/verify?token=a&b=1",
+    });
+    expect(sent.html).toContain("token=a&amp;b=1");   // escaped for HTML
+    expect(sent.text).toContain("token=a&b=1");        // raw in plain text
   });
 });
 

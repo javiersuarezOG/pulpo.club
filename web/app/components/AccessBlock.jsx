@@ -40,8 +40,12 @@ export function AccessBlock({ app, locale: lc, surface, cfg, onDone }) {
     try { track("access.free_submitted", { surface, reason, email_domain_only: domain, result: result.kind }); } catch { /* ignore */ }
     if (result.kind === "success" || result.kind === "already") {
       try { track("free_member_created", { surface, reason, via: "access_block" }); } catch { /* ignore */ }
-      app.becomeFreeMember({ email: value, openListingId: reason === "top3" ? (cfg && cfg.listingId) || null : null });
+      // becomeFreeMember fires the app-level JoinCelebration reveal.
+      app.becomeFreeMember({ email: value, openListingId: reason === "top3" ? (cfg && cfg.listingId) || null : null, returning: result.kind === "already" });
       if (typeof onDone === "function") onDone();
+      // Inline surfaces (hero) have no modal to unmount — reset the button so
+      // it never freezes on "Joining…"; the celebration overlay takes over.
+      else { setStatus("idle"); setEmail(""); }
       return;
     }
     setStatus(result.kind === "invalid" ? "invalid" : "error");

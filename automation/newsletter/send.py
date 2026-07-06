@@ -37,6 +37,7 @@ API_KEY_ENV = "RESEND_API_KEY"
 FROM_EMAIL_ENV = "RESEND_FROM_EMAIL"
 REPLY_TO_ENV = "RESEND_REPLY_TO_EMAIL"          # optional
 UNSUBSCRIBE_SECRET_ENV = "PULPO_UNSUBSCRIBE_SECRET"
+SALT_ENV = "PULPO_NEWSLETTER_SALT"              # salts recipient_hash → unsubscribe r=
 SITE_ROOT_ENV = "PULPO_SITE_ROOT"               # defaults to https://pulpo.club
 
 RESEND_API_BASE = "https://api.resend.com"
@@ -87,6 +88,25 @@ def list_unsubscribe_headers(recipient_hash: str, issue_number: int) -> dict[str
 _TAG_RE = re.compile(r"<[^>]+>")
 _WS_RE = re.compile(r"[ \t\r\f\v]+")
 _BLANK_LINES_RE = re.compile(r"\n{3,}")
+# Anchor → "text (url)" so the plain-text part keeps its destinations. The
+# naive tag-strip used to delete every <a href>, dropping the unsubscribe
+# link + all CTA URLs from the text/plain MIME part (launch audit) — a
+# recipient reading plain text was left with dead label text and, worse,
+# no way to unsubscribe (RFC 8058 also relies on the visible link).
+_ANCHOR_RE = re.compile(
+    r'<a\b[^>]*?\bhref\s*=\s*["\']([^"\']+)["\'][^>]*>(.*?)</a>', re.I | re.S
+)
+
+
+def _expand_anchor(m: "re.Match") -> str:
+    href = (m.group(1) or "").strip()
+    inner = _TAG_RE.sub("", m.group(2) or "").strip()
+    # Non-navigational hrefs (in-page anchors, mailto) — keep just the text.
+    if not href or href.startswith("#") or href.lower().startswith("mailto:"):
+        return inner or href
+    if inner and inner != href:
+        return f"{inner} ({href})"
+    return href
 
 
 def html_to_text(html: str) -> str:
@@ -97,6 +117,8 @@ def html_to_text(html: str) -> str:
     html = re.sub(r"<head\b.*?</head>", "", html, flags=re.S | re.I)
     html = re.sub(r"<style\b.*?</style>", "", html, flags=re.S | re.I)
     html = re.sub(r"<script\b.*?</script>", "", html, flags=re.S | re.I)
+    # Preserve link destinations BEFORE the blanket tag-strip below.
+    html = _ANCHOR_RE.sub(_expand_anchor, html)
     # Block-level tags → newlines so paragraphs separate.
     html = re.sub(r"</(p|tr|li|h1|h2|h3|h4|div|br|table)>", "\n", html, flags=re.I)
     html = re.sub(r"<br\s*/?>", "\n", html, flags=re.I)
@@ -163,6 +185,19 @@ def send_issue(
         return SendResult(True, True, fake_id, None, None,
                           int((time.monotonic() - t0) * 1000), 1)
 
+    # Fail-closed on the salt. `recipient_hash` was derived upstream by
+    # store.email_hash(), which silently falls back to a PUBLIC dev salt
+    # when PULPO_NEWSLETTER_SALT is unset. On a LIVE send that produces an
+    # unsubscribe `r=` hash that /api/unsubscribe (real salt on Vercel)
+    # can never match — the click no-ops and the user keeps getting mail
+    # (CAN-SPAM breach), and a public salt makes any recipient's hash
+    # forgeable. Refuse rather than ship a broken/forgeable unsubscribe
+    # link. Dry-run is exempt above: it uses the dev salt on purpose for
+    # reproducible fixtures and makes no HTTP call. See P0-1, launch audit.
+    if not os.environ.get(SALT_ENV, "").strip():
+        return SendResult(False, False, None, "missing_newsletter_salt", None,
+                          int((time.monotonic() - t0) * 1000), 0)
+
     api_key = os.environ.get(API_KEY_ENV, "").strip()
     from_email = os.environ.get(FROM_EMAIL_ENV, "").strip()
     if not api_key:
@@ -197,6 +232,14 @@ def send_issue(
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
+        # Deterministic per (issue, recipient). A workflow rerun/cancel, or
+        # an in-call retry after a lost response (the send may have landed
+        # before the network error), reuses the SAME key — Resend returns
+        # the original result instead of sending a second copy. Combined
+        # with concurrency:queued on the send workflow, this closes the
+        # double-send window (launch audit P1). recipient_hash is already
+        # opaque + collision-safe; issue_number scopes it to this edition.
+        "Idempotency-Key": f"pulpo-nl-{issue_number}-{recipient_hash}",
     }
     poster = post_override or _post_json
     last_error: Optional[str] = None

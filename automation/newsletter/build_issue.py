@@ -386,6 +386,27 @@ def _absolute_photo(listing: dict, site_root: str) -> str:
     return ""
 
 
+# Spanish abbreviated month names — strftime("%b") is English regardless of
+# locale (and locale-dependent strftime is unreliable/unavailable in CI), so
+# a Spanish edition showed "5 Jan 2026" instead of "5 ene 2026" in the header
+# + title (launch audit). July/June happen to coincide EN↔ES; Jan/Apr/Aug/Dec
+# do not, so the leak was real 4+ months a year.
+_ES_MONTHS_ABBR = (
+    "ene", "feb", "mar", "abr", "may", "jun",
+    "jul", "ago", "sep", "oct", "nov", "dic",
+)
+
+
+def _format_issue_date(issue_date, locale: Locale) -> str:
+    """Locale-aware short date for the masthead. EN: '5 Jul 2026' (strftime);
+    ES: '5 jul 2026' via the Spanish abbreviation table."""
+    if not hasattr(issue_date, "strftime"):
+        return ""
+    if locale == "es":
+        return f"{issue_date.day} {_ES_MONTHS_ABBR[issue_date.month - 1]} {issue_date.year}"
+    return issue_date.strftime("%-d %b %Y")
+
+
 def _location_line(listing: dict, locale: Locale) -> str:
     parts: list[str] = []
     if listing.get("municipality"):
@@ -571,11 +592,11 @@ def _filter_summary_human(pref: Preference, locale: Locale, cohort: Cohort) -> s
 
     # Property type — single most expected token.
     if "land" in pref.property_types:
-        parts.append("land" if locale == "en" else "terreno")
+        parts.append(i18n.t("filter.summary.land", locale))
     elif "house" in pref.property_types:
-        parts.append("house" if locale == "en" else "casa")
+        parts.append(i18n.t("filter.summary.house", locale))
     elif "condo" in pref.property_types:
-        parts.append("condo" if locale == "en" else "condo")
+        parts.append(i18n.t("filter.summary.condo", locale))
 
     # Price cap — present only when it bites. Compact dollar format
     # ("$500k", not "$500,000") matches the mockup tone.
@@ -587,16 +608,38 @@ def _filter_summary_human(pref: Preference, locale: Locale, cohort: Cohort) -> s
             money = f"${cap // 1_000}k"
         else:
             money = f"${cap}"
-        parts.append(f"under {money}" if locale == "en" else f"menos de {money}")
+        parts.append(i18n.t("filter.summary.under_price", locale, money=money))
 
-    # Categories last — they're usually editorial, not structural.
+    # Categories last — they're usually editorial, not structural. Look
+    # each up through the i18n table (filter.category.<slug>) so a Spanish
+    # reader never sees an English-humanized slug ("Ocean View") — the
+    # enum-render trap (CLAUDE.md). i18n.t returns the key on a miss, so a
+    # slug with no translation row falls back to the humanized form as a
+    # last resort; a valid category always has a row.
     for c in pref.categories[:2]:
-        parts.append(c.replace("_", " ").title())
+        key = f"filter.category.{c}"
+        label = i18n.t(key, locale)
+        if label == key:                         # not in the closed set
+            label = c.replace("_", " ").title()  # safety net; shouldn't be reached
+        parts.append(label)
 
     return " · ".join(parts) if parts else ""
 
 
-def _pulpo_urls(listing: dict, *, issue_number: int, site_root: str) -> tuple[str, str]:
+# The SPA reads `?lang=es` from the query string and it WINS over the
+# reader's stored/browser locale (web/app/i18n.jsx). Without it, a reader
+# who clicks a Spanish email lands on the ENGLISH listing/page whenever
+# their localStorage/browser default isn't Spanish. So every in-app link
+# in the email must pin the edition's locale. Only stamp non-default
+# locales — `?lang=en` is redundant (en is the SPA default) and would
+# churn every English URL + its tests for no behavior change.
+def _lang_suffix(locale: Locale) -> str:
+    return f"&lang={locale}" if locale and locale != "en" else ""
+
+
+def _pulpo_urls(
+    listing: dict, *, issue_number: int, site_root: str, locale: Locale = "en",
+) -> tuple[str, str]:
     """The canonical /listing/<source>__<source_id> page on pulpo.club plus
     a save variant. The save_url adds `?save=1` so the SPA auto-saves
     the listing on mount (PR-NL-8 wired this for /account-authed users).
@@ -609,11 +652,13 @@ def _pulpo_urls(listing: dict, *, issue_number: int, site_root: str) -> tuple[st
     detail. Caught 2026-05-29 after the first v3 send.
 
     Both URLs include `ref=newsletter_issue_<N>` so PostHog can attribute
-    in-app conversion back to the issue."""
+    in-app conversion back to the issue, and `&lang=<locale>` (non-en) so
+    a Spanish reader lands on the Spanish listing, not the English one."""
     source_id = f"{listing.get('source')}__{listing.get('source_id')}"
     base = f"{site_root.rstrip('/')}/listing/{source_id}"
     ref = f"ref=newsletter_issue_{issue_number}"
-    return (f"{base}?{ref}", f"{base}?{ref}&save=1")
+    lang = _lang_suffix(locale)
+    return (f"{base}?{ref}{lang}", f"{base}?{ref}{lang}&save=1")
 
 
 def _chips_for_listing(
@@ -878,7 +923,7 @@ def _to_pick(
     title = tc.get(locale) or tc.get("en") or listing.get("title") or "Listing"
     price_text, price_note = _format_price(listing, locale)
     callouts = commentary_mod.pick_callouts_for_listing(listing, locale)
-    pulpo_url, save_url = _pulpo_urls(listing, issue_number=issue_number, site_root=site_root)
+    pulpo_url, save_url = _pulpo_urls(listing, issue_number=issue_number, site_root=site_root, locale=locale)
     chips = _chips_for_listing(listing, rank=rank, locale=locale)
     story_html, story_source = ("", "")
     shortlist_frame_html = ""
@@ -1134,8 +1179,16 @@ def build_issue(
         f"{site_root.rstrip('/')}/api/unsubscribe"
         f"?r={recipient.email_hash}&i={issue_number}&t={_unsub_t}"
     )
+    # The paywall / "See on Pulpo Pro" CTA must point at the /start PAGE,
+    # NOT /api/stripe/start-checkout — that endpoint is POST-only, so a
+    # browser click (GET) returns {"error":"method_not_allowed"} on a black
+    # screen. /start is the public checkout landing (web/app/start.jsx,
+    # routed in vercel.json); its own button POSTs to start-checkout. Carry
+    # the issue ref for attribution and pin the edition locale so a Spanish
+    # reader lands on /start in Spanish.
     paywall_url = (
-        f"{site_root.rstrip('/')}/api/stripe/start-checkout?ref=newsletter_issue_{issue_number}"
+        f"{site_root.rstrip('/')}/start?ref=newsletter_issue_{issue_number}"
+        f"{_lang_suffix(locale)}"
     )
     welcome_prefs_url = None
     if cohort == "anonymous":
@@ -1173,6 +1226,7 @@ def build_issue(
             {"source": lid.split("__")[0], "source_id": lid.split("__", 1)[1] if "__" in lid else ""},
             issue_number=n,
             site_root=root,
+            locale=locale,
         )[0],
         issue_number=issue_number,
         site_root=site_root,
@@ -1210,7 +1264,7 @@ def build_issue(
     return Issue(
         issue_id=issue_id,
         issue_number=issue_number,
-        issue_date_human=issue_date.strftime("%-d %b %Y") if hasattr(issue_date, "strftime") else "",
+        issue_date_human=_format_issue_date(issue_date, locale),
         recipient=recipient,
         cohort=cohort,
         locale=locale,

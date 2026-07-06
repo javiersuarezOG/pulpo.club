@@ -118265,5 +118265,2781 @@
     "cost_usd": 0.00121072,
     "finish_reason": "stop",
     "latency_ms": 5214
+  },
+  "citymax_sc|casa-de-playa-en-venta-en-san-diego-la-libertad": {
+    "ts": "2026-07-04T06:41:16.890203+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in San Diego, La Libertad",
+      "es": "Casa en Venta en San Diego, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "House for sale in San Diego, La Libertad. Property includes built area, bedrooms, and bathrooms. Located near Surf City and El Tunco beaches.",
+      "es": "Casa en venta en San Diego, La Libertad. La propiedad incluye área construida, dormitorios y baños. Ubicada cerca de las playas Surf City y El Tunco."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Near Surf City beaches",
+        "es": "Cerca de playas Surf City"
+      },
+      {
+        "en": "Close to El Tunco",
+        "es": "Cerca de El Tunco"
+      },
+      {
+        "en": "Price $275,000",
+        "es": "Precio $275,000"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bocana San Diego",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3082,
+    "tokens_out": 364,
+    "cost_usd": 0.00123254,
+    "finish_reason": "stop",
+    "latency_ms": 3824
+  },
+  "citymax_sc|complejo-industrial-con-bodegas-en-lourdes-colon": {
+    "ts": "2026-07-04T06:41:16.974223+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Industrial Land in Lourdes Colón, La Libertad",
+      "es": "Terreno Industrial en Lourdes Colón, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Industrial land for sale in Lourdes Colón, La Libertad. Located within an industrial complex, suitable for warehouse construction. Priced at $2,200,000.",
+      "es": "Terreno industrial en venta en Lourdes Colón, La Libertad. Ubicado dentro de un complejo industrial, apto para construcción de bodegas. Precio de $2,200,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Lourdes Colón industrial complex",
+        "es": "Ubicado en complejo industrial Lourdes Colón"
+      },
+      {
+        "en": "Price: $2,200,000",
+        "es": "Precio: $2,200,000"
+      },
+      {
+        "en": "Ideal for warehouse development",
+        "es": "Ideal para desarrollo de bodegas"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -89.3167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Libertad municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3084,
+    "tokens_out": 393,
+    "cost_usd": 0.00126498,
+    "finish_reason": "stop",
+    "latency_ms": 3908
+  },
+  "bienesraices|2423": {
+    "ts": "2026-07-04T06:41:18.577011+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4 Exclusive Land Lots, Costa del Sol, Estero Front",
+      "es": "4 Terrenos Exclusivos, Costa del Sol, Frente al Estero"
+    },
+    "short_description_canonical": {
+      "en": "Four 1,000-varas (698.9 m²) residential lots on Costa del Sol, between Costa Real and Tesoro Beach. Direct frontage to Estero de Jaltepeque, ideal for private dock construction. Priced at $140,000 per lot, below-zone median for beachfront land.",
+      "es": "Cuatro lotes residenciales de 1,000 varas (698.9 m²) en Costa del Sol, entre Costa Real y Tesoro Beach. Frente directo al Estero de Jaltepeque, ideal para construcción de muelle privado. Precio de $140,000 por lote, por debajo de la mediana de la zona."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct Estero de Jaltepeque frontage",
+        "es": "Frente directo al Estero de Jaltepeque"
+      },
+      {
+        "en": "Suitable for private dock construction",
+        "es": "Apto para construcción de muelle privado"
+      },
+      {
+        "en": "Between Costa Real and Tesoro Beach",
+        "es": "Entre Costa Real y Tesoro Beach"
+      },
+      {
+        "en": "1,000 varas (698.9 m²) per lot",
+        "es": "1,000 varas (698.9 m²) por lote"
+      },
+      {
+        "en": "$140,000 per lot, below zone median",
+        "es": "$140,000 por lote, por debajo de la mediana"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3456,
+    "tokens_out": 543,
+    "cost_usd": 0.00153042,
+    "finish_reason": "stop",
+    "latency_ms": 5512
+  },
+  "bienesraices|2425": {
+    "ts": "2026-07-04T06:41:18.969489+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "20-Manana Land for Sale in Ahuachapán",
+      "es": "Terreno de 20 Manzanas en Venta en Ahuachapán"
+    },
+    "short_description_canonical": {
+      "en": "20-manzana (139,779 m²) land parcel in Tacuba, Ahuachapán. Flat to semi-flat topography, ideal for agriculture, livestock, or eco-tourism. 8 minutes from the Ahuachapán-Tacuba highway and 15 minutes from Ahuachapán city center. Requires 4x4 vehicle for access; water via artesian well and solar panel potential.",
+      "es": "Parcela de 20 manzanas (139,779 m²) en Tacuba, Ahuachapán. Topografía plana y semiplana, ideal para agricultura, ganadería o ecoturismo. A 8 minutos de la carretera Ahuachapán-Tacuba y 15 minutos del centro de Ahuachapán. Requiere vehículo 4x4; agua mediante pozo artesanal y potencial para paneles solares."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "20 manzanas (139,779 m²) total area",
+        "es": "20 manzanas (139,779 m²) de área total"
+      },
+      {
+        "en": "8 min from Ahuachapán-Tacuba highway",
+        "es": "8 min de la carretera Ahuachapán-Tacuba"
+      },
+      {
+        "en": "Flat to semi-flat, usable terrain",
+        "es": "Terreno plano y semiplano aprovechable"
+      },
+      {
+        "en": "Solar panel and well water potential",
+        "es": "Potencial para paneles solares y pozo de agua"
+      },
+      {
+        "en": "15 min from Ahuachapán city center",
+        "es": "15 min del centro de Ahuachapán"
+      }
+    ],
+    "lat": 13.9003,
+    "lng": -89.9297,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Tacuba, Ahuachapán, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3469,
+    "tokens_out": 603,
+    "cost_usd": 0.00159993,
+    "finish_reason": "stop",
+    "latency_ms": 5905
+  },
+  "realestate_au_sv|lote-sin-numero-canton-la-palma-jurisdiccion-san-rafael-obrajuelo-san-rafael-obrajuelo-la-paz-san-rafael-obrajuelo-la-paz-department-310109150804": {
+    "ts": "2026-07-04T06:41:20.745939+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in La Palma, San Rafael Obrajuelo, La Paz",
+      "es": "Terreno en La Palma, San Rafael Obrajuelo, La Paz"
+    },
+    "short_description_canonical": {
+      "en": "Vacant lot in Cantón La Palma, San Rafael Obrajuelo, La Paz. No built area or structures. Priced at $264,000.",
+      "es": "Lote vacío en Cantón La Palma, San Rafael Obrajuelo, La Paz. Sin área construida ni estructuras. Precio de $264,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in San Rafael Obrajuelo, La Paz",
+        "es": "Ubicado en San Rafael Obrajuelo, La Paz"
+      },
+      {
+        "en": "Price: $264,000",
+        "es": "Precio: $264,000"
+      },
+      {
+        "en": "Vacant lot, no structures",
+        "es": "Lote vacío, sin estructuras"
+      }
+    ],
+    "lat": 13.4167,
+    "lng": -88.95,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Rafael Obrajuelo, La Paz",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3099,
+    "tokens_out": 394,
+    "cost_usd": 0.00127013,
+    "finish_reason": "stop",
+    "latency_ms": 3855
+  },
+  "realestate_au_sv|marcado-como-segundo-canton-san-jose-sacare-la-palma-chalatenango-norte-chalatenango-la-palma-chalatenango-la-palma-chalatenango-310109126938": {
+    "ts": "2026-07-04T06:41:20.753848+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in La Palma, Chalatenango",
+      "es": "Terreno en Venta en La Palma, Chalatenango"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in second canton San José Sacare, La Palma, Chalatenango. Located in northern Chalatenango department. Priced at $115,000.",
+      "es": "Terreno en segundo cantón San José Sacare, La Palma, Chalatenango. Ubicado en el norte del departamento de Chalatenango. Precio de $115,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in La Palma, Chalatenango",
+        "es": "Ubicado en La Palma, Chalatenango"
+      },
+      {
+        "en": "Price: $115,000",
+        "es": "Precio: $115,000"
+      },
+      {
+        "en": "Listed by RE/MAX CENTRAL",
+        "es": "Listado por RE/MAX CENTRAL"
+      }
+    ],
+    "lat": 14.3,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Palma, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3091,
+    "tokens_out": 377,
+    "cost_usd": 0.00124927,
+    "finish_reason": "stop",
+    "latency_ms": 3779
+  },
+  "encuentra24|32622652": {
+    "ts": "2026-07-04T06:41:20.971642+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury Beach House in Isla San Blas, La Libertad",
+      "es": "Casa de lujo en la playa en Isla San Blas, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Fully furnished 390 m² luxury house in a private gated community on Isla San Blas, La Libertad. 5 bedrooms, 6 bathrooms, private pool, covered parking for 2 vehicles, and air conditioning throughout. Sold turnkey with modern high-end finishes and beach access.",
+      "es": "Casa de lujo de 390 m² totalmente amueblada en comunidad privada cerrada en Isla San Blas, La Libertad. 5 habitaciones, 6 baños, piscina privada, aparcamiento cubierto para 2 vehículos y aire acondicionado en toda la propiedad. Se vende totalmente equipada con acabados modernos de alta gama y acceso a la playa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Fully furnished, turnkey property",
+        "es": "Totalmente amueblado, listo para entrar"
+      },
+      {
+        "en": "Private gated community with security",
+        "es": "Comunidad privada cerrada con seguridad"
+      },
+      {
+        "en": "Private pool and entertainment room",
+        "es": "Piscina privada y sala de entretenimiento"
+      },
+      {
+        "en": "Beach access within the community",
+        "es": "Acceso a la playa dentro de la comunidad"
+      }
+    ],
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Blas beach, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 5,
+      "bathrooms": 6.0,
+      "built_area_m2": 390.0,
+      "parking_spaces": 2,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 3430,
+    "tokens_out": 511,
+    "cost_usd": 0.0014882,
+    "finish_reason": "stop",
+    "latency_ms": 4640
+  },
+  "realtyelsalvador|10670": {
+    "ts": "2026-07-04T06:41:22.415154+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "600 m² lot near Playa El Espino, Jucuarán",
+      "es": "Lote de 600 m² cerca de Playa El Espino, Jucuarán"
+    },
+    "short_description_canonical": {
+      "en": "600 m² second-row lot in Playa El Espino, near Estero La Chepona, Jucuarán. Quick access to the sea. Priced at $40,000.",
+      "es": "Lote de 600 m² en segunda fila en Playa El Espino, cerca del Estero La Chepona, Jucuarán. Acceso rápido al mar. Precio: $40,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Second row, quick sea access",
+        "es": "Segunda fila, acceso rápido al mar"
+      },
+      {
+        "en": "600 m² lot, $40,000",
+        "es": "Lote de 600 m², $40,000"
+      },
+      {
+        "en": "Near Estero La Chepona",
+        "es": "Cerca del Estero La Chepona"
+      }
+    ],
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Espino, Jucuarán",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3090,
+    "tokens_out": 409,
+    "cost_usd": 0.0012842,
+    "finish_reason": "stop",
+    "latency_ms": 3837
+  },
+  "realtyelsalvador|10710": {
+    "ts": "2026-07-04T06:41:22.568027+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4 Beach-Near Lots, Chirilagua, San Miguel",
+      "es": "4 lotes cerca del mar, Chirilagua, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Four 264 m² lots for sale on the main road to Playa El Cuco, near the Malecón in Chirilagua, San Miguel. Each lot measures 12 m front by 22 m deep. Access to nearby water and electricity, 2 minutes from the Malecón.",
+      "es": "Cuatro lotes de 264 m² en venta sobre calle principal hacia Playa El Cuco, cerca del Malecón en Chirilagua, San Miguel. Cada lote mide 12 m de frente por 22 m de fondo. Acceso cercano a agua potable y energía eléctrica, a 2 minutos del Malecón."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "2 minutes from Malecón",
+        "es": "A 2 minutos del Malecón"
+      },
+      {
+        "en": "264 m² per lot",
+        "es": "264 m² por lote"
+      },
+      {
+        "en": "Water and electricity access",
+        "es": "Acceso a agua y electricidad"
+      },
+      {
+        "en": "On main road to beach",
+        "es": "Sobre calle principal a la playa"
+      }
+    ],
+    "lat": 13.1894,
+    "lng": -88.3858,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Cuco, Chirilagua, San Miguel",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3144,
+    "tokens_out": 473,
+    "cost_usd": 0.00136918,
+    "finish_reason": "stop",
+    "latency_ms": 4361
+  },
+  "realtyelsalvador|10724": {
+    "ts": "2026-07-04T06:41:23.019229+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3 Lots for Sale, Colonia Miraflores, San Luis Talpa",
+      "es": "3 Lotes en Venta, Colonia Miraflores, San Luis Talpa"
+    },
+    "short_description_canonical": {
+      "en": "Three 210 m² lots in Colonia Miraflores, next to Autopista a Comalapa, near the International Airport. Each lot measures 10.5m x 20m. Financing available: $7,500 down, 12-month interest-free plan.",
+      "es": "Tres lotes de 210 m² en Colonia Miraflores, a un costado de Autopista a Comalapa, cerca del Aeropuerto Internacional. Cada lote mide 10.5m x 20m. Financiamiento disponible: prima de $7,500, plan sin intereses a 12 meses."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Near International Airport and highway",
+        "es": "Cerca del Aeropuerto Internacional y autopista"
+      },
+      {
+        "en": "Interest-free financing for 1 year",
+        "es": "Financiamiento sin intereses por 1 año"
+      },
+      {
+        "en": "Each lot 210 m², 10.5m frontage",
+        "es": "Cada lote de 210 m², 10.5m de frente"
+      },
+      {
+        "en": "Located in established Colonia Miraflores",
+        "es": "Ubicado en la consolidada Colonia Miraflores"
+      }
+    ],
+    "lat": 13.4667,
+    "lng": -89.0833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Luis Talpa, La Paz, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3161,
+    "tokens_out": 502,
+    "cost_usd": 0.00140567,
+    "finish_reason": "stop",
+    "latency_ms": 4895
+  },
+  "realtyelsalvador|10660": {
+    "ts": "2026-07-04T06:41:23.705607+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "1.25 manzanas land near Volcán de San Miguel",
+      "es": "1.25 manzanas de terreno cerca del Volcán de San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Flat 8,750 m² (1.25 manzanas) lot in Caserío El Jocote, near Volcán de San Miguel, Chinameca. Panoramic views, pleasant climate. 74 m frontage, 285 m depth. 30 min to Las Placitas, 1 hour to San Miguel city.",
+      "es": "Lote plano de 8,750 m² (1.25 manzanas) en Caserío El Jocote, cerca del Volcán de San Miguel, Chinameca. Vistas panorámicas, clima agradable. 74 m de frente, 285 m de fondo. 30 min a Las Placitas, 1 hora a la ciudad de San Miguel."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Panoramic volcano views",
+        "es": "Vistas panorámicas al volcán"
+      },
+      {
+        "en": "8,750 m² flat lot",
+        "es": "Lote plano de 8,750 m²"
+      },
+      {
+        "en": "74 m frontage on road",
+        "es": "74 m de frente sobre carretera"
+      },
+      {
+        "en": "30 min to Las Placitas",
+        "es": "30 min a Las Placitas"
+      },
+      {
+        "en": "1 hour to San Miguel city",
+        "es": "1 hora a la ciudad de San Miguel"
+      }
+    ],
+    "lat": 13.5,
+    "lng": -88.1333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Chinameca municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3148,
+    "tokens_out": 519,
+    "cost_usd": 0.00142086,
+    "finish_reason": "stop",
+    "latency_ms": 4735
+  },
+  "realtyelsalvador|10641": {
+    "ts": "2026-07-04T06:41:24.648537+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Two Land Lots in Los Puentes de Cantora, San Miguel",
+      "es": "Dos lotes en Los Puentes de Cantora, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Two adjacent lots of 200 m² each (total 400 m²) in Los Puentes de Cantora, San Miguel Centro, 3 minutes from the road to Playa El Cuco. Each lot measures 10x20 meters. Electricity access and feasibility for a well. 20 minutes from...",
+      "es": "Dos lotes contiguos de 200 m² cada uno (total 400 m²) en Los Puentes de Cantora, San Miguel Centro, a 3 minutos de la calle hacia Playa El Cuco. Cada lote mide 10x20 metros. Acceso a energía eléctrica y factibilidad para pozo. A 20 minutos de..."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Two lots, buy together or separately",
+        "es": "Dos lotes, se venden juntos o separados"
+      },
+      {
+        "en": "3 minutes from road to Playa El Cuco",
+        "es": "A 3 minutos de la calle hacia Playa El Cuco"
+      },
+      {
+        "en": "Electricity access and well feasibility",
+        "es": "Acceso a energía eléctrica y factibilidad para pozo"
+      },
+      {
+        "en": "Total 400 m², each 10x20 m",
+        "es": "Total 400 m², cada uno 10x20 m"
+      }
+    ],
+    "lat": 13.1894,
+    "lng": -88.3858,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Cuco",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3153,
+    "tokens_out": 506,
+    "cost_usd": 0.00140791,
+    "finish_reason": "stop",
+    "latency_ms": 4681
+  },
+  "realtyelsalvador|10626": {
+    "ts": "2026-07-04T06:41:24.758333+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Lot for Sale, Playa El Espino",
+      "es": "Lote frente al mar en venta, Playa El Espino"
+    },
+    "short_description_canonical": {
+      "en": "Flat 1,675 m² beachfront lot in Playa El Espino, Jucuarán, Usulután. First row with 15 meters of ocean frontage. Priced at $130,000.",
+      "es": "Lote plano de 1,675 m² frente al mar en Playa El Espino, Jucuarán, Usulután. Primera fila con 15 metros de frente al mar. Precio de $130,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront first row, 15 m ocean frontage",
+        "es": "Primera fila frente al mar, 15 m de frente"
+      },
+      {
+        "en": "1,675 m² flat lot, ready to build",
+        "es": "Lote plano de 1,675 m², listo para construir"
+      },
+      {
+        "en": "Priced at $130,000, below zone median",
+        "es": "Precio de $130,000, por debajo de la mediana de la zona"
+      }
+    ],
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Espino, Jucuarán",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3104,
+    "tokens_out": 441,
+    "cost_usd": 0.00132318,
+    "finish_reason": "stop",
+    "latency_ms": 4012
+  },
+  "realtyelsalvador|10487": {
+    "ts": "2026-07-04T06:41:25.147067+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "216 m² lot in Residencial Villas Deportivas, San Miguel",
+      "es": "Lote de 216 m² en Residencial Villas Deportivas, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Flat 216 m² residential lot in Residencial Villas Deportivas, San Miguel. 12 m frontage, 18 m depth, with electricity access and feasibility for a well. 7 minutes from Garden Mall and 10 minutes from Metrocentro San Miguel.",
+      "es": "Lote residencial plano de 216 m² en Residencial Villas Deportivas, San Miguel. 12 m de frente por 18 m de fondo, con acceso a energía eléctrica y factibilidad para pozo. A 7 minutos de Garden Mall y 10 minutos de Metrocentro San Miguel."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "12 m frontage, 18 m depth",
+        "es": "12 m de frente, 18 m de fondo"
+      },
+      {
+        "en": "Electricity access and well feasible",
+        "es": "Acceso a electricidad y factibilidad para pozo"
+      },
+      {
+        "en": "7 min from Garden Mall",
+        "es": "A 7 min de Garden Mall"
+      },
+      {
+        "en": "10 min from Metrocentro San Miguel",
+        "es": "A 10 min de Metrocentro San Miguel"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3128,
+    "tokens_out": 474,
+    "cost_usd": 0.00136596,
+    "finish_reason": "stop",
+    "latency_ms": 4175
+  },
+  "realtyelsalvador|10579": {
+    "ts": "2026-07-04T06:41:25.267237+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "480 m² Corner Lot in El Tránsito, San Miguel",
+      "es": "Terreno Esquinero de 480 m² en El Tránsito, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "480 m² corner lot in Lotificación Calle Nueva 2, El Tránsito, San Miguel, near Usulután city. The lot has 13 m frontage by 20 m depth for the corner portion, and 11 m by 20 m for the adjacent lot. Priced at $43,000.",
+      "es": "Terreno esquinero de 480 m² en Lotificación Calle Nueva 2, El Tránsito, San Miguel, cerca de la ciudad de Usulután. El lote tiene 13 m de frente por 20 m de fondo en la parte esquinera, y 11 m por 20 m en el lote contiguo. Precio: $43,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Corner lot with 13 m frontage",
+        "es": "Lote esquinero con 13 m de frente"
+      },
+      {
+        "en": "480 m² total area",
+        "es": "480 m² de área total"
+      },
+      {
+        "en": "Near Usulután city",
+        "es": "Cerca de la ciudad de Usulután"
+      },
+      {
+        "en": "Priced at $43,000",
+        "es": "Precio de $43,000"
+      }
+    ],
+    "lat": 13.3667,
+    "lng": -88.35,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Tránsito, San Miguel, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3149,
+    "tokens_out": 503,
+    "cost_usd": 0.00140353,
+    "finish_reason": "stop",
+    "latency_ms": 4513
+  },
+  "realtyelsalvador|10477": {
+    "ts": "2026-07-04T06:41:26.281512+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Two 200 m² Lots in San Miguel",
+      "es": "Dos lotes de 200 m² en San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Two 10x20 m lots in Lotificación Nuevo San Miguel 2, near shopping centers in San Miguel. Each lot is 200 m², total 400 m². Access to electricity.",
+      "es": "Dos lotes de 10x20 m en Lotificación Nuevo San Miguel 2, cerca de centros comerciales en San Miguel. Cada lote es de 200 m², total 400 m². Acceso a energía eléctrica."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Two adjacent 200 m² lots",
+        "es": "Dos lotes contiguos de 200 m²"
+      },
+      {
+        "en": "Near shopping centers in San Miguel",
+        "es": "Cerca de centros comerciales en San Miguel"
+      },
+      {
+        "en": "Electricity access available",
+        "es": "Acceso a energía eléctrica disponible"
+      },
+      {
+        "en": "Total 400 m² buildable area",
+        "es": "Área total edificable de 400 m²"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3137,
+    "tokens_out": 427,
+    "cost_usd": 0.00131669,
+    "finish_reason": "stop",
+    "latency_ms": 3865
+  },
+  "realtyelsalvador|10267": {
+    "ts": "2026-07-04T06:41:26.557291+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3 Corner Lots for Sale, El Divisadero, Morazán",
+      "es": "3 Lotes de Esquina en Venta, El Divisadero, Morazán"
+    },
+    "short_description_canonical": {
+      "en": "Three 200 m² corner lots for sale in Lotificación Villa Rosa, El Divisadero, Morazán. Each lot measures 10 m front by 20 m deep with water and electricity access. Located near Carretera Ruta Militar on the main street.",
+      "es": "Tres lotes de esquina de 200 m² en venta en Lotificación Villa Rosa, El Divisadero, Morazán. Cada lote mide 10 m de frente por 20 m de fondo con acceso a agua potable y energía eléctrica. Ubicados cerca de la Carretera Ruta Militar sobre calle principal."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Corner lots on main street",
+        "es": "Lotes de esquina sobre calle principal"
+      },
+      {
+        "en": "Water and electricity connected",
+        "es": "Agua y luz conectadas"
+      },
+      {
+        "en": "Near Carretera Ruta Militar",
+        "es": "Cerca de Carretera Ruta Militar"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -88.0333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Divisadero, Morazán",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3138,
+    "tokens_out": 443,
+    "cost_usd": 0.00133456,
+    "finish_reason": "stop",
+    "latency_ms": 3988
+  },
+  "realtyelsalvador|10257": {
+    "ts": "2026-07-04T06:41:27.278515+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Corner Lot in El Transito, San Miguel",
+      "es": "Lote Esquinero en El Tránsito, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Corner lot of 256.57 m² in Lotificación Calle Nueva 2, El Tránsito, San Miguel. One minute from Litoral Highway, 10 minutes from city center. Electricity and water connections available.",
+      "es": "Lote esquinero de 256.57 m² en Lotificación Calle Nueva 2, El Tránsito, San Miguel. A un minuto de la Carretera Litoral, 10 minutos del centro de la ciudad. Conexiones de electricidad y agua potable disponibles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Corner lot, 13x20 meters",
+        "es": "Lote esquinero, 13x20 metros"
+      },
+      {
+        "en": "1 minute from Litoral Highway",
+        "es": "1 minuto de Carretera Litoral"
+      },
+      {
+        "en": "Electricity and water connections",
+        "es": "Conexiones de electricidad y agua"
+      },
+      {
+        "en": "10 minutes from San Miguel city",
+        "es": "10 minutos de la ciudad de San Miguel"
+      }
+    ],
+    "lat": 13.3567,
+    "lng": -88.3467,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Tránsito, San Miguel",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3144,
+    "tokens_out": 455,
+    "cost_usd": 0.00134938,
+    "finish_reason": "stop",
+    "latency_ms": 4258
+  },
+  "realtyelsalvador|10246": {
+    "ts": "2026-07-04T06:41:27.543788+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "480 m² lot on Ruta Militar, El Divisadero",
+      "es": "Lote de 480 m² sobre Ruta Militar, El Divisadero"
+    },
+    "short_description_canonical": {
+      "en": "480.80 m² lot on Ruta Militar highway in Cantón Las Conchas, El Divisadero, Morazán. Electricity access and tubed artesian well included. 15 minutes from San Miguel.",
+      "es": "Lote de 480.80 m² sobre Carretera Ruta Militar en Cantón Las Conchas, El Divisadero, Morazán. Incluye acceso a energía eléctrica y pozo artesanal entubado. A 15 minutos de San Miguel."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "On Ruta Militar highway",
+        "es": "Sobre Carretera Ruta Militar"
+      },
+      {
+        "en": "Electricity and water ready",
+        "es": "Electricidad y agua listas"
+      },
+      {
+        "en": "15 minutes from San Miguel",
+        "es": "A 15 minutos de San Miguel"
+      }
+    ],
+    "lat": 13.7333,
+    "lng": -88.0833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Divisadero, Morazán",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3132,
+    "tokens_out": 410,
+    "cost_usd": 0.00129664,
+    "finish_reason": "stop",
+    "latency_ms": 3837
+  },
+  "realtyelsalvador|10216": {
+    "ts": "2026-07-04T06:41:28.960777+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Large Lot in El Paraíso, San Miguel",
+      "es": "Lote grande en El Paraíso, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Flat 250 m² lot in Lotificación El Paraíso, 7 minutes from Walmart San Miguel. 10 m frontage by 25 m depth, with electricity access and feasibility for a well. Near Calle Al Delirio, 7 minutes from Garden Mall and Walmart.",
+      "es": "Lote plano de 250 m² en Lotificación El Paraíso, a 7 minutos de Walmart San Miguel. 10 m de frente por 25 m de fondo, con acceso a energía eléctrica y factibilidad para pozo. Cerca de Calle Al Delirio, a 7 minutos de Garden Mall y Walmart."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "7 min to Walmart San Miguel",
+        "es": "7 min a Walmart San Miguel"
+      },
+      {
+        "en": "Electricity access available",
+        "es": "Acceso a energía eléctrica"
+      },
+      {
+        "en": "Well feasibility included",
+        "es": "Factibilidad para pozo"
+      },
+      {
+        "en": "10x25 m lot, 250 m²",
+        "es": "Lote 10x25 m, 250 m²"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3121,
+    "tokens_out": 452,
+    "cost_usd": 0.00133987,
+    "finish_reason": "stop",
+    "latency_ms": 4311
+  },
+  "realtyelsalvador|10208": {
+    "ts": "2026-07-04T06:41:29.010461+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "700 m² lot in Quelepa, San Miguel",
+      "es": "Terreno de 700 m² en Quelepa, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "700 m² lot in Caserío El Castaño, Quelepa, San Miguel. Two adobe structures, two large washbasins, artesian well, and electricity access. 8 minutes from Quelepa park, 15 minutes from San Miguel.",
+      "es": "Terreno de 700 m² en Caserío El Castaño, Quelepa, San Miguel. Dos construcciones de adobe, dos pilas grandes, pozo artesanal y acceso a electricidad. A 8 minutos del parque de Quelepa, 15 minutos de San Miguel."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "700 m² lot with two structures",
+        "es": "Terreno de 700 m² con dos construcciones"
+      },
+      {
+        "en": "Artesian well and electricity",
+        "es": "Pozo artesanal y electricidad"
+      },
+      {
+        "en": "8 min from Quelepa park",
+        "es": "8 min del parque de Quelepa"
+      },
+      {
+        "en": "15 min from San Miguel",
+        "es": "15 min de San Miguel"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Quelepa, San Miguel",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3147,
+    "tokens_out": 454,
+    "cost_usd": 0.00134909,
+    "finish_reason": "stop",
+    "latency_ms": 4251
+  },
+  "realtyelsalvador|10051": {
+    "ts": "2026-07-04T06:41:29.778209+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4 Land Lots in El Obrajuelo, San Miguel",
+      "es": "4 Lotes en El Obrajuelo, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Four 200 m² residential lots in El Obrajuelo gated community, San Miguel, near El Encuentro mall and PriceSmart. Each lot is 10x20 m, with water and electricity access. Two lots have trees.",
+      "es": "Cuatro lotes residenciales de 200 m² en residencial privada El Obrajuelo, San Miguel, cerca de Centro Comercial El Encuentro y PriceSmart. Cada lote mide 10x20 m, con acceso a agua potable y energía eléctrica. Dos lotes tienen árboles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Gated community with access control",
+        "es": "Residencial privada con control de acceso"
+      },
+      {
+        "en": "Near El Encuentro mall and PriceSmart",
+        "es": "Cerca de Centro Comercial El Encuentro y PriceSmart"
+      },
+      {
+        "en": "Water and electricity available",
+        "es": "Acceso a agua potable y energía eléctrica"
+      },
+      {
+        "en": "Two lots with trees",
+        "es": "Dos lotes con árboles"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Quelepa, San Miguel, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3150,
+    "tokens_out": 464,
+    "cost_usd": 0.0013609,
+    "finish_reason": "stop",
+    "latency_ms": 4510
+  },
+  "realtyelsalvador|10106": {
+    "ts": "2026-07-04T06:41:29.843158+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "200 m² corner lot near El Cuco beach",
+      "es": "Lote de esquina 200 m² cerca de Playa El Cuco"
+    },
+    "short_description_canonical": {
+      "en": "200 m² corner lot in Hacienda San Román, second row from El Cuco beach, 5 minutes from the Malecón. Lot measures 10 m front by 20 m deep, with banana plants. Priced at $18,000.",
+      "es": "Lote de esquina de 200 m² en Hacienda San Román, segunda fila de Playa El Cuco, a 5 minutos del Malecón. Mide 10 m de frente por 20 m de fondo, con matas de guineo. Precio: $18,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Corner lot, 10x20 m",
+        "es": "Lote de esquina, 10x20 m"
+      },
+      {
+        "en": "5 min walk to El Cuco boardwalk",
+        "es": "5 min caminando al Malecón de El Cuco"
+      },
+      {
+        "en": "Second row from beach",
+        "es": "Segunda fila de la playa"
+      },
+      {
+        "en": "Banana plants on site",
+        "es": "Con matas de guineo"
+      },
+      {
+        "en": "Priced at $18,000",
+        "es": "Precio: $18,000"
+      }
+    ],
+    "lat": 13.1894,
+    "lng": -88.3858,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Cuco",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3133,
+    "tokens_out": 493,
+    "cost_usd": 0.00138821,
+    "finish_reason": "stop",
+    "latency_ms": 4695
+  },
+  "realtyelsalvador|10025": {
+    "ts": "2026-07-04T06:41:30.137671+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "1,559 m² lot near San Miguel, cool climate",
+      "es": "Terreno de 1,559 m² cerca de San Miguel, clima fresco"
+    },
+    "short_description_canonical": {
+      "en": "Flat 1,559 m² residential lot on Volcán de San Miguel, 8 minutes from Residencial San Andrés. Cool climate ideal for a country house. Near San Miguel city and Pricesmart.",
+      "es": "Terreno residencial plano de 1,559 m² en el Volcán de San Miguel, a 8 minutos de Residencial San Andrés. Clima fresco ideal para casa de campo. Cerca de la ciudad de San Miguel y Pricesmart."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1,559 m² flat lot",
+        "es": "Terreno plano de 1,559 m²"
+      },
+      {
+        "en": "8 minutes from Residencial San Andrés",
+        "es": "A 8 minutos de Residencial San Andrés"
+      },
+      {
+        "en": "Cool climate, country house potential",
+        "es": "Clima fresco, ideal para casa de campo"
+      },
+      {
+        "en": "Near San Miguel city and Pricesmart",
+        "es": "Cerca de San Miguel y Pricesmart"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel city centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3133,
+    "tokens_out": 442,
+    "cost_usd": 0.00133211,
+    "finish_reason": "stop",
+    "latency_ms": 3855
+  },
+  "realtyelsalvador|9999": {
+    "ts": "2026-07-04T06:41:30.682944+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Large Lot with Fruit Trees in Monte Grande",
+      "es": "Lote grande con árboles frutales en Monte Grande"
+    },
+    "short_description_canonical": {
+      "en": "240 m² residential lot in Monte Grande, San Miguel, near Monte Grande school. Lot measures 10 m front by 24 m deep, with electricity access and feasibility for a well. Includes fruit trees and a rear perimeter wall.",
+      "es": "Lote residencial de 240 m² en Monte Grande, San Miguel, cerca de la escuela de Monte Grande. El lote mide 10 m de frente por 24 m de fondo, con acceso a energía eléctrica y factibilidad para pozo. Incluye árboles frutales y muro perimetral atrás."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "240 m² lot with fruit trees",
+        "es": "Lote de 240 m² con árboles frutales"
+      },
+      {
+        "en": "Electricity access and well feasibility",
+        "es": "Acceso a electricidad y factibilidad para pozo"
+      },
+      {
+        "en": "Near Monte Grande school",
+        "es": "Cerca de la escuela de Monte Grande"
+      },
+      {
+        "en": "Rear perimeter wall included",
+        "es": "Muro perimetral atrás incluido"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3121,
+    "tokens_out": 450,
+    "cost_usd": 0.00133767,
+    "finish_reason": "stop",
+    "latency_ms": 4125
+  },
+  "realtyelsalvador|9929": {
+    "ts": "2026-07-04T06:41:31.591618+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Large Lot with Retaining Wall in El Jobo",
+      "es": "Lote grande con muro de contención en El Jobo"
+    },
+    "short_description_canonical": {
+      "en": "342 m² flat lot in El Jobo, Cantora, San Miguel, one minute from Calle al Delirio and 15 minutes from San Miguel. Includes a retaining wall. Priced at $19,500.",
+      "es": "Lote plano de 342 m² en El Jobo, Cantora, San Miguel, a un minuto de Calle al Delirio y 15 minutos de San Miguel. Incluye muro de contención. Precio: $19,500."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "342 m² lot with retaining wall",
+        "es": "Lote de 342 m² con muro de contención"
+      },
+      {
+        "en": "1 minute from Calle al Delirio",
+        "es": "A 1 minuto de Calle al Delirio"
+      },
+      {
+        "en": "15 minutes from San Miguel",
+        "es": "A 15 minutos de San Miguel"
+      },
+      {
+        "en": "Price $19,500 for 342 m²",
+        "es": "Precio $19,500 por 342 m²"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3089,
+    "tokens_out": 449,
+    "cost_usd": 0.00132793,
+    "finish_reason": "stop",
+    "latency_ms": 4047
+  },
+  "realtyelsalvador|9957": {
+    "ts": "2026-07-04T06:41:31.619250+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "375 m² lot with panoramic views in Alegría",
+      "es": "Lote de 375 m² con vistas panorámicas en Alegría"
+    },
+    "short_description_canonical": {
+      "en": "Flat 375 m² residential lot in Alegría, Usulután. Dimensions 14 m front by 25 m deep, with 220v electricity access. Panoramic views and pleasant climate.",
+      "es": "Lote residencial plano de 375 m² en Alegría, Usulután. Medidas 14 m de frente por 25 m de fondo, con acceso a energía eléctrica 220v. Vistas panorámicas y clima agradable."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "375 m² flat lot, 14x25 m",
+        "es": "Lote plano de 375 m², 14x25 m"
+      },
+      {
+        "en": "220v electricity access",
+        "es": "Acceso a energía eléctrica 220v"
+      },
+      {
+        "en": "Panoramic views, pleasant climate",
+        "es": "Vistas panorámicas, clima agradable"
+      },
+      {
+        "en": "Located in Alegría, Usulután",
+        "es": "Ubicado en Alegría, Usulután"
+      }
+    ],
+    "lat": 13.5067,
+    "lng": -88.4833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Alegría, Usulután, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3115,
+    "tokens_out": 451,
+    "cost_usd": 0.00133715,
+    "finish_reason": "stop",
+    "latency_ms": 4340
+  },
+  "realtyelsalvador|9852": {
+    "ts": "2026-07-04T06:41:33.090614+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Lot with Avocado Trees in Alegría",
+      "es": "Lote Plano con Árboles de Aguacate en Alegría"
+    },
+    "short_description_canonical": {
+      "en": "Flat 350 m² lot with avocado and mamón trees in Alegría, Usulután. Electricity access available, near the town center. Potable water pending.",
+      "es": "Lote plano de 350 m² con árboles de aguacate y mamón en Alegría, Usulután. Acceso a electricidad, cerca del casco urbano. Agua potable pendiente."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "350 m² flat lot, ready to build",
+        "es": "Lote plano de 350 m², listo para construir"
+      },
+      {
+        "en": "Electricity access available",
+        "es": "Acceso a electricidad disponible"
+      },
+      {
+        "en": "Fruit trees already on site",
+        "es": "Árboles frutales ya en el terreno"
+      },
+      {
+        "en": "Near Alegría town center",
+        "es": "Cerca del casco urbano de Alegría"
+      }
+    ],
+    "lat": 13.5072,
+    "lng": -88.4889,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Alegría, Usulután, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3145,
+    "tokens_out": 428,
+    "cost_usd": 0.00131995,
+    "finish_reason": "stop",
+    "latency_ms": 4079
+  },
+  "realtyelsalvador|9807": {
+    "ts": "2026-07-04T06:41:33.770804+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Two adjacent lots, 500 m² total, San Miguel",
+      "es": "Dos lotes juntos, 500 m² total, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Two adjacent lots of 10x25 m each, totaling 500 m², in Lotificación El Paraíso, San Miguel. Located near Calle Al Delirio and Walmart San Miguel. Priced at $23,000.",
+      "es": "Dos lotes juntos de 10x25 m cada uno, totalizando 500 m², en Lotificación El Paraíso, San Miguel. Ubicados cerca de Calle Al Delirio y Walmart San Miguel. Precio de $23,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Two adjacent lots, 500 m² total",
+        "es": "Dos lotes juntos, 500 m² total"
+      },
+      {
+        "en": "Near Calle Al Delirio and Walmart",
+        "es": "Cerca de Calle Al Delirio y Walmart"
+      },
+      {
+        "en": "Price $23,000 for both lots",
+        "es": "Precio $23,000 por ambos lotes"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3095,
+    "tokens_out": 427,
+    "cost_usd": 0.00130535,
+    "finish_reason": "stop",
+    "latency_ms": 3992
+  },
+  "realtyelsalvador|8827": {
+    "ts": "2026-07-04T06:41:33.930929+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "242 m² lot in San Miguel, near shops",
+      "es": "Lote de 242 m² en San Miguel, cerca de tiendas"
+    },
+    "short_description_canonical": {
+      "en": "Flat 242 m² residential lot in a developing area of San Miguel, near shopping centers and convenience stores. Paved road access and utilities available. Priced at $35,000.",
+      "es": "Lote residencial plano de 242 m² en zona en desarrollo de San Miguel, cerca de centros comerciales y tiendas de conveniencia. Acceso por calle pavimentada y servicios disponibles. Precio de $35,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "242 m² flat lot",
+        "es": "Lote plano de 242 m²"
+      },
+      {
+        "en": "Developing area in San Miguel",
+        "es": "Zona en desarrollo en San Miguel"
+      },
+      {
+        "en": "Near shopping centers and stores",
+        "es": "Cerca de centros comerciales y tiendas"
+      },
+      {
+        "en": "Priced at $35,000",
+        "es": "Precio de $35,000"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3075,
+    "tokens_out": 417,
+    "cost_usd": 0.00128895,
+    "finish_reason": "stop",
+    "latency_ms": 3792
+  },
+  "realtyelsalvador|8879": {
+    "ts": "2026-07-04T06:41:33.972768+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3 Large Lots 2 Min from Beach, Playa El Esterón",
+      "es": "3 Grandes Lotes a 2 Min de la Playa El Esterón"
+    },
+    "short_description_canonical": {
+      "en": "Three large lots totaling 540 m², two minutes from Playa El Esterón in eastern El Salvador. Located in Intipucá, La Unión department. Priced at $42,000 for the combined lots.",
+      "es": "Tres lotes grandes de 540 m² totales, a dos minutos de Playa El Esterón en el oriente de El Salvador. Ubicados en Intipucá, departamento de La Unión. Precio de $42,000 por los lotes combinados."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "2-minute walk to Playa El Esterón",
+        "es": "A 2 minutos caminando de Playa El Esterón"
+      },
+      {
+        "en": "540 m² total lot area",
+        "es": "540 m² de área total de lotes"
+      },
+      {
+        "en": "Price $42,000 for three lots",
+        "es": "Precio $42,000 por tres lotes"
+      },
+      {
+        "en": "Located in Intipucá, La Unión",
+        "es": "Ubicado en Intipucá, La Unión"
+      }
+    ],
+    "lat": 13.1822,
+    "lng": -88.1839,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Esterón",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3093,
+    "tokens_out": 470,
+    "cost_usd": 0.00135211,
+    "finish_reason": "stop",
+    "latency_ms": 4129
+  },
+  "realtyelsalvador|9892": {
+    "ts": "2026-07-04T06:41:34.118059+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Playa Punta Mango, Surf City",
+      "es": "Terreno en Venta cerca de Playa Punta Mango, Surf City"
+    },
+    "short_description_canonical": {
+      "en": "Flat 1,400 m² lot in second row at Playa El Carrizal, near Playa Punta Mango in Surf City Circuit 2, eastern El Salvador. Lot measures 20 m front by 70 m depth with mature coconut and fruit trees. Includes potable water, fencing, and electrical access.",
+      "es": "Lote plano de 1,400 m² en segunda fila en Playa El Carrizal, cerca de Playa Punta Mango en el Circuito 2 de Surf City, oriente de El Salvador. El terreno mide 20 m de frente por 70 m de fondo con árboles de coco y frutales maduros. Incluye agua potable, cercado y acceso a energía eléctrica."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Second row, near Playa Punta Mango",
+        "es": "Segunda fila, cerca de Playa Punta Mango"
+      },
+      {
+        "en": "1,400 m² with coconut and fruit trees",
+        "es": "1,400 m² con cocoteros y árboles frutales"
+      },
+      {
+        "en": "Potable water, fencing, electrical access",
+        "es": "Agua potable, cercado, acceso eléctrico"
+      },
+      {
+        "en": "Part of Surf City Circuit 2",
+        "es": "Parte del Circuito 2 de Surf City"
+      }
+    ],
+    "lat": 13.1894,
+    "lng": -88.3858,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Punta Mango (near Playa El Carrizal)",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3143,
+    "tokens_out": 528,
+    "cost_usd": 0.00142941,
+    "finish_reason": "stop",
+    "latency_ms": 5156
+  },
+  "remax|002684399006": {
+    "ts": "2026-07-04T06:41:35.597181+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Lot in El Refugio, Atiquizaya, Ahuachapán",
+      "es": "Lote Plano en El Refugio, Atiquizaya, Ahuachapán"
+    },
+    "short_description_canonical": {
+      "en": "Flat 224.76 m² residential lot in El Salitrero Canton, El Refugio, Atiquizaya, Ahuachapán. Has access to potable water and electricity. Ready for construction in a growing area.",
+      "es": "Lote residencial plano de 224.76 m² en cantón El Salitrero, El Refugio, Atiquizaya, Ahuachapán. Cuenta con acceso a agua potable y electricidad. Listo para construir en una zona en crecimiento."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat topography, ready to build",
+        "es": "Topografía plana, lista para construir"
+      },
+      {
+        "en": "Potable water and electricity available",
+        "es": "Agua potable y electricidad disponibles"
+      },
+      {
+        "en": "Growing area with investment potential",
+        "es": "Zona en crecimiento con potencial de inversión"
+      }
+    ],
+    "lat": 13.9167,
+    "lng": -89.8333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Atiquizaya, Ahuachapán",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3204,
+    "tokens_out": 426,
+    "cost_usd": 0.00133368,
+    "finish_reason": "stop",
+    "latency_ms": 3977
+  },
+  "remax|002524178012": {
+    "ts": "2026-07-04T06:41:35.841316+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "26,800 m² Productive Farm, Candelaria, Cojutepeque",
+      "es": "Finca productiva de 26,800 m², Candelaria, Cojutepeque"
+    },
+    "short_description_canonical": {
+      "en": "26,800 m² agricultural farm in Nance Verde, Candelaria, Cojutepeque, Cuscatlán Sur. Features 3,000 banana plants, 200 orange trees, deep water well at 115 m with pump. Located in front of Cerro de las Pavas, minutes from Lake Ilopango.",
+      "es": "Finca agrícola de 26,800 m² en Nance Verde, Candelaria, Cojutepeque, Cuscatlán Sur. Cuenta con 3,000 plantas de banano, 200 naranjos, pozo profundo de 115 m con bomba. Ubicada frente al Cerro de las Pavas, a minutos del Lago de Ilopango."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3,000 productive banana plants",
+        "es": "3,000 plantas de banano productivas"
+      },
+      {
+        "en": "Deep water well with pump",
+        "es": "Pozo profundo con bomba"
+      },
+      {
+        "en": "Fronting Cerro de las Pavas",
+        "es": "Frente al Cerro de las Pavas"
+      },
+      {
+        "en": "Minutes from Lake Ilopango",
+        "es": "Minutos del Lago de Ilopango"
+      },
+      {
+        "en": "26,800 m² with diverse crops",
+        "es": "26,800 m² con cultivos diversos"
+      }
+    ],
+    "lat": 13.6667,
+    "lng": -89.0833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Candelaria, Cojutepeque, Cuscatlán Sur",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3508,
+    "tokens_out": 542,
+    "cost_usd": 0.00154336,
+    "finish_reason": "stop",
+    "latency_ms": 5158
+  },
+  "remax|001462660078": {
+    "ts": "2026-07-04T06:41:36.098407+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Residential Lot in Altos de Las Piletas",
+      "es": "Lote Residencial en Altos de Las Piletas"
+    },
+    "short_description_canonical": {
+      "en": "Residential lot of 681.81 m² in Altos de Las Piletas, Km 12.5 road to Comasagua, La Unión. The development offers underground utilities, security gatehouse, and recreational areas. Over 40% of the project is green space.",
+      "es": "Lote residencial de 681.81 m² en Altos de Las Piletas, Km 12.5 carretera a Comasagua, La Unión. El desarrollo ofrece servicios subterráneos, garita de seguridad y áreas recreativas. Más del 40% del proyecto es área verde."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Security gatehouse at entrance",
+        "es": "Garita de seguridad en la entrada"
+      },
+      {
+        "en": "Over 40% green space",
+        "es": "Más del 40% de área verde"
+      },
+      {
+        "en": "Close to ESEN and Colegio Lamatepec",
+        "es": "Cerca de ESEN y Colegio Lamatepec"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3403,
+    "tokens_out": 470,
+    "cost_usd": 0.00143581,
+    "finish_reason": "stop",
+    "latency_ms": 4506
+  },
+  "santizo|10118706": {
+    "ts": "2026-07-04T06:41:37.632691+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3-Bed Home in Gated Community, Los Planes de Renderos",
+      "es": "Casa de 3 habs. en residencial privada, Los Planes de Renderos"
+    },
+    "short_description_canonical": {
+      "en": "House for sale in a gated community in Los Planes de Renderos, Panchimalco. It has 3 bedrooms, 3 bathrooms, living room, dining room, kitchen, full service area, storage room, and large garden. 24/7 security included.",
+      "es": "Casa en venta en residencial privada en Los Planes de Renderos, Panchimalco. Cuenta con 3 habitaciones, 3 baños, sala, comedor, cocina, área de servicio completa, bodega y amplio jardín. Seguridad 24/7 incluida."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Residencial privada con seguridad 24/7"
+      },
+      {
+        "en": "3 bedrooms and 3 bathrooms",
+        "es": "3 habitaciones y 3 baños"
+      },
+      {
+        "en": "Large garden and storage room",
+        "es": "Amplio jardín y bodega"
+      },
+      {
+        "en": "Full service area included",
+        "es": "Área de servicio completa incluida"
+      }
+    ],
+    "lat": 13.5833,
+    "lng": -89.1667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Panchimalco, San Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3136,
+    "tokens_out": 474,
+    "cost_usd": 0.00136812,
+    "finish_reason": "stop",
+    "latency_ms": 3861
+  },
+  "remax|001463594052": {
+    "ts": "2026-07-04T06:41:37.693977+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "1.74 Acre Lot in San Rafael Obrajuelo",
+      "es": "Terreno de 1.74 acres en San Rafael Obrajuelo"
+    },
+    "short_description_canonical": {
+      "en": "Flat 7,000 m² semi-urban lot in Cantón La Palma, San Rafael Obrajuelo, La Paz. Mostly flat terrain with gentle slope, suitable for residential development. Electricity, potable water, and mobile coverage available; good road access to urban center.",
+      "es": "Lote semiurbano plano de 7,000 m² en Cantón La Palma, San Rafael Obrajuelo, La Paz. Terreno mayormente plano con pendiente suave, apto para desarrollo residencial. Cuenta con electricidad, agua potable y cobertura móvil; buen acceso vial al centro urbano."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1.74 acres (7,000 m²) flat lot",
+        "es": "1.74 acres (7,000 m²) de terreno plano"
+      },
+      {
+        "en": "Electricity, water, mobile coverage available",
+        "es": "Electricidad, agua y cobertura móvil disponibles"
+      },
+      {
+        "en": "Good road access to urban center",
+        "es": "Buen acceso vial al centro urbano"
+      },
+      {
+        "en": "Suitable for residential development",
+        "es": "Apto para desarrollo residencial"
+      },
+      {
+        "en": "Strategic location for urban growth",
+        "es": "Ubicación estratégica para crecimiento urbano"
+      }
+    ],
+    "lat": 13.5,
+    "lng": -88.95,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Rafael Obrajuelo, La Paz",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3225,
+    "tokens_out": 511,
+    "cost_usd": 0.00143285,
+    "finish_reason": "stop",
+    "latency_ms": 4603
+  },
+  "santizo|10115712": {
+    "ts": "2026-07-04T06:41:38.416933+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Torre Avia Luxury Apartments, Lomas de San Francisco",
+      "es": "Torre Avia Apartamentos de Lujo, Lomas de San Francisco"
+    },
+    "short_description_canonical": {
+      "en": "Torre Avia is a residential project in Lomas de San Francisco, offering apartments where comfort and functionality meet luxury. Amenities include pool, gym, coworking, cinema room, and rooftop deck. Price: $248,500.",
+      "es": "Torre Avia es un proyecto residencial en Lomas de San Francisco, que ofrece apartamentos donde el confort y la funcionalidad se encuentran con el lujo. Amenidades incluyen piscina, gimnasio, coworking, sala de cine y terraza. Precio: $248,500."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Luxury amenities: pool, gym, coworking",
+        "es": "Amenidades de lujo: piscina, gimnasio, coworking"
+      },
+      {
+        "en": "Located in Lomas de San Francisco",
+        "es": "Ubicado en Lomas de San Francisco"
+      },
+      {
+        "en": "Rooftop deck with sky lounge",
+        "es": "Terraza con sky lounge"
+      },
+      {
+        "en": "Pet wash and yoga garden",
+        "es": "Pet wash y jardín de yoga"
+      }
+    ],
+    "lat": 13.6892,
+    "lng": -89.2472,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Lomas de San Francisco, San Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3311,
+    "tokens_out": 466,
+    "cost_usd": 0.00140657,
+    "finish_reason": "stop",
+    "latency_ms": 4443
+  },
+  "encuentra24|32586058": {
+    "ts": "2026-07-04T07:27:19.924311+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury Residence in Alcázar Park, Coronado Golf",
+      "es": "Residencia de Lujo en Alcázar Park, Coronado Golf"
+    },
+    "short_description_canonical": {
+      "en": "Luxury house on a 2,250 m² lot in Alcázar Park, Coronado Golf & Country Club. It has 4 bedrooms, 3 bathrooms, private pool, gazebo, and bar. Located in an exclusive residential area with golf course views, near beaches and services.",
+      "es": "Casa de lujo en terreno de 2,250 m² en Alcázar Park, Coronado Golf & Country Club. Cuenta con 4 recámaras, 3 baños, piscina privada, gazebo y bar. Ubicada en zona residencial exclusiva con vista al campo de golf, cerca de playas y servicios."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "2,250 m² lot with privacy",
+        "es": "Terreno de 2,250 m² con privacidad"
+      },
+      {
+        "en": "Private pool, gazebo, and bar",
+        "es": "Piscina privada, gazebo y bar"
+      },
+      {
+        "en": "In Alcázar Park, Coronado Golf",
+        "es": "En Alcázar Park, Coronado Golf"
+      },
+      {
+        "en": "Minutes from beaches and services",
+        "es": "Minutos de playas y servicios"
+      }
+    ],
+    "lat": 8.5167,
+    "lng": -79.8833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Coronado Golf, Playa Coronado",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 3.0,
+      "built_area_m2": 2250.0,
+      "parking_spaces": 5,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2603,
+    "tokens_out": 496,
+    "cost_usd": 0.00124841,
+    "finish_reason": "stop",
+    "latency_ms": 4276
+  },
+  "encuentra24|32625456": {
+    "ts": "2026-07-04T07:27:20.148387+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lakefront Colonial House in Buenaventura Resort",
+      "es": "Casa Colonial Frente al Lago en Buenaventura Resort"
+    },
+    "short_description_canonical": {
+      "en": "Single-story colonial Spanish-inspired house on a 1,251 m² flat lot with 287 m² built area in PH Los Portales, Buenaventura Golf & Beach Resort, Pacific coast. 3 bedrooms, 4 bathrooms, 2 parking spaces. Lakefront location within a gated resort community.",
+      "es": "Casa uniplanta de inspiración colonial española en lote plano de 1,251 m² con 287 m² construidos en PH Los Portales, Buenaventura Golf & Beach Resort, costa pacífica. 3 habitaciones, 4 baños, 2 estacionamientos. Ubicación frente al lago dentro de un resort cerrado."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Lakefront lot in Buenaventura Resort",
+        "es": "Lote frente al lago en Buenaventura Resort"
+      },
+      {
+        "en": "1,251 m² flat terrain",
+        "es": "1,251 m² de terreno plano"
+      },
+      {
+        "en": "287 m² colonial-style residence",
+        "es": "287 m² de residencia estilo colonial"
+      },
+      {
+        "en": "3 bedrooms, 4 bathrooms",
+        "es": "3 habitaciones, 4 baños"
+      },
+      {
+        "en": "Gated community with golf & beach",
+        "es": "Comunidad cerrada con golf y playa"
+      }
+    ],
+    "lat": 8.1833,
+    "lng": -80.0667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Buenaventura, Río Hato, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 4.0,
+      "built_area_m2": 287.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2340,
+    "tokens_out": 527,
+    "cost_usd": 0.0012115,
+    "finish_reason": "stop",
+    "latency_ms": 4500
+  },
+  "encuentra24|32486912": {
+    "ts": "2026-07-04T07:27:20.197059+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4BR House with Pool in Coronado, Panama",
+      "es": "Casa 4 habs con piscina en Coronado, Panamá"
+    },
+    "short_description_canonical": {
+      "en": "House of 500 m² built on a 1,200 m² lot in Coronado, near beaches and services. 4 bedrooms, 3 bathrooms, private pool, BBQ area, and fruit trees. Gated property with water tank, hot water system, and security features.",
+      "es": "Casa de 500 m² construidos en un terreno de 1,200 m² en Coronado, cerca de playas y servicios. 4 recámaras, 3 baños, piscina privada, área BBQ y árboles frutales. Propiedad cercada con tanque de agua, sistema de agua caliente y seguridad."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "4 bedrooms, 3 bathrooms",
+        "es": "4 recámaras, 3 baños"
+      },
+      {
+        "en": "Private pool and BBQ area",
+        "es": "Piscina privada y área BBQ"
+      },
+      {
+        "en": "1,200 m² lot with fruit trees",
+        "es": "Terreno de 1,200 m² con árboles frutales"
+      },
+      {
+        "en": "Located in Coronado near beaches",
+        "es": "Ubicado en Coronado cerca de playas"
+      },
+      {
+        "en": "Security features: gated, CCTV",
+        "es": "Seguridad: portón eléctrico, circuito cerrado"
+      }
+    ],
+    "lat": 8.5,
+    "lng": -80.0,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Coronado, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 3.0,
+      "built_area_m2": 500.0,
+      "parking_spaces": 2,
+      "furnished": false,
+      "has_pool": true
+    },
+    "tokens_in": 2660,
+    "tokens_out": 519,
+    "cost_usd": 0.0012891,
+    "finish_reason": "stop",
+    "latency_ms": 4550
+  },
+  "encuentra24|25325238": {
+    "ts": "2026-07-04T07:27:20.347400+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront 3-Home Property in Playa Gorgona",
+      "es": "Propiedad frente al mar en Playa Gorgona con 3 viviendas"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront property on Playa Gorgona with 2,161.50 m² lot and 527 m² built area. Built in 2003, it features three attached two-story homes, each with 2 bedrooms and 3 bathrooms, plus a jacuzzi and water reserve system. Includes 6 parking spaces.",
+      "es": "Propiedad frente al mar en Playa Gorgona con lote de 2,161.50 m² y 527 m² construidos. Construida en 2003, cuenta con tres viviendas adosadas de dos niveles, cada una con 2 habitaciones y 3 baños, además de jacuzzi y sistema de reserva de agua. Incluye 6 estacionamientos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront on Playa Gorgona",
+        "es": "Frente al mar en Playa Gorgona"
+      },
+      {
+        "en": "Three attached homes, 6 bedrooms total",
+        "es": "Tres viviendas adosadas, 6 habitaciones total"
+      },
+      {
+        "en": "Built 2003, well-maintained",
+        "es": "Construida en 2003, bien conservada"
+      },
+      {
+        "en": "Includes jacuzzi and water reserve",
+        "es": "Incluye jacuzzi y sistema de reserva de agua"
+      },
+      {
+        "en": "6 parking spaces",
+        "es": "6 estacionamientos"
+      }
+    ],
+    "lat": 8.5333,
+    "lng": -79.8667,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Gorgona, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": 2003,
+      "year_renovated": null,
+      "bedrooms": 6,
+      "bathrooms": 9.0,
+      "built_area_m2": 527.0,
+      "parking_spaces": 6,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2616,
+    "tokens_out": 551,
+    "cost_usd": 0.00131242,
+    "finish_reason": "stop",
+    "latency_ms": 4700
+  },
+  "encuentra24|32643943": {
+    "ts": "2026-07-04T07:27:20.422929+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "680m² Luxury House in Ocean Lakes, Buenaventura",
+      "es": "Casa de lujo de 680m² en Ocean Lakes, Buenaventura"
+    },
+    "short_description_canonical": {
+      "en": "This 680 m² three-level house in Ocean Lakes, Buenaventura, Playa Blanca, is fully furnished. It features 4 bedrooms, 5.5 bathrooms, a private pool, jacuzzi, and terrace with lake and golf course views. Located within Buenaventura Golf & Beach Resort, it offers 24/7 security, marina, beach clubs, and a Jack Nicklaus golf course.",
+      "es": "Esta casa de tres niveles de 680 m² en Ocean Lakes, Buenaventura, Playa Blanca, está completamente amoblada. Cuenta con 4 recámaras, 5.5 baños, piscina privada, jacuzzi y terraza con vista al lago y al campo de golf. Ubicada dentro de Buenaventura Golf & Beach Resort, ofrece seguridad 24/7, marina, clubes de playa y un campo de golf de Jack Nicklaus."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Fully furnished, turnkey ready",
+        "es": "Completamente amoblado, listo para habitar"
+      },
+      {
+        "en": "Private pool and jacuzzi",
+        "es": "Piscina privada y jacuzzi"
+      },
+      {
+        "en": "Lake and golf course views",
+        "es": "Vista al lago y al campo de golf"
+      },
+      {
+        "en": "Inside Buenaventura Golf & Beach Resort",
+        "es": "Dentro de Buenaventura Golf & Beach Resort"
+      },
+      {
+        "en": "Jack Nicklaus designed golf course",
+        "es": "Campo de golf diseñado por Jack Nicklaus"
+      }
+    ],
+    "lat": 8.2333,
+    "lng": -80.1333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Río Hato, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 5.5,
+      "built_area_m2": 680.0,
+      "parking_spaces": 6,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2610,
+    "tokens_out": 588,
+    "cost_usd": 0.0013515,
+    "finish_reason": "stop",
+    "latency_ms": 4776
+  },
+  "encuentra24|31989052": {
+    "ts": "2026-07-04T07:27:20.534470+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "6BR House in Coronado Golf & Beach Club",
+      "es": "Casa 6 habs en Coronado Golf & Beach Club"
+    },
+    "short_description_canonical": {
+      "en": "House of 800 m² built on a 1,250 m² lot inside Coronado Golf & Beach Club. It has 6 bedrooms, 5 bathrooms, a large living-dining room with floor-to-ceiling windows, a covered terrace, and a private pool with garden. The gated community offers 24/7 security, golf course, beach club, and nearby services.",
+      "es": "Casa de 800 m² construidos en un terreno de 1,250 m² dentro de Coronado Golf & Beach Club. Cuenta con 6 recámaras, 5 baños, amplio salón sala-comedor con ventanales de piso a techo, terraza techada y piscina privada con jardín. La comunidad cerrada ofrece seguridad 24/7, campo de golf, club de playa y servicios cercanos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Inside exclusive Coronado Golf & Beach Club",
+        "es": "Dentro del exclusivo Coronado Golf & Beach Club"
+      },
+      {
+        "en": "1,250 m² lot with 800 m² built",
+        "es": "Terreno de 1,250 m² con 800 m² construidos"
+      },
+      {
+        "en": "Private pool and garden",
+        "es": "Piscina y jardín privados"
+      },
+      {
+        "en": "6 bedrooms, 5 bathrooms",
+        "es": "6 recámaras, 5 baños"
+      },
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Comunidad cerrada con seguridad 24/7"
+      }
+    ],
+    "lat": 8.5167,
+    "lng": -79.8833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Coronado, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 6,
+      "bathrooms": 5.0,
+      "built_area_m2": 800.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2612,
+    "tokens_out": 570,
+    "cost_usd": 0.00133224,
+    "finish_reason": "stop",
+    "latency_ms": 4886
+  },
+  "encuentra24|32527629": {
+    "ts": "2026-07-04T07:27:20.668069+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Exclusive Residence in Santa María Golf & Country Club",
+      "es": "Exclusiva Residencia en Santa María Golf & Country Club"
+    },
+    "short_description_canonical": {
+      "en": "This 650 m² house on an 800 m² lot is located in Santa María Golf & Country Club, one of the most prestigious areas. It features 4 bedrooms each with private bath and walk-in closet, a main bedroom with private balcony, family room with balcony, integrated living room and bar, separate dining room, pool with heated jacuzzi and beach area, outdoor bathroom, maid's quarters, internal laundry, and 6 covered parking spaces. The property offers spaciousness, privacy, and comfort within an exclusive community.",
+      "es": "Esta casa de 650 m² en un lote de 800 m² está ubicada en Santa María Golf & Country Club, una de las zonas más prestigiosas. Cuenta con 4 recámaras cada una con baño privado y walk-in closet, recámara principal con balcón privado, sala familiar con balcón, sala y bar integrados, comedor independiente, piscina con jacuzzi climatizado y área de playa, baño exterior, cuarto de empleada, lavandería interna y 6 estacionamientos cubiertos. La propiedad ofrece amplitud, privacidad y comodidad dentro de una comunidad exclusiva."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "650 m² built, 800 m² lot",
+        "es": "650 m² construidos, 800 m² de terreno"
+      },
+      {
+        "en": "4 bedrooms with private baths",
+        "es": "4 recámaras con baño privado"
+      },
+      {
+        "en": "Pool with heated jacuzzi",
+        "es": "Piscina con jacuzzi climatizado"
+      },
+      {
+        "en": "6 covered parking spaces",
+        "es": "6 estacionamientos cubiertos"
+      },
+      {
+        "en": "Located in Santa María Golf & Country Club",
+        "es": "Ubicado en Santa María Golf & Country Club"
+      }
+    ],
+    "lat": 8.5,
+    "lng": -80.5,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa María, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 5.0,
+      "built_area_m2": 650.0,
+      "parking_spaces": 6,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2463,
+    "tokens_out": 628,
+    "cost_usd": 0.00135581,
+    "finish_reason": "stop",
+    "latency_ms": 5021
+  },
+  "encuentra24|32629953": {
+    "ts": "2026-07-05T07:02:37.149583+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Condo, Costa del Sol, Private Complex",
+      "es": "Apartamento frente al mar, Costa del Sol, Complejo Privado"
+    },
+    "short_description_canonical": {
+      "en": "135 m² beachfront condo in a private complex on Costa del Sol, La Paz. 3 bedrooms, 2 bathrooms, private pool, 2 parking spaces, fully furnished with modern finishes. Turnkey Airbnb-ready unit with 24/7 security and pet-friendly complex.",
+      "es": "Apartamento frente al mar de 135 m² en complejo privado en Costa del Sol, La Paz. 3 habitaciones, 2 baños, piscina privada, 2 estacionamientos, completamente amueblado con acabados modernos. Listo para Airbnb, con seguridad 24/7 y complejo pet-friendly."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront first row",
+        "es": "Primera fila frente al mar"
+      },
+      {
+        "en": "Private pool in unit",
+        "es": "Piscina privada en la unidad"
+      },
+      {
+        "en": "Fully furnished, turnkey",
+        "es": "Completamente amueblado, listo para usar"
+      },
+      {
+        "en": "Longest adult pool in El Salvador",
+        "es": "Piscina para adultos más larga de El Salvador"
+      },
+      {
+        "en": "24/7 security, pet-friendly",
+        "es": "Seguridad 24/7, pet-friendly"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 135.0,
+      "parking_spaces": 2,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 3506,
+    "tokens_out": 503,
+    "cost_usd": 0.00149992,
+    "finish_reason": "stop",
+    "latency_ms": 4193
+  },
+  "bienesraices|2426": {
+    "ts": "2026-07-05T07:02:37.301711+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Lot 1,546 v² Surf City 2",
+      "es": "Terreno frente al mar 1,546 v² Surf City 2"
+    },
+    "short_description_canonical": {
+      "en": "Flat 1,080.79 m² (1,546.42 v²) lot at Playa La Ventana, Surf City 2, Jucuarán. First lot inside the security gate with private beach access and beach club with 2 pools. Priced at $100 per v² ($154,600 total).",
+      "es": "Terreno plano de 1,080.79 m² (1,546.42 v²) en Playa La Ventana, Surf City 2, Jucuarán. Primer lote al ingresar al portón de seguridad con acceso a playa privada y club de playa con 2 piscinas. Precio de $100 por v² ($154,600 total)."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "First lot inside security gate",
+        "es": "Primer lote dentro del portón de seguridad"
+      },
+      {
+        "en": "Private beach and beach club",
+        "es": "Playa privada y club de playa"
+      },
+      {
+        "en": "Two swimming pools on site",
+        "es": "Dos piscinas en el lugar"
+      },
+      {
+        "en": "Priced at $100 per square v²",
+        "es": "Precio de $100 por v²"
+      }
+    ],
+    "lat": 13.1894,
+    "lng": -88.3858,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Cuco (nearest named beach in table)",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3180,
+    "tokens_out": 498,
+    "cost_usd": 0.0014064,
+    "finish_reason": "stop",
+    "latency_ms": 4346
+  },
+  "oceanside|15701": {
+    "ts": "2026-07-05T07:02:37.910921+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Premium 665 m² lot with ocean views in Solimar, El Sunzal",
+      "es": "Lote premium de 665 m² con vista al mar en Solimar, El Sunzal"
+    },
+    "short_description_canonical": {
+      "en": "Flat 665.01 m² (951.64 v²) residential lot in Solimar community, Tamanique, La Libertad. Elevated position with panoramic ocean views of El Sunzal surf break, 3-minute drive to El Tunco. Community features high-end modern residences; ideal for multi-unit project or private villa.",
+      "es": "Lote residencial plano de 665.01 m² (951.64 v²) en comunidad Solimar, Tamanique, La Libertad. Posición elevada con vista panorámica al mar y al punto de surf El Sunzal, a 3 minutos en auto de El Tunco. La comunidad cuenta con residencias modernas de alta gama; ideal para proyecto de unidades múltiples o villa privada."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Ocean view of El Sunzal surf break",
+        "es": "Vista al mar del punto de surf El Sunzal"
+      },
+      {
+        "en": "3-minute drive to El Tunco",
+        "es": "A 3 minutos en auto de El Tunco"
+      },
+      {
+        "en": "665 m² buildable lot in growing community",
+        "es": "Lote edificable de 665 m² en comunidad en crecimiento"
+      },
+      {
+        "en": "10 minutes from El Zonte surf break",
+        "es": "A 10 minutos del punto de surf El Zonte"
+      },
+      {
+        "en": "15 minutes from La Libertad Port",
+        "es": "A 15 minutos del Puerto de La Libertad"
+      }
+    ],
+    "lat": 13.4844,
+    "lng": -89.6322,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Sunzal beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3381,
+    "tokens_out": 549,
+    "cost_usd": 0.00151677,
+    "finish_reason": "stop",
+    "latency_ms": 4954
+  },
+  "remax|003093331050": {
+    "ts": "2026-07-05T07:02:39.785864+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots in Los Cañales, Juayúa",
+      "es": "Lotes Planos Residenciales en Los Cañales, Juayúa"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 652 m² in Los Cañales, 8 min from Juayúa. Easy vehicle access, basic utilities available, near Los Chorros de La Calera and Río Monterrey. Starting at $45,000.",
+      "es": "Lotes planos residenciales desde 652 m² en Los Cañales, a 8 min de Juayúa. Acceso vehicular fácil, servicios básicos disponibles, cerca de Los Chorros de La Calera y Río Monterrey. Desde $45,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "8 minutes from downtown Juayúa",
+        "es": "8 minutos del centro de Juayúa"
+      },
+      {
+        "en": "Flat topography, easy access",
+        "es": "Topografía plana, fácil acceso"
+      },
+      {
+        "en": "Basic utilities available",
+        "es": "Servicios básicos disponibles"
+      },
+      {
+        "en": "Near natural attractions",
+        "es": "Cerca de atractivos naturales"
+      },
+      {
+        "en": "Starting at $45,000",
+        "es": "Desde $45,000"
+      }
+    ],
+    "lat": 13.8436,
+    "lng": -89.7453,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Juayúa, Sonsonate, SV",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3350,
+    "tokens_out": 462,
+    "cost_usd": 0.0014127,
+    "finish_reason": "stop",
+    "latency_ms": 3752
+  },
+  "remax|003093331049": {
+    "ts": "2026-07-05T07:02:40.507707+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "760 m² Lot in Cumbres de Zaragoza, Gated Community",
+      "es": "Lote de 760 m² en Cumbres de Zaragoza, Comunidad Cerrada"
+    },
+    "short_description_canonical": {
+      "en": "Flat 760 m² residential lot in Cumbres de Zaragoza, La Libertad. Gently sloping, 20 m frontage, 38 m depth, with gated access and basic utilities. No HOA restrictions; ideal for a home or Airbnb.",
+      "es": "Lote residencial plano de 760 m² en Cumbres de Zaragoza, La Libertad. Suavemente inclinado, 20 m de frente, 38 m de fondo, con acceso controlado y servicios básicos. Sin restricciones de condominio; ideal para casa o Airbnb."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "760 m² lot, 20 m frontage",
+        "es": "Lote de 760 m², 20 m de frente"
+      },
+      {
+        "en": "Gated community with remote access",
+        "es": "Comunidad cerrada con acceso remoto"
+      },
+      {
+        "en": "No HOA restrictions",
+        "es": "Sin restricciones de condominio"
+      },
+      {
+        "en": "Near Surf City and La Libertad beaches",
+        "es": "Cerca de Surf City y playas de La Libertad"
+      },
+      {
+        "en": "Bank financing available",
+        "es": "Financiamiento bancario disponible"
+      }
+    ],
+    "lat": 13.5894,
+    "lng": -89.2883,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Zaragoza, La Libertad, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3355,
+    "tokens_out": 508,
+    "cost_usd": 0.00146465,
+    "finish_reason": "stop",
+    "latency_ms": 4287
+  },
+  "encuentra24|32553811": {
+    "ts": "2026-07-05T07:42:39.038594+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in Chame, Colinas Brisas del Celaje",
+      "es": "Casa en Venta en Chame, Colinas Brisas del Celaje"
+    },
+    "short_description_canonical": {
+      "en": "House of 208 m² built on a 627 m² lot in Chame, Colinas Brisas del Celaje. It has 3 bedrooms, 2 bathrooms, pool, and community amenities. Includes parking and security booth.",
+      "es": "Casa de 208 m² construida en un terreno de 627 m² en Chame, Colinas Brisas del Celaje. Tiene 3 habitaciones, 2 baños, piscina y amenidades comunitarias. Incluye estacionamiento y garita de seguridad."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "627 m² lot with pool",
+        "es": "Terreno de 627 m² con piscina"
+      },
+      {
+        "en": "Community amenities: clubhouse, playground",
+        "es": "Amenidades comunitarias: casa club, juegos"
+      },
+      {
+        "en": "Security booth and paved roads",
+        "es": "Garita de seguridad y cunetas pavimentadas"
+      }
+    ],
+    "lat": 8.5767,
+    "lng": -79.8856,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Chame, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 208.18,
+      "parking_spaces": 1,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2369,
+    "tokens_out": 433,
+    "cost_usd": 0.00111593,
+    "finish_reason": "stop",
+    "latency_ms": 3957
+  },
+  "encuentra24|31922843": {
+    "ts": "2026-07-05T07:42:39.605381+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3BR House Near Beach, Las Uvas, San Carlos",
+      "es": "Casa 3 hab cerca de playa, Las Uvas, San Carlos"
+    },
+    "short_description_canonical": {
+      "en": "House on 1,001 m² lot in Las Uvas, San Carlos, near beaches and Pan-American Highway. 3 bedrooms, 3 bathrooms, large pool, gazebo with A/C, barbecue area, fruit trees. Ideal for permanent living or vacation rental investment.",
+      "es": "Casa en terreno de 1,001 m² en Las Uvas, San Carlos, cerca de playas y Vía Panamericana. 3 recámaras, 3 baños, piscina amplia, gazebo con A/A, área de barbacoa, árboles frutales. Ideal para vivienda permanente o inversión de alquiler vacacional."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1,001 m² lot with pool",
+        "es": "Terreno de 1,001 m² con piscina"
+      },
+      {
+        "en": "3 bedrooms, 3 bathrooms",
+        "es": "3 recámaras, 3 baños"
+      },
+      {
+        "en": "Near beaches and highway",
+        "es": "Cerca de playas y autopista"
+      },
+      {
+        "en": "Gazebo with A/C, barbecue",
+        "es": "Gazebo con A/A, barbacoa"
+      }
+    ],
+    "lat": 8.4833,
+    "lng": -80.0,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Las Uvas, San Carlos, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": 1001.0,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2452,
+    "tokens_out": 491,
+    "cost_usd": 0.00120214,
+    "finish_reason": "stop",
+    "latency_ms": 4524
   }
 }

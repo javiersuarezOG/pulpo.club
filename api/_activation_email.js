@@ -116,7 +116,8 @@ const TEMPLATES = {
     subject: "Set up your Pulpo Pro account — your subscription is active",
     preheader: "One step left: set your password and start exploring.",
     html: (actionUrl, fallbackUrl) => `<!doctype html>
-<html><head><meta charset="utf-8"></head><body style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;color:#1a1a1a;line-height:1.5;max-width:560px;margin:0 auto;padding:24px;">
+<html lang="en"><head><meta charset="utf-8"></head><body style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;color:#1a1a1a;line-height:1.5;max-width:560px;margin:0 auto;padding:24px;">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">One step left: set your password and start exploring.</div>
 ${BRAND_HEADER_HTML}
 <p>Hi there,</p>
 <p>Thanks for joining Pulpo Pro — your subscription is active.</p>
@@ -153,7 +154,8 @@ Questions? Reply to this email or write to hello@pulpo.club.
     subject: "Configura tu cuenta Pulpo Pro — tu suscripción está activa",
     preheader: "Solo falta un paso: elige tu contraseña y empieza a explorar.",
     html: (actionUrl, fallbackUrl) => `<!doctype html>
-<html><head><meta charset="utf-8"></head><body style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;color:#1a1a1a;line-height:1.5;max-width:560px;margin:0 auto;padding:24px;">
+<html lang="es"><head><meta charset="utf-8"></head><body style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif;color:#1a1a1a;line-height:1.5;max-width:560px;margin:0 auto;padding:24px;">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;mso-hide:all;">Solo falta un paso: elige tu contraseña y empieza a explorar.</div>
 ${BRAND_HEADER_HTML}
 <p>Hola,</p>
 <p>Gracias por sumarte a Pulpo Pro — tu suscripción está activa.</p>
@@ -205,6 +207,27 @@ Si este correo llega a Promociones, muévelo a Principal para que el próximo em
 // returning 500 because Resend was briefly down would cause Stripe to
 // retry the webhook, which would create another invitation + try to
 // send again. That's the wrong loop.
+// actionUrl comes from Clerk's invitation `url`. Validate it's a well-formed
+// http(s) URL and HTML-escape it before interpolating into an href — a
+// malformed or attacker-influenced value must not break out of the attribute
+// or inject markup into the email (launch audit).
+function isSafeHttpUrl(u) {
+  try {
+    const p = new URL(String(u));
+    return p.protocol === "https:" || p.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+function escapeHtmlAttr(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 async function sendActivationEmail({ email, locale, actionUrl, sessionId }) {
   const apiKey = (process.env.RESEND_API_KEY || "").trim();
   if (!apiKey) {
@@ -218,6 +241,16 @@ async function sendActivationEmail({ email, locale, actionUrl, sessionId }) {
     const errorMessage = "missing required field (email/actionUrl)";
     captureSendFailed({
       email, errorCode: "missing_required_field",
+      errorMessage, statusCode: 0,
+    });
+    return { ok: false, error: errorMessage, status_code: 0 };
+  }
+  if (!isSafeHttpUrl(actionUrl)) {
+    // Refuse to send a broken/injected activation link rather than ship
+    // one that can't work (or worse, escapes the href attribute).
+    const errorMessage = "invalid actionUrl (not an http(s) URL)";
+    captureSendFailed({
+      email, errorCode: "invalid_action_url",
       errorMessage, statusCode: 0,
     });
     return { ok: false, error: errorMessage, status_code: 0 };
@@ -236,7 +269,9 @@ async function sendActivationEmail({ email, locale, actionUrl, sessionId }) {
     from,
     to: [email],
     subject: tpl.subject,
-    html: tpl.html(actionUrl, fallbackUrl),
+    // HTML part gets attribute-escaped URLs; the text part keeps the raw
+    // URLs (no HTML context — escaping would surface literal &amp; there).
+    html: tpl.html(escapeHtmlAttr(actionUrl), escapeHtmlAttr(fallbackUrl)),
     text: tpl.text(actionUrl, fallbackUrl),
     // Tags + headers are how the lifecycle events at /api/resend-webhook
     // join back to the post-Stripe funnel in PostHog. The resend-webhook

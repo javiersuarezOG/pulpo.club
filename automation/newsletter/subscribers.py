@@ -135,10 +135,12 @@ class ClerkUser:
     saves: list[dict] = field(default_factory=list)
     # Pro Welcome dedup stamp — set by automation/newsletter/welcome_dispatch
     # after a successful Resend 2xx. ISO-8601 UTC string. When present AND
-    # within the past 24h, the weekly cron skips this recipient to avoid
-    # back-to-back welcome + weekly with the same 10 picks. Decision
-    # locked 2026-06-01; see `project_resubscribe_welcome_funnel` memory
-    # for why this stamp is permanent (no re-send on resubscribe).
+    # within the first-Sunday skip window (SIGNUP_SKIP_WINDOW_HOURS), the
+    # weekly cron defers this recipient to avoid back-to-back welcome +
+    # weekly with the same 10 picks. Decision locked 2026-06-01 (24h),
+    # extended to 96h + Free on 2026-07-03; see
+    # `project_resubscribe_welcome_funnel` memory for why this stamp is
+    # permanent (no re-send on resubscribe).
     welcome_sent_at: Optional[str] = None
     # Resubscribe welcome-back dedup key — the Stripe subscription id the
     # last welcome-back was sent for. The resubscribe re-acquisition email
@@ -469,29 +471,66 @@ def _locale_for(user: Optional[ClerkUser]) -> Locale:
 PRO_AUDIENCE_TIERS: frozenset[str] = frozenset({"pro", "agency"})
 
 
-def _welcome_within_24h(welcome_sent_at: Optional[str], *, now=None) -> bool:
-    """True iff the Pro Welcome shipped to this user less than 24h ago.
+# First-Sunday skip window. A subscriber (Free OR Pro) who signed up
+# within this many hours before an upcoming Sunday send is deferred:
+# they skip that first Sunday and start on the FOLLOWING Sunday. They've
+# just received the instant welcome email (which already carries picks),
+# so a Sunday send within the window would be a near-duplicate. 96h = 4
+# days: a Wednesday-afternoon-or-later signup skips the coming Sunday.
+# Because the window (96h) is shorter than the weekly cadence (168h), at
+# most one Sunday is ever skipped. Decision locked 2026-07-03 — replaces
+# the earlier Pro-only 24h welcome-collision skip and extends it to Free.
+SIGNUP_SKIP_WINDOW_HOURS = 96
 
-    `welcome_sent_at` is ISO-8601 UTC (with or without `Z` suffix). On
-    parse failure we conservatively return False — better to send a
-    duplicate weekly than to silently drop a recipient because of an
-    upstream metadata format change. `now` injectable for tests.
+
+def _signup_within_grace(iso: Optional[str], *, now=None) -> bool:
+    """True iff `iso` (a signup-ish timestamp) is within the skip window.
+
+    Accepts ISO-8601 UTC (with or without `Z` suffix). On missing / parse
+    failure we conservatively return False — better to send one extra
+    weekly than to silently drop a recipient over an upstream metadata
+    format change. `now` injectable for tests; defaults to wall-clock,
+    which at cron time ≈ the upcoming Sunday send.
     """
-    if not welcome_sent_at:
+    if not iso:
         return False
     from datetime import datetime, timedelta, timezone
-    iso = welcome_sent_at.strip()
-    if iso.endswith("Z"):
-        iso = iso[:-1] + "+00:00"
+    s = iso.strip()
+    if s.endswith("Z"):
+        s = s[:-1] + "+00:00"
     try:
-        sent = datetime.fromisoformat(iso)
+        ts = datetime.fromisoformat(s)
     except ValueError:
         return False
-    if sent.tzinfo is None:
-        sent = sent.replace(tzinfo=timezone.utc)
+    if ts.tzinfo is None:
+        ts = ts.replace(tzinfo=timezone.utc)
     if now is None:
         now = datetime.now(timezone.utc)
-    return (now - sent) < timedelta(hours=24)
+    return (now - ts) < timedelta(hours=SIGNUP_SKIP_WINDOW_HOURS)
+
+
+def _skip_for_recent_signup(
+    contact: "ResendContact",
+    user: Optional["ClerkUser"],
+    *,
+    now=None,
+) -> bool:
+    """True iff this subscriber signed up inside the first-Sunday skip
+    window, across BOTH cohorts, using whichever signup signal exists:
+
+      • Pro welcome stamp (`publicMetadata.welcome_newsletter_sent_at`) —
+        the Pro welcome fires on signup, so this ≈ signup time AND
+        doubles as the same-10-picks collision guard it was built for.
+        Only Pro users carry it (Free never stamps it).
+      • Resend contact `created_at` — the audience-join timestamp, which
+        is the ONLY signal Free / anonymous subscribers carry, and is
+        present for every emailable contact (Pro included).
+
+    Either being recent defers the recipient. See SIGNUP_SKIP_WINDOW_HOURS.
+    """
+    welcome = user.welcome_sent_at if user is not None else None
+    return (_signup_within_grace(welcome, now=now)
+            or _signup_within_grace(contact.created_at, now=now))
 
 
 def join_recipients(
@@ -502,6 +541,7 @@ def join_recipients(
     only_emails: Optional[set[str]] = None,
     allow_non_pro: bool = False,
     free_only: bool = False,
+    now=None,
 ) -> list[Recipient]:
     """Build the cron's per-recipient queue.
 
@@ -559,6 +599,12 @@ def join_recipients(
         if user is None:
             if not include_non_pro:
                 continue
+            # First-Sunday skip (Free / anonymous): a contact that joined
+            # the audience within the grace window just got the instant
+            # free welcome — defer their first weekly to next Sunday. The
+            # `--allow-all-subscribers` broadcast bypasses it wholesale.
+            if not allow_non_pro and _skip_for_recent_signup(c, None, now=now):
+                continue
             # Anonymous synthesis: locale from Resend first_name
             # side-channel, everything else nominal. The build_issue
             # path treats cohort=anonymous with a fallback_preference.
@@ -582,16 +628,16 @@ def join_recipients(
         # default Pro audience: drop free Clerk users (unless admitted above).
         if not is_pro and not include_non_pro:
             continue
-        # Welcome-vs-weekly collision skip. Pro users whose welcome
-        # newsletter shipped within the past 24h are dropped from the
-        # weekly queue to avoid back-to-back emails with the same 10
-        # picks. The welcome carries its own copy of the picks; the
-        # weekly the following Sunday is when the cadence really
-        # starts for them. Decision locked 2026-06-01. The
-        # `--allow-all-subscribers` escape hatch DOES bypass this
-        # skip too — if an operator deliberately broadcasts to all,
-        # they're overriding gates wholesale.
-        if not allow_non_pro and _welcome_within_24h(user.welcome_sent_at):
+        # First-Sunday skip (Free Clerk + Pro). A recipient who signed
+        # up within the grace window just received the instant welcome
+        # (which carries its own picks); their first weekly starts the
+        # FOLLOWING Sunday. Pro uses the welcome stamp (also the original
+        # same-10-picks collision guard), Free-Clerk uses the Resend
+        # contact created_at — see _skip_for_recent_signup. Window
+        # extended 24h→96h and generalised to Free on 2026-07-03. The
+        # `--allow-all-subscribers` escape hatch bypasses it wholesale —
+        # an operator broadcasting to all is overriding gates on purpose.
+        if not allow_non_pro and _skip_for_recent_signup(c, user, now=now):
             continue
         preference = _preference_from_profile(user.profile)
         preference_source = _preference_source_from_profile(user.profile)

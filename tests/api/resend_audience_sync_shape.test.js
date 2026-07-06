@@ -100,6 +100,22 @@ describe("api/stripe/webhook.js — Pro upgrade enroll sites", () => {
     expect(webhookSrc).toMatch(/source:\s*"stripe\.checkout\.anonymous_new_user"/);
   });
 
+  it("self-heals audience membership on subscription.updated (active path)", () => {
+    // The checkout enroll is best-effort + non-retried; this 5th site
+    // re-enrolls on every active subscription.updated (checkout + renewals),
+    // catching users a transient checkout-time Resend failure dropped.
+    // Detailed guard in stripe_webhook_audience_self_heal.test.js.
+    expect(webhookSrc).toMatch(/source:\s*"stripe\.subscription\.active_self_heal"/);
+  });
+
+  it("self-heals audience membership on invoice.payment_succeeded", () => {
+    // 6th site: fires on the FIRST invoice at signup AND every renewal —
+    // gives an immediate independent retry of the checkout-time enroll
+    // plus a recurring one, so enrollment is fully self-healing through
+    // the webhook path (no reconcile cron needed).
+    expect(webhookSrc).toMatch(/source:\s*"stripe\.invoice\.payment_succeeded_self_heal"/);
+  });
+
   it("enroll calls are gated on email presence (not all 4 paths guarantee it)", () => {
     // At least one enroll site checks `if (email)` — auth_gated path
     // doesn't always have an email in scope. The 3 anonymous paths
@@ -107,9 +123,9 @@ describe("api/stripe/webhook.js — Pro upgrade enroll sites", () => {
     expect(webhookSrc).toMatch(/if \(email\)\s*\{\s*await enrollPaidUserInAudience/);
   });
 
-  it("calls enrollPaidUserInAudience exactly 4 times (one per Pro-upgrade path)", () => {
+  it("calls enrollPaidUserInAudience exactly 6 times (4 checkout paths + subscription.updated + invoice.payment_succeeded self-heals)", () => {
     const enrollCalls = (webhookSrc.match(/await enrollPaidUserInAudience\(/g) || []).length;
-    expect(enrollCalls).toBe(4);
+    expect(enrollCalls).toBe(6);
   });
 });
 
