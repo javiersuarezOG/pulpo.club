@@ -341,6 +341,44 @@ def publish_item(
     return item
 
 
+# ── activity log ──────────────────────────────────────────────────────
+
+DEFAULT_LOG = Path("web/data/ig_post_log.jsonl")
+
+
+def _build_log_entry(item: dict, status: str, error: Optional[str] = None) -> dict:
+    """One activity-log row for a single publish attempt.  Shape is read
+    verbatim by api/admin/ig-log.js and rendered in the admin console's
+    activity feed, so keep the keys stable."""
+    caption = (item.get("caption") or "").replace("**", "").strip()
+    preview = caption.split("\n", 1)[0][:90]
+    entry = {
+        "ts":              datetime.now(timezone.utc).isoformat(),
+        "day":             item.get("day"),
+        "shelf":           item.get("shelf"),
+        "status":          status,   # "posted" | "failed"
+        "caption_preview": preview,
+        "slides":          1 + len(item.get("carousel_photo_paths") or []),
+    }
+    if status == "posted":
+        entry["media_id"] = item.get("posted_media_id")
+    if error:
+        entry["error"] = str(error)[:300]
+    return entry
+
+
+def append_post_log(log_path: Path, entry: dict) -> None:
+    """Append one JSON line to the activity log.  Defensive: a logging
+    failure must never break or mask the publish result, so any error is
+    swallowed with a breadcrumb."""
+    try:
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        with log_path.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    except OSError as e:                                          # pragma: no cover
+        print(f"[ig_publish] WARN could not write activity log: {e}", file=sys.stderr)
+
+
 # ── top-level orchestration ──────────────────────────────────────────
 
 def run_publish(
@@ -353,6 +391,7 @@ def run_publish(
     dry_run: bool = False,
     client: Optional[IgClient] = None,
     force_day: Optional[int] = None,
+    attempt_log: Optional[list] = None,
 ) -> dict:
     """Run the publisher against an in-memory queue payload.  Returns
     the (possibly mutated) payload.
@@ -362,7 +401,12 @@ def run_publish(
 
     When `force_day` is set, publishes that specific item (if approved
     and not yet posted), bypassing the scheduled_for gate.  Used by the
-    "Publish now" button in /admin/ig-review for on-the-spot test posts."""
+    "Publish now" button in /admin/ig-review for on-the-spot test posts.
+
+    `attempt_log`, when provided, receives one `_build_log_entry` dict per
+    publish attempt (posted or failed) — the CLI persists these to the
+    activity-log jsonl.  Default None keeps run_publish side-effect-free
+    for tests that don't care about the log."""
     items = queue_payload.get("items") or []
     if force_day is not None:
         due = select_forced_item(items, force_day)
@@ -400,8 +444,12 @@ def run_publish(
             f"[ig_publish] OK d{due['day']:02d} → media_id={due['posted_media_id']} "
             f"at {due['posted_at']}"
         )
+        if attempt_log is not None:
+            attempt_log.append(_build_log_entry(due, "posted"))
     except IgApiError as e:
         print(f"[ig_publish] FAILED d{due['day']:02d}: {e}", file=sys.stderr)
+        if attempt_log is not None:
+            attempt_log.append(_build_log_entry(due, "failed", error=e))
         raise
 
     return queue_payload
@@ -417,6 +465,10 @@ def main(argv: Optional[list[str]] = None) -> int:
         description="Publish the next due item from ig_queue.json to Instagram.",
     )
     parser.add_argument("--queue", type=Path, default=DEFAULT_QUEUE)
+    parser.add_argument(
+        "--log", type=Path, default=DEFAULT_LOG,
+        help="Activity-log jsonl to append each publish attempt to.",
+    )
     parser.add_argument(
         "--dry-run", action="store_true",
         help="Log what would be published without calling the Graph API.",
@@ -463,17 +515,29 @@ def main(argv: Optional[list[str]] = None) -> int:
         now = datetime.now(timezone.utc)
 
     payload = json.loads(args.queue.read_text(encoding="utf-8"))
-    updated = run_publish(
-        payload,
-        ig_user_id=ig_user_id,
-        access_token=access_token,
-        base_url=base_url,
-        now=now,
-        dry_run=args.dry_run,
-        force_day=args.force_day,
-    )
+    attempts: list = []
+    try:
+        updated = run_publish(
+            payload,
+            ig_user_id=ig_user_id,
+            access_token=access_token,
+            base_url=base_url,
+            now=now,
+            dry_run=args.dry_run,
+            force_day=args.force_day,
+            attempt_log=attempts,
+        )
+    except IgApiError:
+        # Record the failed attempt before re-raising so the admin
+        # activity log shows failures, not just successes.
+        if not args.dry_run:
+            for entry in attempts:
+                append_post_log(args.log, entry)
+        raise
 
     if not args.dry_run:
+        for entry in attempts:
+            append_post_log(args.log, entry)
         atomic_write_json(args.queue, updated, indent=2)
         print(f"[ig_publish] queue persisted to {args.queue}")
     return 0

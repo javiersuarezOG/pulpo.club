@@ -529,3 +529,71 @@ def test_ig_client_extract_id_raises_on_missing_id():
     r.json.return_value = {"weird": "shape"}
     with pytest.raises(IgApiError, match="no id"):
         IgClient._extract_id(r, ctx="upload")
+
+
+# ── activity log (admin console feed) ─────────────────────────────────
+
+def test_build_log_entry_posted_strips_bold_and_carries_media_id():
+    from automation.ig_publish import _build_log_entry
+    item = {
+        "day": 100, "shelf": "announce_intro_1",
+        "caption": "**Todos los terrenos.**\n\nbody.",
+        "carousel_photo_paths": ["a", "b"], "posted_media_id": "m1",
+    }
+    e = _build_log_entry(item, "posted")
+    assert e["status"] == "posted"
+    assert e["media_id"] == "m1"
+    assert e["caption_preview"] == "Todos los terrenos." and "**" not in e["caption_preview"]
+    assert e["slides"] == 3
+    assert "error" not in e
+
+
+def test_build_log_entry_failed_carries_error_no_media():
+    from automation.ig_publish import _build_log_entry, IgApiError
+    item = {"day": 5, "shelf": "s", "caption": "x", "carousel_photo_paths": []}
+    e = _build_log_entry(item, "failed", error=IgApiError("wait_for_ready", "stuck"))
+    assert e["status"] == "failed"
+    assert "stuck" in e["error"]
+    assert "media_id" not in e
+    assert e["slides"] == 1
+
+
+def test_run_publish_appends_to_attempt_log_on_success(pub):
+    from unittest.mock import MagicMock
+    client = MagicMock()
+    client.upload_carousel_item.side_effect = ["c1", "c2"]
+    client.create_carousel.return_value = "car1"
+    client.publish.return_value = "media999"
+    payload = {"items": [_it(day=7, approved=True,
+                             scheduled_for="2026-06-01T01:00:00+00:00",
+                             carousel_photo_paths=["web/photos/a.jpg"])]}
+    attempts = []
+    with patch.object(pub, "wait_for_ready", lambda *_: None):
+        pub.run_publish(
+            payload, ig_user_id="u", access_token="t",
+            base_url="https://pulpo.club",
+            now=datetime(2026, 6, 2, tzinfo=timezone.utc),
+            client=client, attempt_log=attempts,
+        )
+    assert len(attempts) == 1
+    assert attempts[0]["status"] == "posted"
+    assert attempts[0]["media_id"] == "media999"
+
+
+def test_run_publish_appends_failure_to_attempt_log(pub):
+    from unittest.mock import MagicMock
+    client = MagicMock()
+    client.upload_carousel_item.side_effect = pub.IgApiError("upload", "boom")
+    payload = {"items": [_it(day=8, approved=True,
+                             scheduled_for="2026-06-01T01:00:00+00:00")]}
+    attempts = []
+    with pytest.raises(pub.IgApiError):
+        pub.run_publish(
+            payload, ig_user_id="u", access_token="t",
+            base_url="https://pulpo.club",
+            now=datetime(2026, 6, 2, tzinfo=timezone.utc),
+            client=client, attempt_log=attempts,
+        )
+    assert len(attempts) == 1
+    assert attempts[0]["status"] == "failed"
+    assert "boom" in attempts[0]["error"]
