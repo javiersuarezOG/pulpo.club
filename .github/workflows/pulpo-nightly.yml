@@ -1202,49 +1202,56 @@ jobs:
             gh pr merge "$BRANCH" --squash --delete-branch --admin
           echo "committed=true" >> "$GITHUB_OUTPUT"
 
-      - name: Deploy to Vercel
-        # Only runs when fresh data was actually committed.
-        # Direct vercel deploy --prod: no local build needed — this is a static
-        # site (buildCommand = "echo ..."). Skipping vercel build avoids the
-        # 'spawn uv ENOENT' error caused by Vercel CLI trying to install Python
-        # deps on the runner.
-        # IMPORTANT: Vercel CLI 44.x does NOT read the VERCEL_TOKEN env var —
-        # only `--token` works. The env-var assumption shipped in #830 and the
-        # step failed every run since with "No existing credentials found"
-        # (first real execution: run 27413389659, 2026-06-12 — data committed,
-        # deploy dead, site only refreshed because human PR merges triggered
-        # integration deploys). The value is passed via "$VERCEL_TOKEN" quoted,
-        # which is also the fix for the earlier hyphen-rejection: that came
-        # from unquoted interpolation, not from --token itself.
+      - name: Deploy to Vercel (best-effort — NEVER fails the run)
+        # PRIMARY deploy path is Vercel's GitHub integration, which builds on
+        # the merged data PR and ships fresh data to production. This is
+        # verified daily: the watchdog's own public-deploy check reports the
+        # live ranked.json is fresh every day. This explicit CLI deploy is a
+        # belt-and-suspenders that has been chronically fragile (token / CLI-
+        # version churn — history below) and was failing EVERY run, turning the
+        # whole nightly red and masking real pipeline/canary failures behind a
+        # baseline of noise (2026-06-30 audit). It is now best-effort via
+        # `continue-on-error: true`: a failure emits a ::warning:: and records a
+        # truthful `outcome=failure` for the run summary, but does NOT fail the
+        # workflow (job.status stays success, so the Slack trip-wire below never
+        # pages on it). If the integration deploy ever stops, the watchdog's
+        # freshness + public-deploy checks (2h later) page on the real symptom —
+        # stale prod data — which is the correct layer to detect a deploy outage.
+        #
+        # History (keep for the next token/CLI-churn incident):
+        # - CLI 44.x ignores the VERCEL_TOKEN env var; only `--token` works
+        #   (#830). Value passed via quoted "$VERCEL_TOKEN".
+        # - Vercel deprecates old CLIs server-side; pin bumped to 47.2.2
+        #   (2026-06-13) after "requires version 47.2.2 or later". If that
+        #   error recurs, raise the pin to the version named in the error.
         # vercel.json ignoreCommand stops the GitHub-integration from making a
         # duplicate Blocked deploy for the same bot commit.
         id: deploy
         if: steps.commit.outputs.committed == 'true'
+        continue-on-error: true
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
+          warn() {
+            echo "::warning::Vercel CLI deploy did not complete ($1) — non-fatal; production ships via the Vercel git-integration deploy on PR merge (verified daily by the watchdog public-deploy check). This is NOT a data freeze."
+          }
+          # Non-zero exits below are swallowed by `continue-on-error: true` (the
+          # run stays green) but still surface as outcome=failure in the story.
           if [ -z "$VERCEL_TOKEN" ]; then
-            echo "::error::VERCEL_TOKEN secret is empty — deploy cannot run. Rotate/restore it in Settings → Secrets."
-            exit 1
+            warn "VERCEL_TOKEN empty — restore it in Settings → Secrets"; exit 1
           fi
-          # Pinned to 47.2.2 (2026-06-13): Vercel's deploy endpoint began
-          # rejecting CLI 44.7.3 with "Your Vercel CLI version is outdated.
-          # This endpoint requires version 47.2.2 or later." (nightly
-          # 27471280829 — auth + 2.8GB upload succeeded, then the server
-          # rejected the old client). Vercel deprecates old CLIs server-side
-          # over time, so this pin needs periodic bumps; if this error recurs,
-          # raise it to the version named in the error.
-          npm install -g vercel@47.2.2
+          npm install -g vercel@47.2.2 || { warn "vercel CLI install failed"; exit 1; }
           for attempt in 1 2; do
             if vercel deploy --prod --yes --archive=tgz --token "$VERCEL_TOKEN"; then
+              echo "Vercel CLI deploy succeeded."
               exit 0
             fi
             echo "::warning::Vercel deploy attempt $attempt failed"
             sleep 15
           done
-          exit 1
+          warn "deploy failed after 2 attempts"; exit 1
 
       - name: Social-floor canary (alert-only, NEVER blocks)
         # Guards the /api/social/listings hires floor: the contract test
