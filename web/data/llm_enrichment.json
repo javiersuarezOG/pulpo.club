@@ -121041,5 +121041,156 @@
     "cost_usd": 0.00120214,
     "finish_reason": "stop",
     "latency_ms": 4524
+  },
+  "realestate_au_sv|nance-verde-cojutepeque-cuscatlan-sur-candelaria-cuscatlan-candelaria-cuscatlan-department-310109225072": {
+    "ts": "2026-07-06T07:34:09.927336+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "1,840 m² Land in Cojutepeque, Cuscatlán",
+      "es": "Terreno de 1,840 m² en Cojutepeque, Cuscatlán"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 1,840 m² in Nance Verde, Cojutepeque, Cuscatlán. Located in a residential area of Candelaria. Priced at $184,000.",
+      "es": "Terreno de 1,840 m² en Nance Verde, Cojutepeque, Cuscatlán. Ubicado en zona residencial de Candelaria. Precio de $184,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1,840 m² lot in Cojutepeque",
+        "es": "Lote de 1,840 m² en Cojutepeque"
+      },
+      {
+        "en": "Residential area in Candelaria",
+        "es": "Zona residencial en Candelaria"
+      },
+      {
+        "en": "Listed at $184,000 USD",
+        "es": "Listado en $184,000 USD"
+      }
+    ],
+    "lat": 13.7167,
+    "lng": -88.9333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Cojutepeque, Cuscatlán, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3099,
+    "tokens_out": 425,
+    "cost_usd": 0.00130423,
+    "finish_reason": "stop",
+    "latency_ms": 3702
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109225053": {
+    "ts": "2026-07-06T07:34:10.054434+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 4,000 m² located at Km 12.5 on the Comasagua road, Santa Tecla, La Libertad. Priced at $411,236. Suitable for development with road access.",
+      "es": "Terreno de 4,000 m² ubicado en el Km 12.5 de la carretera a Comasagua, Santa Tecla, La Libertad. Precio de $411,236. Apto para desarrollo con acceso vial."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "4,000 m² lot near Santa Tecla",
+        "es": "Lote de 4,000 m² cerca de Santa Tecla"
+      },
+      {
+        "en": "Priced at $411,236",
+        "es": "Precio de $411,236"
+      },
+      {
+        "en": "Road access on Comasagua highway",
+        "es": "Acceso vial en carretera a Comasagua"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 420,
+    "cost_usd": 0.00129846,
+    "finish_reason": "stop",
+    "latency_ms": 3828
+  },
+  "encuentra24|32646828": {
+    "ts": "2026-07-06T08:17:08.365670+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront House with Pool in Coronado",
+      "es": "Casa frente al mar con piscina en Coronado"
+    },
+    "short_description_canonical": {
+      "en": "House for sale on the street parallel to the sea in Coronado. It has 3 bedrooms, 3 bathrooms, living-dining room, kitchen, and a guest house with 1 bedroom and bathroom. The property includes a large garden, gazebo, pool, and parking for 3 cars.",
+      "es": "Casa en venta en la calle paralela al mar en Coronado. Cuenta con 3 recámaras, 3 baños, sala comedor, cocina y casa de huéspedes con 1 recámara y baño. La propiedad incluye amplio jardín, gazebo, piscina y estacionamiento para 3 autos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location, steps to the beach",
+        "es": "Ubicación frente al mar, a pasos de la playa"
+      },
+      {
+        "en": "Guest house with separate entrance",
+        "es": "Casa de huéspedes con entrada independiente"
+      },
+      {
+        "en": "Pool, gazebo, and large garden",
+        "es": "Piscina, gazebo y amplio jardín"
+      },
+      {
+        "en": "Parking for 3 cars",
+        "es": "Estacionamiento para 3 autos"
+      }
+    ],
+    "lat": 8.5333,
+    "lng": -79.8833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Coronado, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": 330.0,
+      "parking_spaces": 3,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2322,
+    "tokens_out": 492,
+    "cost_usd": 0.00116814,
+    "finish_reason": "stop",
+    "latency_ms": 4496
   }
 }

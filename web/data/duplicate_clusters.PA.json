@@ -1,1 +1,30 @@
-[]
+[
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "fdd37bd586a81b1a54eba2beef76e4522b65a093",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 315000.0,
+        "source": "encuentra24",
+        "source_id": "32646828",
+        "title": "Se vende casa con amplio terreno en Coronado",
+        "url": "https://www.encuentra24.com/panama-es/bienes-raices-venta-de-propiedades-casas/se-vende-casa-con-amplio-terreno-en-coronado/32646828",
+        "zone": null
+      },
+      {
+        "area_m2": null,
+        "price_usd": 315000.0,
+        "source": "encuentra24",
+        "source_id": "32510492",
+        "title": "Se vende casa con amplio terreno en Coronado",
+        "url": "https://www.encuentra24.com/panama-es/bienes-raices-venta-de-propiedades-casas/se-vende-casa-con-amplio-terreno-en-coronado/32510492",
+        "zone": null
+      }
+    ],
+    "sources": [
+      "encuentra24"
+    ]
+  }
+]
