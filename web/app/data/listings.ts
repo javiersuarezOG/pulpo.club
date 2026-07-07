@@ -90,6 +90,38 @@ function deriveSourceType(source: string): "on_market" | "off_market" {
   return OFF_MARKET_SOURCES.has(source) ? "off_market" : "on_market";
 }
 
+// Cheap source-language heuristic for a short broker string, mirroring
+// automation/ensure_bilingual.py:detect_lang so the frontend and pipeline
+// agree on placement. Spanish diacritics are decisive; otherwise a Spanish-
+// vs-English stopword tally, ties → "es" (LATAM broker default). The
+// definite articles el/la/los/las are intentionally NOT Spanish signals —
+// nearly every place name here starts with one ("El Zonte", "La Libertad").
+const _ES_DIACRITICS = /[áéíóúñ¿¡ü]/i;
+const _ES_STOP = new Set([
+  "de", "en", "con", "para", "por", "del", "una", "un", "y", "se", "su", "al",
+  "casa", "terreno", "playa", "mar", "vista", "venta", "frente", "cerca",
+  "lote", "lujo", "apartamento", "sobre",
+]);
+const _EN_STOP = new Set([
+  "the", "for", "with", "and", "sale", "lot", "house", "home", "beach",
+  "beachfront", "ocean", "oceanfront", "view", "near", "front", "land", "of",
+  "in", "on", "to", "luxury", "apartment", "condo",
+]);
+
+export function detectListingLang(text: string | null | undefined): "en" | "es" {
+  if (!text || !text.trim()) return "es";
+  if (_ES_DIACRITICS.test(text)) return "es";
+  const words = (text.toLowerCase().match(/[a-záéíóúñü]+/gi) || []);
+  if (words.length === 0) return "es";
+  let es = 0;
+  let en = 0;
+  for (const w of words) {
+    if (_ES_STOP.has(w)) es++;
+    if (_EN_STOP.has(w)) en++;
+  }
+  return en > es ? "en" : "es";
+}
+
 function daysSince(iso: string | null | undefined): number {
   if (!iso) return 0;
   const t = Date.parse(iso);
@@ -220,27 +252,62 @@ export function adaptListing(raw: any): Listing {
       : SOURCE_LABELS[sourceKey] ??
         sourceKey.replace(/^\w/, (c) => c.toUpperCase());
 
+  const urlLanguage: "en" | "es" | "mixed" | null =
+    raw.url_language === "en" || raw.url_language === "es" || raw.url_language === "mixed"
+      ? raw.url_language
+      : null;
+
+  // The source language a single-language (un-enriched) listing string is
+  // actually written in. Prefer the enrichment's declared url_language;
+  // otherwise detect it from the raw broker title. Used so a Spanish-only
+  // broker string is placed in the .es slot instead of being mislabeled as
+  // English — the exact defense-in-depth for the leak PR #988 closes at the
+  // pipeline. "mixed" resolves to English placement (its en side is the
+  // primary). See detectListingLang().
+  const contentLang: "en" | "es" =
+    urlLanguage === "es"
+      ? "es"
+      : urlLanguage === "en" || urlLanguage === "mixed"
+        ? "en"
+        : detectListingLang(typeof raw.title === "string" ? raw.title : "");
+
   // Schema v3 emits {en, es} dicts for title_canonical /
-  // short_description_canonical / reasons_to_buy when DeepSeek runs.
-  // The fallback template path still writes single-language strings.
-  // localizedFromAny accepts either shape and yields a Localized; missing
-  // .es is allowed and tr() falls back to .en at render time.
+  // short_description_canonical / reasons_to_buy when DeepSeek runs. The
+  // fallback template path also emits {en, es} (post-#988). A residual
+  // single-language string (fresh listing before enrichment) is placed in
+  // the slot matching its ACTUAL language — never blindly .en — so tr()
+  // renders it honestly and a badge can flag original-language content.
   const localizedFromAny = (
     canonical: any,
     legacy: string | undefined,
   ): { en: string; es?: string } => {
-    if (canonical && typeof canonical === "object" && typeof canonical.en === "string") {
-      const out: { en: string; es?: string } = { en: canonical.en };
-      if (typeof canonical.es === "string" && canonical.es.length > 0) out.es = canonical.es;
-      return out;
+    // Bilingual (or partial) dict: keep whichever sides are non-empty.
+    if (canonical && typeof canonical === "object") {
+      const en = typeof canonical.en === "string" ? canonical.en : "";
+      const es = typeof canonical.es === "string" ? canonical.es : "";
+      if (en || es) {
+        const out: { en: string; es?: string } = { en };
+        if (es) out.es = es;
+        return out;
+      }
     }
-    if (typeof canonical === "string" && canonical.length > 0) return { en: canonical };
-    if (typeof legacy === "string" && legacy.length > 0) return { en: legacy };
-    return { en: "" };
+    const single =
+      typeof canonical === "string" && canonical.length > 0
+        ? canonical
+        : typeof legacy === "string" && legacy.length > 0
+          ? legacy
+          : "";
+    if (!single) return { en: "" };
+    // Honest slot: place the single string in its real language.
+    return contentLang === "es" ? { en: "", es: single } : { en: single };
   };
 
   const titleLocalized = localizedFromAny(raw.title_canonical, raw.title);
-  if (!titleLocalized.en) titleLocalized.en = "Untitled";
+  // Localized fallback (never a hardcoded English "Untitled" shown to ES users).
+  if (!titleLocalized.en && !titleLocalized.es) {
+    titleLocalized.en = "Untitled";
+    titleLocalized.es = "Sin título";
+  }
 
   const descLegacy = typeof raw.description === "string"
     ? decodeHtmlEntities(raw.description).replace(/\s+/g, " ").trim()
@@ -250,26 +317,28 @@ export function adaptListing(raw: any): Listing {
   const usps: Listing["usps"] = Array.isArray(raw.reasons_to_buy)
     ? (raw.reasons_to_buy
         .map((s: any): { en: string; es?: string } | null => {
-          if (s && typeof s === "object" && typeof s.en === "string") {
-            const out: { en: string; es?: string } = { en: s.en };
-            if (typeof s.es === "string" && s.es.length > 0) out.es = s.es;
-            return out;
+          if (s && typeof s === "object") {
+            const en = typeof s.en === "string" ? s.en : "";
+            const es = typeof s.es === "string" ? s.es : "";
+            if (en || es) {
+              const out: { en: string; es?: string } = { en };
+              if (es) out.es = es;
+              return out;
+            }
+            return null;
           }
-          if (typeof s === "string" && s.length > 0) return { en: s };
+          if (typeof s === "string" && s.length > 0) {
+            return contentLang === "es" ? { en: "", es: s } : { en: s };
+          }
           return null;
         })
-        // Drop entries with no usable English text. The LLM-enrichment
-        // path occasionally produces `{en: ""}` placeholders; without
-        // this guard the card renders an empty <li> with just a check
-        // icon. Trim before measuring so whitespace-only strings drop too.
+        // Drop entries with NO usable text on either side. The LLM path can
+        // produce `{en: ""}` placeholders; without this guard the card
+        // renders an empty <li> with just a check icon. Keep an entry when
+        // EITHER language has content (an es-only entry is valid).
         .filter((u: { en: string; es?: string } | null): u is { en: string; es?: string } =>
-          u !== null && u.en.trim().length > 0))
+          u !== null && ((u.en?.trim().length ?? 0) > 0 || (u.es?.trim().length ?? 0) > 0)))
     : [];
-
-  const urlLanguage: "en" | "es" | "mixed" | null =
-    raw.url_language === "en" || raw.url_language === "es" || raw.url_language === "mixed"
-      ? raw.url_language
-      : null;
 
   const isBeachfront = Boolean(raw.is_beachfront);
   const photos = buildPhotos(raw);
