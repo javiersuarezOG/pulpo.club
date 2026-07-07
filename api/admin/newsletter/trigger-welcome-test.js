@@ -189,9 +189,20 @@ async function handler(req, res, { fetchImpl } = {}) {
   }
   const reason = b.reason || (status === "error" ? (b.error || `http_${result.httpStatus}`) : null);
 
+  // A forced test send that left an existing welcome stamp intact means the
+  // target is an already-welcomed live subscriber, not a throwaway test
+  // contact. The dispatcher now preserves their stamp (so their weekly is no
+  // longer suppressed), but the operator should still know they just emailed
+  // a real subscriber — surface an explicit warning + copy for the widget.
+  const stampPreserved = status === "sent" && b.stamp_preserved === true;
+  const warning = stampPreserved
+    ? "This address is already a welcomed subscriber — sent as a test. Their welcome stamp (and weekly cadence) was left untouched. Prefer a +alias for tests."
+    : null;
+
   logApi({
     status: 200, ms: Date.now() - t0, result: status, reason: reason || "-",
     variant, locale: locale || "clerk", dry_run: !!b.dry_run,
+    stamp_preserved: stampPreserved,
   });
   await emitTriggerEvent({ to: email, by, force, variant, locale, result: status, reason });
 
@@ -203,6 +214,8 @@ async function handler(req, res, { fetchImpl } = {}) {
     variant,
     locale: locale || null,
     latency_ms: typeof b.latency_ms === "number" ? b.latency_ms : Date.now() - t0,
+    stamp_preserved: stampPreserved,
+    warning,
   });
 }
 
