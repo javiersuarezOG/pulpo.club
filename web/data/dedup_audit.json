@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-05T07:02:31.992923+00:00",
+  "computed_at": "2026-07-07T07:04:42.424680+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -1110,10 +1110,10 @@
   "overlap_matrix": {},
   "per_source": {
     "bienesraices": {
-      "kept_as_unique": 509,
-      "raw": 510,
+      "kept_as_unique": 508,
+      "raw": 509,
       "shared_with_others": 0,
-      "unique_in_source": 509
+      "unique_in_source": 508
     },
     "century21": {
       "kept_as_unique": 14,
@@ -1128,16 +1128,16 @@
       "unique_in_source": 32
     },
     "citymax_sc": {
-      "kept_as_unique": 159,
-      "raw": 159,
+      "kept_as_unique": 157,
+      "raw": 157,
       "shared_with_others": 0,
-      "unique_in_source": 159
+      "unique_in_source": 157
     },
     "csbr": {
-      "kept_as_unique": 254,
-      "raw": 256,
+      "kept_as_unique": 257,
+      "raw": 259,
       "shared_with_others": 0,
-      "unique_in_source": 254
+      "unique_in_source": 257
     },
     "elagente": {
       "kept_as_unique": 2,
@@ -1176,10 +1176,10 @@
       "unique_in_source": 24
     },
     "realestate_au_sv": {
-      "kept_as_unique": 267,
-      "raw": 298,
+      "kept_as_unique": 270,
+      "raw": 301,
       "shared_with_others": 0,
-      "unique_in_source": 267
+      "unique_in_source": 270
     },
     "realtyelsalvador": {
       "kept_as_unique": 123,
@@ -1188,10 +1188,10 @@
       "unique_in_source": 123
     },
     "remax": {
-      "kept_as_unique": 296,
-      "raw": 311,
+      "kept_as_unique": 292,
+      "raw": 307,
       "shared_with_others": 0,
-      "unique_in_source": 296
+      "unique_in_source": 292
     },
     "santizo": {
       "kept_as_unique": 91,
@@ -1212,6 +1212,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2114,
-  "total_unique_fingerprints": 2061
+  "total_in_dataset": 2113,
+  "total_unique_fingerprints": 2060
 }
