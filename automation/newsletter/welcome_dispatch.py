@@ -93,6 +93,12 @@ class WelcomeDispatchResult:
     recipient_hash: Optional[str] = None
     dry_run: bool = False
     latency_ms: int = 0
+    # True when a FORCED send deliberately left an EXISTING welcome stamp
+    # untouched (an admin re-render / test send to an already-welcomed
+    # subscriber). Surfaced so the admin UI can warn that the target is a
+    # live subscriber and telemetry can prove the weekly cadence was not
+    # disturbed. See the stamp block in `dispatch_welcome`.
+    stamp_preserved: bool = False
 
 
 def _capture(event: str, props: dict) -> None:
@@ -496,9 +502,22 @@ def dispatch_welcome(
     # idempotency stamp (otherwise the next real attempt would skip).
     # welcome_back stamps the resubscribe dedup key (+ refreshes the
     # welcome stamp); welcome stamps the permanent first-time stamp.
+    #
+    # A FORCED send that bypassed an EXISTING welcome stamp is a re-render
+    # / admin test, NOT a genuine first welcome — it must be non-destructive
+    # to the recipient's welcome+skip state. Overwriting the stamp here
+    # would move `welcome_newsletter_sent_at` forward, which re-arms the
+    # weekly cron's 96h first-Sunday skip (subscribers._skip_for_recent_signup
+    # keys off that stamp). That is exactly how an admin "test send" to a
+    # real subscriber's address silently suppressed their next weekly
+    # (Issue-13 incident, 2026-07-05). Preserve the original stamp in that
+    # case; a forced send to a not-yet-welcomed Pro still stamps normally.
     stamped = False
+    stamp_preserved = False
     if not result.dry_run:
-        if effective_variant == "welcome_back":
+        if force and user.welcome_sent_at:
+            stamp_preserved = True
+        elif effective_variant == "welcome_back":
             stamped = _stamp_resubscribe_welcome(user.id, iso_ts, subscription_id)
         else:
             stamped = _stamp_welcome_sent_at(user.id, iso_ts)
@@ -513,6 +532,7 @@ def dispatch_welcome(
         "attempt": result.attempt,
         "source": source,
         "stamped_clerk": stamped,
+        "stamp_preserved": stamp_preserved,
         "variant": effective_variant,
         "subscription_id": subscription_id,
     })
@@ -523,4 +543,5 @@ def dispatch_welcome(
         recipient_hash=recipient.email_hash,
         dry_run=result.dry_run,
         latency_ms=result.latency_ms,
+        stamp_preserved=stamp_preserved,
     )

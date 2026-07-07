@@ -88,6 +88,33 @@ describe("trigger-welcome-test → internal endpoint", () => {
     expect(res.body.reason).toBe("not_pro");
   });
 
+  it("surfaces a warning when the dispatcher preserved an existing stamp (live subscriber)", async () => {
+    // Forced test send to an already-welcomed subscriber: the dispatcher
+    // sends but reports stamp_preserved:true. The endpoint must relay that
+    // + an operator-facing warning so the widget flags a live subscriber.
+    const fetchImpl = vi.fn(async () => ({
+      status: 200,
+      json: async () => ({ status: "sent", message_id: "re_live", dry_run: false, stamp_preserved: true }),
+    }));
+    const res = mockRes();
+    await handler(mockReq({ email: "sebastian.honores@gmail.com" }), res, { fetchImpl });
+    expect(res.body.status).toBe("sent");
+    expect(res.body.stamp_preserved).toBe(true);
+    expect(res.body.warning).toMatch(/already a welcomed subscriber/i);
+  });
+
+  it("no warning on a normal test send to a fresh contact (stamp not preserved)", async () => {
+    const fetchImpl = vi.fn(async () => ({
+      status: 200,
+      json: async () => ({ status: "sent", message_id: "re_fresh", dry_run: false, stamp_preserved: false }),
+    }));
+    const res = mockRes();
+    await handler(mockReq({ email: "me+walk9@pulpo.club" }), res, { fetchImpl });
+    expect(res.body.status).toBe("sent");
+    expect(res.body.stamp_preserved).toBe(false);
+    expect(res.body.warning).toBeNull();
+  });
+
   it("passes through a failure", async () => {
     const fetchImpl = vi.fn(async () => ({ status: 500, json: async () => ({ status: "failed", reason: "send_failed" }) }));
     const res = mockRes();
