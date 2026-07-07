@@ -221,6 +221,11 @@ class handler(BaseHTTPRequestHandler):
             "recipient_hash": result.recipient_hash,
             "dry_run": result.dry_run,
             "latency_ms": elapsed_ms,
+            # True when a forced send left an existing welcome stamp intact
+            # (target is an already-welcomed subscriber). Lets the admin UI
+            # warn the operator that this was a live subscriber, not a fresh
+            # test contact — and that their weekly cadence was preserved.
+            "stamp_preserved": result.stamp_preserved,
         }
         # status="sent" + status="skipped" both map to 200 (skips are
         # expected outcomes — already_sent, not_pro, etc.). status=
