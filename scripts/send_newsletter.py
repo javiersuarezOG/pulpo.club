@@ -39,7 +39,10 @@ from automation.newsletter import (                                        # noq
     render_html,
 )
 from automation.newsletter.templates import TEMPLATES                      # noqa: E402
-from automation.newsletter.issue_state import next_issue_number            # noqa: E402
+from automation.newsletter.issue_state import (                            # noqa: E402
+    IssueStateError,
+    current_issue_number,
+)
 from automation.newsletter.send import is_dry_run, send_issue              # noqa: E402
 from automation.newsletter.subscribers import (                            # noqa: E402
     build_recipient_queue,
@@ -245,11 +248,13 @@ def main() -> int:
         default=None,
         help=(
             "Issue number to stamp into this run. When omitted, the script "
-            "queries PostHog for max(issue_number) from successful past "
-            "sends and uses that + 1 (falls back to 1 on any error). Auto-"
-            "increment only applies to audience-wide LIVE sends; preview "
-            "and --only-email smoke sends require an explicit value so a "
-            "tester send can't bump production state."
+            "reads the authoritative committed counter "
+            "(web/data/newsletter_issue_state.json) — the same number for "
+            "the Pro and Free editions that week, advanced weekly by the "
+            "nightly. FAIL-CLOSED: a missing/corrupt file aborts the send "
+            "(never a guessed Issue 1). The committed counter is audience-"
+            "only; preview and --only-email smoke sends require an explicit "
+            "value so a tester send can't be mistaken for a real edition."
         ),
     )
     p.add_argument(
@@ -378,21 +383,35 @@ def main() -> int:
     if args.limit:
         queue = queue[: args.limit]
 
-    # Resolve issue_number: explicit CLI > PostHog auto-increment > 1.
-    # Smoke (--only-email) and preview sends MUST pass an explicit
-    # number so a tester send can't bump the audience's running counter
-    # (and so a 1-recipient test doesn't end up looking like Issue NN+1
-    # in everyone's history of received issues).
+    # Resolve issue_number: explicit CLI > authoritative committed counter.
+    # Smoke (--only-email) and preview sends MUST pass an explicit number so
+    # a tester send can't be mistaken for a real edition.
+    #
+    # The audience path reads the committed issue-state file
+    # (web/data/newsletter_issue_state.json) — the single source of truth,
+    # advanced weekly by the nightly and shared by the Pro + Free editions.
+    # FAIL-CLOSED: a missing/corrupt file ABORTS the send rather than
+    # guessing. The prior behaviour (PostHog max()+1, default 1) shipped
+    # Issue 1 on a PostHog outage and let Pro/Free diverge (launch audit P1).
     if args.issue_number is None:
         if preview_mode or args.only_email:
             print(
                 "[send] --issue-number is required for --preview-cohorts "
-                "and --only-email runs (auto-increment is audience-only)",
+                "and --only-email runs (the counter is audience-only)",
                 file=sys.stderr,
             )
             return 2
-        resolved_issue_number = next_issue_number(default=1)
-        print(f"[send] auto-incremented issue_number={resolved_issue_number} (from PostHog)")
+        try:
+            resolved_issue_number = current_issue_number()
+        except IssueStateError as e:
+            print(
+                f"[send] FATAL: issue-state unavailable — refusing to send with a "
+                f"guessed number ({e}). Restore web/data/newsletter_issue_state.json "
+                f"or pass --issue-number explicitly.",
+                file=sys.stderr,
+            )
+            return 1
+        print(f"[send] issue_number={resolved_issue_number} (authoritative committed counter)")
     else:
         resolved_issue_number = args.issue_number
     args.issue_number = resolved_issue_number
@@ -524,6 +543,11 @@ def main() -> int:
                 "issue_number": args.issue_number,
                 "recipient_hash": recipient.email_hash,
                 "cohort": issue.cohort,
+                # tier MUST be stamped here (it is on send_succeeded too):
+                # the health endpoint splits weekly failures Pro-vs-Free by
+                # this prop, and a missing tier used to bucket the failure as
+                # Free — hiding a failed Pro campaign (launch audit P1).
+                "tier": recipient.tier,
                 "error": result.error,
                 "error_detail": result.error_detail,
                 "attempt": result.attempt,

@@ -386,6 +386,27 @@ def _absolute_photo(listing: dict, site_root: str) -> str:
     return ""
 
 
+# Spanish abbreviated month names — strftime("%b") is English regardless of
+# locale (and locale-dependent strftime is unreliable/unavailable in CI), so
+# a Spanish edition showed "5 Jan 2026" instead of "5 ene 2026" in the header
+# + title (launch audit). July/June happen to coincide EN↔ES; Jan/Apr/Aug/Dec
+# do not, so the leak was real 4+ months a year.
+_ES_MONTHS_ABBR = (
+    "ene", "feb", "mar", "abr", "may", "jun",
+    "jul", "ago", "sep", "oct", "nov", "dic",
+)
+
+
+def _format_issue_date(issue_date, locale: Locale) -> str:
+    """Locale-aware short date for the masthead. EN: '5 Jul 2026' (strftime);
+    ES: '5 jul 2026' via the Spanish abbreviation table."""
+    if not hasattr(issue_date, "strftime"):
+        return ""
+    if locale == "es":
+        return f"{issue_date.day} {_ES_MONTHS_ABBR[issue_date.month - 1]} {issue_date.year}"
+    return issue_date.strftime("%-d %b %Y")
+
+
 def _location_line(listing: dict, locale: Locale) -> str:
     parts: list[str] = []
     if listing.get("municipality"):
@@ -571,11 +592,11 @@ def _filter_summary_human(pref: Preference, locale: Locale, cohort: Cohort) -> s
 
     # Property type — single most expected token.
     if "land" in pref.property_types:
-        parts.append("land" if locale == "en" else "terreno")
+        parts.append(i18n.t("filter.summary.land", locale))
     elif "house" in pref.property_types:
-        parts.append("house" if locale == "en" else "casa")
+        parts.append(i18n.t("filter.summary.house", locale))
     elif "condo" in pref.property_types:
-        parts.append("condo" if locale == "en" else "condo")
+        parts.append(i18n.t("filter.summary.condo", locale))
 
     # Price cap — present only when it bites. Compact dollar format
     # ("$500k", not "$500,000") matches the mockup tone.
@@ -587,11 +608,20 @@ def _filter_summary_human(pref: Preference, locale: Locale, cohort: Cohort) -> s
             money = f"${cap // 1_000}k"
         else:
             money = f"${cap}"
-        parts.append(f"under {money}" if locale == "en" else f"menos de {money}")
+        parts.append(i18n.t("filter.summary.under_price", locale, money=money))
 
-    # Categories last — they're usually editorial, not structural.
+    # Categories last — they're usually editorial, not structural. Look
+    # each up through the i18n table (filter.category.<slug>) so a Spanish
+    # reader never sees an English-humanized slug ("Ocean View") — the
+    # enum-render trap (CLAUDE.md). i18n.t returns the key on a miss, so a
+    # slug with no translation row falls back to the humanized form as a
+    # last resort; a valid category always has a row.
     for c in pref.categories[:2]:
-        parts.append(c.replace("_", " ").title())
+        key = f"filter.category.{c}"
+        label = i18n.t(key, locale)
+        if label == key:                         # not in the closed set
+            label = c.replace("_", " ").title()  # safety net; shouldn't be reached
+        parts.append(label)
 
     return " · ".join(parts) if parts else ""
 
@@ -1234,7 +1264,7 @@ def build_issue(
     return Issue(
         issue_id=issue_id,
         issue_number=issue_number,
-        issue_date_human=issue_date.strftime("%-d %b %Y") if hasattr(issue_date, "strftime") else "",
+        issue_date_human=_format_issue_date(issue_date, locale),
         recipient=recipient,
         cohort=cohort,
         locale=locale,

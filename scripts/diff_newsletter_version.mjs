@@ -70,6 +70,18 @@ const NON_RENDER_MODULES = new Set([
   // and stamps Clerk metadata; the HTML it sends comes from the guarded
   // pulpo_pro_welcome* template modules, which it only invokes.
   "automation/newsletter/welcome_dispatch.py",
+  // Transport: transmits the already-rendered HTML it is GIVEN (Resend POST,
+  // retries, idempotency key, List-Unsubscribe headers, plain-text
+  // derivation). Owns no HTML/CSS template and no TEMPLATE_VERSION constant,
+  // so a wire-level change (e.g. the Resend Idempotency-Key) must NOT force a
+  // template-revision bump — that would falsely stamp every email as a new
+  // template version. The HTML + version constants live in components/ +
+  // templates/ + _common.py, which stay guarded.
+  "automation/newsletter/send.py",
+  // Issue-number counter — reads/advances the committed
+  // newsletter_issue_state.json and (legacy) queries PostHog. Produces an
+  // integer, zero HTML; changing it can't stale a template version.
+  "automation/newsletter/issue_state.py",
 ]);
 
 function isNewsletterRenderChange(file) {

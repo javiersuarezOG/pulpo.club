@@ -1,0 +1,6 @@
+{
+  "issue_number": 14,
+  "iso_week": "2026-W28",
+  "updated_at": "2026-07-07T07:49:19.221387+00:00",
+  "note": "Newsletter issue counter — the AUTHORITATIVE source of truth for the weekly issue number (replaces the PostHog max() query that failed open to Issue 1). Advanced once per ISO week by the nightly; read read-only + fail-closed by the Pro AND Free Sunday sends so both editions share one number. Seeded 2026-07-05 at issue 13 (last real send was 12). Do not hand-edit unless deliberately resetting the sequence."
+}

@@ -63,6 +63,20 @@ describe("/api/admin/newsletter/health", () => {
     expect(famOf(res, "pro-weekly").dry_run).toBe(false);
   });
 
+  it("a tier-less weekly FAILURE surfaces on Pro (not silently hidden under Free) — P1", async () => {
+    // Regression guard: a send_failed with a missing/empty tier used to
+    // bucket under free-weekly, so a failed Pro campaign read as healthy.
+    // It must now land on pro-weekly (the high-stakes family), never vanish.
+    stubPostHog([
+      ["newsletter.send_failed", null, null, 3, "2026-06-10T09:00:00Z"],
+      ["newsletter.send_failed", "", null, 2, "2026-06-10T09:01:00Z"],
+    ]);
+    const res = mockRes();
+    await health(mockReq(), res);
+    expect(famOf(res, "pro-weekly").failed).toBe(5);   // 3 + 2 surfaced on Pro
+    expect(famOf(res, "free-weekly").failed).toBe(0);  // NOT hidden here
+  });
+
   it("buckets welcome / free-welcome events into sent/skipped/failed", async () => {
     stubPostHog([
       ["newsletter.welcome_sent", null, false, 6, "2026-06-10T08:00:00Z"],

@@ -98,6 +98,21 @@ def _public_url(local_path: str, base_url: str) -> str:
     return base_url.rstrip("/") + stripped
 
 
+def _caption_for_ig(caption: str) -> str:
+    """Strip the ``**bold**`` markdown markers before the caption reaches
+    the Graph API.
+
+    Instagram captions are PLAIN TEXT — they do not render markdown, so a
+    stored ``**hook**`` shows the literal asterisks in the published post.
+    We keep the markers in the stored/queued caption because the admin
+    review UI (`_renderCaption` in IgReviewWidget) renders them as real
+    bold for preview; this function is the wire-level transform that makes
+    the public caption clean.  Only ``**`` is used by ig_caption.py, so
+    that's all we strip (single ``*`` is left alone — it can be a literal
+    asterisk in copy)."""
+    return caption.replace("**", "")
+
+
 def _slide_urls(item: dict, base_url: str) -> list[str]:
     """Poster first, then carousel photos.  Hard-cap at 10 slides
     (Instagram carousel max)."""
@@ -225,6 +240,20 @@ class IgClient:
         )
         return self._extract_id(r, ctx="publish")
 
+    def post_comment(self, media_id: str, message: str) -> str:
+        """Post the first comment on a published media.  Requires the
+        token to carry the `instagram_manage_comments` scope (the
+        content-publish scope alone is NOT enough — see ig_token_helper).
+        Returns the comment id."""
+        r = self._client.post(
+            f"{GRAPH_BASE}/{media_id}/comments",
+            params={
+                "message":      message,
+                "access_token": self.access_token,
+            },
+        )
+        return self._extract_id(r, ctx="post_comment")
+
     def container_status(self, container_id: str) -> str:
         """Graph returns one of {IN_PROGRESS, FINISHED, ERROR, PUBLISHED,
         EXPIRED}.  Used by wait_for_ready below."""
@@ -324,7 +353,9 @@ def publish_item(
         waiter(client, cid)
 
     # Step 4: create the carousel container with the caption.
-    caption = (item.get("caption") or "").strip()
+    # Strip markdown: IG captions are plain text, so `**bold**` would
+    # otherwise publish with literal asterisks (the admin UI keeps them).
+    caption = _caption_for_ig((item.get("caption") or "").strip())
     carousel_id = client.create_carousel(children, caption)
     print(f"  carousel container created → {carousel_id}")
 
@@ -338,7 +369,65 @@ def publish_item(
     item["posted"] = True
     item["posted_at"] = datetime.now(timezone.utc).isoformat()
     item["posted_media_id"] = media_id
+
+    # Step 7 (best-effort): post the first comment — the full listing spec
+    # + discovery hashtags.  A comment failure (e.g. token missing the
+    # instagram_manage_comments scope) must NOT fail the post, which is
+    # already live; we record the outcome on the item and move on.
+    comment = (item.get("comment") or "").strip()
+    if comment:
+        try:
+            comment_id = client.post_comment(media_id, comment)
+            item["comment_posted"] = True
+            item["comment_id"] = comment_id
+            print(f"  first comment posted → {comment_id}")
+        except IgApiError as e:
+            item["comment_posted"] = False
+            item["comment_error"] = str(e)[:300]
+            print(
+                f"  WARN first comment failed (post is live): {e} — "
+                f"token may need the instagram_manage_comments scope",
+                file=sys.stderr,
+            )
     return item
+
+
+# ── activity log ──────────────────────────────────────────────────────
+
+DEFAULT_LOG = Path("web/data/ig_post_log.jsonl")
+
+
+def _build_log_entry(item: dict, status: str, error: Optional[str] = None) -> dict:
+    """One activity-log row for a single publish attempt.  Shape is read
+    verbatim by api/admin/ig-log.js and rendered in the admin console's
+    activity feed, so keep the keys stable."""
+    caption = (item.get("caption") or "").replace("**", "").strip()
+    preview = caption.split("\n", 1)[0][:90]
+    entry = {
+        "ts":              datetime.now(timezone.utc).isoformat(),
+        "day":             item.get("day"),
+        "shelf":           item.get("shelf"),
+        "status":          status,   # "posted" | "failed"
+        "caption_preview": preview,
+        "slides":          1 + len(item.get("carousel_photo_paths") or []),
+    }
+    if status == "posted":
+        entry["media_id"] = item.get("posted_media_id")
+    if error:
+        entry["error"] = str(error)[:300]
+    return entry
+
+
+def append_post_log(log_path: Path, entry: dict) -> None:
+    """Append one JSON line to the activity log.  Defensive: a logging
+    failure must never break or mask the publish result, so any error is
+    swallowed with a breadcrumb."""
+    try:
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        with log_path.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps(entry, ensure_ascii=False) + "\n")
+    except OSError as e:                                          # pragma: no cover
+        print(f"[ig_publish] WARN could not write activity log: {e}", file=sys.stderr)
 
 
 # ── top-level orchestration ──────────────────────────────────────────
@@ -353,6 +442,7 @@ def run_publish(
     dry_run: bool = False,
     client: Optional[IgClient] = None,
     force_day: Optional[int] = None,
+    attempt_log: Optional[list] = None,
 ) -> dict:
     """Run the publisher against an in-memory queue payload.  Returns
     the (possibly mutated) payload.
@@ -362,7 +452,12 @@ def run_publish(
 
     When `force_day` is set, publishes that specific item (if approved
     and not yet posted), bypassing the scheduled_for gate.  Used by the
-    "Publish now" button in /admin/ig-review for on-the-spot test posts."""
+    "Publish now" button in /admin/ig-review for on-the-spot test posts.
+
+    `attempt_log`, when provided, receives one `_build_log_entry` dict per
+    publish attempt (posted or failed) — the CLI persists these to the
+    activity-log jsonl.  Default None keeps run_publish side-effect-free
+    for tests that don't care about the log."""
     items = queue_payload.get("items") or []
     if force_day is not None:
         due = select_forced_item(items, force_day)
@@ -400,8 +495,12 @@ def run_publish(
             f"[ig_publish] OK d{due['day']:02d} → media_id={due['posted_media_id']} "
             f"at {due['posted_at']}"
         )
+        if attempt_log is not None:
+            attempt_log.append(_build_log_entry(due, "posted"))
     except IgApiError as e:
         print(f"[ig_publish] FAILED d{due['day']:02d}: {e}", file=sys.stderr)
+        if attempt_log is not None:
+            attempt_log.append(_build_log_entry(due, "failed", error=e))
         raise
 
     return queue_payload
@@ -417,6 +516,10 @@ def main(argv: Optional[list[str]] = None) -> int:
         description="Publish the next due item from ig_queue.json to Instagram.",
     )
     parser.add_argument("--queue", type=Path, default=DEFAULT_QUEUE)
+    parser.add_argument(
+        "--log", type=Path, default=DEFAULT_LOG,
+        help="Activity-log jsonl to append each publish attempt to.",
+    )
     parser.add_argument(
         "--dry-run", action="store_true",
         help="Log what would be published without calling the Graph API.",
@@ -463,17 +566,29 @@ def main(argv: Optional[list[str]] = None) -> int:
         now = datetime.now(timezone.utc)
 
     payload = json.loads(args.queue.read_text(encoding="utf-8"))
-    updated = run_publish(
-        payload,
-        ig_user_id=ig_user_id,
-        access_token=access_token,
-        base_url=base_url,
-        now=now,
-        dry_run=args.dry_run,
-        force_day=args.force_day,
-    )
+    attempts: list = []
+    try:
+        updated = run_publish(
+            payload,
+            ig_user_id=ig_user_id,
+            access_token=access_token,
+            base_url=base_url,
+            now=now,
+            dry_run=args.dry_run,
+            force_day=args.force_day,
+            attempt_log=attempts,
+        )
+    except IgApiError:
+        # Record the failed attempt before re-raising so the admin
+        # activity log shows failures, not just successes.
+        if not args.dry_run:
+            for entry in attempts:
+                append_post_log(args.log, entry)
+        raise
 
     if not args.dry_run:
+        for entry in attempts:
+            append_post_log(args.log, entry)
         atomic_write_json(args.queue, updated, indent=2)
         print(f"[ig_publish] queue persisted to {args.queue}")
     return 0

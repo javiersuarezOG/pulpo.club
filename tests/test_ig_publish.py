@@ -270,7 +270,8 @@ def test_publish_item_full_flow_mutates_item():
     assert client.create_carousel.call_count == 1
     children = client.create_carousel.call_args[0][0]
     assert len(children) == 3
-    assert client.create_carousel.call_args[0][1] == "**Caption.**"
+    # Markdown bold markers are stripped for the plain-text IG caption.
+    assert client.create_carousel.call_args[0][1] == "Caption."
     # Published once
     assert client.publish.call_count == 1
     # Waiter called for each child + once for the carousel = 4 calls
@@ -529,3 +530,153 @@ def test_ig_client_extract_id_raises_on_missing_id():
     r.json.return_value = {"weird": "shape"}
     with pytest.raises(IgApiError, match="no id"):
         IgClient._extract_id(r, ctx="upload")
+
+
+# ── caption sanitizer (bold markers must not leak to IG) ─────────────
+
+def test_caption_for_ig_strips_bold_markers():
+    from automation.ig_publish import _caption_for_ig
+    stored = (
+        "**Todos los terrenos de El Salvador, rankeados cada semana.**\n\n"
+        "Un solo lugar para ver lo que de verdad vale la pena.\n\n"
+        "pulpo.club · link en bio"
+    )
+    out = _caption_for_ig(stored)
+    assert "**" not in out
+    assert out.startswith("Todos los terrenos")
+    # body + CTA preserved verbatim
+    assert "pulpo.club · link en bio" in out
+    assert "de verdad vale la pena" in out
+
+
+def test_caption_for_ig_leaves_single_asterisk_alone():
+    from automation.ig_publish import _caption_for_ig
+    assert _caption_for_ig("3 * 4 metros") == "3 * 4 metros"
+
+
+def test_publish_item_sends_clean_caption(monkeypatch):
+    """The caption handed to create_carousel carries no `**`."""
+    from automation import ig_publish
+    client = MagicMock()
+    client.upload_carousel_item.side_effect = ["c1", "c2"]
+    client.create_carousel.return_value = "car1"
+    client.publish.return_value = "media123"
+    item = {
+        "day": 100,
+        "caption": "**Bold hook.**\n\nbody.",
+        "poster_path": "web/data/ig_assets/x/slide1.png",
+        "carousel_photo_paths": ["web/data/ig_assets/x/slide2.png"],
+    }
+    ig_publish.publish_item(client, item, "https://pulpo.club", waiter=lambda *_: None)
+    sent_caption = client.create_carousel.call_args.args[1]
+    assert "**" not in sent_caption
+    assert sent_caption.startswith("Bold hook.")
+# ── activity log (admin console feed) ─────────────────────────────────
+
+def test_build_log_entry_posted_strips_bold_and_carries_media_id():
+    from automation.ig_publish import _build_log_entry
+    item = {
+        "day": 100, "shelf": "announce_intro_1",
+        "caption": "**Todos los terrenos.**\n\nbody.",
+        "carousel_photo_paths": ["a", "b"], "posted_media_id": "m1",
+    }
+    e = _build_log_entry(item, "posted")
+    assert e["status"] == "posted"
+    assert e["media_id"] == "m1"
+    assert e["caption_preview"] == "Todos los terrenos." and "**" not in e["caption_preview"]
+    assert e["slides"] == 3
+    assert "error" not in e
+
+
+def test_build_log_entry_failed_carries_error_no_media():
+    from automation.ig_publish import _build_log_entry, IgApiError
+    item = {"day": 5, "shelf": "s", "caption": "x", "carousel_photo_paths": []}
+    e = _build_log_entry(item, "failed", error=IgApiError("wait_for_ready", "stuck"))
+    assert e["status"] == "failed"
+    assert "stuck" in e["error"]
+    assert "media_id" not in e
+    assert e["slides"] == 1
+
+
+def test_run_publish_appends_to_attempt_log_on_success(pub):
+    from unittest.mock import MagicMock
+    client = MagicMock()
+    client.upload_carousel_item.side_effect = ["c1", "c2"]
+    client.create_carousel.return_value = "car1"
+    client.publish.return_value = "media999"
+    payload = {"items": [_it(day=7, approved=True,
+                             scheduled_for="2026-06-01T01:00:00+00:00",
+                             carousel_photo_paths=["web/photos/a.jpg"])]}
+    attempts = []
+    with patch.object(pub, "wait_for_ready", lambda *_: None):
+        pub.run_publish(
+            payload, ig_user_id="u", access_token="t",
+            base_url="https://pulpo.club",
+            now=datetime(2026, 6, 2, tzinfo=timezone.utc),
+            client=client, attempt_log=attempts,
+        )
+    assert len(attempts) == 1
+    assert attempts[0]["status"] == "posted"
+    assert attempts[0]["media_id"] == "media999"
+
+
+def test_run_publish_appends_failure_to_attempt_log(pub):
+    from unittest.mock import MagicMock
+    client = MagicMock()
+    client.upload_carousel_item.side_effect = pub.IgApiError("upload", "boom")
+    payload = {"items": [_it(day=8, approved=True,
+                             scheduled_for="2026-06-01T01:00:00+00:00")]}
+    attempts = []
+    with pytest.raises(pub.IgApiError):
+        pub.run_publish(
+            payload, ig_user_id="u", access_token="t",
+            base_url="https://pulpo.club",
+            now=datetime(2026, 6, 2, tzinfo=timezone.utc),
+            client=client, attempt_log=attempts,
+        )
+    assert len(attempts) == 1
+    assert attempts[0]["status"] == "failed"
+    assert "boom" in attempts[0]["error"]
+
+
+# ── first comment posting (best-effort) ───────────────────────────────
+
+def test_publish_item_posts_first_comment():
+    from automation import ig_publish
+    client = MagicMock()
+    client.upload_carousel_item.side_effect = ["c1", "c2"]
+    client.create_carousel.return_value = "car1"
+    client.publish.return_value = "media123"
+    client.post_comment.return_value = "cmt1"
+    item = {
+        "day": 101, "caption": "**Hook.**\n\nbody.",
+        "comment": "1,581 m² en El Tunco.\n\n#ElSalvador #ElTunco",
+        "poster_path": "web/data/ig_assets/x/p.png",
+        "carousel_photo_paths": ["web/data/ig_assets/x/s.png"],
+    }
+    ig_publish.publish_item(client, item, "https://pulpo.club", waiter=lambda *_: None)
+    client.post_comment.assert_called_once()
+    assert client.post_comment.call_args.args[0] == "media123"
+    assert "#ElTunco" in client.post_comment.call_args.args[1]
+    assert item["comment_posted"] is True
+    assert item["comment_id"] == "cmt1"
+
+
+def test_comment_failure_does_not_fail_the_post():
+    from automation import ig_publish
+    client = MagicMock()
+    client.upload_carousel_item.side_effect = ["c1", "c2"]
+    client.create_carousel.return_value = "car1"
+    client.publish.return_value = "media123"
+    client.post_comment.side_effect = ig_publish.IgApiError("post_comment", "no scope")
+    item = {
+        "day": 101, "caption": "x", "comment": "hi #ElSalvador",
+        "poster_path": "web/data/ig_assets/x/p.png",
+        "carousel_photo_paths": ["web/data/ig_assets/x/s.png"],
+    }
+    # Must NOT raise — the post is already live.
+    ig_publish.publish_item(client, item, "https://pulpo.club", waiter=lambda *_: None)
+    assert item["posted"] is True
+    assert item["posted_media_id"] == "media123"
+    assert item["comment_posted"] is False
+    assert "no scope" in item["comment_error"]

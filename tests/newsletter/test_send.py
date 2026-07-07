@@ -5,7 +5,20 @@ Uses the `post_override` test seam to bypass httpx entirely.
 
 from __future__ import annotations
 
+import pytest
+
 from automation.newsletter import send as send_mod
+
+
+@pytest.fixture(autouse=True)
+def _default_newsletter_salt(monkeypatch):
+    """A LIVE send now requires PULPO_NEWSLETTER_SALT (P0-1 fail-closed).
+
+    Every pre-existing test assumed a configured environment, so seed a
+    deterministic salt here. The two tests that assert the fail-closed
+    behaviour delenv it explicitly.
+    """
+    monkeypatch.setenv("PULPO_NEWSLETTER_SALT", "test-newsletter-salt")
 
 
 class _Resp:
@@ -121,6 +134,68 @@ def test_invalid_email_returns_error(monkeypatch):
     )
     assert out.ok is False
     assert out.error == "invalid_email"
+
+
+# ── salt fail-closed (P0-1) ───────────────────────────────────────────────
+def test_missing_salt_fails_closed_on_live_send(monkeypatch):
+    """A live send with no PULPO_NEWSLETTER_SALT must refuse — shipping an
+    unsubscribe link salted with the public dev salt is a broken/forgeable
+    unsubscribe. Must fail before any HTTP call."""
+    monkeypatch.setenv("PULPO_NEWSLETTER_DRY_RUN", "0")
+    monkeypatch.setenv("RESEND_API_KEY", "re_test")
+    monkeypatch.setenv("RESEND_FROM_EMAIL", "hello@mail.pulpo.club")
+    monkeypatch.delenv("PULPO_NEWSLETTER_SALT", raising=False)
+    poster = _make_post(lambda _i: _Resp(200, {"id": "should-not-be-called"}))
+    out = send_mod.send_issue(
+        to_email="ops@pulpo.club",
+        recipient_hash="abc123",
+        issue_number=2,
+        subject="Hi",
+        html="<p>hi</p>",
+        post_override=poster,
+    )
+    assert out.ok is False
+    assert out.error == "missing_newsletter_salt"
+    assert len(poster.calls) == 0   # never reached the network
+
+
+def test_dry_run_exempt_from_salt_guard(monkeypatch):
+    """Dry-run uses the dev salt on purpose (reproducible fixtures) and
+    makes no HTTP call — the salt guard must NOT block it."""
+    monkeypatch.setenv("PULPO_NEWSLETTER_DRY_RUN", "1")
+    monkeypatch.delenv("PULPO_NEWSLETTER_SALT", raising=False)
+    out = send_mod.send_issue(
+        to_email="ops@pulpo.club",
+        recipient_hash="abc123",
+        issue_number=1,
+        subject="Hi",
+        html="<p>hi</p>",
+    )
+    assert out.ok is True
+    assert out.dry_run is True
+
+
+# ── idempotency key (P1 double-send guard) ────────────────────────────────
+def test_idempotency_key_deterministic_per_issue_and_recipient(monkeypatch):
+    monkeypatch.setenv("PULPO_NEWSLETTER_DRY_RUN", "0")
+    monkeypatch.setenv("RESEND_API_KEY", "re_test")
+    monkeypatch.setenv("RESEND_FROM_EMAIL", "hello@mail.pulpo.club")
+
+    def _key(recipient_hash, issue):
+        poster = _make_post(lambda _i: _Resp(200, {"id": "ok"}))
+        send_mod.send_issue(
+            to_email="ops@pulpo.club", recipient_hash=recipient_hash,
+            issue_number=issue, subject="x", html="<p>x</p>", post_override=poster,
+        )
+        return poster.calls[0]["headers"]["Idempotency-Key"]
+
+    same_a = _key("abc", 7)
+    same_b = _key("abc", 7)           # rerun: same recipient + issue → same key
+    other_issue = _key("abc", 8)
+    other_recipient = _key("xyz", 7)
+    assert same_a == same_b == "pulpo-nl-7-abc"
+    assert same_a != other_issue      # scoped by issue
+    assert same_a != other_recipient  # scoped by recipient
 
 
 # ── retries ──────────────────────────────────────────────────────────────
@@ -256,6 +331,31 @@ def test_html_to_text_strips_style_and_blocks():
     assert "Next." in text
     assert "color: red" not in text
     assert "<" not in text and ">" not in text
+
+
+def test_html_to_text_preserves_link_destinations():
+    """Plain-text MIME must keep the unsubscribe + CTA URLs (launch audit)."""
+    html = (
+        '<p>See <a href="https://pulpo.club/listing/42">this listing</a>.</p>'
+        '<a href="https://pulpo.club/api/unsubscribe?r=abc&amp;i=7&amp;t=xyz">Unsubscribe</a>'
+    )
+    text = send_mod.html_to_text(html)
+    assert "this listing (https://pulpo.club/listing/42)" in text
+    # unsubscribe URL survives + entity-decoded
+    assert "https://pulpo.club/api/unsubscribe?r=abc&i=7&t=xyz" in text
+
+
+def test_html_to_text_no_duplicate_when_text_is_the_url():
+    text = send_mod.html_to_text('<a href="https://pulpo.club">https://pulpo.club</a>')
+    assert text.count("https://pulpo.club") == 1
+
+
+def test_html_to_text_drops_mailto_and_anchor_hrefs():
+    text = send_mod.html_to_text(
+        '<a href="mailto:hi@pulpo.club">Email us</a> and <a href="#top">top</a>'
+    )
+    assert "Email us" in text and "mailto:" not in text
+    assert "top" in text and "#top" not in text
 
 
 def test_is_dry_run_explicit_off(monkeypatch):

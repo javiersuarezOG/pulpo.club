@@ -52,7 +52,11 @@ from automation.newsletter.types import Preference, Recipient
 _SNAPSHOT_PATH = Path(__file__).parent / "_version_snapshots.json"
 _UPDATE = os.environ.get("PULPO_UPDATE_VERSION_SNAPSHOTS") == "1"
 _META_RE = re.compile(r'<meta name="x-pulpo-template"[^>]*>')
-_FIXED_DATE = datetime(2026, 6, 7, 16, 0, 0, tzinfo=timezone.utc)
+# April on purpose: EN "Apr" vs ES "abr" differ (unlike Jun/Jul which
+# coincide), so the snapshot actually exercises the locale-aware masthead
+# date (_format_issue_date) — otherwise the ES date-localization fix would
+# be invisible to this guard.
+_FIXED_DATE = datetime(2026, 4, 12, 16, 0, 0, tzinfo=timezone.utc)
 
 # template_id → (render fn, version constant name, current value)
 _TEMPLATES = {
@@ -71,8 +75,13 @@ def _recipient(locale: str) -> Recipient:
         locale=locale,
         tier="pro",
         has_account=True,
+        # Categories included so the snapshot exercises the Your Pulpo
+        # filter-summary category rendering (localized via i18n as of
+        # TEMPLATE_VERSION v5.0 / P0-4) — otherwise a change to that path is
+        # invisible to this guard.
         preference=Preference(
-            departments=["La Libertad"], property_types=["land"], max_price_usd=500_000
+            departments=["La Libertad"], property_types=["land"], max_price_usd=500_000,
+            categories=["ocean_view", "price_drops"],
         ),
     )
 

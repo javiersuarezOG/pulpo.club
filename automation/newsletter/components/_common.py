@@ -67,13 +67,33 @@ from ..types import Issue
 #       (680x453 = 3:2 reservation; save-thumb 96x84) so email clients
 #       reserve vertical space pre-load and don't reflow. CSS height:auto
 #       still rescales on load (plan 007 step 4).
-TEMPLATE_VERSION = "newsletter-v4.9-2026-07-04"
+#   v5.0 (2026-07-05) — Your Pulpo filter summary now localizes category
+#       tokens through i18n (filter.category.<slug>) instead of humanizing
+#       the raw slug: a Spanish reader with a category filter sees "Vista
+#       al mar" not "Ocean View" (enum-render trap fix, launch audit P0-4).
+#       Rendered Your Pulpo block changes for category-filtered recipients
+#       in BOTH locales (EN casing "Ocean View" -> "Ocean view" too).
+#   v5.1 (2026-07-05) — two ES leaks fixed (launch audit D). (1) masthead
+#       date is locale-aware: the Spanish edition renders "5 ene 2026" not
+#       "5 Jan 2026" (_format_issue_date; strftime %b is English-only) —
+#       header + <title> change for months whose abbreviation differs EN↔ES
+#       (Jan/Apr/Aug/Dec, ...). (2) footer filter summary dropped the
+#       hardcoded English " OK" after "Terreno" and the literal "default"
+#       fallback (now "Todas las propiedades").
+#   v5.2 (2026-07-05) — internal-only: ~18 inline EN/ES ternaries in
+#       render_html.py + build_issue.py (favorites section, preheader,
+#       spotlight byline, pick pill, filter-summary property types) moved
+#       into the i18n STRINGS table so they fall under the EN/ES parity
+#       guard. Rendered output is BYTE-IDENTICAL (verified by a before/after
+#       dry-run diff across all cohorts incl. favorites + ES); the bump only
+#       satisfies the render-file-change guard. No recipient-visible change.
+TEMPLATE_VERSION = "newsletter-v5.2-2026-07-05"
 
 # Human-readable timestamp surfaced in component docs + the admin
 # widget so collaborators can see when the locked design was last
 # revised without trawling git log. Matches the `vN.N (date)` line at
 # the top of the revision history above.
-LAST_UPDATED = "2026-07-04"
+LAST_UPDATED = "2026-07-05"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -114,8 +134,10 @@ LAST_UPDATED = "2026-07-04"
 #       change (page == email edition). Welcome body carries the footer.
 #   welcome-v2.4 (2026-06-12) — inherits the v4.8 listing <img> height
 #       reservation. Welcome body carries listing cards, so its HTML changed.
-WELCOME_TEMPLATE_VERSION = "welcome-v2.5-2026-07-04"
-WELCOME_LAST_UPDATED = "2026-07-04"
+#   welcome-v2.6 (2026-07-05) — inherits the v5.0 Your Pulpo category
+#       localization (P0-4). Welcome body carries Your Pulpo.
+WELCOME_TEMPLATE_VERSION = "welcome-v2.7-2026-07-05"
+WELCOME_LAST_UPDATED = "2026-07-05"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -145,8 +167,10 @@ WELCOME_LAST_UPDATED = "2026-07-04"
 #       stamp change. Welcome-back body carries the footer.
 #   welcome-back-v1.4 (2026-06-12) — inherits the v4.8 listing <img>
 #       height reservation. Welcome-back body carries listing cards.
-WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.5-2026-07-04"
-WELCOME_BACK_LAST_UPDATED = "2026-07-04"
+#   welcome-back-v1.6 (2026-07-05) — inherits the v5.0 Your Pulpo category
+#       localization (P0-4). Welcome-back body carries Your Pulpo.
+WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.7-2026-07-05"
+WELCOME_BACK_LAST_UPDATED = "2026-07-05"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -172,8 +196,10 @@ WELCOME_BACK_LAST_UPDATED = "2026-07-04"
 #       masthead, top-3 "See on Pulpo" + ranks 04-10 "Sign up to Pro",
 #       Pro-locked Weekly News Spotlight. Built on the v4.5 master body
 #       (real-article spotlight artifact).
-FREE_GENERAL_TEMPLATE_VERSION = "free-general-v1.1-2026-07-04"
-FREE_GENERAL_LAST_UPDATED = "2026-07-04"
+#   free-general-v1.2 (2026-07-05) — inherits the v5.0 Your Pulpo category
+#       localization (P0-4). Free weekly carries Your Pulpo.
+FREE_GENERAL_TEMPLATE_VERSION = "free-general-v1.3-2026-07-05"
+FREE_GENERAL_LAST_UPDATED = "2026-07-05"
 
 
 # ─────────────────────────────────────────────────────────────────────
@@ -195,10 +221,12 @@ FREE_GENERAL_LAST_UPDATED = "2026-07-04"
 #       body.
 #   free-welcome-back-v1.0 (2026-06-07) — initial ship. The free welcome
 #       with the "Welcome back" / "next 10" rewrite.
-FREE_WELCOME_TEMPLATE_VERSION = "free-welcome-v1.1-2026-07-04"
-FREE_WELCOME_LAST_UPDATED = "2026-07-04"
-FREE_WELCOME_BACK_TEMPLATE_VERSION = "free-welcome-back-v1.1-2026-07-04"
-FREE_WELCOME_BACK_LAST_UPDATED = "2026-07-04"
+#   free-welcome-v1.2 / free-welcome-back-v1.2 (2026-07-05) — inherit the
+#       v5.0 Your Pulpo category localization (P0-4). Both carry Your Pulpo.
+FREE_WELCOME_TEMPLATE_VERSION = "free-welcome-v1.3-2026-07-05"
+FREE_WELCOME_LAST_UPDATED = "2026-07-05"
+FREE_WELCOME_BACK_TEMPLATE_VERSION = "free-welcome-back-v1.3-2026-07-05"
+FREE_WELCOME_BACK_LAST_UPDATED = "2026-07-05"
 
 
 # LEARNING: hex literals live here on purpose. The :root { --paper: … }
