@@ -32,6 +32,7 @@ def _cand(lid, rank=50.0, zone="el-tunco"):
         "listing_id": lid, "source": src, "source_id": sid,
         "rank": rank, "rank_score": rank, "zone": zone,
         "area_m2": 1500.0, "price_usd": 200000.0, "palette_suggested": "ink",
+        "hero_photo_quality_score": 100,
     }
 
 
@@ -48,7 +49,7 @@ def _fake_caption(candidate, listing, *, poster_type=None, client=None, override
     return f"**{candidate['area_m2']:.0f} m2 en {candidate['zone']}.**\n\npulpo.club · link en bio"
 
 
-def _run(queue, lookahead=4, cadence=2):
+def _run(queue, lookahead=4, cadence=1):
     return topup(
         queue, CANDS, RANKED_INDEX, now=NOW, lookahead=lookahead, cadence_days=cadence,
         assets_root=Path("/tmp/x"), skip_render=True,
@@ -101,12 +102,17 @@ def test_showcase_slide1_is_listing_brand_slide2_is_listing():
 
 # ── scheduling + dedup ────────────────────────────────────────────────
 
-def test_two_day_spacing_and_future_only():
-    added = _run({"items": []}, lookahead=3, cadence=2)
+def test_cadence_spacing_and_future_only():
+    # daily (default) spacing
+    added = _run({"items": []}, lookahead=3)
     days = [datetime.fromisoformat(it["scheduled_for"]).date() for it in added]
-    assert (days[1] - days[0]).days == 2
-    assert (days[2] - days[1]).days == 2
+    assert (days[1] - days[0]).days == 1
+    assert (days[2] - days[1]).days == 1
     assert all(datetime.fromisoformat(it["scheduled_for"]) > NOW for it in added)
+    # cadence is parameterized — still honors a wider spacing
+    wide = _run({"items": []}, lookahead=2, cadence=3)
+    wdays = [datetime.fromisoformat(it["scheduled_for"]).date() for it in wide]
+    assert (wdays[1] - wdays[0]).days == 3
 
 
 def test_does_not_refeature_recent_listings():
@@ -181,3 +187,34 @@ def test_every_generated_item_carries_a_comment():
     for it in added:
         assert it.get("comment"), "every autopilot item needs a first comment"
         assert "#" in it["comment"], "comment must carry hashtags"
+
+
+# ── photo-quality gate (brand safety) ─────────────────────────────────
+
+def test_pick_candidate_quality_gate_beats_rank():
+    cands = [
+        {"listing_id": "a__1", "hero_photo_quality_score": 80, "rank": 99},   # bad photo, top rank
+        {"listing_id": "a__2", "hero_photo_quality_score": 100, "rank": 40},  # clean photo
+    ]
+    # The quality floor excludes the 80 (Google-Maps/billboard class) even
+    # though it out-ranks the clean one.
+    assert _pick_candidate(cands, set())["listing_id"] == "a__2"
+
+
+def test_pick_candidate_never_strands_when_no_top_quality():
+    cands = [{"listing_id": "a__1", "hero_photo_quality_score": 80, "rank": 99}]
+    assert _pick_candidate(cands, set())["listing_id"] == "a__1"
+
+
+def test_generated_week_all_top_quality():
+    # every autopilot pick from a mixed pool has a top-quality photo
+    good = [_cand(f"g__{i}", rank=90 - i) for i in range(10)]           # q=100
+    bad = [{**_cand(f"b__{i}", rank=100), "hero_photo_quality_score": 80} for i in range(3)]
+    pool = bad + good
+    added = topup(
+        {"items": []}, pool, {c["listing_id"]: {} for c in pool},
+        now=NOW, lookahead=5, cadence_days=1, assets_root=Path("/tmp/x"),
+        skip_render=True, poster_renderer=_fake_render, caption_generator=_fake_caption,
+    )
+    for it in added:
+        assert not it["primary_listing_id"].startswith("b__"), "bad-photo listing leaked in"

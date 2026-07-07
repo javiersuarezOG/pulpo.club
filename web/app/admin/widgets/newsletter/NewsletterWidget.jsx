@@ -55,12 +55,12 @@ const TEMPLATES = [
   {
     id: "pro-weekly", tier: "pro", title: "Pro · Weekly",
     templateId: "pulpo-pro-general", route: "preview", audience: true,
-    trigger: "Mondays 14:00 UTC · cron",
+    trigger: "Sundays 16:00 UTC · cron",
   },
   {
     id: "free-weekly", tier: "free", title: "Free · Weekly",
     templateId: "pulpo-free-general", route: "preview", audience: false,
-    trigger: "Mondays 14:00 UTC · cron",
+    trigger: "Sundays 17:00 UTC · staged cron",
   },
   {
     id: "pro-welcome", tier: "pro", title: "Pro · Welcome",
@@ -517,12 +517,16 @@ export function NewsletterWidget() {
       if (tpl.route === "welcome" || tpl.route === "free") {
         const st = body.status;
         if (st === "sent") {
-          setStatusFor(tpl.id, {
-            kind: "ok",
-            message: body.dry_run
-              ? `Rendered to ${value} · dry-run (no email left the building)`
-              : `Sent to ${value} ✓`,
-          });
+          // A forced test send to an already-welcomed subscriber comes back
+          // with a warning: the send went through but the target is a live
+          // subscriber, not a throwaway test contact. Surface it (warn tint)
+          // rather than a clean "Sent ✓" so the operator notices.
+          const sentMsg = body.dry_run
+            ? `Rendered to ${value} · dry-run (no email left the building)`
+            : `Sent to ${value} ✓`;
+          setStatusFor(tpl.id, body.warning
+            ? { kind: "warn", message: `${sentMsg} — ⚠️ ${body.warning}` }
+            : { kind: "ok", message: sentMsg });
           setLocalEntries(appendLogEntry({ ...baseEntry, result: body.dry_run ? "dry_run" : "ok" }));
         } else if (st === "skipped") {
           setStatusFor(tpl.id, { kind: "warn", message: `Skipped — ${reasonText(body.reason)}` });
@@ -544,7 +548,7 @@ export function NewsletterWidget() {
         let friendly = body.error ? dispatchErrorText(body.error) : `HTTP ${r.status}`;
         if (body.error === "rate_limited" && body.retry_after_s) {
           const mins = Math.max(1, Math.ceil(body.retry_after_s / 60));
-          friendly = `Test-send limit reached (20 per hour) — try again in ~${mins} min.`;
+          friendly = `Test-send limit reached (5 per hour) — try again in ~${mins} min.`;
         }
         setStatusFor(tpl.id, { kind: "err", message: friendly });
         setLocalEntries(appendLogEntry({ ...baseEntry, result: "error", detail: body.error || `HTTP ${r.status}` }));
