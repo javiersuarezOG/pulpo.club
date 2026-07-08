@@ -1,15 +1,15 @@
 {
-  "ranked_total": 1916,
-  "with_local_path": 1367,
-  "local_path_exists": 1367,
+  "ranked_total": 1931,
+  "with_local_path": 1382,
+  "local_path_exists": 1382,
   "local_path_missing": 0,
   "missing_rate": 0.0,
   "nulled": 0,
   "top_browse": {
     "n": 50,
-    "present": 46,
+    "present": 47,
     "missing": 0,
-    "coverage": 0.92
+    "coverage": 0.94
   },
   "top_hero": {
     "n": 10,
@@ -23,5 +23,5 @@
     "top_browse_coverage": 0.95,
     "top_hero_coverage": 1.0
   },
-  "evaluated_at": "2026-07-07T07:13:42.427460+00:00"
+  "evaluated_at": "2026-07-08T06:26:17.895855+00:00"
 }

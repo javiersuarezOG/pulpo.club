@@ -30,8 +30,10 @@ IG_PAUSED.
 from __future__ import annotations
 
 import argparse
+import io
 import json
 import sys
+import urllib.request
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Callable, Optional
@@ -270,6 +272,102 @@ def build_comment(candidate: dict, listing: dict) -> str:
     return "\n".join(lines)
 
 
+# ── listing photos (2–3 real, resolution-checked, 1080×1350) ──────────
+#
+# Every post must show 2–3 actual photos of the listing at good
+# resolution. Broker photos vary wildly (letterbox 1200×554, hi-res
+# 4000×1848, tiny 661×960), so we download each, reject anything too small
+# to look crisp, and normalise onto a 1080×1350 (4:5 — matches the poster)
+# branded canvas: cover-crop when it fills without notable upscale, else
+# fit + pad on cream (letterbox, always sharp).
+#
+# Brand safety: only the hero photo is quality-scored (the q100 gate);
+# the extra photos come from the ACCEPTED photo_urls set. The human Skip
+# in /admin/ig — with the full-carousel viewer — is the backstop for any
+# brand/quality issue in a non-hero photo.
+
+_SLIDE_W, _SLIDE_H = 1080, 1350
+_PAD_BG = (244, 239, 230)          # cream (--color-bg-cream)
+_MIN_COVER_UPSCALE = 1.15          # fill the frame only if upscale ≤ this
+_MIN_FIT_WIDTH = 1000              # else must be ≥ this wide to stay crisp
+PHOTOS_PER_POST = 3                # ideal
+MIN_PHOTOS_PER_POST = 2            # hard floor — skip the listing below this
+
+
+def _download_image(url: str, timeout: int = 20):
+    from PIL import Image
+    req = urllib.request.Request(url, headers={"User-Agent": "pulpo-ig-autopilot"})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        data = r.read()
+    return Image.open(io.BytesIO(data)).convert("RGB")
+
+
+def _fit_slide(img):
+    """Normalise a PIL image to a crisp 1080×1350 slide, or None if it's
+    too low-res to look good."""
+    from PIL import Image
+    w, h = img.size
+    cover = max(_SLIDE_W / w, _SLIDE_H / h)
+    if cover <= _MIN_COVER_UPSCALE:
+        nw, nh = round(w * cover), round(h * cover)
+        img = img.resize((nw, nh), Image.LANCZOS)
+        left, top = (nw - _SLIDE_W) // 2, (nh - _SLIDE_H) // 2
+        return img.crop((left, top, left + _SLIDE_W, top + _SLIDE_H))
+    if w >= _MIN_FIT_WIDTH:
+        s = _SLIDE_W / w
+        nw, nh = _SLIDE_W, round(h * s)
+        if nh > _SLIDE_H:                      # very tall → fit height instead
+            s = _SLIDE_H / h
+            nw, nh = round(w * s), _SLIDE_H
+        img = img.resize((nw, nh), Image.LANCZOS)
+        canvas = Image.new("RGB", (_SLIDE_W, _SLIDE_H), _PAD_BG)
+        canvas.paste(img, ((_SLIDE_W - nw) // 2, (_SLIDE_H - nh) // 2))
+        return canvas
+    return None                                # too small to look sharp
+
+
+def prepare_listing_photos(
+    listing: dict,
+    assets_dir: Path,
+    slug: str,
+    *,
+    want: int = PHOTOS_PER_POST,
+    fetcher: Callable = _download_image,
+) -> list:
+    """Download + normalise up to `want` good listing photos. Returns the
+    list of web-relative paths (may be shorter than `want`; empty when the
+    listing has no usable photos)."""
+    urls = listing.get("photo_urls") or []
+    out: list = []
+    assets_dir.mkdir(parents=True, exist_ok=True)
+    for url in urls:
+        if len(out) >= want:
+            break
+        try:
+            img = fetcher(url)
+            slide = _fit_slide(img)
+        except Exception as e:                                  # noqa: BLE001
+            print(f"[ig_autopilot] photo skip ({e}): {url[:80]}", file=sys.stderr)
+            continue
+        if slide is None:
+            continue
+        idx = len(out) + 1
+        fname = f"photo_{idx}.jpg"
+        slide.save(assets_dir / fname, "JPEG", quality=88, optimize=True)
+        out.append(f"web/data/ig_assets/autopilot/{slug}/{fname}")
+    return out
+
+
+def _predict_photos(listing: dict, assets_dir: Path, slug: str, **_) -> list:
+    """Offline stand-in for prepare_listing_photos (no download / no I/O) —
+    used by --skip-render dry runs and tests.  Predicts up to
+    PHOTOS_PER_POST paths from the listing's photo_urls count."""
+    n = min(PHOTOS_PER_POST, len(listing.get("photo_urls") or []))
+    return [
+        f"web/data/ig_assets/autopilot/{slug}/photo_{i + 1}.jpg" for i in range(n)
+    ]
+
+
 # ── item construction ─────────────────────────────────────────────────
 
 def build_item(
@@ -284,17 +382,29 @@ def build_item(
     skip_render: bool,
     poster_renderer: Callable = _render_poster,
     caption_generator: Callable = _generate_caption,
-) -> dict:
-    """Build one approved, listing-bearing queue item.
+    photo_preparer: Callable = prepare_listing_photos,
+) -> Optional[dict]:
+    """Build one approved queue item with a branded cover + 2–3 real
+    listing photos.  Returns None when the listing can't yield at least
+    MIN_PHOTOS_PER_POST good photos (caller should try another listing).
 
-    brand    → [TYPO_MAX brand poster, STICKER listing card]
-    showcase → [STICKER listing card, listing hero photo]
-    Either way slide-2..N carries a real listing, so every post shows one.
+    brand    → [TYPO_MAX brand poster, STICKER card, photo×2–3]
+    showcase → [STICKER card, photo×2–3]
     """
     slug = f"d{day:03d}__{kind}"
     assets_dir = assets_root / slug
     palette = candidate.get("palette_suggested") or "ink"
-    hero = _hero_path(candidate)
+
+    # 2–3 real, resolution-checked listing photos. Bail early if the
+    # listing is too thin — every post must show at least MIN_PHOTOS.
+    photos = photo_preparer(listing, assets_dir, slug)
+    if len(photos) < MIN_PHOTOS_PER_POST:
+        print(
+            f"[ig_autopilot] d{day} skip {candidate.get('listing_id')}: "
+            f"only {len(photos)} usable photo(s) (need {MIN_PHOTOS_PER_POST})",
+            file=sys.stderr,
+        )
+        return None
 
     def _render(ptype, pal, overrides, name):
         out = assets_dir / f"poster_{name}.png"
@@ -302,6 +412,7 @@ def build_item(
             poster_renderer(candidate, listing, ptype, pal, out, overrides=overrides)
         return f"web/data/ig_assets/autopilot/{slug}/poster_{name}.png"
 
+    sticker_path = _render(STICKER, palette, {}, f"sticker_{palette}")
     if kind == "brand":
         brand_overrides = {
             "eyebrow": brand_msg["eyebrow"], "hook": brand_msg["hook"],
@@ -309,13 +420,11 @@ def build_item(
             "price": "pulpo.club", "loc": "link en bio",
         }
         poster_path = _render(TYPO_MAX, "cream", brand_overrides, "typo_max_cream")
-        sticker_path = _render(STICKER, palette, {}, f"sticker_{palette}")
-        carousel = [sticker_path]
+        carousel = [sticker_path] + photos
         caption = brand_msg["caption"]
     else:  # showcase
-        sticker_path = _render(STICKER, palette, {}, f"sticker_{palette}")
         poster_path = sticker_path
-        carousel = [hero]
+        carousel = list(photos)
         caption = caption_generator(candidate, listing, poster_type=STICKER, client=None)
 
     violations = _lint_check(caption)
@@ -357,16 +466,22 @@ def topup(
     skip_render: bool,
     poster_renderer: Callable = _render_poster,
     caption_generator: Callable = _generate_caption,
+    photo_preparer: Callable = prepare_listing_photos,
     brand_messages: tuple = BRAND_MESSAGES,
 ) -> list:
     """Append approved items until `lookahead` future posts exist.
-    Returns the list of newly-added items (also appended to queue)."""
+    Returns the list of newly-added items (also appended to queue).
+
+    A candidate that can't yield MIN_PHOTOS_PER_POST good photos is skipped
+    (added to `failed`) and the next-best listing is tried instead."""
     items = queue.setdefault("items", [])
     added: list = []
+    failed: set = set()
     guard = 0
-    while _future_approved_count(items + added, now) < lookahead and guard < lookahead + 2:
+    max_iters = lookahead * 6 + 4          # room to skip thin listings
+    while _future_approved_count(items + added, now) < lookahead and guard < max_iters:
         guard += 1
-        used = _used_listing_ids(items + added)
+        used = _used_listing_ids(items + added) | failed
         cand = _pick_candidate(candidates, used)
         if cand is None:
             print("[ig_autopilot] no candidates available — stopping topup", file=sys.stderr)
@@ -382,12 +497,16 @@ def topup(
             day=day, kind=kind, candidate=cand, listing=listing,
             brand_msg=brand_msg, scheduled_for=scheduled, assets_root=assets_root,
             skip_render=skip_render, poster_renderer=poster_renderer,
-            caption_generator=caption_generator,
+            caption_generator=caption_generator, photo_preparer=photo_preparer,
         )
+        if item is None:                    # too few usable photos → try another
+            failed.add(cand.get("listing_id"))
+            continue
         added.append(item)
         print(
             f"[ig_autopilot] queued d{day} kind={kind} "
             f"listing={cand.get('listing_id')} scheduled={scheduled} "
+            f"slides={1 + len(item['carousel_photo_paths'])} "
             f"caption_status={item['caption_status']}"
         )
     items.extend(added)
@@ -426,6 +545,8 @@ def main(argv: Optional[list] = None) -> int:
         queue, candidates, ranked_index,
         now=now, lookahead=args.lookahead, cadence_days=args.cadence_days,
         assets_root=args.assets_root, skip_render=args.skip_render,
+        # --skip-render is an offline mode → don't hit the network for photos.
+        photo_preparer=_predict_photos if args.skip_render else prepare_listing_photos,
     )
 
     args.queue.parent.mkdir(parents=True, exist_ok=True)

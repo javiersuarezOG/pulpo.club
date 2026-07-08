@@ -132,12 +132,25 @@ function useUnits() {
 //   - string                                   → returned as-is (legacy / non-translatable)
 //   - { en: "...", es: "..." }                 → picks current locale, falls back to EN
 //   - array of either                          → maps over and returns array
+//
+// Fallback uses truthiness (||), not nullishness (??), so an EMPTY slot
+// falls through instead of rendering "". This matters for the honest-slot
+// fix in the listings adapter: a Spanish-only listing is stored as
+// { en: "", es: "…" } so its language is not mislabeled as English; an
+// English-locale user must then fall back to the (non-empty) es string
+// rather than seeing a blank title. Order: requested locale → default
+// locale → first non-empty side → "".
 function tr(value, locale) {
   if (value == null) return value;
   if (Array.isArray(value)) return value.map(v => tr(v, locale));
   if (typeof value === "string") return value;
   if (typeof value === "object") {
-    return value[locale] ?? value[DEFAULT_LOCALE] ?? Object.values(value)[0];
+    return (
+      value[locale] ||
+      value[DEFAULT_LOCALE] ||
+      Object.values(value).find(v => typeof v === "string" && v) ||
+      ""
+    );
   }
   return value;
 }
