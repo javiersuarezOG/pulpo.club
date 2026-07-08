@@ -37,7 +37,7 @@ def _cand(lid, rank=50.0, zone="el-tunco"):
 
 
 CANDS = [_cand(f"src__{i}", rank=100 - i, zone=f"z{i}") for i in range(20)]
-RANKED_INDEX = {c["listing_id"]: {"photo_urls": ["http://x/img.jpg"]} for c in CANDS}
+RANKED_INDEX = {c["listing_id"]: {"photo_urls": ["http://x/1", "http://x/2", "http://x/3"]} for c in CANDS}
 NOW = datetime(2026, 7, 6, 12, 0, tzinfo=timezone.utc)
 
 
@@ -49,11 +49,17 @@ def _fake_caption(candidate, listing, *, poster_type=None, client=None, override
     return f"**{candidate['area_m2']:.0f} m2 en {candidate['zone']}.**\n\npulpo.club · link en bio"
 
 
-def _run(queue, lookahead=4, cadence=1):
+def _fake_photos(listing, assets_dir, slug, **_):
+    # 3 good listing photos, no download
+    return [f"web/data/ig_assets/autopilot/{slug}/photo_{i + 1}.jpg" for i in range(3)]
+
+
+def _run(queue, lookahead=4, cadence=1, photo_preparer=_fake_photos):
     return topup(
         queue, CANDS, RANKED_INDEX, now=NOW, lookahead=lookahead, cadence_days=cadence,
         assets_root=Path("/tmp/x"), skip_render=True,
         poster_renderer=_fake_render, caption_generator=_fake_caption,
+        photo_preparer=photo_preparer,
     )
 
 
@@ -89,15 +95,20 @@ def test_kinds_alternate_brand_showcase():
     ]
 
 
-def test_showcase_slide1_is_listing_brand_slide2_is_listing():
+def test_carousel_composition_and_photo_count():
     added = _run({"items": []}, lookahead=2)
     brand, showcase = added[0], added[1]
-    # brand: slide 1 = TYPO_MAX brand poster, slide 2 = sticker listing
+    # brand: cover = TYPO_MAX brand poster; carousel = sticker + 3 photos
     assert brand["poster_type"] == "typo_max"
     assert "sticker" in brand["carousel_photo_paths"][0]
-    # showcase: slide 1 = sticker listing, slide 2 = hero photo
+    assert sum(1 for p in brand["carousel_photo_paths"] if "photo_" in p) == 3
+    # showcase: cover = sticker; carousel = 3 photos (no sticker in carousel)
     assert showcase["poster_type"] == "sticker"
-    assert showcase["carousel_photo_paths"][0].endswith(".hero.jpg")
+    assert all("photo_" in p for p in showcase["carousel_photo_paths"])
+    assert len(showcase["carousel_photo_paths"]) == 3
+    # every post shows at least the 2-photo floor of real listing photos
+    for it in added:
+        assert sum(1 for p in it["carousel_photo_paths"] if "photo_" in p) >= 2
 
 
 # ── scheduling + dedup ────────────────────────────────────────────────
@@ -218,3 +229,51 @@ def test_generated_week_all_top_quality():
     )
     for it in added:
         assert not it["primary_listing_id"].startswith("b__"), "bad-photo listing leaked in"
+
+
+# ── listing photos: resolution gate + skip-thin-listings ──────────────
+
+def test_fit_slide_covers_when_big_enough():
+    from automation.ig_autopilot import _fit_slide
+    from PIL import Image
+    big = Image.new("RGB", (4000, 1848))          # hi-res landscape → cover-crop
+    out = _fit_slide(big)
+    assert out.size == (1080, 1350)
+
+
+def test_fit_slide_pads_letterbox_crisp():
+    from automation.ig_autopilot import _fit_slide
+    from PIL import Image
+    wide = Image.new("RGB", (1200, 554))          # letterbox, wide enough → fit+pad
+    out = _fit_slide(wide)
+    assert out.size == (1080, 1350)
+
+
+def test_fit_slide_rejects_low_res():
+    from automation.ig_autopilot import _fit_slide
+    from PIL import Image
+    tiny = Image.new("RGB", (640, 480))           # too small → reject
+    assert _fit_slide(tiny) is None
+
+
+def test_topup_skips_listing_with_too_few_photos():
+    # a photo_preparer that returns only 1 usable photo → every candidate
+    # is skipped, so nothing is queued (never posts a thin listing).
+    def _one_photo(listing, assets_dir, slug, **_):
+        return [f"web/data/ig_assets/autopilot/{slug}/photo_1.jpg"]
+    added = _run({"items": []}, lookahead=3, photo_preparer=_one_photo)
+    assert added == []
+
+
+def test_topup_moves_to_next_listing_when_one_is_thin():
+    # first candidate yields 1 photo (thin → skipped); the next yields 3
+    # and fills the slot. Proves topup advances past a thin listing.
+    calls = {"n": 0}
+
+    def _first_thin(listing, assets_dir, slug, **_):
+        calls["n"] += 1
+        cnt = 1 if calls["n"] == 1 else 3
+        return [f"web/data/ig_assets/autopilot/{slug}/photo_{i + 1}.jpg" for i in range(cnt)]
+    added = _run({"items": []}, lookahead=1, photo_preparer=_first_thin)
+    assert len(added) == 1        # the one slot got filled by the 2nd listing
+    assert calls["n"] == 2        # first (thin) tried + skipped, second used

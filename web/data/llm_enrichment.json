@@ -121514,5 +121514,1329 @@
     "cost_usd": 0.00129361,
     "finish_reason": "stop",
     "latency_ms": 6009
+  },
+  "realestate_au_sv|nance-verde-cojutepeque-cuscatlan-sur-candelaria-cuscatlan-candelaria-cuscatlan-department-310109225072": {
+    "ts": "2026-07-08T06:17:16.962437+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "1.5 mz Land in Cojutepeque, Cuscatlán",
+      "es": "1.5 mz Terreno en Cojutepeque, Cuscatlán"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Nance Verde, Cojutepeque, Cuscatlán. 1 bedroom, 1 bathroom structure on site. Priced at $184,000.",
+      "es": "Terreno en Nance Verde, Cojutepeque, Cuscatlán. Cuenta con estructura de 1 dormitorio y 1 baño. Precio: $184,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1 bedroom, 1 bathroom structure",
+        "es": "Estructura de 1 dormitorio, 1 baño"
+      },
+      {
+        "en": "Located in Cojutepeque, Cuscatlán",
+        "es": "Ubicado en Cojutepeque, Cuscatlán"
+      },
+      {
+        "en": "Listed by RE/MAX ELITE",
+        "es": "Listado por RE/MAX ELITE"
+      }
+    ],
+    "lat": 13.7167,
+    "lng": -88.9333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Cojutepeque, Cuscatlán",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 1,
+      "bathrooms": 1.0,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3099,
+    "tokens_out": 420,
+    "cost_usd": 0.00129873,
+    "finish_reason": "stop",
+    "latency_ms": 3850
+  },
+  "remax|001463696024": {
+    "ts": "2026-07-08T06:17:17.435863+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "15,912 m² lot in San José Sacaré, La Palma",
+      "es": "Terreno de 15,912 m² en San José Sacaré, La Palma"
+    },
+    "short_description_canonical": {
+      "en": "Flat 15,912 m² lot in San José Sacaré, La Palma, Chalatenango. Gently rolling terrain with abundant vegetation, river at rear, electricity and water access, easy vehicle access. Previously used for coffee production; ideal for agriculture, recreation, or ecotourism.",
+      "es": "Terreno plano de 15,912 m² en San José Sacaré, La Palma, Chalatenango. Terreno ondulado con abundante vegetación, río al fondo, acceso a electricidad y agua potable, acceso vehicular. Anteriormente usado para café; ideal para agricultura, recreación o ecoturismo."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "River at rear of property",
+        "es": "Río al fondo del terreno"
+      },
+      {
+        "en": "Electricity and water access",
+        "es": "Acceso a electricidad y agua"
+      },
+      {
+        "en": "Minutes from La Palma center",
+        "es": "Minutos del centro de La Palma"
+      },
+      {
+        "en": "Previously used for coffee",
+        "es": "Anteriormente usado para café"
+      }
+    ],
+    "lat": 14.3333,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Palma, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3409,
+    "tokens_out": 457,
+    "cost_usd": 0.00142313,
+    "finish_reason": "stop",
+    "latency_ms": 4323
+  },
+  "remax|001462660094": {
+    "ts": "2026-07-08T06:17:17.628328+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 40 in Altos de Las Piletas, 730 m²",
+      "es": "Lote 40 en Altos de Las Piletas, 730 m²"
+    },
+    "short_description_canonical": {
+      "en": "Lot 40, 730 m² residential lot in Altos de Las Piletas, Km 12.5 road to Comasagua, La Unión. 20 m frontage, 36.51 m depth. Development includes security gatehouse, recreational area, green zones, underground utilities, and individual water connection.",
+      "es": "Lote 40, lote residencial de 730 m² en Altos de Las Piletas, Km 12.5 carretera a Comasagua, La Unión. 20 m de frente, 36.51 m de fondo. El desarrollo incluye caseta de seguridad, área recreativa, zonas verdes, servicios subterráneos y conexión de agua individual."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "20 m frontage, 36.51 m depth",
+        "es": "20 m de frente, 36.51 m de fondo"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Security gatehouse and recreational area",
+        "es": "Caseta de seguridad y área recreativa"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, Colegio La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, Colegio La Floresta"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3408,
+    "tokens_out": 526,
+    "cost_usd": 0.00149876,
+    "finish_reason": "stop",
+    "latency_ms": 4515
+  },
+  "remax|001462660095": {
+    "ts": "2026-07-08T06:17:17.752499+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 41 in Altos de Las Piletas, Comasagua",
+      "es": "Lote 41 en Altos de Las Piletas, Comasagua"
+    },
+    "short_description_canonical": {
+      "en": "Lot 41, 834 m² residential lot in Altos de Las Piletas, Km 12.5 Comasagua road. 20 m frontage, 41.72 m depth. Development includes gatehouse, recreational area, green zone, underground utilities. Near ESEN, Colegio Lamatepec, Colegio La Floresta.",
+      "es": "Lote 41, terreno residencial de 834 m² en Altos de Las Piletas, Km 12.5 carretera a Comasagua. 20 m de frente, 41.72 m de fondo. El desarrollo incluye garita de seguridad, área recreativa, zona verde, servicios subterráneos. Cerca de ESEN, Colegio Lamatepec, Colegio La Floresta."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "20 m frontage, 834 m² lot",
+        "es": "20 m de frente, lote de 834 m²"
+      },
+      {
+        "en": "Underground utilities included",
+        "es": "Servicios subterráneos incluidos"
+      },
+      {
+        "en": "Near top schools: ESEN, Lamatepec",
+        "es": "Cerca de escuelas: ESEN, Lamatepec"
+      },
+      {
+        "en": "Gated community with security",
+        "es": "Comunidad cerrada con seguridad"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3403,
+    "tokens_out": 518,
+    "cost_usd": 0.00148861,
+    "finish_reason": "stop",
+    "latency_ms": 4639
+  },
+  "remax|001462660093": {
+    "ts": "2026-07-08T06:17:21.087485+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 39 in Altos de Las Piletas, Intipucá",
+      "es": "Lote 39 en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "Lot 39 (742.93 m², 20 m frontage) in Altos de Las Piletas, Intipucá, La Unión. The development offers underground utilities, security gatehouse, and recreational areas. Over 40% of the project is dedicated to green and common areas.",
+      "es": "Lote 39 (742.93 m², 20 m de frente) en Altos de Las Piletas, Intipucá, La Unión. El desarrollo ofrece servicios subterráneos, caseta de seguridad y áreas recreativas. Más del 40% del proyecto está dedicado a áreas verdes y comunes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "20 m frontage, 742.93 m² lot",
+        "es": "20 m de frente, lote de 742.93 m²"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Security gatehouse and recreational areas",
+        "es": "Caseta de seguridad y áreas recreativas"
+      },
+      {
+        "en": "Over 40% green and common areas",
+        "es": "Más del 40% de áreas verdes y comunes"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, Colegio La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, Colegio La Floresta"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3403,
+    "tokens_out": 545,
+    "cost_usd": 0.00151831,
+    "finish_reason": "stop",
+    "latency_ms": 4817
+  },
+  "remax|001462660087": {
+    "ts": "2026-07-08T06:17:21.456370+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 25 in Altos de Las Piletas, Intipucá",
+      "es": "Lote 25 en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "Residential lot 25 in Altos de Las Piletas, Intipucá, La Unión. 458.85 m² lot with 18.80 m frontage, part of an exclusive development with underground utilities and security. Includes water connection rights and access to recreational areas.",
+      "es": "Lote residencial 25 en Altos de Las Piletas, Intipucá, La Unión. Terreno de 458.85 m² con 18.80 m de frente, parte de un desarrollo exclusivo con servicios subterráneos y seguridad. Incluye derechos de conexión de agua y acceso a áreas recreativas."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "458.85 m² lot, 18.80 m frontage",
+        "es": "Lote de 458.85 m², 18.80 m de frente"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Security gatehouse and visitor parking",
+        "es": "Caseta de seguridad y estacionamiento para visitantes"
+      },
+      {
+        "en": "Water connection rights included",
+        "es": "Derechos de conexión de agua incluidos"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3410,
+    "tokens_out": 498,
+    "cost_usd": 0.0014685,
+    "finish_reason": "stop",
+    "latency_ms": 3827
+  },
+  "remax|001462660091": {
+    "ts": "2026-07-08T06:17:21.507620+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "993 m² Lot in Altos de Las Piletas, Intipucá",
+      "es": "Lote de 993 m² en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "Flat 993 m² residential lot in Altos de Las Piletas, Intipucá, La Unión. Lot 34 has 8 m frontage and 124.16 m depth. The development includes security gatehouse, recreational area, underground utilities, and individual water connection rights.",
+      "es": "Lote residencial plano de 993 m² en Altos de Las Piletas, Intipucá, La Unión. El lote 34 tiene 8 m de frente y 124.16 m de fondo. El desarrollo incluye garita de seguridad, área recreativa, servicios subterráneos y derechos de conexión de agua individual."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "8 m frontage, 124.16 m depth",
+        "es": "8 m de frente, 124.16 m de fondo"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Security gatehouse and recreational area",
+        "es": "Garita de seguridad y área recreativa"
+      },
+      {
+        "en": "Individual water connection rights included",
+        "es": "Derechos de conexión de agua individual incluidos"
+      },
+      {
+        "en": "Close to ESEN and top schools",
+        "es": "Cerca de ESEN y colegios de primer nivel"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3408,
+    "tokens_out": 532,
+    "cost_usd": 0.00150536,
+    "finish_reason": "stop",
+    "latency_ms": 4544
+  },
+  "remax|001462660086": {
+    "ts": "2026-07-08T06:17:21.734653+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 24 in Altos de Las Piletas, Intipucá",
+      "es": "Lote 24 en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "375 m² residential lot in Altos de Las Piletas, Intipucá, La Unión. Lot 24 has 18 m frontage and 29.83 m depth. The development includes security gatehouse, recreational area, green zone, and underground utilities.",
+      "es": "Lote residencial de 375 m² en Altos de Las Piletas, Intipucá, La Unión. El lote 24 tiene 18 m de frente y 29.83 m de fondo. El desarrollo incluye garita de seguridad, área recreativa, zona verde y servicios subterráneos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "375 m² lot, 18 m frontage",
+        "es": "Lote de 375 m², 18 m de frente"
+      },
+      {
+        "en": "Gated community with security",
+        "es": "Comunidad cerrada con seguridad"
+      },
+      {
+        "en": "Underground utilities included",
+        "es": "Servicios subterráneos incluidos"
+      },
+      {
+        "en": "Near ESEN and top schools",
+        "es": "Cerca de ESEN y colegios de primer nivel"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3403,
+    "tokens_out": 475,
+    "cost_usd": 0.00144131,
+    "finish_reason": "stop",
+    "latency_ms": 3981
+  },
+  "remax|001462660089": {
+    "ts": "2026-07-08T06:17:21.882517+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 34 in Altos de Las Piletas, Comasagua",
+      "es": "Lote 34 en Altos de Las Piletas, Comasagua"
+    },
+    "short_description_canonical": {
+      "en": "Lot 34, 704 m² residential lot in Altos de Las Piletas, Km 12.5 Comasagua road. Flat lot with 8 m frontage, 88 m depth, in a gated development with security, underground utilities, and recreational areas. Over 40% of the project is green space.",
+      "es": "Lote 34, terreno residencial de 704 m² en Altos de Las Piletas, Km 12.5 carretera a Comasagua. Terreno plano con 8 m de frente y 88 m de fondo, en un desarrollo cerrado con seguridad, servicios subterráneos y áreas recreativas. Más del 40% del proyecto es área verde."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "704 m² lot, 8 m frontage",
+        "es": "Lote de 704 m², 8 m de frente"
+      },
+      {
+        "en": "Gated security with gatehouse",
+        "es": "Seguridad con caseta de acceso"
+      },
+      {
+        "en": "Underground electrical infrastructure",
+        "es": "Infraestructura eléctrica subterránea"
+      },
+      {
+        "en": "Near ESEN and top schools",
+        "es": "Cerca de ESEN y colegios de primer nivel"
+      },
+      {
+        "en": "Over 40% green areas",
+        "es": "Más del 40% de áreas verdes"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Unión bay",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3407,
+    "tokens_out": 529,
+    "cost_usd": 0.00150179,
+    "finish_reason": "stop",
+    "latency_ms": 4429
+  },
+  "remax|001462660092": {
+    "ts": "2026-07-08T06:17:22.007226+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 34 in Altos de Las Piletas, Comasagua",
+      "es": "Lote 34 en Altos de Las Piletas, Comasagua"
+    },
+    "short_description_canonical": {
+      "en": "Lot 34, 880 m² (8.40m x 104.80m) in Altos de Las Piletas, Km 12.5 Comasagua road. Exclusive development with security gatehouse, underground utilities, and recreational areas. Near ESEN, Colegio Lamatepec, and Colegio La Floresta.",
+      "es": "Lote 34, 880 m² (8.40m x 104.80m) en Altos de Las Piletas, Km 12.5 carretera a Comasagua. Desarrollo exclusivo con garita de seguridad, servicios subterráneos y áreas recreativas. Cerca de ESEN, Colegio Lamatepec y Colegio La Floresta."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "8.40m frontage, 104.80m depth",
+        "es": "8.40m de frente, 104.80m de fondo"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Security gatehouse at entrance",
+        "es": "Garita de seguridad en la entrada"
+      },
+      {
+        "en": "Near top-tier schools: ESEN, Lamatepec, La Floresta",
+        "es": "Cerca de escuelas de primer nivel: ESEN, Lamatepec, La Floresta"
+      },
+      {
+        "en": "Individual potable water connection rights",
+        "es": "Derechos de conexión de agua potable individual"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3413,
+    "tokens_out": 563,
+    "cost_usd": 0.00154081,
+    "finish_reason": "stop",
+    "latency_ms": 5423
+  },
+  "remax|001462660090": {
+    "ts": "2026-07-08T06:17:22.209228+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 35, Altos de Las Piletas, 797 m²",
+      "es": "Lote 35, Altos de Las Piletas, 797 m²"
+    },
+    "short_description_canonical": {
+      "en": "Lot 35 is a 797 m² residential lot in Altos de Las Piletas, Km 12.5 road to Comasagua, La Libertad. It features 8 m frontage, 99.64 m depth, underground utilities, and access to a gated community with security and recreational areas. Over 40% of the project is dedicated to green and common areas.",
+      "es": "El lote 35 es un terreno residencial de 797 m² en Altos de Las Piletas, Km 12.5 carretera a Comasagua, La Libertad. Tiene 8 m de frente, 99.64 m de fondo, servicios subterráneos y acceso a un conjunto cerrado con seguridad y áreas recreativas. Más del 40% del proyecto está dedicado a áreas verdes y comunes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "797 m² lot, 8 m frontage",
+        "es": "Lote de 797 m², 8 m de frente"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Gated community with security gatehouse",
+        "es": "Conjunto cerrado con garita de seguridad"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, La Floresta"
+      },
+      {
+        "en": "Over 40% green and common areas",
+        "es": "Más del 40% áreas verdes y comunes"
+      }
+    ],
+    "lat": 13.5867,
+    "lng": -89.3797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Km 12.5 road to Comasagua, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3407,
+    "tokens_out": 590,
+    "cost_usd": 0.00156889,
+    "finish_reason": "stop",
+    "latency_ms": 4772
+  },
+  "remax|001462660088": {
+    "ts": "2026-07-08T06:17:22.238537+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 31 in Altos de Las Piletas, 719 m²",
+      "es": "Lote 31 en Altos de Las Piletas, 719 m²"
+    },
+    "short_description_canonical": {
+      "en": "Lot 31 is a 719 m² residential lot in Altos de Las Piletas, Km 12.5 road to Comasagua, near ESEN and Colegio Lamatepec. The lot has a 20.80 m frontage and 34.58 m depth, with underground utilities and individual water connection rights. The development includes a security gatehouse, recreational area, and eco-friendly green spaces.",
+      "es": "El lote 31 es un terreno residencial de 719 m² en Altos de Las Piletas, Km 12.5 carretera a Comasagua, cerca de ESEN y Colegio Lamatepec. El lote tiene 20.80 m de frente y 34.58 m de fondo, con servicios subterráneos y derechos de conexión de agua individual. El desarrollo incluye garita de seguridad, área recreativa y zonas verdes ecológicas."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "719 m² lot, 20.8 m frontage",
+        "es": "Lote de 719 m², 20.8 m de frente"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y servicios subterráneos"
+      },
+      {
+        "en": "Near ESEN and Colegio Lamatepec",
+        "es": "Cerca de ESEN y Colegio Lamatepec"
+      },
+      {
+        "en": "Security gatehouse and recreational area",
+        "es": "Garita de seguridad y área recreativa"
+      },
+      {
+        "en": "Individual water connection rights included",
+        "es": "Derechos de conexión de agua individual incluidos"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3412,
+    "tokens_out": 589,
+    "cost_usd": 0.00156914,
+    "finish_reason": "stop",
+    "latency_ms": 4761
+  },
+  "remax|001462660085": {
+    "ts": "2026-07-08T06:17:25.072693+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 23 in Altos de Las Piletas, Intipucá",
+      "es": "Lote 23 en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "Lot 23, 358 m² residential lot in Altos de Las Piletas, Intipucá, La Unión. Located at Km 12.5 on the road to Comasagua, near ESEN and Colegio Lamatepec. The development includes security gatehouse, recreational area, underground utilities, and individual water rights.",
+      "es": "Lote 23, terreno residencial de 358 m² en Altos de Las Piletas, Intipucá, La Unión. Ubicado en el Km 12.5 de la carretera a Comasagua, cerca de ESEN y Colegio Lamatepec. El desarrollo incluye garita de seguridad, área recreativa, servicios subterráneos y derechos de agua individuales."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "358 m² lot, 19.45 m frontage",
+        "es": "Lote de 358 m², 19.45 m de frente"
+      },
+      {
+        "en": "Near ESEN and top schools",
+        "es": "Cerca de ESEN y colegios de primer nivel"
+      },
+      {
+        "en": "Underground utilities included",
+        "es": "Servicios subterráneos incluidos"
+      },
+      {
+        "en": "Security gatehouse and recreation area",
+        "es": "Garita de seguridad y área recreativa"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3412,
+    "tokens_out": 517,
+    "cost_usd": 0.00148994,
+    "finish_reason": "stop",
+    "latency_ms": 3984
+  },
+  "remax|001462660083": {
+    "ts": "2026-07-08T06:17:25.558142+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 13 in Altos de Las Piletas, Comasagua",
+      "es": "Lote 13 en Altos de Las Piletas, Comasagua"
+    },
+    "short_description_canonical": {
+      "en": "Lot 13, 769.74 m² in Altos de Las Piletas, Km 12.5 Comasagua road. Residential lot with 18 m frontage, 42.76 m depth. Development includes security, underground utilities, recreational areas, and green spaces.",
+      "es": "Lote 13, 769.74 m² en Altos de Las Piletas, Km 12.5 carretera a Comasagua. Lote residencial con 18 m de frente, 42.76 m de fondo. El desarrollo incluye seguridad, servicios subterráneos, áreas recreativas y zonas verdes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "18 m frontage, 42.76 m depth",
+        "es": "18 m de frente, 42.76 m de fondo"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, La Floresta"
+      },
+      {
+        "en": "Security gatehouse and visitor parking",
+        "es": "Caseta de seguridad y estacionamiento para visitantes"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3403,
+    "tokens_out": 506,
+    "cost_usd": 0.00147541,
+    "finish_reason": "stop",
+    "latency_ms": 4050
+  },
+  "remax|001462660084": {
+    "ts": "2026-07-08T06:17:25.718075+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 17 in Altos de Las Piletas, Intipucá",
+      "es": "Lote 17 en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "Lot 17, 754.69 m² residential lot in Altos de Las Piletas, Intipucá, La Unión. Features 17 m frontage, 44.56 m depth, underground utilities, and individual water connection. Development includes security gatehouse, recreational area, and eco-friendly green zone.",
+      "es": "Lote 17, terreno residencial de 754.69 m² en Altos de Las Piletas, Intipucá, La Unión. Cuenta con 17 m de frente, 44.56 m de fondo, servicios subterráneos y conexión de agua individual. El desarrollo incluye garita de seguridad, área recreativa y zona verde ecológica."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "17 m frontage, 44.56 m depth",
+        "es": "17 m de frente, 44.56 m de fondo"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Close to ESEN, Colegio Lamatepec, La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, La Floresta"
+      },
+      {
+        "en": "Security gatehouse and recreational area",
+        "es": "Garita de seguridad y área recreativa"
+      },
+      {
+        "en": "Individual potable water connection rights",
+        "es": "Derechos de conexión de agua potable individual"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3403,
+    "tokens_out": 552,
+    "cost_usd": 0.00152601,
+    "finish_reason": "stop",
+    "latency_ms": 4261
+  },
+  "remax|001462660082": {
+    "ts": "2026-07-08T06:17:26.049378+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 13 in Altos de Las Piletas, Intipucá",
+      "es": "Lote 13 en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "Lot 13, 732.85 m² residential lot in Altos de Las Piletas, Intipucá, La Unión. 10 m frontage, 73.29 m depth. Development includes security gatehouse, recreational areas, underground utilities, and individual water rights. Over 40% of the project dedicated to green and common areas.",
+      "es": "Lote 13, terreno residencial de 732.85 m² en Altos de Las Piletas, Intipucá, La Unión. 10 m de frente, 73.29 m de fondo. El desarrollo incluye garita de seguridad, áreas recreativas, servicios subterráneos y derechos de agua individuales. Más del 40% del proyecto dedicado a áreas verdes y comunes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "10 m frontage, 73.29 m depth",
+        "es": "10 m de frente, 73.29 m de fondo"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Security gatehouse and recreational areas",
+        "es": "Garita de seguridad y áreas recreativas"
+      },
+      {
+        "en": "Individual potable water connection rights",
+        "es": "Derechos de conexión de agua potable individual"
+      },
+      {
+        "en": "Over 40% green and common areas",
+        "es": "Más del 40% áreas verdes y comunes"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3403,
+    "tokens_out": 555,
+    "cost_usd": 0.00152931,
+    "finish_reason": "stop",
+    "latency_ms": 4314
+  },
+  "remax|001462660081": {
+    "ts": "2026-07-08T06:17:26.167563+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 8 in Altos de Las Piletas, Intipucá",
+      "es": "Lote 8 en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "Lot 8, 1001.43 m² residential lot in Altos de Las Piletas, Intipucá, La Unión. Features 8 m frontage, 125.18 m length, underground utilities, and access to planned amenities including security gatehouse and recreational area. Located near ESEN and Colegio Lamatepec.",
+      "es": "Lote 8, terreno residencial de 1001.43 m² en Altos de Las Piletas, Intipucá, La Unión. Cuenta con 8 m de frente, 125.18 m de fondo, servicios subterráneos y acceso a amenidades planificadas como garita de seguridad y área recreativa. Ubicado cerca de ESEN y Colegio Lamatepec."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1001.43 m² lot, 8 m frontage",
+        "es": "Lote de 1001.43 m², 8 m de frente"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Near ESEN and top schools",
+        "es": "Cerca de ESEN y colegios de primer nivel"
+      },
+      {
+        "en": "Planned security gatehouse and recreational area",
+        "es": "Garita de seguridad y área recreativa planificadas"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3412,
+    "tokens_out": 531,
+    "cost_usd": 0.00150534,
+    "finish_reason": "stop",
+    "latency_ms": 4284
+  },
+  "remax|001462660080": {
+    "ts": "2026-07-08T06:17:26.501693+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 2 in Altos de Las Piletas, 685 m²",
+      "es": "Lote 2 en Altos de Las Piletas, 685 m²"
+    },
+    "short_description_canonical": {
+      "en": "Lot 2, 685.58 m² residential lot in Altos de Las Piletas, Km 12.5 road to Comasagua, La Unión. Features 18 m frontage, 38.09 m depth, underground utilities, and individual water connection. Over 40% of the project is dedicated to green areas.",
+      "es": "Lote 2, lote residencial de 685.58 m² en Altos de Las Piletas, Km 12.5 carretera a Comasagua, La Unión. Cuenta con 18 m de frente, 38.09 m de fondo, servicios subterráneos y conexión de agua individual. Más del 40% del proyecto está dedicado a áreas verdes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "685.58 m² lot, 18 m frontage",
+        "es": "Lote de 685.58 m², 18 m de frente"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Over 40% green areas in project",
+        "es": "Más del 40% de áreas verdes en el proyecto"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, La Floresta"
+      },
+      {
+        "en": "Security gatehouse and recreational area",
+        "es": "Caseta de seguridad y área recreativa"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Unión bay",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3406,
+    "tokens_out": 563,
+    "cost_usd": 0.00153892,
+    "finish_reason": "stop",
+    "latency_ms": 4494
+  },
+  "remax|002283140052": {
+    "ts": "2026-07-08T06:17:26.627816+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Industrial Land, 6.7 Manzanas, Comalapa Highway",
+      "es": "Terreno Industrial, 6.7 Manzanas, Carretera Comalapa"
+    },
+    "short_description_canonical": {
+      "en": "Flat 6.7-manzana (47,089 m²) industrial lot on Comalapa Highway, Km 61, Olocuilta, La Paz. 100 m frontage on the main motorway with a wide ramp for heavy vehicles. Full visibility from the busiest road to the international airport.",
+      "es": "Lote industrial plano de 6.7 manzanas (47,089 m²) sobre la Carretera Comalapa, Km 61, Olocuilta, La Paz. 100 m de frente sobre la autopista principal con rampa ancha para vehículos pesados. Visibilidad total desde la carretera más transitada hacia el aeropuerto internacional."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "100 m frontage on main motorway",
+        "es": "100 m de frente sobre autopista principal"
+      },
+      {
+        "en": "6.7 manzanas flat land, 2 terraces",
+        "es": "6.7 manzanas terreno plano, 2 terrazas"
+      },
+      {
+        "en": "Heavy vehicle ramp included",
+        "es": "Rampa para vehículos pesados incluida"
+      },
+      {
+        "en": "Direct access from Comalapa Highway",
+        "es": "Acceso directo desde Carretera Comalapa"
+      },
+      {
+        "en": "Full visibility to international airport",
+        "es": "Visibilidad total hacia aeropuerto internacional"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Comalapa Highway near Olocuilta, La Paz",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3455,
+    "tokens_out": 544,
+    "cost_usd": 0.00153125,
+    "finish_reason": "stop",
+    "latency_ms": 4388
+  },
+  "remax|001462660079": {
+    "ts": "2026-07-08T06:17:26.698165+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "681 m² Lot in Altos de Las Piletas, Intipucá",
+      "es": "Lote de 681 m² en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "Lot 1 of 681.81 m² in Altos de Las Piletas, a residential development on the road to Comasagua, near ESEN and Colegio Lamatepec. The lot has 17 m frontage and 40.11 m depth. The development includes a security gatehouse, recreational area, green zone, and underground utilities.",
+      "es": "Lote 1 de 681.81 m² en Altos de Las Piletas, un desarrollo residencial sobre la carretera a Comasagua, cerca de ESEN y Colegio Lamatepec. El lote tiene 17 m de frente y 40.11 m de fondo. El desarrollo incluye caseta de seguridad, área recreativa, zona verde y servicios subterráneos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "17 m frontage, 40.11 m depth",
+        "es": "17 m de frente, 40.11 m de fondo"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, La Floresta"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Security gatehouse and recreational area included",
+        "es": "Caseta de seguridad y área recreativa incluida"
+      },
+      {
+        "en": "Individual potable water connection rights",
+        "es": "Derechos de conexión de agua potable individual"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Unión bay",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3403,
+    "tokens_out": 565,
+    "cost_usd": 0.00154031,
+    "finish_reason": "stop",
+    "latency_ms": 4488
+  },
+  "santizo|10133680": {
+    "ts": "2026-07-08T06:17:28.857651+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Wellness House in Brickell, 550,900 USD",
+      "es": "Casa de Bienestar en Brickell, 550,900 USD"
+    },
+    "short_description_canonical": {
+      "en": "House of Wellness in Brickell, designed for holistic well-being. Features loft ceilings, premium appliances, and exceptional views. Balcony and porcelain finishes included.",
+      "es": "Casa de Bienestar en Brickell, diseñada para el bienestar integral. Incluye techos tipo loft, electrodomésticos premium y vistas excepcionales. Balcón y acabados en porcelanato."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Loft ceilings 9'4\"",
+        "es": "Techos tipo loft de 9'4\""
+      },
+      {
+        "en": "Premium appliances included",
+        "es": "Electrodomésticos premium incluidos"
+      },
+      {
+        "en": "Exceptional Brickell and Bay views",
+        "es": "Vistas excepcionales a Brickell y la Bahía"
+      },
+      {
+        "en": "Continuous finish floors throughout",
+        "es": "Pisos de acabado continuo en toda la residencia"
+      },
+      {
+        "en": "Polished concrete balcony",
+        "es": "Balcón de concreto pulido"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Brickell, El Salvador (Puerto de La Libertad area)",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3377,
+    "tokens_out": 457,
+    "cost_usd": 0.00141449,
+    "finish_reason": "stop",
+    "latency_ms": 3784
+  },
+  "encuentra24|32451818": {
+    "ts": "2026-07-08T07:02:59.949939+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3-Bed House in Playa Dorada – $90,000",
+      "es": "Casa 3 Hab. en Playa Dorada – $90,000"
+    },
+    "short_description_canonical": {
+      "en": "House of 168 m² built in Villa Marina, Playa Dorada, Arraiján. It has 3 bedrooms, 2 bathrooms, covered terrace, private patio, and 2 parking spaces. Located in a secure residential area with access gate and parks.",
+      "es": "Casa de 168 m² construidos en Villa Marina, Playa Dorada, Arraiján. Cuenta con 3 habitaciones, 2 baños, terraza techada, patio privado y 2 estacionamientos. Ubicada en zona residencial segura con garita de acceso y parques."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Only $90,000 for 168 m²",
+        "es": "Solo $90,000 por 168 m²"
+      },
+      {
+        "en": "3 bedrooms, 2 bathrooms",
+        "es": "3 habitaciones, 2 baños"
+      },
+      {
+        "en": "Covered terrace and private patio",
+        "es": "Terraza techada y patio privado"
+      },
+      {
+        "en": "Secure residential area with gate",
+        "es": "Zona residencial segura con garita"
+      }
+    ],
+    "lat": 8.9333,
+    "lng": -79.6333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Dorada, Arraiján, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 168.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2427,
+    "tokens_out": 482,
+    "cost_usd": 0.00118549,
+    "finish_reason": "stop",
+    "latency_ms": 4426
+  },
+  "encuentra24|32605683": {
+    "ts": "2026-07-08T07:03:00.155908+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Elegant 2-Story Home Steps from Playa El Toro",
+      "es": "Elegante Residencia de 2 Niveles a Pasos de Playa El Toro"
+    },
+    "short_description_canonical": {
+      "en": "Two-level house with 210 m² built on a 600 m² lot in Pedasí, steps from Playa El Toro. It has 3 bedrooms, 2 bathrooms, parking for 4 cars, private well, and solar panels. Includes free immigration assistance for foreign buyers.",
+      "es": "Casa de dos niveles con 210 m² construidos en lote de 600 m² en Pedasí, a pasos de Playa El Toro. Cuenta con 3 habitaciones, 2 baños, estacionamiento para 4 autos, pozo propio y paneles solares. Incluye asesoría migratoria gratuita para compradores extranjeros."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Steps from Playa El Toro",
+        "es": "A pasos de Playa El Toro"
+      },
+      {
+        "en": "Private well and solar panels",
+        "es": "Pozo propio y paneles solares"
+      },
+      {
+        "en": "Free immigration assistance included",
+        "es": "Asesoría migratoria gratuita incluida"
+      },
+      {
+        "en": "210 m² built on 600 m² lot",
+        "es": "210 m² construidos en lote de 600 m²"
+      },
+      {
+        "en": "Parking for 4 cars",
+        "es": "Estacionamiento para 4 autos"
+      }
+    ],
+    "lat": 7.5333,
+    "lng": -80.0333,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Toro, Pedasí, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 210.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2492,
+    "tokens_out": 540,
+    "cost_usd": 0.00126684,
+    "finish_reason": "stop",
+    "latency_ms": 4631
+  },
+  "encuentra24|31995169": {
+    "ts": "2026-07-08T07:03:00.521205+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront House with Pool in Casamar, San Carlos",
+      "es": "Casa frente al mar con piscina en Casamar, San Carlos"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront house in Casamar, San Carlos, on a 767 m² lot with 346 m² of construction. Built in 2015, it has 3 bedrooms, 3.5 bathrooms, private pool, jacuzzi, and covered parking for 2 cars. Direct ocean frontage in an exclusive gated community.",
+      "es": "Casa frente al mar en Casamar, San Carlos, en lote de 767 m² con 346 m² de construcción. Construida en 2015, tiene 3 recámaras, 3.5 baños, piscina privada, jacuzzi y estacionamiento techado para 2 autos. Frente directo al mar en comunidad exclusiva."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct beachfront with ocean views",
+        "es": "Frente directo al mar con vistas al océano"
+      },
+      {
+        "en": "Private pool and jacuzzi",
+        "es": "Piscina privada y jacuzzi"
+      },
+      {
+        "en": "Built in 2015, well-maintained",
+        "es": "Construida en 2015, bien mantenida"
+      },
+      {
+        "en": "Exclusive gated community in Casamar",
+        "es": "Comunidad exclusiva en Casamar"
+      },
+      {
+        "en": "3 bedrooms plus service quarters",
+        "es": "3 recámaras más cuarto de servicio"
+      }
+    ],
+    "lat": 8.4833,
+    "lng": -79.9833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Casamar, San Carlos, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": 2015,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.5,
+      "built_area_m2": 346.48,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2509,
+    "tokens_out": 542,
+    "cost_usd": 0.00127363,
+    "finish_reason": "stop",
+    "latency_ms": 4997
   }
 }
