@@ -299,6 +299,36 @@
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
+    },
+    {
+      "day": 109,
+      "shelf": "autopilot_brand",
+      "selector": "autopilot",
+      "poster_type": "typo_max",
+      "palette": "ink",
+      "scheduled_for": "2026-07-15T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d109__brand",
+      "poster_path": "web/data/ig_assets/autopilot/d109__brand/poster_typo_max_cream.png",
+      "poster_overrides": {},
+      "caption": "**Menos ruido, mejores terrenos.**\n\nNada de listas infinitas ni precios inflados. Filtramos el mercado y te mostramos lo que vale.\n\npulpo.club · link en bio",
+      "comment": "49,000 m² en El Cuco.\n$830,000 · $16.97/m²\nA 730 m del mar.\n\nLos mejores terrenos de El Salvador, rankeados cada semana.\nTodos los detalles en pulpo.club — link en bio.\n\n#ElSalvador #Terrenos #BienesRaices #TerrenosEnElSalvador #InvertirEnElSalvador #InversionInmobiliaria #TerrenoEnVenta #SurfCity #ElCuco #PlayasDeElSalvador #SalvadorenosPorElMundo #BitcoinCountry",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d109__brand/poster_sticker_ink.png",
+        "web/data/ig_assets/autopilot/d109__brand/photo_1.jpg",
+        "web/data/ig_assets/autopilot/d109__brand/photo_2.jpg",
+        "web/data/ig_assets/autopilot/d109__brand/photo_3.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__2007"
+      ],
+      "primary_listing_id": "bienesraices__2007",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
