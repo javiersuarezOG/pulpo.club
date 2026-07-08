@@ -107,14 +107,22 @@ for (const file of walk(ROOT)) {
 // ── Enum-render trap ──────────────────────────────────────────────────────
 // `{x.replace("_", " ")}` humanizes an enum slug for display in EVERY locale,
 // bypassing t() — the exact bug behind the active-filter chip + table-header
-// leaks (raw "ocean view" / "price drop" shown to Spanish users). Catch the
-// humanize pattern in JSX/TSX render files. A legitimate site (the capitalize()
-// safety net AFTER a closed-set t() guard, an SEO slug, or a dev-only control)
-// is exempted with `// i18n-allow: <reason>` on the same or preceding line.
-const ENUM_RENDER_REGEX = /\.replace\(\s*(?:["'`]_["'`]|\/_\/[gimsuy]*)\s*,\s*["'` ]/;
+// leaks (raw "ocean view" / "price drop" shown to Spanish users). A .ts data
+// adapter can humanize a slug for display just as easily as a .jsx render
+// file, so this scans ALL source extensions (not just JSX/TSX).
+//
+// Precision: the trap replaces `_` with a SPACE. We require the replacement
+// string to begin with whitespace (`, " "` / `, ' '`) so we do NOT flag
+// unrelated `_` replacements such as base64url decoding (`.replace(/_/g,"/")`)
+// — those replace with a non-space char and are not display humanization.
+//
+// A legitimate site (the capitalize() safety net AFTER a closed-set t()
+// guard, an SEO slug, or a dev-only control) is exempted with
+// `// i18n-allow: <reason>` on the same or preceding line.
+const ENUM_RENDER_REGEX = /\.replace\(\s*(?:["'`]_["'`]|\/_\/[gimsuy]*)\s*,\s*["'`]\s/;
 const enumFindings = [];
 for (const file of walk(ROOT)) {
-  if (![".jsx", ".tsx"].includes(path.extname(file))) continue;
+  if (![".jsx", ".tsx", ".ts", ".js"].includes(path.extname(file))) continue;
   const lines = fs.readFileSync(file, "utf8").split("\n");
   for (let i = 0; i < lines.length; i++) {
     if (!ENUM_RENDER_REGEX.test(lines[i])) continue;
