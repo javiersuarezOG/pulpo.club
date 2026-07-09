@@ -2,13 +2,13 @@
   "source": "oceanside",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-07-08T19:58:57.988015+00:00",
+  "probed_at": "2026-07-09T04:17:12.983755+00:00",
   "last_probe": {
     "probed_url": "https://oceansideelsalvador.com/",
     "status_code": 200,
     "final_url": "https://oceansideelsalvador.com/",
     "response_size_bytes": null,
-    "duration_ms": 92,
+    "duration_ms": 62,
     "error": null
   },
   "baseline": {
@@ -17,6 +17,6 @@
     "final_url": "https://oceansideelsalvador.com/",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-07-08T19:58:57.988040+00:00"
+    "last_ok_at": "2026-07-09T04:17:12.983771+00:00"
   }
 }
