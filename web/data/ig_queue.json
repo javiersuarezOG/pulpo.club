@@ -331,6 +331,35 @@
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
+    },
+    {
+      "day": 110,
+      "shelf": "autopilot_showcase",
+      "selector": "autopilot",
+      "poster_type": "sticker",
+      "palette": "paper",
+      "scheduled_for": "2026-07-16T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d110__showcase",
+      "poster_path": "web/data/ig_assets/autopilot/d110__showcase/poster_sticker_paper.png",
+      "poster_overrides": {},
+      "caption": "**200 m² en La Libertad.**\n\n200 m² en La Libertad, sin construir.\n\n$22,000 · a 11.2 km del mar\n\npulpo.club · listing N° 146",
+      "comment": "200 m² en La Libertad.\n$22,000 · $110/m²\nA 11.2 km del mar.\n\nLos mejores terrenos de El Salvador, rankeados cada semana.\nTodos los detalles en pulpo.club — link en bio.\n\n#ElSalvador #Terrenos #BienesRaices #TerrenosEnElSalvador #InvertirEnElSalvador #InversionInmobiliaria #TerrenoEnVenta #SurfCity #LaLibertad #PlayasDeElSalvador #SalvadorenosPorElMundo #BitcoinCountry",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d110__showcase/photo_1.jpg",
+        "web/data/ig_assets/autopilot/d110__showcase/photo_2.jpg",
+        "web/data/ig_assets/autopilot/d110__showcase/photo_3.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__2101"
+      ],
+      "primary_listing_id": "bienesraices__2101",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
