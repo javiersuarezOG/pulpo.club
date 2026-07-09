@@ -122838,5 +122838,376 @@
     "cost_usd": 0.00127363,
     "finish_reason": "stop",
     "latency_ms": 4997
+  },
+  "citymax_sc|casa-en-venta-con-uso-comercial-en-antiguo-cuscatlan": {
+    "ts": "2026-07-09T07:06:32.750363+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in Antiguo Cuscatlán, Santa Elena",
+      "es": "Casa en Venta en Antiguo Cuscatlán, Santa Elena"
+    },
+    "short_description_canonical": {
+      "en": "House for sale in Santa Elena, Antiguo Cuscatlán. Price: $690,000. Located in a residential area of Cuscatlán department.",
+      "es": "Casa en venta en Santa Elena, Antiguo Cuscatlán. Precio: $690,000. Ubicada en zona residencial del departamento de Cuscatlán."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Santa Elena area",
+        "es": "Ubicada en zona de Santa Elena"
+      },
+      {
+        "en": "Price: $690,000",
+        "es": "Precio: $690,000"
+      },
+      {
+        "en": "Residential neighborhood in Antiguo Cuscatlán",
+        "es": "Barrio residencial en Antiguo Cuscatlán"
+      }
+    ],
+    "lat": 13.6667,
+    "lng": -89.25,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Antiguo Cuscatlán, Cuscatlán department",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3074,
+    "tokens_out": 396,
+    "cost_usd": 0.00126558,
+    "finish_reason": "stop",
+    "latency_ms": 3357
+  },
+  "citymax_sc|terreno-en-venta-carretera-panoramica-la-paz": {
+    "ts": "2026-07-09T07:06:32.796797+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale on Panoramic Highway, San Juan Tepezontes",
+      "es": "Terreno en Venta en Carretera Panorámica, San Juan Tepezontes"
+    },
+    "short_description_canonical": {
+      "en": "Land plot on the Panoramic Highway in San Juan Tepezontes, La Paz department. Located along a scenic route with road access. Priced at $118,000.",
+      "es": "Terreno sobre la Carretera Panorámica en San Juan Tepezontes, departamento de La Paz. Ubicado en una ruta escénica con acceso vial. Precio de $118,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "On scenic Panoramic Highway",
+        "es": "Sobre la Carretera Panorámica"
+      },
+      {
+        "en": "Located in San Juan Tepezontes",
+        "es": "Ubicado en San Juan Tepezontes"
+      },
+      {
+        "en": "Price: $118,000",
+        "es": "Precio: $118,000"
+      }
+    ],
+    "lat": 13.4983,
+    "lng": -89.5856,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Juan Tepezontes, La Paz",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3068,
+    "tokens_out": 399,
+    "cost_usd": 0.00126726,
+    "finish_reason": "stop",
+    "latency_ms": 3404
+  },
+  "remax|001461694380": {
+    "ts": "2026-07-09T07:06:33.280600+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "493 m² Land Near Constitución Walmart, Santa Ana",
+      "es": "Terreno 493 m² Cerca Walmart Constitución, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Flat 493 m² rustic plot in an urban setting, 5 minutes from Constitución Walmart. Electricity is connected, vehicle access via private lane, and large shade trees on site. A small existing structure is included.",
+      "es": "Terreno rústico plano de 493 m² en entorno urbano, a 5 minutos del Walmart Constitución. Cuenta con electricidad conectada, acceso vehicular por calle privada y árboles grandes que dan sombra. Incluye una pequeña estructura existente."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "5 min from Constitución Walmart",
+        "es": "5 min del Walmart Constitución"
+      },
+      {
+        "en": "Electricity already connected",
+        "es": "Electricidad ya conectada"
+      },
+      {
+        "en": "Vehicle access via private lane",
+        "es": "Acceso vehicular por calle privada"
+      },
+      {
+        "en": "Large shade trees on site",
+        "es": "Árboles grandes que dan sombra"
+      }
+    ],
+    "lat": 13.9943,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Constitución Walmart, Santa Ana",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3109,
+    "tokens_out": 430,
+    "cost_usd": 0.00131243,
+    "finish_reason": "stop",
+    "latency_ms": 3887
+  },
+  "remax|001462657084": {
+    "ts": "2026-07-09T07:06:33.373983+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Land 300m from Beach, Club Salinitas",
+      "es": "Terreno Plano a 300m de la Playa, Club Salinitas"
+    },
+    "short_description_canonical": {
+      "en": "Flat 1,744 m² lot in Club Salinitas, near Decameron Hotel. Located in a private complex, 300 meters from the beach with direct access through Club Salinitas 1. Priced at $165,000.",
+      "es": "Lote plano de 1,744 m² en Club Salinitas, cerca del Hotel Decamerón. Ubicado en un complejo privado, a 300 metros de la playa con acceso directo por Club Salinitas 1. Precio de $165,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "300 meters from the beach",
+        "es": "A 300 metros de la playa"
+      },
+      {
+        "en": "Flat, ready-to-build lot",
+        "es": "Terreno plano, listo para construir"
+      },
+      {
+        "en": "Private club with security",
+        "es": "Club privado con seguridad"
+      },
+      {
+        "en": "Near Decameron Hotel",
+        "es": "Cerca del Hotel Decamerón"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3145,
+    "tokens_out": 440,
+    "cost_usd": 0.00133315,
+    "finish_reason": "stop",
+    "latency_ms": 3979
+  },
+  "remax|001463696025": {
+    "ts": "2026-07-09T07:06:33.533160+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "15,920 m² Land in San José Sacaré, La Palma",
+      "es": "Terreno de 15,920 m² en San José Sacaré, La Palma"
+    },
+    "short_description_canonical": {
+      "en": "Rolling terrain of 15,920.61 m² in San José Sacaré, La Palma, Chalatenango. Previously used for coffee production, it has timber and shade trees, access to electricity and potable water, and easy vehicular access. Located 4 km from downtown La Palma.",
+      "es": "Terreno ondulado de 15,920.61 m² en San José Sacaré, La Palma, Chalatenango. Anteriormente usado para café, cuenta con árboles maderables y de sombra, acceso a electricidad y agua potable, y fácil acceso vehicular. Ubicado a 4 km del centro de La Palma."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "15,920.61 m² rolling terrain",
+        "es": "15,920.61 m² de terreno ondulado"
+      },
+      {
+        "en": "Electricity and potable water available",
+        "es": "Electricidad y agua potable disponibles"
+      },
+      {
+        "en": "4 km from downtown La Palma",
+        "es": "4 km del centro de La Palma"
+      },
+      {
+        "en": "Previously coffee-producing fertile soil",
+        "es": "Suelo fértil anteriormente cafetalero"
+      },
+      {
+        "en": "Cool mountain climate year-round",
+        "es": "Clima fresco de montaña todo el año"
+      }
+    ],
+    "lat": 14.3333,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Palma, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3396,
+    "tokens_out": 510,
+    "cost_usd": 0.00147792,
+    "finish_reason": "stop",
+    "latency_ms": 4139
+  },
+  "remax|001462657083": {
+    "ts": "2026-07-09T07:06:36.292998+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "8.7 Manzana Flat Lot on Pan-American Highway",
+      "es": "Lote Plano de 8.7 Manzanas en Carretera Panamericana"
+    },
+    "short_description_canonical": {
+      "en": "Flat 8.7-manzana (60,762 m²) lot on the Pan-American Highway (km 73) between Santa Ana and Candelaria de la Frontera. Located 8 minutes from Las Ramblas Santa Ana, ideal for logistics, industrial, commercial, or mixed-use projects. Priced at US$28 per square vara (total US$2,450,000).",
+      "es": "Lote plano de 8.7 manzanas (60,762 m²) en la Carretera Panamericana (km 73) entre Santa Ana y Candelaria de la Frontera. Ubicado a 8 minutos de Las Ramblas Santa Ana, ideal para proyectos logísticos, industriales, comerciales o de uso mixto. Precio de US$28 por vara cuadrada (total US$2,450,000)."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "8.7 manzanas (60,762 m²) flat land",
+        "es": "8.7 manzanas (60,762 m²) de terreno plano"
+      },
+      {
+        "en": "On Pan-American Highway, km 73",
+        "es": "Sobre Carretera Panamericana, km 73"
+      },
+      {
+        "en": "8 minutes from Las Ramblas Santa Ana",
+        "es": "8 minutos de Las Ramblas Santa Ana"
+      },
+      {
+        "en": "US$28 per square vara",
+        "es": "US$28 por vara cuadrada"
+      },
+      {
+        "en": "Ideal for logistics and industrial use",
+        "es": "Ideal para uso logístico e industrial"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3248,
+    "tokens_out": 569,
+    "cost_usd": 0.00150286,
+    "finish_reason": "stop",
+    "latency_ms": 4049
+  },
+  "remax|002282685121": {
+    "ts": "2026-07-09T07:06:36.342315+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat 1378 m² lot, Playa El Espino",
+      "es": "Lote plano de 1378 m², Playa El Espino"
+    },
+    "short_description_canonical": {
+      "en": "Flat 1378 m² lot on Playa El Espino, Jucuarán, Usulután. Direct Pacific Ocean access, estuary at rear. Ideal for tourism, hotel, or residential development. Benefits from Surf City 2 infrastructure.",
+      "es": "Lote plano de 1378 m² en Playa El Espino, Jucuarán, Usulután. Acceso directo al Océano Pacífico, estero al fondo. Ideal para turismo, hotel o desarrollo residencial. Se beneficia de la infraestructura de Surf City 2."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct Pacific Ocean access",
+        "es": "Acceso directo al Océano Pacífico"
+      },
+      {
+        "en": "Borders estuary at rear",
+        "es": "Limita con estero al fondo"
+      },
+      {
+        "en": "Flat terrain, 1378 m²",
+        "es": "Terreno plano, 1378 m²"
+      },
+      {
+        "en": "Surf City 2 infrastructure zone",
+        "es": "Zona de infraestructura Surf City 2"
+      }
+    ],
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Espino",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3230,
+    "tokens_out": 456,
+    "cost_usd": 0.0013737,
+    "finish_reason": "stop",
+    "latency_ms": 3591
   }
 }
