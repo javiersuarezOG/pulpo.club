@@ -102,9 +102,9 @@ jobs:
       - name: Commit queue mutation + activity log
         if: github.event.inputs.dry_run != 'true'
         run: |
-          git add web/data/ig_queue.json web/data/ig_post_log.jsonl
+          git add web/data/ig_queue.json web/data/ig_post_log.jsonl web/data/ig_token_meta.json
           if git diff --cached --quiet; then
-            echo "[ig-publish] queue + log unchanged — nothing to commit"
+            echo "[ig-publish] queue + log + token-meta unchanged — nothing to commit"
             exit 0
           fi
           git commit -m "chore(ig): publisher posted next item + activity log"

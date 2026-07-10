@@ -528,6 +528,25 @@ jobs:
             --run-url "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
             || echo "::warning::source-health alert script failed (non-blocking)"
 
+      - name: Bilingual-coverage canary (i18n leak trip-wire, Slack)
+        # Every served listing must carry BOTH en + es on title/description/
+        # usps (the deterministic fallback emits bilingual templates and
+        # ensure_bilingual translates broker text). This canary reads the
+        # working-tree ranked.list*.json and Slack-pages if any field ships
+        # monolingual, identical-across-locales, or language-swapped copy —
+        # the regression that leaked English listing copy to Spanish users.
+        # Alert, never block (CLAUDE.md: never silent-freeze data). Runs at
+        # the same pre-canary point so an operator can correlate signals
+        # against one Actions run.
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          python3 scripts/check_bilingual_coverage.py \
+            --data-dir web/data \
+            --run-url "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            || echo "::warning::bilingual-coverage canary failed (non-blocking)"
+
       - name: Stranded-inventory alert (R6)
         # R6 of docs/RESILIENCE-AUDIT-PRD.md. Reads R1's candidate
         # bundle at web/data/.staging/<run_id>/ and fires Slack + opens

@@ -623,6 +623,20 @@ export const UI_STRINGS = {
   // the FilterPanel — these are the three axes a buyer thinks in.
   "filter.primary.where":        { en: "Where",           es: "Dónde" },
   "filter.primary.type":         { en: "Type",            es: "Tipo" },
+  // Price-range "no upper bound" label — replaces an inline
+  // `locale === "es" ? "sin tope" : "no max"` ternary at the active-chip
+  // and slider-aria sites so the string routes through t() like everything
+  // else. ES canary asserts "sin tope" never leaks into the EN UI.
+  "filter.price.no_cap":         { en: "no max",          es: "sin tope" },
+  // Max-price input placeholder (empty field). EN reads "any" here (not
+  // "no max"); ES shares "sin tope".
+  "filter.price.max_placeholder": { en: "any",            es: "sin tope" },
+  // JSON-LD breadcrumb labels (Browse + Detail). Own keys rather than
+  // reusing nav.* so the SEO breadcrumb text ("Browse"/"Explorar") stays
+  // independent of the nav tab label ("Discover"/"Descubrir").
+  "breadcrumb.home":             { en: "Home",            es: "Inicio" },
+  "breadcrumb.browse":           { en: "Browse",          es: "Explorar" },
+  "breadcrumb.listing":          { en: "Listing",         es: "Anuncio" },
   "filter.primary.ranking":      { en: "Ranking",         es: "Ranking" },
   "filter.ranking.top10":        { en: "Top 10",          es: "Top 10" },
   "filter.ranking.price_drops":  { en: "Price drops",     es: "Bajó de precio" },

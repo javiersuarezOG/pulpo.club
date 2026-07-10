@@ -462,6 +462,64 @@ sweep catches it in the states a test renders. A leak that survives all
 three means a brand-new render state nobody scanned — add it to the
 sweep when you find it.
 
+## NEVER ship a listing that isn't bilingual (post-2026-07-06)
+
+The prior i18n guardrails all police **UI-chrome** strings (things that go
+through `t()`). But the biggest EN/ES leak reported by users was **listing
+content** — a listing's own title / description / reasons-to-buy — which
+does NOT go through `t()`: it comes from the data pipeline. A tail of
+listings the LLM enrichment skipped (most often the grandfathered-geocoded
+ones that `_present_latlong` makes ineligible in
+`automation/llm_enrichment_schema.py`) fell through to the deterministic
+fallback, which used to write **monolingual English strings**. `tr()` then
+rendered that single language in every locale — Spanish titles shown to EN
+users, English template titles/USPs shown to ES users. Fixed in the #988
+series.
+
+**The invariant: every served listing carries BOTH `en` and `es` on
+`title_canonical`, `short_description_canonical`, and every
+`reasons_to_buy` entry.** Three layers keep it true — keep all three
+healthy:
+
+1. **Producers emit bilingual, and upgrade mono in place.**
+   [automation/ai_enrichment_fallback.py](automation/ai_enrichment_fallback.py)
+   emits `{en, es}` from deterministic templates (free, no API) and
+   `apply_fallbacks` **upgrades** any legacy monolingual string to bilingual
+   while preserving real AI output — so the nightly self-heals old data.
+   [automation/ensure_bilingual.py](automation/ensure_bilingual.py) is the
+   DeepSeek translate-only safety net for genuine broker prose, persisted to
+   the reusable cache `web/data/bilingual_fill.json`. Both are soft-fail and
+   run in `run.py` after enrichment. **A new producer of listing copy must
+   emit both languages, or route through these — never write a bare string.**
+
+2. **The frontend never mislabels a source-language string.**
+   [web/app/data/listings.ts](web/app/data/listings.ts) places a
+   single-language string in the slot matching its ACTUAL language
+   (`url_language` or `detectListingLang`), never blindly `.en`; `tr()`
+   falls back by truthiness so an es-only listing renders honestly. Any new
+   Localized field follows this — no `{ en: <possibly-Spanish-string> }`.
+
+3. **The nightly canary Slack-pages on regression, never blocks.**
+   [scripts/check_bilingual_coverage.py](scripts/check_bilingual_coverage.py)
+   flags monolingual / identical-across-locales / language-swapped listing
+   copy per country and pages via `SLACK_WEBHOOK_URL`. Per the
+   never-silent-freeze rule it always exits 0 (alert + backfill, not block);
+   `--strict` is only for the guardrail self-test. Its unit test
+   ([tests/test_bilingual_coverage.py](tests/test_bilingual_coverage.py)) is
+   deterministic + synthetic — it must NEVER read `web/data` (that would make
+   it a data-driven CI blocker, the social-floor anti-pattern).
+
+**Telemetry split:** `i18n.fallback_used {locale=es}` in prod flags a
+**UI-string** leak (the `key` names the row to fix); the coverage canary
+flags a **listing-copy** leak. They cover different surfaces — do not
+conflate them. Both are documented in
+[docs/observability.md](docs/observability.md).
+
+To remediate already-committed data immediately (rather than waiting a
+nightly): `python3 scripts/backfill_bilingual.py --write <ranked files>`
+(deterministic upgrade is free; `--llm` adds DeepSeek translate-fill). Open
+the resulting data change as its own PR — do not mix with code.
+
 ## Geocoding & beach reference table
 
 Coastal listings get their lat/lng from a single LLM call (DeepSeek). The

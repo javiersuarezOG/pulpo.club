@@ -107,17 +107,21 @@
       "lint_violations": [],
       "caption_status": "clean",
       "carousel_photo_paths": [
-        "web/photos/bienesraices_1783.hero.jpg"
+        "web/data/ig_assets/autopilot/d102__showcase/photo_1.jpg",
+        "web/data/ig_assets/autopilot/d102__showcase/photo_2.jpg",
+        "web/data/ig_assets/autopilot/d102__showcase/photo_3.jpg"
       ],
       "listing_ids": [
         "bienesraices__1783"
       ],
       "primary_listing_id": "bienesraices__1783",
-      "status": "superseded_campaign_v1",
-      "approved": false,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "status": "scheduled",
+      "approved": true,
+      "posted": true,
+      "posted_at": "2026-07-08T04:27:44.083522+00:00",
+      "posted_media_id": "18604192972024221",
+      "comment_posted": true,
+      "comment_id": "18053470016549940"
     },
     {
       "day": 103,
@@ -134,17 +138,22 @@
       "lint_violations": [],
       "caption_status": "clean",
       "carousel_photo_paths": [
-        "web/data/ig_assets/autopilot/d103__brand/poster_sticker_paper.png"
+        "web/data/ig_assets/autopilot/d103__brand/poster_sticker_paper.png",
+        "web/data/ig_assets/autopilot/d103__brand/photo_1.jpg",
+        "web/data/ig_assets/autopilot/d103__brand/photo_2.jpg",
+        "web/data/ig_assets/autopilot/d103__brand/photo_3.jpg"
       ],
       "listing_ids": [
         "bienesraices__1875"
       ],
       "primary_listing_id": "bienesraices__1875",
-      "status": "superseded_campaign_v1",
-      "approved": false,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "status": "scheduled",
+      "approved": true,
+      "posted": true,
+      "posted_at": "2026-07-09T04:10:10.118575+00:00",
+      "posted_media_id": "17957855685158238",
+      "comment_posted": true,
+      "comment_id": "18200824351324097"
     },
     {
       "day": 104,
@@ -161,17 +170,21 @@
       "lint_violations": [],
       "caption_status": "clean",
       "carousel_photo_paths": [
-        "web/photos/bienesraices_2191.hero.jpg"
+        "web/data/ig_assets/autopilot/d104__showcase/photo_1.jpg",
+        "web/data/ig_assets/autopilot/d104__showcase/photo_2.jpg",
+        "web/data/ig_assets/autopilot/d104__showcase/photo_3.jpg"
       ],
       "listing_ids": [
         "bienesraices__2191"
       ],
       "primary_listing_id": "bienesraices__2191",
-      "status": "superseded_campaign_v1",
-      "approved": false,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "status": "scheduled",
+      "approved": true,
+      "posted": true,
+      "posted_at": "2026-07-10T05:04:54.901996+00:00",
+      "posted_media_id": "18097013567595450",
+      "comment_posted": true,
+      "comment_id": "18012372431866218"
     },
     {
       "day": 105,
@@ -188,7 +201,10 @@
       "lint_violations": [],
       "caption_status": "clean",
       "carousel_photo_paths": [
-        "web/data/ig_assets/autopilot/d105__brand/poster_sticker_paper.png"
+        "web/data/ig_assets/autopilot/d105__brand/poster_sticker_paper.png",
+        "web/data/ig_assets/autopilot/d105__brand/photo_1.jpg",
+        "web/data/ig_assets/autopilot/d105__brand/photo_2.jpg",
+        "web/data/ig_assets/autopilot/d105__brand/photo_3.jpg"
       ],
       "listing_ids": [
         "bienesraices__2258"
@@ -241,7 +257,9 @@
       "lint_violations": [],
       "caption_status": "clean",
       "carousel_photo_paths": [
-        "web/photos/bienesraices_2135.hero.jpg"
+        "web/data/ig_assets/autopilot/d106__showcase/photo_1.jpg",
+        "web/data/ig_assets/autopilot/d106__showcase/photo_2.jpg",
+        "web/data/ig_assets/autopilot/d106__showcase/photo_3.jpg"
       ],
       "listing_ids": [
         "bienesraices__2135"
@@ -294,7 +312,10 @@
       "lint_violations": [],
       "caption_status": "clean",
       "carousel_photo_paths": [
-        "web/data/ig_assets/autopilot/d107__brand/poster_sticker_ink.png"
+        "web/data/ig_assets/autopilot/d107__brand/poster_sticker_ink.png",
+        "web/data/ig_assets/autopilot/d107__brand/photo_1.jpg",
+        "web/data/ig_assets/autopilot/d107__brand/photo_2.jpg",
+        "web/data/ig_assets/autopilot/d107__brand/photo_3.jpg"
       ],
       "listing_ids": [
         "bienesraices__2296"
@@ -333,6 +354,35 @@
       "posted_media_id": null
     },
     {
+      "day": 108,
+      "shelf": "autopilot_showcase",
+      "selector": "autopilot",
+      "poster_type": "sticker",
+      "palette": "paper",
+      "scheduled_for": "2026-07-14T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d108__showcase",
+      "poster_path": "web/data/ig_assets/autopilot/d108__showcase/poster_sticker_paper.png",
+      "poster_overrides": {},
+      "caption": "**77,000 m² en Conchagua.**\n\n77,000 m² en Conchagua, sin construir.\n\n$1.1M · a 760 m del mar\n\npulpo.club · listing N° 088",
+      "comment": "77,000 m² en Conchagua.\n$1.1M · $14.31/m²\nA 760 m del mar.\n\nLos mejores terrenos de El Salvador, rankeados cada semana.\nTodos los detalles en pulpo.club — link en bio.\n\n#ElSalvador #Terrenos #BienesRaices #TerrenosEnElSalvador #InvertirEnElSalvador #InversionInmobiliaria #TerrenoEnVenta #SurfCity #Conchagua #PlayasDeElSalvador #SalvadorenosPorElMundo #BitcoinCountry",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d108__showcase/photo_1.jpg",
+        "web/data/ig_assets/autopilot/d108__showcase/photo_2.jpg",
+        "web/data/ig_assets/autopilot/d108__showcase/photo_3.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__1132"
+      ],
+      "primary_listing_id": "bienesraices__1132",
+      "status": "superseded_campaign_v1",
+      "approved": false,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
       "day": 204,
       "shelf": "campaign_top10",
       "selector": "campaign_v1",
@@ -354,6 +404,36 @@
       "primary_listing_id": null,
       "status": "scheduled",
       "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 109,
+      "shelf": "autopilot_brand",
+      "selector": "autopilot",
+      "poster_type": "typo_max",
+      "palette": "ink",
+      "scheduled_for": "2026-07-15T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d109__brand",
+      "poster_path": "web/data/ig_assets/autopilot/d109__brand/poster_typo_max_cream.png",
+      "poster_overrides": {},
+      "caption": "**Menos ruido, mejores terrenos.**\n\nNada de listas infinitas ni precios inflados. Filtramos el mercado y te mostramos lo que vale.\n\npulpo.club · link en bio",
+      "comment": "49,000 m² en El Cuco.\n$830,000 · $16.97/m²\nA 730 m del mar.\n\nLos mejores terrenos de El Salvador, rankeados cada semana.\nTodos los detalles en pulpo.club — link en bio.\n\n#ElSalvador #Terrenos #BienesRaices #TerrenosEnElSalvador #InvertirEnElSalvador #InversionInmobiliaria #TerrenoEnVenta #SurfCity #ElCuco #PlayasDeElSalvador #SalvadorenosPorElMundo #BitcoinCountry",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d109__brand/poster_sticker_ink.png",
+        "web/data/ig_assets/autopilot/d109__brand/photo_1.jpg",
+        "web/data/ig_assets/autopilot/d109__brand/photo_2.jpg",
+        "web/data/ig_assets/autopilot/d109__brand/photo_3.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__2007"
+      ],
+      "primary_listing_id": "bienesraices__2007",
+      "status": "superseded_campaign_v1",
+      "approved": false,
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
@@ -385,6 +465,35 @@
       "posted_media_id": null
     },
     {
+      "day": 110,
+      "shelf": "autopilot_showcase",
+      "selector": "autopilot",
+      "poster_type": "sticker",
+      "palette": "paper",
+      "scheduled_for": "2026-07-16T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d110__showcase",
+      "poster_path": "web/data/ig_assets/autopilot/d110__showcase/poster_sticker_paper.png",
+      "poster_overrides": {},
+      "caption": "**200 m² en La Libertad.**\n\n200 m² en La Libertad, sin construir.\n\n$22,000 · a 11.2 km del mar\n\npulpo.club · listing N° 146",
+      "comment": "200 m² en La Libertad.\n$22,000 · $110/m²\nA 11.2 km del mar.\n\nLos mejores terrenos de El Salvador, rankeados cada semana.\nTodos los detalles en pulpo.club — link en bio.\n\n#ElSalvador #Terrenos #BienesRaices #TerrenosEnElSalvador #InvertirEnElSalvador #InversionInmobiliaria #TerrenoEnVenta #SurfCity #LaLibertad #PlayasDeElSalvador #SalvadorenosPorElMundo #BitcoinCountry",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d110__showcase/photo_1.jpg",
+        "web/data/ig_assets/autopilot/d110__showcase/photo_2.jpg",
+        "web/data/ig_assets/autopilot/d110__showcase/photo_3.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__2101"
+      ],
+      "primary_listing_id": "bienesraices__2101",
+      "status": "superseded_campaign_v1",
+      "approved": false,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
       "day": 206,
       "shelf": "campaign_top10",
       "selector": "campaign_v1",
@@ -406,6 +515,36 @@
       "primary_listing_id": null,
       "status": "scheduled",
       "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 111,
+      "shelf": "autopilot_brand",
+      "selector": "autopilot",
+      "poster_type": "typo_max",
+      "palette": "paper",
+      "scheduled_for": "2026-07-17T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d111__brand",
+      "poster_path": "web/data/ig_assets/autopilot/d111__brand/poster_typo_max_cream.png",
+      "poster_overrides": {},
+      "caption": "**Cada domingo, los mejores terrenos en tu correo.**\n\nGratis. Un resumen tranquilo de lo mejor de la semana, sin prisa.\n\npulpo.club · link en bio",
+      "comment": "7,000 m² en San Jose Villanueva.\n$340,000 · $48.57/m²\nA 18.8 km del mar.\n\nLos mejores terrenos de El Salvador, rankeados cada semana.\nTodos los detalles en pulpo.club — link en bio.\n\n#ElSalvador #Terrenos #BienesRaices #TerrenosEnElSalvador #InvertirEnElSalvador #InversionInmobiliaria #TerrenoEnVenta #SurfCity #SanJoseVillanueva #PlayasDeElSalvador #SalvadorenosPorElMundo #BitcoinCountry",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d111__brand/poster_sticker_paper.png",
+        "web/data/ig_assets/autopilot/d111__brand/photo_1.jpg",
+        "web/data/ig_assets/autopilot/d111__brand/photo_2.jpg",
+        "web/data/ig_assets/autopilot/d111__brand/photo_3.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__1244"
+      ],
+      "primary_listing_id": "bienesraices__1244",
+      "status": "superseded_campaign_v1",
+      "approved": false,
       "posted": false,
       "posted_at": null,
       "posted_media_id": null

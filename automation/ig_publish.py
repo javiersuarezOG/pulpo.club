@@ -392,6 +392,51 @@ def publish_item(
     return item
 
 
+# ── token expiry meta (for the admin console pill) ────────────────────
+
+DEFAULT_TOKEN_META = Path("web/data/ig_token_meta.json")
+
+
+def fetch_token_expiry(token: str, *, base: str = GRAPH_BASE) -> Optional[dict]:
+    """Query Meta's debug_token for the token's REAL expiry so the console
+    never shows a hardcoded (lie-able) date.  Self-inspection works because
+    the publisher token is an admin token for the app.  Returns
+    {"expires_at": <unix>, "expires_at_iso": <iso>} or None on any
+    error / non-expiring token."""
+    try:
+        r = httpx.get(
+            f"{base}/debug_token",
+            params={"input_token": token, "access_token": token},
+            timeout=15,
+        )
+        if r.status_code != 200:
+            return None
+        data = (r.json() or {}).get("data") or {}
+        exp = data.get("expires_at")
+        if not exp:                      # 0 / missing → non-expiring or unknown
+            return None
+        return {
+            "expires_at": int(exp),
+            "expires_at_iso": datetime.fromtimestamp(int(exp), tz=timezone.utc).isoformat(),
+        }
+    except Exception:                    # noqa: BLE001 — best-effort, never break publish
+        return None
+
+
+def write_token_meta(path: Path, token: str) -> bool:
+    """Best-effort refresh of the committed token-expiry file.  Writes only
+    stable fields (no timestamps) so it commits ONLY when the expiry
+    actually changes — i.e. right after a re-mint.  Returns True on write."""
+    meta = fetch_token_expiry(token)
+    if not meta:
+        return False
+    try:
+        atomic_write_json(path, meta, indent=2)
+        return True
+    except OSError:                      # pragma: no cover
+        return False
+
+
 # ── activity log ──────────────────────────────────────────────────────
 
 DEFAULT_LOG = Path("web/data/ig_post_log.jsonl")
@@ -521,6 +566,10 @@ def main(argv: Optional[list[str]] = None) -> int:
         help="Activity-log jsonl to append each publish attempt to.",
     )
     parser.add_argument(
+        "--token-meta", type=Path, default=DEFAULT_TOKEN_META,
+        help="JSON file to refresh with the token's real expiry (for the admin console).",
+    )
+    parser.add_argument(
         "--dry-run", action="store_true",
         help="Log what would be published without calling the Graph API.",
     )
@@ -549,6 +598,13 @@ def main(argv: Optional[list[str]] = None) -> int:
     ig_user_id = env_str("IG_USER_ID", "")
     access_token = env_str("IG_ACCESS_TOKEN", "")
     base_url = env_str("PULPO_PUBLIC_BASE_URL", DEFAULT_PUBLIC_BASE_URL)
+
+    # Refresh the token-expiry file the admin console reads (best-effort;
+    # commits only when the expiry changes, i.e. after a re-mint).
+    if access_token and not args.dry_run:
+        if write_token_meta(args.token_meta, access_token):
+            print(f"[ig_publish] token expiry refreshed → {args.token_meta}")
+
     if not args.dry_run and not (ig_user_id and access_token):
         print(
             "[ig_publish] missing IG_USER_ID and/or IG_ACCESS_TOKEN env vars "
