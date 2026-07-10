@@ -362,6 +362,36 @@
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
+    },
+    {
+      "day": 111,
+      "shelf": "autopilot_brand",
+      "selector": "autopilot",
+      "poster_type": "typo_max",
+      "palette": "paper",
+      "scheduled_for": "2026-07-17T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d111__brand",
+      "poster_path": "web/data/ig_assets/autopilot/d111__brand/poster_typo_max_cream.png",
+      "poster_overrides": {},
+      "caption": "**Cada domingo, los mejores terrenos en tu correo.**\n\nGratis. Un resumen tranquilo de lo mejor de la semana, sin prisa.\n\npulpo.club · link en bio",
+      "comment": "7,000 m² en San Jose Villanueva.\n$340,000 · $48.57/m²\nA 18.8 km del mar.\n\nLos mejores terrenos de El Salvador, rankeados cada semana.\nTodos los detalles en pulpo.club — link en bio.\n\n#ElSalvador #Terrenos #BienesRaices #TerrenosEnElSalvador #InvertirEnElSalvador #InversionInmobiliaria #TerrenoEnVenta #SurfCity #SanJoseVillanueva #PlayasDeElSalvador #SalvadorenosPorElMundo #BitcoinCountry",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d111__brand/poster_sticker_paper.png",
+        "web/data/ig_assets/autopilot/d111__brand/photo_1.jpg",
+        "web/data/ig_assets/autopilot/d111__brand/photo_2.jpg",
+        "web/data/ig_assets/autopilot/d111__brand/photo_3.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__1244"
+      ],
+      "primary_listing_id": "bienesraices__1244",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
