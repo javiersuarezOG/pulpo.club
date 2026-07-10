@@ -113,8 +113,8 @@
         "bienesraices__1783"
       ],
       "primary_listing_id": "bienesraices__1783",
-      "status": "scheduled",
-      "approved": true,
+      "status": "superseded_campaign_v1",
+      "approved": false,
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
@@ -140,8 +140,8 @@
         "bienesraices__1875"
       ],
       "primary_listing_id": "bienesraices__1875",
-      "status": "scheduled",
-      "approved": true,
+      "status": "superseded_campaign_v1",
+      "approved": false,
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
@@ -167,8 +167,8 @@
         "bienesraices__2191"
       ],
       "primary_listing_id": "bienesraices__2191",
-      "status": "scheduled",
-      "approved": true,
+      "status": "superseded_campaign_v1",
+      "approved": false,
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
@@ -194,6 +194,32 @@
         "bienesraices__2258"
       ],
       "primary_listing_id": "bienesraices__2258",
+      "status": "superseded_campaign_v1",
+      "approved": false,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 201,
+      "shelf": "campaign_inspira",
+      "selector": "campaign_v1",
+      "poster_type": "campaign",
+      "palette": "inspiracion",
+      "scheduled_for": "2026-07-11T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/campaign/d01_escasez",
+      "poster_path": "web/data/ig_assets/campaign/d01_escasez/slide1.png",
+      "poster_overrides": {},
+      "caption": "**La tierra frente al mar no se fabrica. Y ya casi no queda.**\n\nDe cada 1,916 propiedades a la venta en El Salvador, solo 139 están de verdad frente al mar. Menos del 8%.\n\nEn Pulpo las tenemos todas juntas y rankeadas, para que veás las mejores sin revisar mil sitios.\n\npulpo.club · link en bio\n\n· · ·\n\n**Oceanfront land isn't being made — and there's barely any left.**\n\nOf the 1,916 properties for sale in El Salvador, only 139 are truly oceanfront. Under 8%.\n\nAt Pulpo we keep them all in one place, ranked, so you see the best without digging through a dozen sites.\n\npulpo.club · link in bio",
+      "comment": "Comparamos cada propiedad por precio, zona y acceso, y te mostramos solo las mejores.\n\nRankeadas. El Top 10 en tu correo cada domingo.\n\npulpo.club\n\n· · ·\n\nWe compare every property by price, location, and access, and show you only the best.\n\nRanked. The Top 10 in your inbox every Sunday.\n\npulpo.club\n\n#ElSalvador #BienesRaices #FrenteAlMar #SurfCity #Terrenos #PlayasDeElSalvador #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/campaign/d01_escasez/slide2.png",
+        "web/data/ig_assets/campaign/d01_escasez/slide3.png"
+      ],
+      "listing_ids": [],
+      "primary_listing_id": null,
       "status": "scheduled",
       "approved": true,
       "posted": false,
@@ -221,8 +247,8 @@
         "bienesraices__2135"
       ],
       "primary_listing_id": "bienesraices__2135",
-      "status": "scheduled",
-      "approved": true,
+      "status": "superseded_campaign_v1",
+      "approved": false,
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
@@ -248,8 +274,8 @@
         "bienesraices__2296"
       ],
       "primary_listing_id": "bienesraices__2296",
-      "status": "scheduled",
-      "approved": true,
+      "status": "superseded_campaign_v1",
+      "approved": false,
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
