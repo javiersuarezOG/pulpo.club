@@ -66,6 +66,31 @@ function readQueueFile() {
   return { found: false, reason: "not_found", error: lastErr };
 }
 
+// Token expiry meta — refreshed with the token's REAL expiry by the
+// publisher (automation/ig_publish.py debug_token). Absent → we simply
+// don't show an expiry (never a hardcoded date).
+const TOKEN_META_CANDIDATES = [
+  path.join(__dirname, "..", "..", "web", "data", "ig_token_meta.json"),
+  path.join(process.cwd(), "web", "data", "ig_token_meta.json"),
+];
+
+function readTokenExpiry() {
+  for (const p of TOKEN_META_CANDIDATES) {
+    try {
+      const meta = JSON.parse(fs.readFileSync(p, "utf8"));
+      const iso = meta && meta.expires_at_iso;
+      if (!iso) return { iso: null, days: null };
+      const ms = new Date(String(iso).replace("Z", "+00:00")).getTime();
+      if (!Number.isFinite(ms)) return { iso: null, days: null };
+      const days = Math.floor((ms - Date.now()) / 86400000);
+      return { iso, days };
+    } catch {
+      continue;
+    }
+  }
+  return { iso: null, days: null };
+}
+
 function logApi(name, fields) {
   const parts = ["[api]", name];
   for (const [k, v] of Object.entries(fields)) parts.push(`${k}=${v}`);
@@ -88,11 +113,17 @@ function _parseISO(s) {
 }
 
 function deriveHealth(payload) {
+  const tokenExp = readTokenExpiry();
   // Defaults so the widget always has stable keys to read.
   const out = {
     ig_paused:           _trueBool(process.env.IG_PAUSED || ""),
     ig_user_id_set:      Boolean((process.env.IG_USER_ID || "").trim()),
     ig_token_set:        Boolean((process.env.IG_ACCESS_TOKEN || "").trim()),
+    // The token lives in GitHub Actions (where the publisher posts), NOT in
+    // Vercel — so ig_token_set above is always false here and is NOT a real
+    // signal. The console shows the real expiry below instead.
+    token_expires_at_iso: tokenExp.iso,   // real expiry from debug_token, or null
+    token_expires_days:   tokenExp.days,   // days remaining, or null
     items_total:         0,
     items_approved:      0,
     items_pending:       0,

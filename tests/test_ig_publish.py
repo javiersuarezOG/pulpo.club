@@ -680,3 +680,29 @@ def test_comment_failure_does_not_fail_the_post():
     assert item["posted_media_id"] == "media123"
     assert item["comment_posted"] is False
     assert "no scope" in item["comment_error"]
+
+
+# ── token expiry meta (admin console pill) ────────────────────────────
+
+def test_fetch_token_expiry_parses_debug_token():
+    from unittest.mock import MagicMock, patch
+    from automation import ig_publish
+    resp = MagicMock(status_code=200)
+    resp.json.return_value = {"data": {"expires_at": 1790000000, "is_valid": True}}
+    with patch.object(ig_publish.httpx, "get", return_value=resp):
+        meta = ig_publish.fetch_token_expiry("tok")
+    assert meta["expires_at"] == 1790000000
+    assert meta["expires_at_iso"].startswith("2026-")
+
+
+def test_fetch_token_expiry_best_effort_on_error():
+    from unittest.mock import patch
+    from automation import ig_publish
+    with patch.object(ig_publish.httpx, "get", side_effect=Exception("boom")):
+        assert ig_publish.fetch_token_expiry("tok") is None
+    # non-expiring / missing expires_at → None (not a crash)
+    from unittest.mock import MagicMock
+    resp = MagicMock(status_code=200)
+    resp.json.return_value = {"data": {"expires_at": 0}}
+    with patch.object(ig_publish.httpx, "get", return_value=resp):
+        assert ig_publish.fetch_token_expiry("tok") is None
