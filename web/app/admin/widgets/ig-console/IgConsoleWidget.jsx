@@ -232,9 +232,16 @@ export function IgConsoleWidget() {
   // Upcoming = approved posts that will auto-publish, not yet posted and
   // not skipped, earliest scheduled first. Posts are auto-approved by the
   // autopilot; the operator's only lever here is Skip.
+  //
+  // `approved === true` is load-bearing, not cosmetic: patch_queue keeps
+  // superseded old-design items in the queue with `approved:false` +
+  // `status:superseded_campaign_v1` (audit trail, not deletion). Without
+  // this gate they render interleaved with the real campaign — the
+  // "old campaign still showing" bug. The publisher itself only posts
+  // approved+due items, so this matches what will actually go live.
   const upcoming = useMemo(() => {
     return items
-      .filter((it) => it && it.posted !== true && it.skipped !== true)
+      .filter((it) => it && it.approved === true && it.posted !== true && it.skipped !== true)
       .sort((a, b) => String(a.scheduled_for || "").localeCompare(String(b.scheduled_for || "")));
   }, [items]);
   const nextUp = upcoming[0] || null;
