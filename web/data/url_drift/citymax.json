@@ -2,13 +2,13 @@
   "source": "citymax",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-07-10T09:56:20.724345+00:00",
+  "probed_at": "2026-07-10T15:06:01.573833+00:00",
   "last_probe": {
     "probed_url": "https://www.citymax-sv.com",
     "status_code": 200,
     "final_url": "https://www.citymax-sv.com",
     "response_size_bytes": null,
-    "duration_ms": 319,
+    "duration_ms": 311,
     "error": null
   },
   "baseline": {
@@ -17,6 +17,6 @@
     "final_url": "https://www.citymax-sv.com",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-07-10T09:56:20.724375+00:00"
+    "last_ok_at": "2026-07-10T15:06:01.573864+00:00"
   }
 }
