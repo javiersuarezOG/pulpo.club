@@ -123209,5 +123209,1042 @@
     "cost_usd": 0.0013737,
     "finish_reason": "stop",
     "latency_ms": 3591
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287062": {
+    "ts": "2026-07-10T07:00:34.231801+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the Comasagua road, Santa Tecla, La Libertad. No further details on size or improvements are provided. Priced at $464,270.",
+      "es": "Terreno en el Km 12.5 de la carretera a Comasagua, Santa Tecla, La Libertad. No se proporcionan más detalles sobre tamaño o mejoras. Precio: $464,270."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 Comasagua road location",
+        "es": "Ubicación en Km 12.5 carretera a Comasagua"
+      },
+      {
+        "en": "Near Santa Tecla amenities",
+        "es": "Cerca de servicios de Santa Tecla"
+      },
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Listado por RE/MAX Central"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 404,
+    "cost_usd": 0.00128086,
+    "finish_reason": "stop",
+    "latency_ms": 3987
+  },
+  "realestate_au_sv|marcado-como-segundo-cton-san-jose-sacare-correspondiente-a-la-ubicacion-geografica-de-san-jose-sacare-la-palma-chalatenango-norte-chalatenango-la-palma-chalatenango-la-palma-chalatenango-310109287065": {
+    "ts": "2026-07-10T07:00:34.326668+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Lot in La Palma, Chalatenango",
+      "es": "Terreno de 850 m² en La Palma, Chalatenango"
+    },
+    "short_description_canonical": {
+      "en": "Flat 850 m² residential lot in San José Sacare, La Palma, Chalatenango. Located in a quiet area with access to basic utilities. Priced at $60,000, below market average for the zone.",
+      "es": "Terreno residencial plano de 850 m² en San José Sacare, La Palma, Chalatenango. Ubicado en zona tranquila con acceso a servicios básicos. Precio de $60,000, por debajo del promedio de la zona."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat 850 m² lot",
+        "es": "Terreno plano de 850 m²"
+      },
+      {
+        "en": "Below-zone price $60,000",
+        "es": "Precio por debajo de la zona $60,000"
+      },
+      {
+        "en": "Quiet residential area",
+        "es": "Zona residencial tranquila"
+      },
+      {
+        "en": "Basic utilities available",
+        "es": "Servicios básicos disponibles"
+      }
+    ],
+    "lat": 14.3167,
+    "lng": -89.1667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Palma, Chalatenango",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3123,
+    "tokens_out": 429,
+    "cost_usd": 0.00131511,
+    "finish_reason": "stop",
+    "latency_ms": 4082
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287063": {
+    "ts": "2026-07-10T07:00:34.342174+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale, Km 12.5 Carretera a Comasagua",
+      "es": "Terreno en Venta, Km 12.5 Carretera a Comasagua"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the Comasagua highway, Santa Tecla, La Libertad. Price: $421,741. Located in a developing area with road access.",
+      "es": "Terreno en el Km 12.5 de la carretera a Comasagua, Santa Tecla, La Libertad. Precio: $421,741. Ubicado en zona en desarrollo con acceso vial."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 Carretera a Comasagua location",
+        "es": "Ubicación en Km 12.5 Carretera a Comasagua"
+      },
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Listado por RE/MAX Central"
+      },
+      {
+        "en": "Price: $421,741",
+        "es": "Precio: $421,741"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 416,
+    "cost_usd": 0.00129406,
+    "finish_reason": "stop",
+    "latency_ms": 4098
+  },
+  "realestate_au_sv|km-61-autopista-a-comalapa-olocuilta-la-paz-olocuilta-la-paz-department-310109287117": {
+    "ts": "2026-07-10T07:00:34.405272+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale, Km 61 Comalapa Highway, Olocuilta",
+      "es": "Terreno en Venta, Km 61 Autopista a Comalapa, Olocuilta"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel for sale at Km 61 on the Comalapa Highway in Olocuilta, La Paz. Located in a strategic corridor near the airport and commercial zones. Priced at $2,358,158.",
+      "es": "Terreno en venta en el Km 61 de la Autopista a Comalapa, Olocuilta, La Paz. Ubicado en un corredor estratégico cerca del aeropuerto y zonas comerciales. Precio: $2,358,158."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 61 Comalapa Highway location",
+        "es": "Ubicación en Km 61 Autopista a Comalapa"
+      },
+      {
+        "en": "Near airport and commercial zones",
+        "es": "Cerca del aeropuerto y zonas comerciales"
+      },
+      {
+        "en": "Strategic corridor for development",
+        "es": "Corredor estratégico para desarrollo"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Comalapa Highway near Olocuilta",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3085,
+    "tokens_out": 428,
+    "cost_usd": 0.00130375,
+    "finish_reason": "stop",
+    "latency_ms": 4161
+  },
+  "csbr|venta-de-17-manzanas-en-desvio-de-amayo-tejutla-chalatenango": {
+    "ts": "2026-07-10T07:00:34.415018+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "17 Manzanas Land for Sale, Tejutla, Chalatenango",
+      "es": "17 Manzanas de Terreno en Venta, Tejutla, Chalatenango"
+    },
+    "short_description_canonical": {
+      "en": "17 manzanas (119,000 m²) land lot in Desvío de Amayo, Tejutla, Chalatenango. Listed with the Salvadoran Chamber of Real Estate. Priced at $1,000,000.",
+      "es": "Lote de terreno de 17 manzanas (119,000 m²) en Desvío de Amayo, Tejutla, Chalatenango. Publicado en la Cámara Salvadoreña de Bienes Raíces. Precio de $1,000,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "119,000 m² lot in Tejutla",
+        "es": "Lote de 119,000 m² en Tejutla"
+      },
+      {
+        "en": "Listed with CSBR",
+        "es": "Publicado en la CSBR"
+      },
+      {
+        "en": "Priced at $1,000,000",
+        "es": "Precio de $1,000,000"
+      }
+    ],
+    "lat": 14.0333,
+    "lng": -89.1667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Tejutla, Chalatenango",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3085,
+    "tokens_out": 432,
+    "cost_usd": 0.00130815,
+    "finish_reason": "stop",
+    "latency_ms": 4171
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287061": {
+    "ts": "2026-07-10T07:00:37.380257+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the Comasagua road, Santa Tecla, La Libertad. Located in a developing area with road access. Price: $419,448.",
+      "es": "Terreno en el Km 12.5 de la carretera a Comasagua, Santa Tecla, La Libertad. Ubicado en una zona en desarrollo con acceso vial. Precio: $419,448."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 Comasagua road location",
+        "es": "Ubicación en Km 12.5 carretera a Comasagua"
+      },
+      {
+        "en": "Near Santa Tecla amenities",
+        "es": "Cerca de servicios de Santa Tecla"
+      },
+      {
+        "en": "Road access available",
+        "es": "Acceso vial disponible"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 397,
+    "cost_usd": 0.00127316,
+    "finish_reason": "stop",
+    "latency_ms": 3884
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287053": {
+    "ts": "2026-07-10T07:00:37.978646+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale, Km 12.5 Comasagua Road, Santa Tecla",
+      "es": "Terreno en Venta, Km 12.5 Carretera a Comasagua, Santa Tecla"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 0 m² on Km 12.5 Comasagua Road, Santa Tecla, La Libertad. Listed for sale at USD 413,510. No further details provided.",
+      "es": "Terreno de 0 m² en Km 12.5 Carretera a Comasagua, Santa Tecla, La Libertad. En venta por USD 413,510. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 Comasagua Road location",
+        "es": "Ubicación en Km 12.5 Carretera a Comasagua"
+      },
+      {
+        "en": "Listed at USD 413,510",
+        "es": "Precio de venta USD 413,510"
+      },
+      {
+        "en": "Santa Tecla, La Libertad",
+        "es": "Santa Tecla, La Libertad"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 425,
+    "cost_usd": 0.00130396,
+    "finish_reason": "stop",
+    "latency_ms": 3563
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287056": {
+    "ts": "2026-07-10T07:00:38.097842+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel located at Km 12.5 on the Comasagua highway, Santa Tecla, La Libertad. The property is offered for sale at USD 596,450. No further details on size or improvements are provided.",
+      "es": "Parcela de terreno ubicada en el Km 12.5 de la carretera a Comasagua, Santa Tecla, La Libertad. La propiedad se ofrece en venta por USD 596,450. No se proporcionan más detalles sobre tamaño o mejoras."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located on Comasagua highway",
+        "es": "Ubicado en carretera a Comasagua"
+      },
+      {
+        "en": "Near Santa Tecla city",
+        "es": "Cerca de la ciudad de Santa Tecla"
+      },
+      {
+        "en": "Price: USD 596,450",
+        "es": "Precio: USD 596,450"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 415,
+    "cost_usd": 0.00129296,
+    "finish_reason": "stop",
+    "latency_ms": 3770
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287058": {
+    "ts": "2026-07-10T07:00:38.234851+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 12,500 m² located at Km 12.5 on the Comasagua Road, Santa Tecla, La Libertad. The property is offered for sale at USD 305,262. No further details on terrain, utilities, or zoning are provided.",
+      "es": "Terreno de 12,500 m² ubicado en el Km 12.5 de la Carretera a Comasagua, Santa Tecla, La Libertad. Se ofrece en venta por USD 305,262. No se proporcionan más detalles sobre el terreno, servicios públicos o zonificación."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "12,500 m² lot near Santa Tecla",
+        "es": "Lote de 12,500 m² cerca de Santa Tecla"
+      },
+      {
+        "en": "Located on Comasagua Road, Km 12.5",
+        "es": "Ubicado en Carretera a Comasagua, Km 12.5"
+      },
+      {
+        "en": "Price: USD 305,262",
+        "es": "Precio: USD 305,262"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 453,
+    "cost_usd": 0.00133476,
+    "finish_reason": "stop",
+    "latency_ms": 4002
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287055": {
+    "ts": "2026-07-10T07:00:38.371008+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 12,500 m² located at Km 12.5 on the Comasagua road, Santa Tecla, La Libertad. Price: USD 319,752. Suitable for development or investment.",
+      "es": "Terreno de 12,500 m² ubicado en el Km 12.5 de la carretera a Comasagua, Santa Tecla, La Libertad. Precio: USD 319,752. Apto para desarrollo o inversión."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "12,500 m² lot near Santa Tecla",
+        "es": "Lote de 12,500 m² cerca de Santa Tecla"
+      },
+      {
+        "en": "Located on Comasagua road, Km 12.5",
+        "es": "Ubicado en carretera a Comasagua, Km 12.5"
+      },
+      {
+        "en": "Priced at USD 319,752",
+        "es": "Precio de USD 319,752"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 436,
+    "cost_usd": 0.00131606,
+    "finish_reason": "stop",
+    "latency_ms": 4028
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287054": {
+    "ts": "2026-07-10T07:00:38.544733+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the Comasagua Highway, Santa Tecla, La Libertad. The property is a flat lot suitable for development. Located in a growing area with access to main road.",
+      "es": "Terreno en el Km 12.5 de la Carretera a Comasagua, Santa Tecla, La Libertad. La propiedad es un lote plano apto para desarrollo. Ubicado en una zona en crecimiento con acceso a vía principal."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 Comasagua Highway location",
+        "es": "Ubicación en Km 12.5 Carretera a Comasagua"
+      },
+      {
+        "en": "Flat lot, ready for development",
+        "es": "Lote plano, listo para desarrollar"
+      },
+      {
+        "en": "Close to Santa Tecla city",
+        "es": "Cerca de la ciudad de Santa Tecla"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 416,
+    "cost_usd": 0.00129406,
+    "finish_reason": "stop",
+    "latency_ms": 4139
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287052": {
+    "ts": "2026-07-10T07:00:38.992566+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the Comasagua Highway, Santa Tecla, La Libertad. No built area or structures on site. Located in a developing area with highway access.",
+      "es": "Terreno en el Km 12.5 de la Carretera a Comasagua, Santa Tecla, La Libertad. Sin área construida ni estructuras en el sitio. Ubicado en una zona en desarrollo con acceso por carretera."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 Comasagua Highway location",
+        "es": "Ubicación en Km 12.5 Carretera a Comasagua"
+      },
+      {
+        "en": "Near Santa Tecla urban area",
+        "es": "Cerca del área urbana de Santa Tecla"
+      },
+      {
+        "en": "Highway frontage for access",
+        "es": "Frente a carretera para acceso"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 412,
+    "cost_usd": 0.00128966,
+    "finish_reason": "stop",
+    "latency_ms": 4199
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287051": {
+    "ts": "2026-07-10T07:00:39.502596+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the Comasagua Highway, Santa Tecla, La Libertad. Located in a developing area with highway access. Priced at $465,765.",
+      "es": "Terreno en el Km 12.5 de la Carretera a Comasagua, Santa Tecla, La Libertad. Ubicado en una zona en desarrollo con acceso a carretera. Precio: $465,765."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Highway frontage at Km 12.5",
+        "es": "Frente a carretera en Km 12.5"
+      },
+      {
+        "en": "Near Santa Tecla city center",
+        "es": "Cerca del centro de Santa Tecla"
+      },
+      {
+        "en": "Developing area with growth potential",
+        "es": "Zona en desarrollo con potencial de crecimiento"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 400,
+    "cost_usd": 0.00127646,
+    "finish_reason": "stop",
+    "latency_ms": 3907
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287050": {
+    "ts": "2026-07-10T07:00:40.957570+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the Comasagua road, Santa Tecla, La Libertad. No built area or structures. Located in a developing area with road access.",
+      "es": "Parcela de terreno en el Km 12.5 de la carretera a Comasagua, Santa Tecla, La Libertad. Sin área construida ni estructuras. Ubicado en una zona en desarrollo con acceso vial."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 Comasagua road location",
+        "es": "Ubicación en Km 12.5 carretera a Comasagua"
+      },
+      {
+        "en": "Near Santa Tecla city center",
+        "es": "Cerca del centro de Santa Tecla"
+      },
+      {
+        "en": "Land with road access",
+        "es": "Terreno con acceso vial"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 400,
+    "cost_usd": 0.00127646,
+    "finish_reason": "stop",
+    "latency_ms": 3576
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287049": {
+    "ts": "2026-07-10T07:00:41.440357+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the Comasagua Highway, Santa Tecla, La Libertad. No building details provided. Priced at $440,422.",
+      "es": "Parcela de terreno en el Km 12.5 de la Carretera a Comasagua, Santa Tecla, La Libertad. Sin detalles de construcción. Precio: $440,422."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 Comasagua Highway location",
+        "es": "Ubicación en Km 12.5 Carretera a Comasagua"
+      },
+      {
+        "en": "Near Santa Tecla city",
+        "es": "Cerca de la ciudad de Santa Tecla"
+      },
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Listado por RE/MAX Central"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 396,
+    "cost_usd": 0.00127206,
+    "finish_reason": "stop",
+    "latency_ms": 3461
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287046": {
+    "ts": "2026-07-10T07:00:41.848022+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the road to Comasagua, Santa Tecla, La Libertad. Located in a developing area with road access. Priced at USD 525,519.",
+      "es": "Terreno en el Km 12.5 de la carretera a Comasagua, Santa Tecla, La Libertad. Ubicado en una zona en desarrollo con acceso vial. Precio: USD 525,519."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 on Comasagua road",
+        "es": "Km 12.5 carretera a Comasagua"
+      },
+      {
+        "en": "Near Santa Tecla city",
+        "es": "Cerca de Santa Tecla"
+      },
+      {
+        "en": "Priced at USD 525,519",
+        "es": "Precio USD 525,519"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 402,
+    "cost_usd": 0.00127866,
+    "finish_reason": "stop",
+    "latency_ms": 3612
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287047": {
+    "ts": "2026-07-10T07:00:42.091188+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the Comasagua Highway, Santa Tecla, La Libertad. The property is located in a developing area with road access. Price: USD 391,026.",
+      "es": "Parcela de terreno en el Km 12.5 de la Carretera a Comasagua, Santa Tecla, La Libertad. La propiedad está ubicada en una zona en desarrollo con acceso vial. Precio: USD 391,026."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 Comasagua Highway location",
+        "es": "Ubicación en Km 12.5 Carretera a Comasagua"
+      },
+      {
+        "en": "Near Santa Tecla city center",
+        "es": "Cerca del centro de Santa Tecla"
+      },
+      {
+        "en": "Road access available",
+        "es": "Acceso vial disponible"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 406,
+    "cost_usd": 0.00128306,
+    "finish_reason": "stop",
+    "latency_ms": 3993
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287042": {
+    "ts": "2026-07-10T07:00:42.155376+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the Comasagua Highway, Santa Tecla, La Libertad. Located in a developing area with road access. Ideal for investment or development.",
+      "es": "Terreno en el Km 12.5 de la Carretera a Comasagua, Santa Tecla, La Libertad. Ubicado en una zona en desarrollo con acceso vial. Ideal para inversión o desarrollo."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 Comasagua Highway location",
+        "es": "Ubicación en Km 12.5 Carretera a Comasagua"
+      },
+      {
+        "en": "Near Santa Tecla urban area",
+        "es": "Cerca del área urbana de Santa Tecla"
+      },
+      {
+        "en": "Road access available",
+        "es": "Acceso vial disponible"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 398,
+    "cost_usd": 0.00127426,
+    "finish_reason": "stop",
+    "latency_ms": 3610
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287044": {
+    "ts": "2026-07-10T07:00:42.156604+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the Comasagua road, Santa Tecla, La Libertad. No details on size or improvements provided. Priced at $433,812.",
+      "es": "Parcela de terreno en Km 12.5 carretera a Comasagua, Santa Tecla, La Libertad. Sin detalles de tamaño o mejoras. Precio: $433,812."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located on main road to Comasagua",
+        "es": "Ubicado en carretera principal a Comasagua"
+      },
+      {
+        "en": "Near Santa Tecla, La Libertad",
+        "es": "Cerca de Santa Tecla, La Libertad"
+      },
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Listado por RE/MAX Central"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 397,
+    "cost_usd": 0.00127316,
+    "finish_reason": "stop",
+    "latency_ms": 3785
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287041": {
+    "ts": "2026-07-10T07:00:42.528843+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 Carretera a Comasagua, Santa Tecla, La Libertad. Located on a main road with development potential. Price: $448,100.",
+      "es": "Terreno en Km 12.5 Carretera a Comasagua, Santa Tecla, La Libertad. Ubicado sobre carretera principal con potencial de desarrollo. Precio: $448,100."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 Carretera a Comasagua location",
+        "es": "Ubicación en Km 12.5 Carretera a Comasagua"
+      },
+      {
+        "en": "Main road access",
+        "es": "Acceso por carretera principal"
+      },
+      {
+        "en": "Near Santa Tecla amenities",
+        "es": "Cerca de servicios de Santa Tecla"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 400,
+    "cost_usd": 0.00127646,
+    "finish_reason": "stop",
+    "latency_ms": 3535
+  },
+  "remax|002522430091": {
+    "ts": "2026-07-10T07:00:43.988596+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "8,583 m² Development Land in Juayúa",
+      "es": "Terreno de 8,583 m² en Juayúa para Desarrollo"
+    },
+    "short_description_canonical": {
+      "en": "8,582.76 m² irregular lot in San José La Majada, Juayúa, Sonsonate. Cobblestone road access and potable water available. Ideal for residential, hotel, or eco-lodge projects in a growing tourism area.",
+      "es": "Lote irregular de 8,582.76 m² en San José La Majada, Juayúa, Sonsonate. Acceso por calle adoquinada y agua potable disponible. Ideal para proyectos residenciales, hoteleros o ecolodges en zona turística en crecimiento."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "8,582.76 m² lot in Juayúa",
+        "es": "Lote de 8,582.76 m² en Juayúa"
+      },
+      {
+        "en": "Cobblestone road access year-round",
+        "es": "Acceso por calle adoquinada todo el año"
+      },
+      {
+        "en": "Potable water service available",
+        "es": "Servicio de agua potable disponible"
+      },
+      {
+        "en": "Flexible for residential or tourism development",
+        "es": "Flexible para desarrollo residencial o turístico"
+      }
+    ],
+    "lat": 13.8433,
+    "lng": -89.7494,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Juayúa, Sonsonate, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3337,
+    "tokens_out": 469,
+    "cost_usd": 0.00141689,
+    "finish_reason": "stop",
+    "latency_ms": 4485
   }
 }
