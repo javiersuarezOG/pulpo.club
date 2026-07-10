@@ -98,9 +98,16 @@ jobs:
       # that already shipped a change. See the scripts for the policy.
       - name: home versions.json bump guard
         run: |
-          BASE_SHA="${{ github.event.pull_request.base.sha || github.event.before }}"
-          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
-            BASE_SHA="$(git rev-parse HEAD^)"
+          # PR events carry the real base. Push events on a branch that has
+          # merged main must diff against the merge-base with main — NOT
+          # `github.event.before`, which sees main's already-bumped home
+          # changes as new and false-fails on the merge commit (same class
+          # the newsletter TEMPLATE_VERSION guard below documents; this is
+          # a whole-branch contract, not per-commit).
+          BASE_SHA="${{ github.event.pull_request.base.sha || '' }}"
+          if [ -z "$BASE_SHA" ]; then
+            git fetch --no-tags --depth=200 origin main >/dev/null 2>&1 || true
+            BASE_SHA="$(git merge-base origin/main HEAD 2>/dev/null || git rev-parse HEAD^)"
           fi
           if ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
             echo "::warning::Base SHA $BASE_SHA is not available in checkout; falling back to HEAD^"
