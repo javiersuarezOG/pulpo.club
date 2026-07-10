@@ -59,7 +59,7 @@ PLAN: list[dict] = [
         "color_key": "inspiracion",
         "scheduled_for": "2026-07-11T01:00:00+00:00",
         "slides": [
-            {"t": "statement", "eyebrow": "El Salvador",
+            {"t": "statement", "eyebrow": "El Salvador",  # multi-country-exempt: hand-written SV marketing copy (Sebas-approved campaign)
              "l1": "La costa", "l2": "no crece.", "punch": "Pero la fila sí."},
             {"t": "stat", "big": "139",
              "label": "de 1,916 propiedades a la venta\nestán de verdad frente al mar",
