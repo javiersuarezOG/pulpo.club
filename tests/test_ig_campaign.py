@@ -7,10 +7,13 @@ import json
 
 import pytest
 
+from pathlib import Path
+
 from automation import ig_campaign
 from automation.ig_campaign_poster import (
     CATEGORY_COLORS,
     INSPIRACION,
+    _DISPATCH,
     build_slide_html,
 )
 
@@ -53,6 +56,60 @@ def test_build_slide_html_escapes_and_rejects_unknown():
     assert "<script>" not in html and "&lt;script&gt;" in html
     with pytest.raises(ValueError):
         build_slide_html({"t": "nope"}, INSPIRACION)
+
+
+# ── ig_campaign: the full 14-day plan is complete & coherent ───────────
+
+def test_plan_covers_14_contiguous_days():
+    days = [p["day"] for p in ig_campaign.PLAN]
+    assert days == list(range(201, 215)), days
+    # one post per calendar day, strictly increasing schedule
+    scheds = [p["scheduled_for"] for p in ig_campaign.PLAN]
+    assert scheds == sorted(scheds)
+    assert len(set(scheds)) == len(scheds)
+    assert scheds[0].startswith("2026-07-11") and scheds[-1].startswith("2026-07-24")
+
+
+def test_every_day_is_bilingual_and_on_palette():
+    for p in ig_campaign.PLAN:
+        assert p["color_key"] in CATEGORY_COLORS, p["color_key"]
+        for k in ("capES", "capEN", "comES", "comEN", "tags"):
+            assert p.get(k), f"day {p['day']} missing {k}"
+        # bilingual: ES and EN copy are distinct text
+        assert p["capES"] != p["capEN"]
+
+
+def test_every_slide_type_is_renderable():
+    for p in ig_campaign.PLAN:
+        assert 1 <= len(p["slides"]) <= 3
+        for spec in p["slides"]:
+            assert spec["t"] in _DISPATCH, spec["t"]
+            color = CATEGORY_COLORS[p["color_key"]]
+            html = build_slide_html(spec, color)  # must not raise
+            assert html.startswith("<!DOCTYPE html>")
+
+
+def test_photo_slides_reference_committed_source_frames():
+    # Every Top-10 photo slide points at a hand-inspected source frame
+    # that must be committed alongside the plan (else render 404s).
+    seen_photo = False
+    for p in ig_campaign.PLAN:
+        for spec in p["slides"]:
+            if spec["t"] == "photo":
+                seen_photo = True
+                assert Path(spec["img"]).exists(), spec["img"]
+                assert spec.get("ribbon")
+    assert seen_photo, "expected at least one photo (Top-10) slide"
+
+
+def test_top10_day_item_shape(no_browser):
+    # Day 202 (Casas de Playa) is a 3-photo Top-10 carousel.
+    item = ig_campaign.render_post(ig_campaign.PLAN_BY_DAY[202])
+    assert item["poster_type"] == "campaign"
+    assert item["poster_path"].endswith("slide1.png")
+    assert len(item["carousel_photo_paths"]) == 2
+    assert ig_campaign.DIV in item["caption"]
+    assert item["approved"] is True and item["posted"] is False
 
 
 # ── ig_campaign: item build + queue patch ──────────────────────────────
