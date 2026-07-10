@@ -800,7 +800,7 @@ function PriceHistogram({ filters, setFilters }) {
           aria-valuemin={0}
           aria-valuemax={HISTO_VISUAL_MAX}
           aria-valuenow={visualMaxPrice}
-          aria-valuetext={liveMax != null ? formatPrice(liveMax) : (filters.price_max != null ? formatPrice(filters.price_max) : (lc === "es" ? "sin tope" : "no max"))}
+          aria-valuetext={liveMax != null ? formatPrice(liveMax) : (filters.price_max != null ? formatPrice(filters.price_max) : t("filter.price.no_cap", lc))}
           onPointerDown={(e) => startThumbDrag("max", e)}
           onPointerMove={onThumbMove}
           onPointerUp={onThumbUp}
@@ -810,7 +810,7 @@ function PriceHistogram({ filters, setFilters }) {
           {dragging === "max" && (
             <span className="histo-thumb-label" aria-hidden="true">
               {liveMax != null && liveMax >= HISTO_VISUAL_MAX
-                ? (lc === "es" ? "sin tope" : "no max")
+                ? t("filter.price.no_cap", lc)
                 : formatPrice(visualMaxPrice)}
             </span>
           )}
@@ -819,7 +819,7 @@ function PriceHistogram({ filters, setFilters }) {
       {hasRange && (
         <div className="histo-meta" aria-live="polite">
           <span className="histo-current-range">
-            {formatPrice(filters.price_min)}–{filters.price_max != null ? formatPrice(filters.price_max) : (lc === "es" ? "sin tope" : "no max")}
+            {formatPrice(filters.price_min)}–{filters.price_max != null ? formatPrice(filters.price_max) : t("filter.price.no_cap", lc)}
           </span>
           <button type="button" className="link-btn histo-reset" onClick={onReset}>
             {lc === "es" ? "Restablecer" : "Reset"}
@@ -836,7 +836,7 @@ function PriceHistogram({ filters, setFilters }) {
           <input
             type="number"
             value={filters.price_max ?? ""}
-            placeholder={filters.price_max == null ? (lc === "es" ? "sin tope" : "any") : ""}
+            placeholder={filters.price_max == null ? t("filter.price.max_placeholder", lc) : ""}
             onChange={(e) => {
               const v = e.target.value;
               setFilters({ price_max: v === "" ? null : +v });
@@ -1627,8 +1627,8 @@ function BrowsePage({ app }) {
     ? new URLSearchParams(window.location.search).get("cat")
     : null;
   const browseBreadcrumb = [
-    { name: lcBc === "es" ? "Inicio" : "Home", url: "/" },
-    { name: lcBc === "es" ? "Explorar" : "Browse", url: "/browse" },
+    { name: t("breadcrumb.home", lcBc), url: "/" },
+    { name: t("breadcrumb.browse", lcBc), url: "/browse" },
   ];
   if (browseCat) {
     // Title-case the cat slug for a readable breadcrumb leaf. Cheap and
@@ -1762,7 +1762,7 @@ function BrowsePage({ app }) {
               {[...filters.features].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.features); s.delete(f); setFiltersWithPinClear({...filters, features: s});}}>{t(`filter.feature.${f}`, app.locale)} <Icon name="close" size={12}/></span>)}
               {[...filters.infra].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.infra); s.delete(f); setFiltersWithPinClear({...filters, infra: s});}}>{t(`filter.infra.${f}`, app.locale)} <Icon name="close" size={12}/></span>)}
               {[...filters.status].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.status); s.delete(f); setFiltersWithPinClear({...filters, status: s});}}>{statusChipLabel(f, app.locale)} <Icon name="close" size={12}/></span>)}
-              {(filters.price_min > 0 || filters.price_max != null) && <span className="active-chip" onClick={() => setFiltersWithPinClear({...filters, price_min: 0, price_max: null})}>{formatPrice(filters.price_min)}–{filters.price_max != null ? formatPrice(filters.price_max) : (app.locale === "es" ? "sin tope" : "no max")} <Icon name="close" size={12}/></span>}
+              {(filters.price_min > 0 || filters.price_max != null) && <span className="active-chip" onClick={() => setFiltersWithPinClear({...filters, price_min: 0, price_max: null})}>{formatPrice(filters.price_min)}–{filters.price_max != null ? formatPrice(filters.price_max) : t("filter.price.no_cap", app.locale)} <Icon name="close" size={12}/></span>}
             </div>
           )}
 
@@ -2602,10 +2602,10 @@ function ListingDetail({ listing, app, asPanel = true }) {
 
   const lcBc = app.locale === "es" ? "es" : "en";
   const breadcrumbItems = [
-    { name: lcBc === "es" ? "Inicio" : "Home", url: "/" },
-    { name: lcBc === "es" ? "Explorar" : "Browse", url: "/browse" },
+    { name: t("breadcrumb.home", lcBc), url: "/" },
+    { name: t("breadcrumb.browse", lcBc), url: "/browse" },
     {
-      name: (listing.title?.[lcBc] ?? listing.title?.en ?? (lcBc === "es" ? "Anuncio" : "Listing")),
+      name: (listing.title?.[lcBc] ?? listing.title?.en ?? t("breadcrumb.listing", lcBc)),
       url: `/listing/${encodeURIComponent(listing.id)}`,
     },
   ];

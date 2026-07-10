@@ -1,0 +1,26 @@
+{
+  "width": 8064,
+  "height": 4536,
+  "aspect_ratio": 1.778,
+  "file_size_kb": 6505.5,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-07-08T06:24:58.279306+00:00",
+  "source_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002283140051/v3/HDPhotos/dji_fly_20260625_104752_0022_1782416384752_photo~3.jpg",
+  "original_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002283140051/v3/HDPhotos/dji_fly_20260625_104752_0022_1782416384752_photo~3.jpg",
+  "transform_used": "none",
+  "fetched_at": "2026-07-08T06:25:04.434536+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": 7056,
+  "resdet_detected_height": 3969,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 7.2,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.259 color_entropy=0.512"
+  }
+}
