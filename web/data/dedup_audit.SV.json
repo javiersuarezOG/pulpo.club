@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-09T07:06:28.288903+00:00",
+  "computed_at": "2026-07-10T07:00:29.055228+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -577,6 +577,34 @@
     {
       "count": 2,
       "cross_source": false,
+      "fingerprint": "3a2fdf644646a6f80a0eb9fa2d617250b3907cf6",
+      "samples": [
+        {
+          "area_m2": null,
+          "price_usd": 411236.0,
+          "source": "realestate_au_sv",
+          "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287054",
+          "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287054/",
+          "zone": "santa-tecla"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 411236.0,
+          "source": "realestate_au_sv",
+          "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109225053",
+          "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109225053/",
+          "zone": "santa-tecla"
+        }
+      ],
+      "sources": [
+        "realestate_au_sv"
+      ]
+    },
+    {
+      "count": 2,
+      "cross_source": false,
       "fingerprint": "47358c262122fda1b60afe7d00265a889dd0c1a3",
       "samples": [
         {
@@ -1134,10 +1162,16 @@
       "unique_in_source": 157
     },
     "csbr": {
-      "kept_as_unique": 256,
-      "raw": 258,
+      "kept_as_unique": 257,
+      "raw": 259,
       "shared_with_others": 0,
-      "unique_in_source": 256
+      "unique_in_source": 257
+    },
+    "elagente": {
+      "kept_as_unique": 2,
+      "raw": 2,
+      "shared_with_others": 0,
+      "unique_in_source": 2
     },
     "encuentra24": {
       "kept_as_unique": 21,
@@ -1164,22 +1198,28 @@
       "unique_in_source": 8
     },
     "oceanside": {
-      "kept_as_unique": 23,
-      "raw": 23,
+      "kept_as_unique": 24,
+      "raw": 24,
       "shared_with_others": 0,
-      "unique_in_source": 23
+      "unique_in_source": 24
     },
     "realestate_au_sv": {
-      "kept_as_unique": 267,
-      "raw": 298,
+      "kept_as_unique": 284,
+      "raw": 316,
       "shared_with_others": 0,
-      "unique_in_source": 267
+      "unique_in_source": 284
+    },
+    "realtyelsalvador": {
+      "kept_as_unique": 123,
+      "raw": 123,
+      "shared_with_others": 0,
+      "unique_in_source": 123
     },
     "remax": {
-      "kept_as_unique": 316,
-      "raw": 331,
+      "kept_as_unique": 315,
+      "raw": 330,
       "shared_with_others": 0,
-      "unique_in_source": 316
+      "unique_in_source": 315
     },
     "santizo": {
       "kept_as_unique": 91,
@@ -1200,6 +1240,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2002,
-  "total_unique_fingerprints": 1949
+  "total_in_dataset": 2146,
+  "total_unique_fingerprints": 2092
 }
