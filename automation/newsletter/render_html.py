@@ -1289,7 +1289,11 @@ def _footer_html(issue: Issue, *, free: bool = False) -> str:
         summary = _i18n.filter_summary(issue.recipient.preference, locale)
         you_line = i18n.t("footer.you_get_this", locale, filter_summary=summary)
     change_filters_label = i18n.t("footer.change_filters", locale)
-    change_cadence_label = i18n.t("footer.change_cadence", locale)
+    # "Change cadence" removed (QA bug 6/7): cadence is NOT an adjustable
+    # setting for free subscribers, and the pill pointed at the same dead
+    # /account target as Change filters. Per CLAUDE.md "never ship a UI
+    # control that lies about persistence," the control is gone until a real
+    # wired cadence surface exists. See docs / the contract test below.
     unsubscribe_label = i18n.t("footer.unsubscribe", locale)
     no_commission = i18n.t("footer.no_commission", locale)
     copyright_line = i18n.t("footer.copyright", locale, year=issue.issue_id[:4])
@@ -1333,7 +1337,7 @@ def _footer_html(issue: Issue, *, free: bool = False) -> str:
       <div style="margin:18px 0 14px;height:1px;background:rgba(0,0,0,0.08);"></div>
       <p style="margin:0 0 10px;font-size:12px;color:#888780;letter-spacing:0.04em;">{_e(you_line)}</p>
       <div>
-        {_pill(issue.settings_url, change_filters_label)}{_pill(issue.settings_url, change_cadence_label)}{_pill(unsubscribe_href, unsubscribe_label)}
+        {_pill(issue.settings_url, change_filters_label)}{_pill(unsubscribe_href, unsubscribe_label)}
       </div>
       <p style="margin:14px 0 0;font-size:11px;color:#888780;letter-spacing:0.04em;">{_e(copyright_line)} · pulpo.club</p>
       <p style="margin:4px 0 0;font-size:11px;color:#888780;letter-spacing:0.04em;">Pulpo · San Salvador, El Salvador</p>
