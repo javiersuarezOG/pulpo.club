@@ -238,9 +238,11 @@
       "primary_listing_id": null,
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-07-11T03:37:02.262140+00:00",
+      "posted_media_id": "18097521827365473",
+      "comment_posted": true,
+      "comment_id": "18069571679389535"
     },
     {
       "day": 106,
