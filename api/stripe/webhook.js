@@ -48,6 +48,7 @@ const { sendActivationEmail } = require("../_activation_email");
 const { GRACE_MS } = require("../_plan");
 const { auditEnvOverridesOnce } = require("../_env_audit");
 const { enrollPaidUserInAudience } = require("../_resend_audience");
+const capi = require("../_capi");
 
 const ACTIVE_STATUSES = new Set(["active", "trialing"]);
 // Statuses that mean "subscription is finished, not paused": fully
@@ -755,6 +756,40 @@ module.exports = async (req, res) => {
             // funnel-attribution sugar, not a payment correctness gate.
             logApi("stripe.webhook", {
               status: 200, type: event.type, alias_failed: true,
+              error: err && err.message,
+            });
+          }
+        }
+
+        // Server-side ad-network conversions (Meta CAPI + Google Enhanced
+        // Conversions) for this purchase — best-effort, env-gated (dark until
+        // creds set), AWAITED so the POST completes before Vercel freezes the
+        // function, bounded by a per-network timeout. Reuses event.id as the
+        // de-dup event_id for a future browser pixel. (2026-06-30 audit P0-2.)
+        if (capi.isAnyConfigured()) {
+          try {
+            const conv = await capi.sendPurchaseConversions({
+              email,
+              valueCents: amountTotal,
+              currency,
+              eventId: event.id,
+              eventSourceUrl: `${(process.env.PULPO_SITE_ROOT || "https://pulpo.club").replace(/\/+$/, "")}/start`,
+              conversionDateTime: new Date(event.created ? event.created * 1000 : Date.now())
+                .toISOString().replace("T", " ").replace(/\.\d+Z$/, "+00:00"),
+              gclid: (session.metadata && session.metadata.gclid) || null,
+              fbc: (session.metadata && session.metadata.fbc) || null,
+              fbp: (session.metadata && session.metadata.fbp) || null,
+            });
+            posthog.capture(distinctId, "conversion.capi_sent", {
+              ...baseProps,
+              meta_status: capi.resultStatus(conv.meta),
+              google_status: capi.resultStatus(conv.google),
+              value_cents: amountTotal,
+            });
+          } catch (err) {
+            // A conversion failure must NEVER affect plan provisioning.
+            logApi("stripe.webhook", {
+              status: 200, type: event.type, capi_failed: true,
               error: err && err.message,
             });
           }
