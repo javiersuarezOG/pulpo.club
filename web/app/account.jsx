@@ -163,7 +163,29 @@ function AccountPage({ app }) {
         new URLSearchParams(window.location.search).has("__clerk_ticket")) {
       return <div className="page page-account account-welcome-preview" aria-busy="true" />;
     }
-    return null;
+    // QA bug 6: an anonymous visitor who lands on /account (e.g. from the
+    // newsletter "Change filters" link) and dismisses the sign-in modal used
+    // to hit `return null` — a blank white screen, the reported dead-end.
+    // Render a real guest panel instead: re-open sign-in, or head home. Reuses
+    // the free-member layout classes so it stays responsive with no new CSS.
+    return (
+      <div className="page page-account">
+        <div className="account-layout-free">
+          <main className="account-content account-free">
+            <h1 className="account-free-title">{t("account.guest.title", app.locale)}</h1>
+            <section className="account-free-card">
+              <p className="account-free-value">{t("account.guest.body", app.locale)}</p>
+              <button type="button" className="btn-pro lg block" onClick={() => app.openSignup({ mode: "login" })}>
+                {t("access.signin.link", app.locale)}
+              </button>
+            </section>
+            <button type="button" className="btn-ghost account-free-signout" onClick={() => app.go("home")}>
+              {t("account.guest.home", app.locale)}
+            </button>
+          </main>
+        </div>
+      </div>
+    );
   }
 
   // Email-first: a Free member (email-only, no Clerk account) gets a

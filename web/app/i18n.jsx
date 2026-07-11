@@ -132,12 +132,25 @@ function useUnits() {
 //   - string                                   → returned as-is (legacy / non-translatable)
 //   - { en: "...", es: "..." }                 → picks current locale, falls back to EN
 //   - array of either                          → maps over and returns array
+//
+// Fallback uses truthiness (||), not nullishness (??), so an EMPTY slot
+// falls through instead of rendering "". This matters for the honest-slot
+// fix in the listings adapter: a Spanish-only listing is stored as
+// { en: "", es: "…" } so its language is not mislabeled as English; an
+// English-locale user must then fall back to the (non-empty) es string
+// rather than seeing a blank title. Order: requested locale → default
+// locale → first non-empty side → "".
 function tr(value, locale) {
   if (value == null) return value;
   if (Array.isArray(value)) return value.map(v => tr(v, locale));
   if (typeof value === "string") return value;
   if (typeof value === "object") {
-    return value[locale] ?? value[DEFAULT_LOCALE] ?? Object.values(value)[0];
+    return (
+      value[locale] ||
+      value[DEFAULT_LOCALE] ||
+      Object.values(value).find(v => typeof v === "string" && v) ||
+      ""
+    );
   }
   return value;
 }
@@ -610,6 +623,20 @@ export const UI_STRINGS = {
   // the FilterPanel — these are the three axes a buyer thinks in.
   "filter.primary.where":        { en: "Where",           es: "Dónde" },
   "filter.primary.type":         { en: "Type",            es: "Tipo" },
+  // Price-range "no upper bound" label — replaces an inline
+  // `locale === "es" ? "sin tope" : "no max"` ternary at the active-chip
+  // and slider-aria sites so the string routes through t() like everything
+  // else. ES canary asserts "sin tope" never leaks into the EN UI.
+  "filter.price.no_cap":         { en: "no max",          es: "sin tope" },
+  // Max-price input placeholder (empty field). EN reads "any" here (not
+  // "no max"); ES shares "sin tope".
+  "filter.price.max_placeholder": { en: "any",            es: "sin tope" },
+  // JSON-LD breadcrumb labels (Browse + Detail). Own keys rather than
+  // reusing nav.* so the SEO breadcrumb text ("Browse"/"Explorar") stays
+  // independent of the nav tab label ("Discover"/"Descubrir").
+  "breadcrumb.home":             { en: "Home",            es: "Inicio" },
+  "breadcrumb.browse":           { en: "Browse",          es: "Explorar" },
+  "breadcrumb.listing":          { en: "Listing",         es: "Anuncio" },
   "filter.primary.ranking":      { en: "Ranking",         es: "Ranking" },
   "filter.ranking.top10":        { en: "Top 10",          es: "Top 10" },
   "filter.ranking.price_drops":  { en: "Price drops",     es: "Bajó de precio" },
@@ -1294,6 +1321,9 @@ export const UI_STRINGS = {
   "account.free.email_label": { en: "Your email",                    es: "Tu correo" },
   "account.free.email_hint":  { en: "This is where your weekly picks land. To stop them, use the unsubscribe link in any Pulpo email.", es: "Aquí llegan tus selecciones semanales. Para detenerlas, usa el enlace para darte de baja en cualquier correo de Pulpo." },
   "account.free.signout":     { en: "Sign out",                      es: "Cerrar sesión" },
+  "account.guest.title":      { en: "Your account",                 es: "Tu cuenta" },
+  "account.guest.body":       { en: "Sign in to manage your subscription and preferences — or head back to this week's picks.", es: "Inicia sesión para gestionar tu suscripción y preferencias, o vuelve a las selecciones de esta semana." },
+  "account.guest.home":       { en: "Back to home",                 es: "Volver al inicio" },
   "account.profile":         { en: "Profile",                       es: "Perfil" },
   // Renamed `notifications` → `newsletter` 2026-05-29. The legacy key
   // is preserved for back-compat with cached bundles during rollout.
@@ -1750,11 +1780,13 @@ export const UI_STRINGS = {
   "access.free.cta_loading":           { en: "Joining…",                      es: "Uniéndote…" },
   "access.free.note":                  { en: "No account, no card — just your email", es: "Sin cuenta, sin tarjeta — solo tu correo" },
   "access.go_pro.cta":                 { en: "Unlock everything — $9.99/mo",  es: "Desbloquea todo — $9.99/mes" },
+  "access.go_pro.cta_loading":         { en: "Taking you to checkout…",       es: "Llevándote al pago…" },
   "access.go_pro.sub":                 { en: "Every listing + all 10 of our weekly picks. First month's on us.", es: "Todas las propiedades + las 10 selecciones de la semana. El primer mes va por nuestra cuenta." },
   "access.signin.prefix":              { en: "Already one of us?",            es: "¿Ya eres de los nuestros?" },
   "access.signin.link":                { en: "Sign in",                       es: "Inicia sesión" },
   "access.error.invalid":              { en: "Enter a valid email address.",  es: "Ingresa un correo válido." },
   "access.error.generic":              { en: "Something went wrong. Try again.", es: "Algo salió mal. Inténtalo de nuevo." },
+  "access.error.rate_limited":         { en: "Too many attempts just now. Wait a moment and try again.", es: "Demasiados intentos por ahora. Espera un momento e inténtalo de nuevo." },
   "access.modal.top3.title":           { en: "We've picked this week's top 3 for you.", es: "Elegimos el top 3 de esta semana para ti." },
   "access.modal.top3.lead":            { en: "We read every new beach & lake listing in El Salvador and keep the three best. They're yours to open in full — free.", es: "Leemos cada propiedad nueva de playa y lago en El Salvador y nos quedamos con las tres mejores. Son tuyas para abrir completas — gratis." },
   "access.modal.welcome.title":        { en: "Welcome to Pulpo.",             es: "Bienvenido a Pulpo." },
@@ -1969,6 +2001,12 @@ export const UI_STRINGS = {
                                            es: "Requiere revisión" },
   "admin.ig_review.status.posted":     { en: "Posted",
                                           es: "Publicado" },
+  "admin.ig_review.status.superseded": { en: "Superseded",
+                                          es: "Reemplazado" },
+  "admin.ig_review.status.scheduled":  { en: "Approved · queued",
+                                          es: "Aprobado · en cola" },
+  "admin.ig_review.first_comment":     { en: "First comment",
+                                          es: "Primer comentario" },
   "admin.ig_review.stat.total":        { en: "Total",
                                           es: "Total" },
   "admin.ig_review.stat.approved":     { en: "Approved",

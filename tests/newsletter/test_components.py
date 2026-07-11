@@ -243,8 +243,13 @@ def test_pro_general_renders_locked_v4_markers(rendered_pro_general_html):
     # Your Pulpo as 3 stacked cream cards (not the v3 dark panel)
     assert 'class="yp-table"' not in html
     assert "Pick up where you left off" in html
-    # Footer pill buttons (border:1px on each action)
-    assert "Change filters" in html and "Change cadence" in html and "Unsubscribe" in html
+    # Footer pill buttons (border:1px on each action). "Change cadence" was
+    # removed (QA bug 6/7) — cadence isn't an adjustable setting, so the
+    # control must NOT render until a real wired cadence surface exists
+    # (CLAUDE.md "never ship a UI control that lies about persistence"). The
+    # absence assertion below is the regression guard.
+    assert "Change filters" in html and "Unsubscribe" in html
+    assert "Change cadence" not in html and "Cambiar frecuencia" not in html
     # Footer copyright says Pulpo Pro (v4.1)
     assert "Pulpo Pro" in html
 

@@ -1527,7 +1527,13 @@ function App() {
       if (prev && isPaid(prev)) return prev;
       return hydrateUser({ email, provider: "email", plan: "free", email_member: true, joined: Date.now() });
     });
-    setCelebration({ returning: !!returning });
+    // A returning / already-active member re-submitting their email must NOT
+    // replay the full "you're in" reveal — that reads as a brand-new signup
+    // (QA: repeat signup re-fired the octopus celebration). Membership state
+    // is still (re)established above, and the submitting surface shows its own
+    // inline "already a member" acknowledgment; only a genuine first join
+    // gets the celebration.
+    if (!returning) setCelebration({ returning: false });
   }, [user]);
 
   // Unified "they want more access" gate: anonymous → start-free email

@@ -34,7 +34,8 @@ function resendDuplicate() {
     create: vi.fn(async () => ({ data: null, error: { name: "validation_error", message: "Contact already exists" } })),
     update: vi.fn(async () => ({ data: {}, error: null })),
     // Contact exists AND was unsubscribed → genuine re-subscribe path.
-    list: vi.fn(async () => ({ data: { data: [{ id: "c1", email: "back@example.com", unsubscribed: true }] } })),
+    // O(1) get-by-email (no pagination) — replaces the old full-list scan.
+    get: vi.fn(async () => ({ data: { id: "c1", email: "back@example.com", unsubscribed: true }, error: null })),
   } };
 }
 function resendDuplicateActive() {
@@ -42,7 +43,7 @@ function resendDuplicateActive() {
     create: vi.fn(async () => ({ data: null, error: { name: "validation_error", message: "Contact already exists" } })),
     update: vi.fn(async () => ({ data: {}, error: null })),
     // Contact exists and is STILL subscribed → resubmit, not a re-subscribe.
-    list: vi.fn(async () => ({ data: { data: [{ id: "c1", email: "active@example.com", unsubscribed: false }] } })),
+    get: vi.fn(async () => ({ data: { id: "c1", email: "active@example.com", unsubscribed: false }, error: null })),
   } };
 }
 

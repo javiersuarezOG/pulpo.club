@@ -107,18 +107,34 @@ function useIgData() {
 
 // ── small presentational bits ─────────────────────────────────────────
 
+const _DAY_FMT = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" });
+function _fmtDay(iso) {
+  if (!iso) return "—";
+  const d = new Date(String(iso).replace("Z", "+00:00"));
+  return Number.isFinite(d.getTime()) ? _DAY_FMT.format(d) : "—";
+}
+
+// The token lives in GitHub Actions (where the publisher posts), not in
+// Vercel — so we show its REAL expiry (written by the publisher), not a
+// "set/missing" check of Vercel's env, which was a false alarm.
+function TokenPill({ health }) {
+  const d = health.token_expires_days;
+  const iso = health.token_expires_at_iso;
+  if (d == null) return <span className="igc-pill muted">Token: set in CI</span>;
+  if (d <= 0) return <span className="igc-pill bad">Token expired {_fmtDay(iso)} — re-mint</span>;
+  const cls = d <= 14 ? "warn" : "ok";
+  return <span className={`igc-pill ${cls}`}>Token · exp {_fmtDay(iso)} · {d}d</span>;
+}
+
 function HealthBar({ health }) {
   if (!health) return null;
   const paused = health.ig_paused;
-  const tokenOk = health.ig_user_id_set && health.ig_token_set;
   return (
     <div className="igc-health">
       <span className={`igc-pill ${paused ? "warn" : "ok"}`}>
         {paused ? "⏸ Paused" : "● Live"}
       </span>
-      <span className={`igc-pill ${tokenOk ? "ok" : "bad"}`}>
-        {tokenOk ? "Token set" : "Token missing"}
-      </span>
+      <TokenPill health={health} />
       <span className="igc-pill muted">
         Next: {health.next_due ? _fmtDate(health.next_due.scheduled_for) : "nothing approved"}
       </span>
@@ -216,9 +232,16 @@ export function IgConsoleWidget() {
   // Upcoming = approved posts that will auto-publish, not yet posted and
   // not skipped, earliest scheduled first. Posts are auto-approved by the
   // autopilot; the operator's only lever here is Skip.
+  //
+  // `approved === true` is load-bearing, not cosmetic: patch_queue keeps
+  // superseded old-design items in the queue with `approved:false` +
+  // `status:superseded_campaign_v1` (audit trail, not deletion). Without
+  // this gate they render interleaved with the real campaign — the
+  // "old campaign still showing" bug. The publisher itself only posts
+  // approved+due items, so this matches what will actually go live.
   const upcoming = useMemo(() => {
     return items
-      .filter((it) => it && it.posted !== true && it.skipped !== true)
+      .filter((it) => it && it.approved === true && it.posted !== true && it.skipped !== true)
       .sort((a, b) => String(a.scheduled_for || "").localeCompare(String(b.scheduled_for || "")));
   }, [items]);
   const nextUp = upcoming[0] || null;

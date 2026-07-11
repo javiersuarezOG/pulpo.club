@@ -1,0 +1,14 @@
+{
+  "failure_id": "e2d8509a",
+  "source": "jamesedition",
+  "ts": "2026-07-10T06:06:31.893816+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 1.43,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}

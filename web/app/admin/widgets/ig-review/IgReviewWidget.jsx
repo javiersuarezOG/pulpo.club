@@ -139,7 +139,16 @@ function _relativeFromNow(iso) {
   return `${sign === "ago" ? "" : "in "}${days}d${sign === "ago" ? " ago" : ""}`;
 }
 
-// Status label + colour key.
+// An item is superseded when a newer campaign replaced it in the queue
+// (approved flipped false + a superseded_* status).  We treat any
+// status starting with "superseded" as dead-in-queue.
+function _isSuperseded(item) {
+  return typeof item.status === "string" && item.status.startsWith("superseded");
+}
+
+// Status label + colour key.  Local review decisions win over the
+// queue's own persisted flags; then posted; then the queue state
+// (superseded / needs_human / already-approved / pending).
 function _statusBadge(item, decision) {
   if (decision === DECISION_APPROVE)
     return { kind: "approve", label: t("admin.ig_review.status.approved") };
@@ -147,8 +156,14 @@ function _statusBadge(item, decision) {
     return { kind: "skip", label: t("admin.ig_review.status.skipped") };
   if (item.posted === true)
     return { kind: "posted", label: t("admin.ig_review.status.posted") };
+  if (_isSuperseded(item))
+    return { kind: "skip", label: t("admin.ig_review.status.superseded") };
   if (item.status === "needs_human")
     return { kind: "alert", label: t("admin.ig_review.status.needs_human") };
+  // Persisted-approved items (e.g. campaign posts built approved) read
+  // as queued, not pending — the operator hasn't got a pending decision.
+  if (item.approved === true)
+    return { kind: "approve", label: t("admin.ig_review.status.scheduled") };
   return { kind: "pending", label: t("admin.ig_review.status.pending") };
 }
 
@@ -500,6 +515,30 @@ const WIDGET_STYLES = `
 }
 .ig-card .caption strong { font-weight: 800; }
 
+/* First comment (the Top-10 list / hashtags posted as comment #1) —
+   collapsed by default so long comment bodies don't crowd the card. */
+.ig-side .first-comment {
+  font-size: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper-2);
+}
+.ig-side .first-comment > summary {
+  cursor: pointer;
+  padding: 8px 12px;
+  font-weight: 700;
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+}
+.ig-side .first-comment .fc-body {
+  padding: 4px 12px 12px;
+  line-height: 1.5;
+  color: var(--ink);
+  white-space: normal;
+  word-wrap: break-word;
+}
+.ig-side .first-comment .fc-body strong { font-weight: 800; }
+
 /* Side panel: meta + status + actions */
 .ig-side {
   display: flex;
@@ -757,6 +796,7 @@ function _Item({ item, decision, onDecide }) {
   const itemClass = decision === DECISION_APPROVE ? "approve"
                  : decision === DECISION_SKIP    ? "skip"
                  : item.posted === true          ? "posted"
+                 : _isSuperseded(item)           ? "skip"
                  : item.status === "needs_human" ? "alert"
                  : "";
 
@@ -847,6 +887,12 @@ function _Item({ item, decision, onDecide }) {
             <b>{t("admin.ig_review.media_id")}</b>
             <span>{item.posted_media_id}</span>
           </div>
+        )}
+        {item.comment && (
+          <details className="first-comment">
+            <summary>{t("admin.ig_review.first_comment")}</summary>
+            <div className="fc-body">{_renderCaption(item.comment)}</div>
+          </details>
         )}
         {violations.length > 0 && (
           <div className="violations" role="alert" aria-label={t("admin.ig_review.lint_alert")}>

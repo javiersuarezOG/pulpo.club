@@ -612,6 +612,19 @@ test.describe("New app boots cleanly on key routes", () => {
       "Bedrooms",                                     // detail.fact.bedrooms (es: Habitaciones)
       "Year built",                                   // detail.fact.year_built (es: Año de construcción)
       "Built area",                                   // detail.fact.built_area (es: Área construida)
+      // Deterministic fallback title/USP templates (ai_enrichment_fallback.py)
+      // are bilingual since #988; a Spanish card renders "Terreno · … ·
+      // Frente al mar", never these English forms. These phrases are
+      // template-specific (a broker never writes them verbatim in a listing),
+      // so they're safe listing-content canaries: if the fallback ever
+      // regresses to monolingual English, an ES card/shelf/detail shows one
+      // of these and this sweep catches it. Data-layer backstop:
+      // scripts/check_bilingual_coverage.py (nightly Slack canary).
+      "Raw Land",                                     // fallback type label (es: Terreno)
+      "Flat Terrain",                                 // fallback feature (es: Terreno plano)
+      "Utilities Connected",                          // fallback feature (es: Servicios conectados)
+      "Mixed-Use Land",                               // fallback legacy type (es: Terreno de uso mixto)
+      "Recreational Land",                            // fallback legacy type (es: Terreno recreativo)
     ];
 
     // Tokens that legitimately exist in BOTH EN and ES copy and would
@@ -727,11 +740,16 @@ test.describe("New app boots cleanly on key routes", () => {
   // copy literally contained the Spanish plural "terrenos" instead of
   // "land". This test locks the fix in and catches the next one.
   //
-  // Listing titles + descriptions come from Spanish-language broker
-  // sources (e.g. "TERRENOS PLAYA EL ZONTE") — translating those is a
-  // separate ingest-pipeline workstream. We scope the sweep to surfaces
-  // we own (the homepage shell + the Browse results header & shelves);
-  // the detail panel is intentionally NOT swept.
+  // Listing titles + descriptions are now BILINGUAL end-to-end (the
+  // enrichment + deterministic-fallback + ensure_bilingual chain, #988),
+  // and that guarantee is enforced at the data layer by the nightly
+  // scripts/check_bilingual_coverage.py canary — a far more reliable
+  // enforcement point than scanning rendered broker text, which can carry
+  // incidental cross-language words. So we STILL do not sweep raw broker
+  // title/description prose here (flake-avoidance, not "untranslated"). We
+  // DO now assert on the template-shaped fallback phrases (see the ES
+  // canary's "Raw Land"/"Flat Terrain"/… entries) because those are
+  // Pulpo-owned, deterministic, and safe to match.
   test("English locale: no Spanish canary words leak into rendered UI", async ({ page }) => {
     // Spanish words/phrases that should NOT appear in the EN UI. Each
     // entry is a word we've shipped at least once in EN copy and had

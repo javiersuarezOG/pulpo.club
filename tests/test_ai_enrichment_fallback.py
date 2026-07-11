@@ -121,24 +121,37 @@ def test_zone_name_falls_back_to_department():
 
 def test_title_full_four_parts():
     title = fallback_title(_li(area_m2=12_000, zone="el-cuco", is_beachfront=True))
-    assert title == "Raw Land · 1.2 ha · El Cuco · Beachfront"
+    # Bilingual: type + feature translate; size + zone are language-neutral.
+    assert title["en"] == "Raw Land · 1.2 ha · El Cuco · Beachfront"
+    assert title["es"] == "Terreno · 1.2 ha · El Cuco · Frente al mar"
 
 
 def test_title_omits_missing_top_feature():
     title = fallback_title(_li(area_m2=4500, zone="el-zonte"))
-    assert title == "Raw Land · 4,500 m² · El Zonte"
+    assert title["en"] == "Raw Land · 4,500 m² · El Zonte"
+    assert title["es"] == "Terreno · 4,500 m² · El Zonte"
 
 
 def test_title_caps_at_80_chars():
     long_zone = "x" * 100
     title = fallback_title(_li(area_m2=5000, zone=long_zone))
-    assert len(title) <= 80
+    assert len(title["en"]) <= 80
+    assert len(title["es"]) <= 80
 
 
 def test_title_uses_correct_land_type_label():
     """Commercial property_type renders its commercial-land prefix."""
     title = fallback_title(_li(property_type="commercial", area_m2=120_000))
-    assert title.startswith("Commercial Land")
+    assert title["en"].startswith("Commercial Land")
+    assert title["es"].startswith("Terreno comercial")
+
+
+def test_title_is_bilingual_dict():
+    """Every fallback title must carry both languages so tr() never leaks
+    an English template to a Spanish-locale user."""
+    title = fallback_title(_li(area_m2=5000, zone="el-tunco", is_beachfront=True))
+    assert set(title.keys()) == {"en", "es"}
+    assert title["en"] and title["es"]
 
 
 # ── fallback_reasons_to_buy — PRD §8.3 trigger table ──────────────────
@@ -153,15 +166,28 @@ def test_reasons_picks_top_3_by_priority():
     )
     reasons = fallback_reasons_to_buy(li, max_n=3)
     assert len(reasons) == 3
-    assert reasons[0].startswith("🏖")
-    assert reasons[1].startswith("📉")
-    assert reasons[2].startswith("⚡")
+    assert reasons[0]["en"].startswith("🏖") and reasons[0]["es"].startswith("🏖")
+    assert reasons[1]["en"].startswith("📉") and reasons[1]["es"].startswith("📉")
+    assert reasons[2]["en"].startswith("⚡") and reasons[2]["es"].startswith("⚡")
+
+
+def test_reasons_are_bilingual():
+    """Every fallback USP carries both languages — no English bullet leaks
+    to a Spanish-locale user."""
+    reasons = fallback_reasons_to_buy(_li(is_beachfront=True, is_repriced=True))
+    assert reasons
+    for r in reasons:
+        assert set(r.keys()) == {"en", "es"}
+        assert r["en"] and r["es"]
+        # the Spanish side must not be a verbatim copy of the English side
+        assert r["es"] != r["en"]
 
 
 def test_reasons_substitutes_zone_placeholder():
     li = _li(is_beachfront=True, zone="punta-mango")
     reasons = fallback_reasons_to_buy(li, max_n=3)
-    assert any("Punta Mango" in r for r in reasons)
+    # zone is language-neutral — appears in both sides
+    assert any("Punta Mango" in r["en"] and "Punta Mango" in r["es"] for r in reasons)
 
 
 def test_reasons_empty_when_nothing_triggers():
@@ -175,17 +201,17 @@ def test_reasons_skips_development_when_name_absent():
     li = _li(is_in_development=True, development_name=None, is_repriced=True)
     reasons = fallback_reasons_to_buy(li, max_n=3)
     # Should NOT contain a development bullet (predicate excludes nameless)
-    assert not any("Inside" in r for r in reasons)
+    assert not any("Inside" in r["en"] for r in reasons)
     # Should still contain the price-drop bullet
-    assert any(r.startswith("📉") for r in reasons)
+    assert any(r["en"].startswith("📉") for r in reasons)
 
 
 def test_reasons_truncates_long_bullets():
-    """Defensive — any bullet >18 words gets cut."""
-    # Hard to trigger naturally; verify the truncation logic doesn't crash
+    """Defensive — any bullet >18 words gets cut, per language."""
     reasons = fallback_reasons_to_buy(_li(is_beachfront=True))
     for r in reasons:
-        assert len(r.split()) <= 18
+        assert len(r["en"].split()) <= 18
+        assert len(r["es"].split()) <= 18
 
 
 # ── apply_fallbacks — orchestrator on a dict ──────────────────────────
@@ -195,21 +221,40 @@ def test_apply_fallbacks_sets_title_and_reasons_when_empty():
     written = apply_fallbacks(li)
     assert "title_canonical" in written
     assert "reasons_to_buy" in written
-    assert li["title_canonical"] == "Raw Land · 5,000 m² · El Tunco · Price Reduced"
+    assert li["title_canonical"]["en"] == "Raw Land · 5,000 m² · El Tunco · Price Reduced"
+    assert li["title_canonical"]["es"] == "Terreno · 5,000 m² · El Tunco · Precio rebajado"
     assert len(li["reasons_to_buy"]) >= 1
+    # every applied USP is bilingual
+    assert all(set(r.keys()) == {"en", "es"} for r in li["reasons_to_buy"])
 
 
-def test_apply_fallbacks_does_not_overwrite_existing():
-    """If AI succeeded, fallback must NOT overwrite the AI-generated value."""
+def test_apply_fallbacks_does_not_overwrite_bilingual_ai():
+    """If AI succeeded (bilingual {en,es}), fallback must NOT overwrite it."""
     li = _li(
         is_beachfront=True,
-        title_canonical="AI-generated title",
-        reasons_to_buy=["AI bullet 1", "AI bullet 2"],
+        title_canonical={"en": "AI title", "es": "Título IA"},
+        reasons_to_buy=[{"en": "AI bullet", "es": "Punto IA"}],
     )
     written = apply_fallbacks(li)
     assert written == {}
-    assert li["title_canonical"] == "AI-generated title"
-    assert li["reasons_to_buy"] == ["AI bullet 1", "AI bullet 2"]
+    assert li["title_canonical"] == {"en": "AI title", "es": "Título IA"}
+    assert li["reasons_to_buy"] == [{"en": "AI bullet", "es": "Punto IA"}]
+
+
+def test_apply_fallbacks_upgrades_monolingual_string():
+    """A legacy monolingual English string (old fallback output) is upgraded
+    to a bilingual dict — the self-healing path that stops a Spanish user
+    seeing an English template title/USP."""
+    li = _li(
+        area_m2=5000, zone="el-tunco", is_repriced=True,
+        title_canonical="Raw Land · 5,000 m² · El Tunco · Price Reduced",
+        reasons_to_buy=["📉 Price recently reduced — negotiate from strength"],
+    )
+    written = apply_fallbacks(li)
+    assert "title_canonical" in written and "reasons_to_buy" in written
+    assert isinstance(li["title_canonical"], dict)
+    assert li["title_canonical"]["en"] and li["title_canonical"]["es"]
+    assert all(set(r.keys()) == {"en", "es"} for r in li["reasons_to_buy"])
 
 
 def test_apply_fallbacks_does_not_set_short_description():
@@ -273,23 +318,28 @@ def test_fallback_title_house_no_longer_says_raw_land():
     )
     title = fallback_title(li)
     assert title is not None
-    assert title.startswith("Beach House"), (
+    assert title["en"].startswith("Beach House"), (
         f"House listing must not be titled as Raw Land: got {title!r}"
     )
+    assert title["es"].startswith("Casa de playa"), title
 
 
 def test_fallback_title_condo_uses_beach_condo_prefix():
     li = _li(property_type="condo", area_m2=None, zone="el-tunco")
     title = fallback_title(li)
     assert title is not None
-    assert title.startswith("Beach Condo"), title
+    assert title["en"].startswith("Beach Condo"), title
+    assert title["es"].startswith("Condominio de playa"), title
 
 
 def test_fallback_title_land_format_unchanged():
-    """Regression guard for the 815 land listings on production today.
-    Format and content for land must be byte-identical to pre-fix output."""
+    """Regression guard for the land listings on production today. The EN
+    format + content must be byte-identical to pre-bilingual output; the
+    ES side is the new bilingual companion."""
     li = _li(area_m2=1500, zone="el-tunco", is_beachfront=True)
-    assert fallback_title(li) == "Raw Land · 1,500 m² · El Tunco · Beachfront"
+    title = fallback_title(li)
+    assert title["en"] == "Raw Land · 1,500 m² · El Tunco · Beachfront"
+    assert title["es"] == "Terreno · 1,500 m² · El Tunco · Frente al mar"
 
 
 def test_fallback_title_house_omits_size_when_no_area():
@@ -297,8 +347,8 @@ def test_fallback_title_house_omits_size_when_no_area():
     is just omitted, not rendered as a stray separator)."""
     title = fallback_title(_li(property_type="house", area_m2=None, zone="el-zonte"))
     assert title is not None
-    assert " ·  · " not in title, "double-separator from missing size"
-    assert title.startswith("Beach House · El Zonte"), title
+    assert " ·  · " not in title["en"], "double-separator from missing size"
+    assert title["en"].startswith("Beach House · El Zonte"), title
 
 
 def test_legacy_alias_still_importable():
@@ -320,14 +370,15 @@ def test_fallback_skips_zone_templates_when_zone_unresolved():
              is_beachfront=True, days_listed=3)
     bullets = fallback_reasons_to_buy(li)
     # Both triggers above use {zone}; should NOT appear with empty zone.
-    rendered = " | ".join(bullets)
+    rendered = " | ".join(b["en"] + " " + b["es"] for b in bullets)
     assert "'s newest additions" not in rendered
     assert "on the  coast" not in rendered  # double-space gives it away
+    assert "costa de  " not in rendered     # ES equivalent empty-zone tell
     # The off-market / repriced / utilities rules don't reference {zone}
     # — they should still apply if their predicates fire.
 
 def test_fallback_uses_zone_templates_when_zone_resolved():
     li = _li(zone="el-tunco", is_beachfront=True, days_listed=3)
     bullets = fallback_reasons_to_buy(li)
-    rendered = " | ".join(bullets)
+    rendered = " | ".join(b["en"] for b in bullets)
     assert "El Tunco coast" in rendered or "El Tunco's newest" in rendered

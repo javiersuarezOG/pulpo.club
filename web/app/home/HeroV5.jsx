@@ -224,10 +224,17 @@ function EmailCapture({ app, locale }) {
       const body = await r.json().catch(() => ({}));
       let result;
       if (r.ok) {
-        setStatus({ kind: body.resubscribed ? "already" : "success" }); result = body.resubscribed ? "already_subscribed" : "success";
+        // A returning member is EITHER a re-subscribe (was unsubscribed →
+        // `resubscribed`) OR an already-active subscriber re-submitting
+        // (`already_subscribed`). The old code only read `resubscribed`, so an
+        // already-active resubmit fell through to the fresh-"success" branch
+        // and replayed the full welcome + join celebration (QA bug). Read both.
+        const returning = !!(body.resubscribed || body.already_subscribed);
+        setStatus({ kind: returning ? "already" : "success" }); result = returning ? "already_subscribed" : "success";
         // Email-first: submitting the hero form makes you a Free member, so
-        // the top-3 unlock immediately (no second prompt).
-        if (app && typeof app.becomeFreeMember === "function") app.becomeFreeMember({ email: value });
+        // the top-3 unlock immediately (no second prompt). `returning` tells
+        // becomeFreeMember to skip the celebration reveal for existing members.
+        if (app && typeof app.becomeFreeMember === "function") app.becomeFreeMember({ email: value, returning });
       }
       else if (r.status === 429) { setStatus({ kind: "error" }); result = "rate_limited"; }
       else if (body && body.error === "invalid_email") { setStatus({ kind: "invalid" }); result = "validation_failed"; }

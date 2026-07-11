@@ -122,9 +122,27 @@ Source of truth: [`web/app/telemetry/events.ts`](../web/app/telemetry/events.ts)
 | Event | Payload | Fires from |
 |---|---|---|
 | `locale.changed` | `{ from, to }` | LocaleToggle |
+| `i18n.fallback_used` | `{ key, locale }` | [`t()`](../web/app/i18n.jsx) — fires ONCE per `(key, locale)` per session when a non-default-locale lookup falls back to English (or the raw key). Deduped, never throws, no-op off-browser. |
 | `data.fetch.failed` | `{ stage, error_class }` | `useListings` fetch error path |
 | `client.error` | `{ message, stack? }` | Top-level ErrorBoundary |
 | `api.error` | `{ endpoint, status, reason?, detail? }` | Any non-2xx response from `/api/saves`, `/api/stripe/*`. Wired in `saves-client.js`, `stripe-checkout.js`, `stripe-portal.js`. Lets the dashboard see API failure rate without needing Vercel runtime-log access. |
+
+#### i18n leak alerts (configure in PostHog)
+
+Two complementary signals catch an English/Spanish copy leak — wire both as
+PostHog alerts:
+
+1. **UI-string leak — `i18n.fallback_used` with `locale = es`.** Any such
+   event in production means a Spanish user hit a UI string that fell back to
+   English (or a raw key). The `key` names the exact `UI_STRINGS` row to fix.
+   Alert: *fire when `count(i18n.fallback_used where locale='es') > 0` over
+   1h in prod.* Do **not** silence by widening the dedupe — fix the key.
+2. **Listing-copy leak — the nightly `check_bilingual_coverage.py` canary.**
+   `i18n.fallback_used` only sees *UI-string* leaks; listing title/description/
+   usps copy comes from the data pipeline, not `t()`. The nightly canary
+   ([scripts/check_bilingual_coverage.py](../scripts/check_bilingual_coverage.py))
+   Slack-pages when a served listing ships monolingual, identical, or
+   language-swapped copy. It never blocks the nightly (alert + backfill).
 
 ### Web Vitals
 

@@ -1,0 +1,28 @@
+{
+  "width": 1449,
+  "height": 1086,
+  "aspect_ratio": 1.334,
+  "file_size_kb": 3864.3,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-07-10T07:19:23.228300+00:00",
+  "source_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002522430091/v3/HDPhotos/Metrocentro Santa Ana.png",
+  "original_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002522430091/v3/HDPhotos/Metrocentro Santa Ana.png",
+  "transform_used": "none",
+  "fetched_at": "2026-07-10T07:19:23.369674+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": null,
+  "resdet_detected_height": null,
+  "resdet_upscaled": null,
+  "quarantined": false,
+  "aesthetic": {
+    "visual_appeal": 5.9,
+    "issues": [
+      "uninteresting"
+    ],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.145 color_entropy=0.489"
+  }
+}

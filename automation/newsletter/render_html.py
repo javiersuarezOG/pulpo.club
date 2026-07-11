@@ -615,8 +615,12 @@ def _why_block_html(pick: IssuePick, locale: Locale) -> str:
         "</li>"
         for b in bullets
     )
+    # QA bug 5: the "Sign up to Pro" / "See on Pulpo" CTA sat flush against
+    # the bottom of this "why we picked it" box (no gap), so the button read
+    # as crowding/covering the block above it. The 16px bottom margin gives
+    # the CTA breathing room.
     block_style = (
-        "margin:18px 0 0;padding:16px 18px 18px;background:#F8F4EC;border-radius:6px;"
+        "margin:18px 0 16px;padding:16px 18px 18px;background:#F8F4EC;border-radius:6px;"
     )
     label_style = (
         "font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;"
@@ -1285,7 +1289,11 @@ def _footer_html(issue: Issue, *, free: bool = False) -> str:
         summary = _i18n.filter_summary(issue.recipient.preference, locale)
         you_line = i18n.t("footer.you_get_this", locale, filter_summary=summary)
     change_filters_label = i18n.t("footer.change_filters", locale)
-    change_cadence_label = i18n.t("footer.change_cadence", locale)
+    # "Change cadence" removed (QA bug 6/7): cadence is NOT an adjustable
+    # setting for free subscribers, and the pill pointed at the same dead
+    # /account target as Change filters. Per CLAUDE.md "never ship a UI
+    # control that lies about persistence," the control is gone until a real
+    # wired cadence surface exists. See docs / the contract test below.
     unsubscribe_label = i18n.t("footer.unsubscribe", locale)
     no_commission = i18n.t("footer.no_commission", locale)
     copyright_line = i18n.t("footer.copyright", locale, year=issue.issue_id[:4])
@@ -1315,7 +1323,7 @@ def _footer_html(issue: Issue, *, free: bool = False) -> str:
     )
 
     return f"""
-    <tr><td class="pad footer-strip" style="padding:24px 24px 28px;background:#F4EFE6;border-top:1px solid rgba(0,0,0,0.08);">
+    <tr><td class="pad footer-strip" style="padding:24px 24px 44px;background:#F4EFE6;border-top:1px solid rgba(0,0,0,0.08);">
       <table role="presentation" cellpadding="0" cellspacing="0"><tr>
         <td style="line-height:0;padding-right:8px;vertical-align:middle;">
           <img src="https://pulpo.club/assets/email-logo-32@2x.png" width="20" height="20" alt="Pulpo" style="display:block;width:20px;height:20px;border:0;" />
@@ -1329,7 +1337,7 @@ def _footer_html(issue: Issue, *, free: bool = False) -> str:
       <div style="margin:18px 0 14px;height:1px;background:rgba(0,0,0,0.08);"></div>
       <p style="margin:0 0 10px;font-size:12px;color:#888780;letter-spacing:0.04em;">{_e(you_line)}</p>
       <div>
-        {_pill(issue.settings_url, change_filters_label)}{_pill(issue.settings_url, change_cadence_label)}{_pill(unsubscribe_href, unsubscribe_label)}
+        {_pill(issue.settings_url, change_filters_label)}{_pill(unsubscribe_href, unsubscribe_label)}
       </div>
       <p style="margin:14px 0 0;font-size:11px;color:#888780;letter-spacing:0.04em;">{_e(copyright_line)} · pulpo.club</p>
       <p style="margin:4px 0 0;font-size:11px;color:#888780;letter-spacing:0.04em;">Pulpo · San Salvador, El Salvador</p>
@@ -1682,13 +1690,21 @@ def _pick_card_html(
         # overflowed the 320px viewport in ES. Top 3 (and all Pro picks)
         # keep the See-on-Pulpo + Save pair.
         show_save = not (free and not is_top_deal)
+        # QA bug 1: the heart sat on the text baseline, so it read as
+        # offset/detached above the "Save" label rather than centred in the
+        # pill. Fix: `line-height:1` tightens the anchor's line box, and both
+        # the heart and the label are wrapped in `vertical-align:middle`
+        # spans so they centre together. Vertical padding is bumped 10→11px
+        # to match the filled CTA, so the two buttons are the same height and
+        # sit on one row cleanly.
         save_td = (
             f'<td><a class="btn-ghost" href="{_e(save_url)}" '
-            f'style="display:inline-block;font-size:13px;font-weight:600;'
-            f'padding:10px 16px;color:#1A1916;border:1px solid #1A1916;'
+            f'style="display:inline-block;font-size:13px;font-weight:600;line-height:1;'
+            f'padding:11px 16px;color:#1A1916;border:1px solid #1A1916;'
             f'border-radius:999px;letter-spacing:0.02em;text-decoration:none;'
             f'white-space:nowrap;">'
-            f'&hearts;&#xfe0e; {_e(save_label)}</a></td>'
+            f'<span style="vertical-align:middle;">&hearts;&#xfe0e;</span>'
+            f'<span style="vertical-align:middle;">&nbsp;{_e(save_label)}</span></a></td>'
         ) if show_save else ""
         cta_html = (
             f'<table role="presentation"><tr>'
