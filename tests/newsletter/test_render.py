@@ -65,7 +65,7 @@ def test_render_pro_prefs_has_no_paywall_banner(pro_with_prefs, ranked_pool):
     # v4.3 (2026-05-31): heart entity gets the U+FE0E text variation
     # selector appended (`&hearts;&#xfe0e;`) so Apple Mail / iOS Mail
     # render it as text instead of substituting a full-size red emoji.
-    assert "&hearts;&#xfe0e; Save" in html   # PR-NL-5: hero-pick ghost CTA
+    assert "&hearts;&#xfe0e;" in html   # heart glyph (label follows in an adjacent vertical-align span, QA bug 1)   # PR-NL-5: hero-pick ghost CTA
     assert "Hand-picked for Javier" in html
 
 
@@ -350,4 +350,4 @@ def test_render_card_component_contract(pro_with_prefs, ranked_pool):
     # v4: shortened "Save to favorites" → "Save" — the &hearts; glyph is
     # rendered alongside the label by the card component, so the
     # full rendered button is "♥ Save". Assert on the glyph + label.
-    assert "&hearts;&#xfe0e; Save" in html  # v4.3 — heart + text variation selector
+    assert "&hearts;&#xfe0e;" in html   # heart glyph (label follows in an adjacent vertical-align span, QA bug 1)  # v4.3 — heart + text variation selector
