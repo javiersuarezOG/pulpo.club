@@ -63,7 +63,7 @@ def _bilingual(es: str, en: str, tail: str = "") -> str:
 PLAN: list[dict] = [{'day': 201,
   'slug': 'd01_escasez',
   'kind': 'inspira',
-  'color_key': 'inspiracion',
+  'color_key': 'insp_violet',
   'scheduled_for': '2026-07-11T01:00:00+00:00',
   'slides': [{'t': 'statement',
               'eyebrow': 'El Salvador',  # multi-country-exempt: hand-written SV marketing copy (Sebas-approved campaign)
@@ -165,7 +165,7 @@ PLAN: list[dict] = [{'day': 201,
  {'day': 203,
   'slug': 'd03_como_funciona',
   'kind': 'inspira',
-  'color_key': 'inspiracion',
+  'color_key': 'insp_indigo',
   'scheduled_for': '2026-07-13T01:00:00+00:00',
   'slides': [{'t': 'statement',
               'eyebrow': 'La vieja forma',
@@ -260,40 +260,35 @@ PLAN: list[dict] = [{'day': 201,
            '501 beach lots compared. Ranked. The Top 10 in your inbox every Sunday 👉 pulpo.club',
   'tags': '#TerrenosDePlaya #BeachLand #ElTunco #SurfCity #ElSalvador #BienesRaices'},
  {'day': 205,
-  'slug': 'd05_seguridad',
+  'slug': 'd05_descubrimiento',
   'kind': 'inspira',
-  'color_key': 'inspiracion',
+  'color_key': 'insp_blue',
   'scheduled_for': '2026-07-15T01:00:00+00:00',
   'slides': [{'t': 'stat',
-              'big': '2.4',
-              'label': 'homicidios por cada 100 mil (2023)\nde los más bajos del hemisferio',
-              'src': 'Cifras oficiales 2023'},
-             {'t': 'statement',
-              'eyebrow': 'Lo que cambió',
-              'l1': 'El país',
-              'l2': 'más seguro',
-              'punch': 'de la región. Y el mundo lo notó.'},
+              'big': '3.9M',
+              'label': 'visitantes en 2024 — récord.\nEl mundo descubrió El Salvador.',
+              'src': 'Visit El Salvador · 2024'},
              {'t': 'usp',
-              'eyebrow': 'Por eso importa',
-              'title': 'Están volviendo.',
-              'body': 'Diáspora y extranjeros comprando aquí. En Pulpo ves lo mejor antes que la fila '
-                      'crezca.'}],
-  'capES': '**El país más seguro del hemisferio ya no es un sueño — es un dato.**\n'
+              'eyebrow': 'Lo que significa',
+              'title': 'Más ojos, más valor.',
+              'body': 'Cuando el mundo descubre un lugar, la buena tierra frente al mar se vuelve '
+                      'escasa.'},
+             {'t': 'usp',
+              'eyebrow': 'Tu ventaja',
+              'title': 'Llegá primero.',
+              'body': 'La diáspora y los de afuera ya están comprando. En Pulpo ves lo mejor antes '
+                      'que la fila crezca.'}],
+  'capES': '**El mundo entero está descubriendo El Salvador — 3.9 millones de visitantes en 2024, un '
+           'récord.**\n'
            '\n'
-           'El Salvador cerró 2023 con una tasa de 2.4 homicidios por cada 100 mil habitantes, de las más '
-           'bajas del continente.\n'
-           '\n'
-           'Por eso los de afuera y la diáspora están volviendo a comprar su pedazo. Vos naciste aquí: llevás '
-           'ventaja.\n'
+           'Cuando un lugar así se pone de moda, la buena tierra frente al mar se vuelve escasa. Vos '
+           'naciste aquí: llegás primero.\n'
            '\n'
            'pulpo.club · link en bio',
-  'capEN': "**The safest country in the hemisphere isn't a dream — it's data.**\n"
+  'capEN': '**The whole world is discovering El Salvador — a record 3.9 million visitors in 2024.**\n'
            '\n'
-           'El Salvador closed 2023 with a homicide rate of 2.4 per 100,000, among the lowest in the '
-           'Americas.\n'
-           '\n'
-           "That's why people from abroad and the diaspora are coming back to buy. You were born here — you're "
-           'ahead.\n'
+           'When a place takes off like this, good oceanfront land gets scarce. You were born here — '
+           'you arrive first.\n'
            '\n'
            'pulpo.club · link in bio',
   'comES': 'Nosotros juntamos todo el mercado y lo rankeamos, para que llegués primero a lo mejor.\n'
@@ -306,7 +301,7 @@ PLAN: list[dict] = [{'day': 201,
            'Ranked. The Top 10 in your inbox every Sunday.\n'
            '\n'
            'pulpo.club',
-  'tags': '#ElSalvador #PaisSeguro #SurfCity #BitcoinCountry #SalvadorenosPorElMundo #BienesRaices'},
+  'tags': '#ElSalvador #SurfCity #TuPedazoDeParaiso #PlayasDeElSalvador #SalvadorenosPorElMundo #BienesRaices'},
  {'day': 206,
   'slug': 'd06_casas_lago',
   'kind': 'top10',
@@ -362,7 +357,7 @@ PLAN: list[dict] = [{'day': 201,
  {'day': 207,
   'slug': 'd07_por_que_rankeado',
   'kind': 'inspira',
-  'color_key': 'inspiracion',
+  'color_key': 'insp_cyan',
   'scheduled_for': '2026-07-17T01:00:00+00:00',
   'slides': [{'t': 'statement',
               'eyebrow': 'No te mostramos todo.',
@@ -451,7 +446,7 @@ PLAN: list[dict] = [{'day': 201,
  {'day': 209,
   'slug': 'd09_demanda',
   'kind': 'inspira',
-  'color_key': 'inspiracion',
+  'color_key': 'insp_teal',
   'scheduled_for': '2026-07-19T01:00:00+00:00',
   'slides': [{'t': 'statement',
               'eyebrow': '2021 → hoy',
@@ -545,7 +540,7 @@ PLAN: list[dict] = [{'day': 201,
  {'day': 211,
   'slug': 'd11_herencia',
   'kind': 'inspira',
-  'color_key': 'inspiracion',
+  'color_key': 'insp_seagreen',
   'scheduled_for': '2026-07-21T01:00:00+00:00',
   'slides': [{'t': 'statement',
               'eyebrow': 'Herencia',
@@ -630,7 +625,7 @@ PLAN: list[dict] = [{'day': 201,
  {'day': 213,
   'slug': 'd13_noticias',
   'kind': 'inspira',
-  'color_key': 'inspiracion',
+  'color_key': 'insp_green',
   'scheduled_for': '2026-07-23T01:00:00+00:00',
   'slides': [{'t': 'news',
               'eyebrow': 'Noticia · Pulpo Pro',
