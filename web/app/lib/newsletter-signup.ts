@@ -2,6 +2,8 @@
 // hero form and the EmailCaptureModal so both submit the same way and both
 // turn the visitor into a Free member (email-first funnel).
 
+import { captureCampaignParams } from "./campaign";
+
 export const NL_EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export type SubscribeResult =
@@ -20,11 +22,16 @@ export async function subscribeEmail(
 ): Promise<SubscribeResult> {
   const value = (email || "").trim();
   if (!NL_EMAIL_RE.test(value)) return { kind: "invalid" };
+  // Campaign attribution: forward the session's UTMs (current URL or the
+  // sessionStorage fallback — the same source of truth /start uses) so the
+  // server can fire the newsletter.signup funnel event + stamp first-touch
+  // acquisition props on the PostHog Person. `{}` for direct traffic.
+  const utms = captureCampaignParams().utms;
   try {
     const r = await fetch("/api/newsletter", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ email: value, source: opts.source, locale: opts.locale }),
+      body: JSON.stringify({ email: value, source: opts.source, locale: opts.locale, utms }),
     });
     const body = await r.json().catch(() => ({} as Record<string, unknown>));
     if (r.ok) return { kind: body.resubscribed ? "already" : "success" };
