@@ -33,6 +33,46 @@
 // "already subscribed" toast, not a 429.
 
 const { Resend } = require("resend");
+const { capture, flush, emailDistinctId } = require("./_posthog");
+
+// Campaign attribution — the 5 UTM keys the client (web/app/lib/campaign.ts)
+// captures + forwards in the POST body. Only these pass onto the PostHog
+// Person / funnel event; anything else in body.utms is dropped (no arbitrary
+// prop injection). Values capped so Person props stay compact.
+const UTM_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
+function pickUtms(raw) {
+  const out = {};
+  if (raw && typeof raw === "object") {
+    for (const k of UTM_KEYS) {
+      const v = raw[k];
+      if (typeof v === "string" && v) out[k] = v.slice(0, 200);
+    }
+  }
+  return out;
+}
+
+// Server-side newsletter.signup funnel event — adblock-proof (the client
+// hero form's hero.email_submitted can be blocked). Keyed on emailDistinctId
+// so it lands on the SAME PostHog Person as the post-Stripe conversion funnel,
+// and stamps first-touch acquisition_utm_* via $set_once so the free/email
+// top-of-funnel is finally attributable to a campaign (2026-06-30 audit P1-3).
+// Best-effort: never blocks the subscribe response.
+async function fireSignupTelemetry({ email, source, locale, utms, status }) {
+  try {
+    const acq = {};
+    for (const [k, v] of Object.entries(utms || {})) acq[`acquisition_${k}`] = v;
+    capture(emailDistinctId(email), "newsletter.signup", {
+      source,
+      locale,
+      status,                    // "new" | "resubscribed" | "already"
+      ...utms,
+      ...(Object.keys(acq).length ? { $set_once: acq } : {}),
+    });
+    await flush();
+  } catch {
+    /* telemetry must never block the subscribe */
+  }
+}
 
 // ── Rate limit (in-memory, per-IP) ────────────────────────────────────
 //
@@ -225,6 +265,7 @@ async function handler(req, res, { fetchImpl, resendImpl } = {}) {
   const email = typeof body.email === "string" ? body.email.trim() : "";
   const source = typeof body.source === "string" ? body.source : "unknown";
   const locale = pickLocale(body.locale);
+  const utms = pickUtms(body.utms);
 
   if (!email || !EMAIL_RE.test(email)) {
     logApi({
@@ -316,6 +357,7 @@ async function handler(req, res, { fetchImpl, resendImpl } = {}) {
         if (!wasUnsubscribed) {
           // Already an active subscriber. Idempotent no-op — no state
           // change, no email. (Resend's create already no-op'd.)
+          await fireSignupTelemetry({ email, source, locale, utms, status: "already" });
           logApi({
             status: 200, ms: Date.now() - t0,
             reason: "already_subscribed_noop",
@@ -332,6 +374,7 @@ async function handler(req, res, { fetchImpl, resendImpl } = {}) {
           });
           // Re-engaged free subscriber → welcome-back (best-effort).
           await fireFreeWelcome({ email, locale, variant: "free_welcome_back", source: "resend_resubscribe", fetchImpl });
+          await fireSignupTelemetry({ email, source, locale, utms, status: "resubscribed" });
           logApi({
             status: 200, ms: Date.now() - t0,
             reason: "resubscribed",
@@ -362,6 +405,7 @@ async function handler(req, res, { fetchImpl, resendImpl } = {}) {
     }
     // New free subscriber → welcome (best-effort; never fails the subscribe).
     await fireFreeWelcome({ email, locale, variant: "free_welcome", source: "signup", fetchImpl });
+    await fireSignupTelemetry({ email, source, locale, utms, status: "new" });
     logApi({
       status: 200, ms: Date.now() - t0,
       domain: emailDomain(email),
@@ -386,3 +430,5 @@ async function handler(req, res, { fetchImpl, resendImpl } = {}) {
 module.exports = (req, res) => handler(req, res);
 module.exports.handler = handler;
 module.exports.fireFreeWelcome = fireFreeWelcome;
+module.exports.pickUtms = pickUtms;
+module.exports.fireSignupTelemetry = fireSignupTelemetry;
