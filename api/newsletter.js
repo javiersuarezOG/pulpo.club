@@ -301,12 +301,16 @@ async function handler(req, res, { fetchImpl, resendImpl } = {}) {
         // block a legitimate re-subscribe.
         let wasUnsubscribed = true;
         try {
-          const listed = await client.contacts.list({ audienceId });
-          const contacts = (listed && listed.data && Array.isArray(listed.data.data) ? listed.data.data
-                          : listed && Array.isArray(listed.data) ? listed.data
-                          : []);
-          const match = contacts.find((c) => (c && c.email || "").toLowerCase() === email.toLowerCase());
-          if (match) wasUnsubscribed = !!match.unsubscribed;
+          // O(1) direct lookup by email (GET /audiences/:id/contacts/:email).
+          // Replaces a full contacts.list + linear scan: that scan reads only
+          // the first page, so once the audience outgrew one page an existing
+          // ACTIVE subscriber could go unmatched → wasUnsubscribed stayed true
+          // → we fired "welcome back" at people who never left. get-by-email
+          // has no pagination surface, so the active-vs-resubscribe split is
+          // correct at any audience size.
+          const got = await client.contacts.get({ audienceId, email });
+          const contact = got && got.data;
+          if (contact) wasUnsubscribed = !!contact.unsubscribed;
         } catch { /* lookup failed — treat as re-subscribe (prior behaviour) */ }
 
         if (!wasUnsubscribed) {
