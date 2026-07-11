@@ -27,7 +27,8 @@ export function AccessBlock({ app, locale: lc, surface, cfg, onDone }) {
   const options = accessOptionsFor(surface);
   const reason = (cfg && cfg.reason) || surface;
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState("idle"); // idle | loading | invalid | error
+  const [status, setStatus] = useState("idle"); // idle | loading | invalid | error (free-email path)
+  const [proStatus, setProStatus] = useState("idle"); // idle | loading | rate_limited | error (go_pro path)
 
   // ① Join free — email → Resend + Free membership (+ open the stashed top-3).
   const onJoinFree = async (e) => {
@@ -53,7 +54,12 @@ export function AccessBlock({ app, locale: lc, surface, cfg, onDone }) {
 
   // ② Go Pro — straight to Stripe checkout (first month free pre-applied).
   const onGoPro = async () => {
+    // In-flight guard: the button previously had no disabled state, so
+    // repeated clicks each fired a fresh /api/stripe/start-checkout POST —
+    // the console flood of 429s in the QA report. One checkout at a time.
+    if (proStatus === "loading") return;
     try { track("access.go_pro_clicked", { surface, reason }); } catch { /* ignore */ }
+    setProStatus("loading");
     // Free→Pro linking: a Free member already has an email (no Clerk
     // account). Pass it so Stripe locks `customer_email` and the eventual
     // Clerk account links to the SAME person — and stamp source=free_upgrade
@@ -67,7 +73,11 @@ export function AccessBlock({ app, locale: lc, surface, cfg, onDone }) {
       source: memberEmail ? "free_upgrade" : "start",
     });
     if (result && result.kind === "redirect") { window.location.assign(result.url); return; }
-    setStatus("error");
+    // Previously this set the shared `status`, which only renders inside the
+    // free-email form — so on a Go-Pro-only surface (e.g. the listing paywall
+    // modal) a 429 produced NO visible feedback: the CTA looked dead. Surface
+    // a rate-limit-specific message next to the button instead.
+    setProStatus(result && result.kind === "rate_limited" ? "rate_limited" : "error");
   };
 
   // ③ Sign in — existing Pro member (Clerk). Falls back to the legacy login modal.
@@ -111,10 +121,15 @@ export function AccessBlock({ app, locale: lc, surface, cfg, onDone }) {
     } else if (id === "go_pro") {
       rows.push(
         <div className="access-pro" key="pro">
-          <button type="button" className="btn-pro lg block access-cta-pro" onClick={onGoPro}>
-            {t("access.go_pro.cta", lc)}
+          <button type="button" className="btn-pro lg block access-cta-pro" onClick={onGoPro} disabled={proStatus === "loading"}>
+            {t(proStatus === "loading" ? "access.go_pro.cta_loading" : "access.go_pro.cta", lc)}
           </button>
           <div className="access-pro-sub">{t("access.go_pro.sub", lc)}</div>
+          {(proStatus === "rate_limited" || proStatus === "error") && (
+            <p className="access-error" role="alert">
+              {t(proStatus === "rate_limited" ? "access.error.rate_limited" : "access.error.generic", lc)}
+            </p>
+          )}
         </div>,
       );
     } else if (id === "sign_in") {
