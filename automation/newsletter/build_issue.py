@@ -372,17 +372,33 @@ def _absolute_photo(listing: dict, site_root: str) -> str:
     # shows first. Eligibility guards above still apply — the selected
     # winner is only surfaced once the card has cleared card_eligible /
     # has_text_overlay. Falls back to photo_urls[0] / hero_photo_path.
+    # EMAIL RELIABILITY (bug: blank listing cards in Gmail). The pipeline
+    # keeps a Pulpo-HOSTED mirror of each hero image at
+    # /photos/<source>_<id>.jpg (`hero_photo_path`), served from our own CDN
+    # (verified: /photos/:file → 200 with access-control-allow-origin:*).
+    # `selected_photo_url` / `photo_urls[0]` are broker HOTLINKS
+    # (remax-central / easybroker / wp.com) whose hotlink protection
+    # frequently 403s Gmail's server-side image proxy — so those cards render
+    # blank in the inbox even though the same image is sitting on our CDN.
+    # Prefer the local mirror: every listing with a broker URL also has this
+    # local copy (1383/1948 both, 0 broker-only), so this never drops an
+    # image — it only makes the reliable, same-image copy win. Broker URLs
+    # stay as the fallback for a rare local miss.
+    #
+    # This reorders the PR #785 "continuity" contract (which led with the
+    # broker URL to match the listing page). The local mirror IS that same
+    # hero image — continuity is preserved; only the delivery gets reliable.
+    p = listing.get("hero_photo_path") or ""
+    if p.startswith("/"):
+        return site_root.rstrip("/") + p
+    if p.startswith("http"):
+        return p
     sel = listing.get("selected_photo_url")
     if isinstance(sel, str) and sel.startswith("http"):
         return sel
     urls = listing.get("photo_urls") or []
     if urls and isinstance(urls[0], str) and urls[0].startswith("http"):
         return urls[0]
-    p = listing.get("hero_photo_path") or ""
-    if p.startswith("http"):
-        return p
-    if p:
-        return site_root.rstrip("/") + (p if p.startswith("/") else "/" + p)
     return ""
 
 
