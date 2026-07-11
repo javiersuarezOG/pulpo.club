@@ -1321,6 +1321,9 @@ export const UI_STRINGS = {
   "account.free.email_label": { en: "Your email",                    es: "Tu correo" },
   "account.free.email_hint":  { en: "This is where your weekly picks land. To stop them, use the unsubscribe link in any Pulpo email.", es: "Aquí llegan tus selecciones semanales. Para detenerlas, usa el enlace para darte de baja en cualquier correo de Pulpo." },
   "account.free.signout":     { en: "Sign out",                      es: "Cerrar sesión" },
+  "account.guest.title":      { en: "Your account",                 es: "Tu cuenta" },
+  "account.guest.body":       { en: "Sign in to manage your subscription and preferences — or head back to this week's picks.", es: "Inicia sesión para gestionar tu suscripción y preferencias, o vuelve a las selecciones de esta semana." },
+  "account.guest.home":       { en: "Back to home",                 es: "Volver al inicio" },
   "account.profile":         { en: "Profile",                       es: "Perfil" },
   // Renamed `notifications` → `newsletter` 2026-05-29. The legacy key
   // is preserved for back-compat with cached bundles during rollout.
@@ -1777,11 +1780,13 @@ export const UI_STRINGS = {
   "access.free.cta_loading":           { en: "Joining…",                      es: "Uniéndote…" },
   "access.free.note":                  { en: "No account, no card — just your email", es: "Sin cuenta, sin tarjeta — solo tu correo" },
   "access.go_pro.cta":                 { en: "Unlock everything — $9.99/mo",  es: "Desbloquea todo — $9.99/mes" },
+  "access.go_pro.cta_loading":         { en: "Taking you to checkout…",       es: "Llevándote al pago…" },
   "access.go_pro.sub":                 { en: "Every listing + all 10 of our weekly picks. First month's on us.", es: "Todas las propiedades + las 10 selecciones de la semana. El primer mes va por nuestra cuenta." },
   "access.signin.prefix":              { en: "Already one of us?",            es: "¿Ya eres de los nuestros?" },
   "access.signin.link":                { en: "Sign in",                       es: "Inicia sesión" },
   "access.error.invalid":              { en: "Enter a valid email address.",  es: "Ingresa un correo válido." },
   "access.error.generic":              { en: "Something went wrong. Try again.", es: "Algo salió mal. Inténtalo de nuevo." },
+  "access.error.rate_limited":         { en: "Too many attempts just now. Wait a moment and try again.", es: "Demasiados intentos por ahora. Espera un momento e inténtalo de nuevo." },
   "access.modal.top3.title":           { en: "We've picked this week's top 3 for you.", es: "Elegimos el top 3 de esta semana para ti." },
   "access.modal.top3.lead":            { en: "We read every new beach & lake listing in El Salvador and keep the three best. They're yours to open in full — free.", es: "Leemos cada propiedad nueva de playa y lago en El Salvador y nos quedamos con las tres mejores. Son tuyas para abrir completas — gratis." },
   "access.modal.welcome.title":        { en: "Welcome to Pulpo.",             es: "Bienvenido a Pulpo." },

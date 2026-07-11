@@ -4,17 +4,29 @@
 // in the logs (high non-200 rates without matching payments) the right
 // upgrade is Upstash Redis behind the same hit() interface.
 //
-// Limit: 5 attempts per 60 seconds per (ip, email) key. Trips return 429.
+// Limit: 15 attempts per 60 seconds per (ip, email) key. Trips return 429.
 // The key combines both axes because a single home IP can have multiple
 // legitimate household members signing up, and a single email can have
 // legitimate retries from a phone-then-desktop flow.
+//
+// Why 15 (was 5): starting a checkout is not itself an abuse vector — Stripe
+// owns fraud/payment protection downstream. For ANONYMOUS visitors `email`
+// is empty (Stripe collects it on the hosted page), so the key collapses to
+// `${ip}|` and EVERY visitor behind one NAT / mobile-carrier / office IP
+// shared a single 5/60s bucket. QA (and any shared-IP user who clicked
+// Unlock → back → Unlock) tripped it in seconds, and once tripped even a
+// single legitimate click 429'd for the next minute — blocking the user at
+// the exact moment of paying. The client-side in-flight guard now prevents
+// the click-flood; this ceiling only needs to stop pathological hammering,
+// not normal shared-IP traffic. Real abuse in the logs → Upstash Redis
+// behind the same hit() interface.
 //
 // The Map is bounded — entries older than the window are pruned on each
 // hit. Memory is therefore O(active visitors in the last minute) per
 // function instance.
 
 const WINDOW_MS = 60 * 1000;
-const MAX_ATTEMPTS = 5;
+const MAX_ATTEMPTS = 15;
 
 const HISTORY = new Map(); // key -> Array<timestamp>
 
