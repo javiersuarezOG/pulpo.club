@@ -87,7 +87,7 @@ from ..types import Issue
 #       guard. Rendered output is BYTE-IDENTICAL (verified by a before/after
 #       dry-run diff across all cohorts incl. favorites + ES); the bump only
 #       satisfies the render-file-change guard. No recipient-visible change.
-TEMPLATE_VERSION = "newsletter-v5.4-2026-07-11"
+TEMPLATE_VERSION = "newsletter-v5.5-2026-07-11"
 
 # Human-readable timestamp surfaced in component docs + the admin
 # widget so collaborators can see when the locked design was last
@@ -136,7 +136,7 @@ LAST_UPDATED = "2026-07-11"
 #       reservation. Welcome body carries listing cards, so its HTML changed.
 #   welcome-v2.6 (2026-07-05) — inherits the v5.0 Your Pulpo category
 #       localization (P0-4). Welcome body carries Your Pulpo.
-WELCOME_TEMPLATE_VERSION = "welcome-v2.9-2026-07-11"
+WELCOME_TEMPLATE_VERSION = "welcome-v2.10-2026-07-11"
 WELCOME_LAST_UPDATED = "2026-07-11"
 
 
@@ -169,7 +169,7 @@ WELCOME_LAST_UPDATED = "2026-07-11"
 #       height reservation. Welcome-back body carries listing cards.
 #   welcome-back-v1.6 (2026-07-05) — inherits the v5.0 Your Pulpo category
 #       localization (P0-4). Welcome-back body carries Your Pulpo.
-WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.9-2026-07-11"
+WELCOME_BACK_TEMPLATE_VERSION = "welcome-back-v1.10-2026-07-11"
 WELCOME_BACK_LAST_UPDATED = "2026-07-11"
 
 
