@@ -1,0 +1,17 @@
+{
+  "width": 1024,
+  "height": 768,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 303.2,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-06-20T07:18:39.455629+00:00",
+  "derivative_width": 1024,
+  "derivative_height": 768,
+  "hero_photo_quality_score": 70,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://nexo.com.sv/media/listings/1117/070fb38204db4167b22e55c39dcc1922.jpeg",
+  "candidate_count": 5
+}

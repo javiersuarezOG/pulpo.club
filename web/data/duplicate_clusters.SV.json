@@ -405,6 +405,43 @@
     ]
   },
   {
+    "count": 3,
+    "cross_source": false,
+    "fingerprint": "cad82211d638e4d5b8df26b5b637c6aa95f51492",
+    "samples": [
+      {
+        "area_m2": 300.0,
+        "price_usd": 60000.0,
+        "source": "remax",
+        "source_id": "002524082017",
+        "title": "Lot for sale",
+        "url": "https://www.remax-elsalvador.com/002524082017",
+        "zone": "el-espino"
+      },
+      {
+        "area_m2": 300.0,
+        "price_usd": 60000.0,
+        "source": "remax",
+        "source_id": "002524082016",
+        "title": "Lot for sale",
+        "url": "https://www.remax-elsalvador.com/002524082016",
+        "zone": "el-espino"
+      },
+      {
+        "area_m2": 300.0,
+        "price_usd": 60000.0,
+        "source": "remax",
+        "source_id": "002524082015",
+        "title": "Lot for sale",
+        "url": "https://www.remax-elsalvador.com/002524082015",
+        "zone": "el-espino"
+      }
+    ],
+    "sources": [
+      "remax"
+    ]
+  },
+  {
     "count": 2,
     "cross_source": false,
     "fingerprint": "0515a84d8ac00d7a9afb615902edf7f36c639f7c",
@@ -715,29 +752,29 @@
   {
     "count": 2,
     "cross_source": false,
-    "fingerprint": "560d0b3ada36080a89213064cd6c45cbedf3e508",
+    "fingerprint": "5ac1f26a2ec92c72b887aaf62090374b809373ed",
     "samples": [
       {
         "area_m2": null,
-        "price_usd": 35638.0,
-        "source": "realestate_au_sv",
-        "source_id": "carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310094614617",
-        "title": "Carretera a Ahuachapán , Cantón Ayutepeque, Chalchupa, Santa Ana, Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310094614617/",
-        "zone": "santa-ana"
+        "price_usd": 155000.0,
+        "source": "csbr",
+        "source_id": "venta-terreno-en-residencial-las-luces-zaragoza-2",
+        "title": "VENTA TERRENO RESIDENCIAL LAS LUCES ZARAGOZA",
+        "url": "https://www.camarabienesraices.com.sv/propiedad/venta-terreno-en-residencial-las-luces-zaragoza-2/",
+        "zone": "zaragoza"
       },
       {
         "area_m2": null,
-        "price_usd": 35926.0,
-        "source": "realestate_au_sv",
-        "source_id": "carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310093383392",
-        "title": "Carretera a Ahuachapán , Cantón Ayutepeque, Chalchupa, Santa Ana, Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310093383392/",
-        "zone": "santa-ana"
+        "price_usd": 155000.0,
+        "source": "csbr",
+        "source_id": "venta-terreno-en-residencial-las-luces-zaragoza",
+        "title": "VENTA TERRENO RESIDENCIAL LAS LUCES ZARAGOZA",
+        "url": "https://www.camarabienesraices.com.sv/propiedad/venta-terreno-en-residencial-las-luces-zaragoza/",
+        "zone": "zaragoza"
       }
     ],
     "sources": [
-      "realestate_au_sv"
+      "csbr"
     ]
   },
   {
