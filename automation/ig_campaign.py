@@ -829,6 +829,12 @@ def patch_queue(item: dict, queue_path: Path = QUEUE_PATH) -> None:
     still-unposted item that isn't part of campaign_v1.  Posted items are
     left untouched (history).  Idempotent: re-running replaces the same
     day id rather than duplicating it.
+
+    NEVER un-posts: if the day already published (posted=True in the queue),
+    the freshly-rendered item inherits that posted state instead of resetting
+    it to posted=False.  Rebuilding the plan (e.g. to tweak slides) must not
+    resurrect an already-live post and make the publisher re-post it — that
+    is exactly how day 201 got queued for a 3rd publish after a slide edit.
     """
     data = json.loads(queue_path.read_text(encoding="utf-8"))
     items = data.get("items", [])
@@ -843,6 +849,16 @@ def patch_queue(item: dict, queue_path: Path = QUEUE_PATH) -> None:
             it["approved"] = False
             it["status"] = "superseded_campaign_v1"
             superseded += 1
+
+    prior = next((it for it in items if it.get("day") == item["day"]), None)
+    if prior and prior.get("posted"):
+        item = {
+            **item,
+            "posted": True,
+            "posted_at": prior.get("posted_at"),
+            "posted_media_id": prior.get("posted_media_id"),
+            "status": prior.get("status") or "posted",
+        }
 
     items = [it for it in items if it.get("day") != item["day"]]
     items.append(item)

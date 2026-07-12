@@ -239,11 +239,11 @@
         "citymax_sc_terreno-residencial-en-venta-isla-san-blas"
       ],
       "primary_listing_id": "citymax_sc_terreno-residencial-en-venta-isla-san-blas",
-      "status": "scheduled",
+      "status": "posted",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-07-11T12:02:24.417320+00:00",
+      "posted_media_id": "17880008943476568"
     },
     {
       "day": 106,
@@ -296,11 +296,11 @@
         "goodlife_new-ocean-view-home-in-gated-community-cerromar-el-sunzal"
       ],
       "primary_listing_id": "goodlife_new-ocean-view-home-in-gated-community-cerromar-el-sunzal",
-      "status": "scheduled",
+      "status": "posted",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-07-12T03:51:28.623229+00:00",
+      "posted_media_id": "18096226243995708"
     },
     {
       "day": 107,

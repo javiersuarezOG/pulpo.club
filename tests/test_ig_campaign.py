@@ -177,3 +177,24 @@ def test_patch_queue_supersedes_and_is_idempotent(no_browser, tmp_path):
     ig_campaign.patch_queue(item, queue_path=queue)
     data2 = json.loads(queue.read_text(encoding="utf-8"))
     assert sum(1 for it in data2["items"] if it["day"] == 201) == 1
+
+
+def test_patch_queue_never_unposts_a_published_day(no_browser, tmp_path):
+    # Rebuilding the plan (fresh render_post → posted=False) must NOT reset a
+    # day the publisher already posted, or the publisher re-posts it. This is
+    # the day-201 3rd-publish regression.
+    queue = tmp_path / "ig_queue.json"
+    queue.write_text(json.dumps({"items": [
+        {"day": 201, "selector": "campaign_v1", "approved": True, "posted": True,
+         "posted_at": "2026-07-11T12:02:24+00:00", "posted_media_id": "17880008943476568",
+         "status": "posted", "scheduled_for": "2026-07-11T01:00:00+00:00"},
+    ]}), encoding="utf-8")
+
+    fresh = ig_campaign.render_post(ig_campaign.PLAN_BY_DAY[201])
+    assert fresh["posted"] is False                              # a fresh build is unposted…
+    ig_campaign.patch_queue(fresh, queue_path=queue)
+
+    day201 = [it for it in json.loads(queue.read_text())["items"] if it["day"] == 201][0]
+    assert day201["posted"] is True                              # …but the queue keeps it posted
+    assert day201["posted_media_id"] == "17880008943476568"
+    assert day201["status"] == "posted"
