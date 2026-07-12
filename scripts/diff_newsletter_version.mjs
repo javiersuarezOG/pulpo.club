@@ -82,6 +82,11 @@ const NON_RENDER_MODULES = new Set([
   // newsletter_issue_state.json and (legacy) queries PostHog. Produces an
   // integer, zero HTML; changing it can't stale a template version.
   "automation/newsletter/issue_state.py",
+  // Free-member filter codec — pure string encode/decode of the Resend
+  // last_name side-channel (api/_prefs_codec.js is its JS twin). Owns no
+  // HTML/CSS and no version constant; parity is guarded by its own contract
+  // test, so a codec edit must NOT force a template-revision bump.
+  "automation/newsletter/prefs_codec.py",
 ]);
 
 function isNewsletterRenderChange(file) {
