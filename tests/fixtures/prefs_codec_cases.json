@@ -1,0 +1,18 @@
+{
+  "_doc": "Shared JS↔Python parity contract for the free-member filter codec. api/_prefs_codec.js and automation/newsletter/prefs_codec.py MUST both satisfy every case. encode: pref -> string. decode: string -> pref (dict). Kept language-neutral (max_price is an integer; Python reads it back as float, which is fine — the STRING is the contract).",
+  "encode": [
+    { "pref": { "property_types": ["land"], "max_price_usd": 500000 }, "out": "pulpo-filter:pt=land;mx=500000" },
+    { "pref": { "property_types": ["land", "house"], "max_price_usd": 500000, "min_price_usd": 0 }, "out": "pulpo-filter:pt=land,house;mx=500000" },
+    { "pref": { "zones": ["el_tunco"], "categories": ["beachfront"] }, "out": "pulpo-filter:z=el_tunco;cat=beachfront" },
+    { "pref": {}, "out": "" },
+    { "pref": { "property_types": [] }, "out": "" }
+  ],
+  "decode": [
+    { "in": "pulpo-filter:pt=land;mx=500000", "out": { "property_types": ["land"], "max_price_usd": 500000 } },
+    { "in": "pulpo-filter:pt=Land, House!;mx=abc500000def;mn=0;z=el_tunco", "out": { "property_types": ["land", "house"], "max_price_usd": 500000, "zones": ["el_tunco"] } },
+    { "in": "garbage", "out": {} },
+    { "in": "", "out": {} },
+    { "in": "pulpo-filter:", "out": {} },
+    { "in": "pulpo-filter:mn=0", "out": {} }
+  ]
+}

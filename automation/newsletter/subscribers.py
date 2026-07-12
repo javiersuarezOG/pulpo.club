@@ -24,6 +24,7 @@ import os
 from dataclasses import dataclass, field
 from typing import Any, Iterable, Optional
 
+from . import prefs_codec
 from .store import email_hash
 from .types import Locale, Preference, Recipient, SavedListing
 
@@ -57,6 +58,12 @@ class ResendContact:
     # the consumer in join_recipients() falls back to "en" in that case
     # — identical to pre-2026-05-28 behavior. See docs/email-audit.md.
     locale: Optional[Locale] = None
+    # Free-member filter side-channel: the Resend contact's `last_name` holds
+    # "pulpo-filter:pt=land;mx=500000", written by api/newsletter-prefs.js and
+    # parsed here via prefs_codec. None when unset. Read for free from the same
+    # audience list call (Resend's list omits custom properties but returns
+    # last_name, which Pulpo never renders). See prefs_codec.py for the why.
+    pref_filter: Optional[dict] = None
 
 
 _LOCALE_PREFIX = "pulpo-locale:"
@@ -103,12 +110,14 @@ def list_audience(
         # Resend returns first_name in either snake- or camel-case
         # depending on SDK version; tolerate both.
         first_name = r.get("first_name") or r.get("firstName")
+        last_name = r.get("last_name") or r.get("lastName")
         out.append(ResendContact(
             id=str(r.get("id") or ""),
             email=email.strip().lower(),
             unsubscribed=bool(r.get("unsubscribed", False)),
             created_at=r.get("created_at"),
             locale=_parse_locale_first_name(first_name),
+            pref_filter=(prefs_codec.decode(last_name) or None),
         ))
     return out
 
@@ -608,16 +617,22 @@ def join_recipients(
             # Anonymous synthesis: locale from Resend first_name
             # side-channel, everything else nominal. The build_issue
             # path treats cohort=anonymous with a fallback_preference.
+            # Free-member filter: read from the Resend last_name side-channel
+            # (api/newsletter-prefs.js writes it). When set, this anonymous
+            # contact gets a real personalized top-N instead of the broad
+            # cohort fallback. decode() already sanitized to known Preference
+            # fields, so the splat is safe.
+            _free_pref = Preference(**c.pref_filter) if c.pref_filter else Preference()
             recipient = Recipient(
                 email_hash=email_hash(c.email),
                 display_name=None,
                 locale=c.locale or "en",
                 tier="free",
                 has_account=False,
-                preference=Preference(),
+                preference=_free_pref,
                 saved_count=0,
                 saves=[],
-                preference_source="none",
+                preference_source=("free_prefs" if c.pref_filter else "none"),
             )
             out.append(recipient)
             continue

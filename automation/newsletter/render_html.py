@@ -1014,7 +1014,7 @@ def _favorites_html(issue: Issue) -> str:
 
     cards = "".join(_favorite_card_html(u, locale) for u in favorites)
 
-    site = (issue.settings_url.split("/account")[0] if "/account" in issue.settings_url else "https://pulpo.club")
+    site = _site_root_from_issue(issue)  # robust origin (settings_url may now be /api/newsletter-prefs)
     ref = f"?ref=newsletter_issue_{issue.issue_number:02d}"
     saved_url = f"{site}/saved{ref}&from=favorites"
     open_all = i18n.t("favorites.open_all", locale)
@@ -1429,17 +1429,22 @@ def _site_root_from_issue(issue: Issue) -> str:
     from any of the absolute URLs already on the Issue. Avoids re-reading
     the env var here — build_issue.py already resolved it once.
 
-    `settings_url` is the safest anchor because `/account` is a stable
-    SPA route (the unsubscribe URL is `/api/unsubscribe?...` post-2026-05-29,
-    so splitting on "/unsubscribe" would leave a stray "/api" suffix and
-    produce `https://pulpo.club/api/saved` etc. for the "Your Pulpo" links).
+    Parse the ORIGIN (scheme://host) instead of string-splitting on a path.
+    settings_url is no longer a stable anchor: email-only members now get
+    `/api/newsletter-prefs?...` (logged-in members still get `/account?...`),
+    so a naive `split("/account")` returns the whole prefs URL and yields
+    `{prefs_url}/browse` for the Your-Pulpo links. The unsubscribe URL is
+    always `{root}/api/unsubscribe?...`, so it's the primary anchor; the
+    others are fallbacks. All are absolute.
     """
-    settings_part = (issue.settings_url or "").split("/account", 1)[0]
-    if settings_part:
-        return settings_part.rstrip("/") or "https://pulpo.club"
-    unsub_part = (issue.unsubscribe_url or "").split("/api/unsubscribe", 1)[0]
-    if unsub_part:
-        return unsub_part.rstrip("/") or "https://pulpo.club"
+    from urllib.parse import urlsplit
+    for candidate in (issue.unsubscribe_url, issue.settings_url,
+                      getattr(issue, "paywall_target_url", None)):
+        if not candidate:
+            continue
+        parts = urlsplit(candidate)
+        if parts.scheme and parts.netloc:
+            return f"{parts.scheme}://{parts.netloc}"
     return "https://pulpo.club"
 
 
