@@ -208,8 +208,13 @@ function cleanPatch(patch) {
   return { out, dropped };
 }
 
-module.exports = async (req, res) => {
+// `deps` lets tests inject clerkClient / authenticateClerkRequest without
+// stubbing the CJS require (mirrors api/newsletter.js's resendImpl pattern).
+// Production callers pass nothing → the real ../_clerk bindings are used.
+module.exports = async (req, res, deps = {}) => {
   const t0 = Date.now();
+  const _clerkClient = deps.clerkClient || clerkClient;
+  const _authenticate = deps.authenticateClerkRequest || authenticateClerkRequest;
 
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -221,7 +226,7 @@ module.exports = async (req, res) => {
 
   let userId;
   try {
-    userId = await authenticateClerkRequest(req);
+    userId = await _authenticate(req);
   } catch (err) {
     logApi("clerk.update_profile", {
       status: 500, ms: Date.now() - t0, reason: "auth_throw",
@@ -261,7 +266,7 @@ module.exports = async (req, res) => {
   let currentPublic = {};
   let nextProfile = null;
   try {
-    const clerk = clerkClient();
+    const clerk = _clerkClient();
     const user = await clerk.users.getUser(userId);
     currentPublic = (user && user.publicMetadata) || {};
     const currentProfile =
@@ -285,25 +290,77 @@ module.exports = async (req, res) => {
   } catch (err) {
     // Clerk SDK errors carry a structured `errors` array ({ code, message,
     // longMessage }) + an HTTP `status`; the bare `err.message` is often just
-    // "Unprocessable Entity". Surface the specific message + the serialized
-    // publicMetadata size so a stuck account — e.g. metadata over Clerk's
-    // ~8 KB cap — is diagnosable at a glance (both logged AND returned).
+    // "Unprocessable Entity".
     const clerkErrors = err && Array.isArray(err.errors) ? err.errors : [];
     const primary = clerkErrors[0] || {};
-    const detail = (primary.longMessage || primary.message || (err && err.message) || "unknown").slice(0, 300);
+    let detail = (primary.longMessage || primary.message || (err && err.message) || "unknown").slice(0, 300);
+
+    // ── Self-heal: shrink publicMetadata to fit Clerk's ~8 KB cap ───────
+    // A heavily-stamped account can push publicMetadata past the cap, and
+    // then EVERY write fails (the reported bug: a Pro user can't save
+    // newsletter prefs). When the failure clearly indicates size, drop only
+    // NON-CRITICAL, regenerable data — first-touch attribution + webhook
+    // idempotency breadcrumbs + the legacy `profile.newsletter` blob
+    // (superseded by discover_filters) — and retry once. Billing / plan /
+    // welcome-stamp keys and the live `discover_filters` / `preferred_categories`
+    // are NEVER dropped.
+    const looksSizeRelated =
+      primary.code === "form_param_value_too_long" ||
+      /8192|maximum size|max.*size|too large|too long|exceed|metadata.*(size|large)|(size|large).*metadata/i.test(detail);
+    if (looksSizeRelated && nextProfile) {
+      const SAFE_DROP_TOP = [
+        "acquisition_utm_source", "acquisition_utm_medium", "acquisition_utm_campaign",
+        "acquisition_utm_term", "acquisition_utm_content", "pulpo_last_event_id",
+      ];
+      const slimPublic = { ...currentPublic };
+      const dropped = [];
+      for (const k of SAFE_DROP_TOP) {
+        if (k in slimPublic) { delete slimPublic[k]; dropped.push(k); }
+      }
+      const slimProfile = { ...nextProfile };
+      if (slimProfile.newsletter && slimProfile.discover_filters) {
+        delete slimProfile.newsletter; dropped.push("profile.newsletter");
+      }
+      slimPublic.profile = slimProfile;
+      if (dropped.length > 0) {
+        try {
+          await _clerkClient().users.updateUserMetadata(userId, { publicMetadata: slimPublic });
+          logApi("clerk.update_profile", {
+            status: 200, ms: Date.now() - t0, healed: "slimmed",
+            dropped: dropped.join(","), keys: Object.keys(patch).join(","),
+          });
+          return res.status(200).json({ profile: slimProfile });
+        } catch (retryErr) {
+          // Retry still failed — report the retry error; if it's still size,
+          // the essential data alone exceeds the cap (needs a deeper trim).
+          const rErrs = retryErr && Array.isArray(retryErr.errors) ? retryErr.errors : [];
+          detail = ((rErrs[0] && (rErrs[0].longMessage || rErrs[0].message)) || (retryErr && retryErr.message) || detail).slice(0, 300);
+        }
+      }
+    }
+
+    // Per-top-level-key byte sizes so any residual bloat is visible at a
+    // glance (both logged AND surfaced in the toast), e.g. "profile:5100".
+    const sizes = {};
     let bytes = -1;
-    try { bytes = JSON.stringify({ ...currentPublic, profile: nextProfile || {} }).length; } catch { /* ignore */ }
+    try {
+      const full = { ...currentPublic, profile: nextProfile || {} };
+      bytes = JSON.stringify(full).length;
+      for (const [k, v] of Object.entries(full)) sizes[k] = JSON.stringify(v).length;
+    } catch { /* ignore */ }
+    const topKeys = Object.entries(sizes).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k, n]) => `${k}:${n}`).join(", ");
+
     logApi("clerk.update_profile", {
       status: 500, ms: Date.now() - t0, reason: "write_failed",
       clerk_status: (err && err.status) || 0,
       clerk_code: primary.code || "-",
-      bytes,
+      bytes, top_keys: topKeys,
       error: detail,
     });
     return res.status(500).json({
       error: "write_failed",
       reason: primary.code || "clerk_error",
-      detail,
+      detail: bytes > 0 ? `${detail} [${bytes}b — ${topKeys}]` : detail,
       bytes,
     });
   }
