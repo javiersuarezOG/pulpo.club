@@ -241,9 +241,11 @@
       "primary_listing_id": "citymax_sc_terreno-residencial-en-venta-isla-san-blas",
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-07-12T23:08:54.162847+00:00",
+      "posted_media_id": "18367371742226678",
+      "comment_posted": true,
+      "comment_id": "18055363901759711"
     },
     {
       "day": 106,
