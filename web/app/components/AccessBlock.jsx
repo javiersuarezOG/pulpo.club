@@ -14,6 +14,7 @@ import { track } from "../telemetry/hook";
 import { subscribeEmail, NL_EMAIL_RE } from "../lib/newsletter-signup";
 import { startCheckoutFromModal } from "../lib/stripe-modal-checkout";
 import { accessOptionsFor } from "../config/access";
+import { isPaid } from "../lib/gating";
 
 /**
  * @param {object} props
@@ -44,8 +45,13 @@ export function AccessBlock({ app, locale: lc, surface, cfg, onDone }) {
       // becomeFreeMember fires the app-level JoinCelebration reveal.
       app.becomeFreeMember({ email: value, openListingId: reason === "top3" ? (cfg && cfg.listingId) || null : null, returning: result.kind === "already" });
       if (typeof onDone === "function") onDone();
-      // Inline surfaces (hero) have no modal to unmount — reset the button so
-      // it never freezes on "Joining…"; the celebration overlay takes over.
+      // Inline surfaces (hero) have no modal to unmount. A brand-new join is
+      // taken over by the celebration overlay (reset the button). An "already a
+      // member" resubmit gets NO celebration (becomeFreeMember suppresses it
+      // for `returning`), so show an inline acknowledgment instead of a silent
+      // reset — otherwise a returning member's resubmit looks like it did
+      // nothing (GAP B).
+      else if (result.kind === "already") { setStatus("already"); setEmail(""); }
       else { setStatus("idle"); setEmail(""); }
       return;
     }
@@ -54,6 +60,14 @@ export function AccessBlock({ app, locale: lc, surface, cfg, onDone }) {
 
   // ② Go Pro — straight to Stripe checkout (first month free pre-applied).
   const onGoPro = async () => {
+    // Already Pro → never open a SECOND Stripe checkout (double-charge risk;
+    // the webhook only detects the duplicate AFTER the money moves). Send them
+    // to manage the subscription they already have — mirrors start.jsx.
+    if (isPaid(app.user)) {
+      try { track("access.go_pro_already_pro", { surface, reason }); } catch { /* ignore */ }
+      window.location.assign("/account/subscription");
+      return;
+    }
     // In-flight guard: the button previously had no disabled state, so
     // repeated clicks each fired a fresh /api/stripe/start-checkout POST —
     // the console flood of 429s in the QA report. One checkout at a time.
@@ -104,13 +118,16 @@ export function AccessBlock({ app, locale: lc, surface, cfg, onDone }) {
             placeholder={t("access.email.placeholder", lc)}
             aria-label={t("access.email.aria", lc)}
             value={email}
-            onChange={(e) => { setEmail(e.target.value); if (status === "invalid" || status === "error") setStatus("idle"); }}
+            onChange={(e) => { setEmail(e.target.value); if (status !== "idle" && status !== "loading") setStatus("idle"); }}
             disabled={status === "loading"}
           />
           <button type="submit" className="btn-primary lg block access-cta-free" disabled={status === "loading"}>
             {t(status === "loading" ? "access.free.cta_loading" : "access.free.cta", lc)}
           </button>
           <div className="access-free-note">{t("access.free.note", lc)}</div>
+          {status === "already" && (
+            <p className="access-free-note" role="status">{t("access.free.already", lc)}</p>
+          )}
           {(status === "invalid" || status === "error") && (
             <p className="access-error" role="alert">
               {t(status === "invalid" ? "access.error.invalid" : "access.error.generic", lc)}
