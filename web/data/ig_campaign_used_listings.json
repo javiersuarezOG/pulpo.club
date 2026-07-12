@@ -1,0 +1,36 @@
+{
+  "campaign": "tu-pedazo-de-paraiso-v1",
+  "note": "Listings featured in the campaign. Future IG selections must exclude these to avoid reshowing.",
+  "shown": [
+    "bienesraices_1529",
+    "bienesraices_2156",
+    "bienesraices_2229",
+    "citymax_sc_casa-en-venta-residencial-san-carlos-sonzacate",
+    "citymax_sc_se-vende-terreno-con-vista-al-mar-en-surf-city",
+    "citymax_sc_terreno-residencial-en-venta-isla-san-blas",
+    "encuentra24_31372098",
+    "encuentra24_32059471",
+    "goodlife_2-bed-condominium-at-zonset-el-zonte-445694",
+    "goodlife_new-ocean-view-home-in-gated-community-cerromar-el-sunzal",
+    "oceanside_11468",
+    "oceanside_12288",
+    "oceanside_12809",
+    "oceanside_15561"
+  ],
+  "by_day": {
+    "201": "citymax_sc_terreno-residencial-en-venta-isla-san-blas",
+    "202": "goodlife_new-ocean-view-home-in-gated-community-cerromar-el-sunzal",
+    "203": "oceanside_15561",
+    "204": "bienesraices_1529",
+    "205": "citymax_sc_casa-en-venta-residencial-san-carlos-sonzacate",
+    "206": "encuentra24_32059471",
+    "207": "oceanside_12809",
+    "208": "goodlife_2-bed-condominium-at-zonset-el-zonte-445694",
+    "209": "oceanside_12288",
+    "210": "bienesraices_2229",
+    "211": "bienesraices_2156",
+    "212": "encuentra24_31372098",
+    "213": "citymax_sc_se-vende-terreno-con-vista-al-mar-en-surf-city",
+    "214": "oceanside_11468"
+  }
+}

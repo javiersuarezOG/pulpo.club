@@ -81,7 +81,8 @@ def test_every_day_is_bilingual_and_on_palette():
 
 def test_every_slide_type_is_renderable():
     for p in ig_campaign.PLAN:
-        assert 1 <= len(p["slides"]) <= 3
+        # topic posts carry 3 design cards + 1 appended ★ listing slide
+        assert 1 <= len(p["slides"]) <= 4
         for spec in p["slides"]:
             assert spec["t"] in _DISPATCH, spec["t"]
             color = CATEGORY_COLORS[p["color_key"]]
@@ -131,15 +132,27 @@ def test_render_post_day1_item_shape(no_browser):
     assert item["day"] == 201
     assert item["selector"] == "campaign_v1"
     assert item["approved"] is True and item["posted"] is False
-    # 3 slides → poster_path + 2 carousel photos
+    # 4 slides (3 design cards + ★ listing) → poster_path + 3 carousel photos
     assert item["poster_path"].endswith("slide1.png")
-    assert len(item["carousel_photo_paths"]) == 2
+    assert len(item["carousel_photo_paths"]) == 3
     # bilingual wire: ES then EN joined by the divider, hashtags on comment
     assert ig_campaign.DIV in item["caption"]
     assert "oceanfront" in item["caption"].lower()
     assert item["comment"].strip().endswith("#TuPedazoDeParaiso")
-    # inspiration post carries no listing
-    assert item["listing_ids"] == [] and item["primary_listing_id"] is None
+    # every post now carries a real featured listing (bug: "all posts have a listing")
+    assert item["primary_listing_id"] and item["listing_ids"] == [item["primary_listing_id"]]
+
+
+def test_every_post_has_a_unique_listing_no_reshow():
+    # Every one of the 14 posts features a real listing, and NO listing is
+    # shown twice across the campaign (the "keep track of listings shown"
+    # requirement). The committed ledger must agree with the plan.
+    ids = [p.get("primary_listing_id") for p in ig_campaign.PLAN]
+    assert all(ids), "every post must feature a listing"
+    assert len(ids) == len(set(ids)) == 14, "no listing may be reshown"
+    ledger = json.loads(Path("web/data/ig_campaign_used_listings.json").read_text(encoding="utf-8"))
+    assert set(ledger["shown"]) == set(ids)
+    assert ledger["by_day"] == {str(p["day"]): p["primary_listing_id"] for p in ig_campaign.PLAN}
 
 
 def test_patch_queue_supersedes_and_is_idempotent(no_browser, tmp_path):
