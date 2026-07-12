@@ -25,8 +25,31 @@ function mockReq(body) {
 
 function resendNewContact() {
   return { contacts: {
+    // Existence check first → not found → create.
+    get: vi.fn(async () => ({ data: null, error: { name: "not_found", message: "Contact not found" } })),
     create: vi.fn(async () => ({ data: { id: "c1" }, error: null })),
     update: vi.fn(async () => ({})),
+  } };
+}
+// The PROD bug regression guard: Resend's create UPSERTS (returns SUCCESS for
+// an existing email), so the old create-error dedup never fired. get-first
+// must catch the active contact and return already_subscribed WITHOUT calling
+// create or sending a welcome.
+function resendUpsertsActive() {
+  return { contacts: {
+    get: vi.fn(async () => ({ data: { id: "c1", email: "active@example.com", unsubscribed: false }, error: null })),
+    create: vi.fn(async () => ({ data: { id: "c1" }, error: null })), // upsert-success (no error)
+    update: vi.fn(async () => ({ data: {}, error: null })),
+  } };
+}
+// get-by-email unavailable (throws) → the list-scan fallback must still find
+// the active contact.
+function resendGetThrowsListActive() {
+  return { contacts: {
+    get: vi.fn(async () => { throw new Error("get unavailable"); }),
+    list: vi.fn(async () => ({ data: { data: [{ id: "c1", email: "active@example.com", unsubscribed: false }] } })),
+    create: vi.fn(async () => ({ data: { id: "c1" }, error: null })),
+    update: vi.fn(async () => ({ data: {}, error: null })),
   } };
 }
 function resendDuplicate() {
@@ -114,6 +137,31 @@ describe("newsletter → free-welcome trigger", () => {
       { fetchImpl, resendImpl: resendDuplicateActive() },
     );
     expect(res.body).toEqual({ ok: true, already_subscribed: true });
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it("create UPSERTS (prod bug) → get-first still returns already_subscribed, no create/welcome", async () => {
+    // The bug found in prod: Resend's create no longer errors on a duplicate,
+    // so the old create-then-catch dedup returned {ok:true} every time and the
+    // client kept replaying the celebration. get-first must short-circuit on
+    // the active contact — never calling create, never sending a welcome.
+    const fetchImpl = vi.fn(async () => ({ status: 200, json: async () => ({ status: "sent" }) }));
+    const resend = resendUpsertsActive();
+    const res = mockRes();
+    await handler(mockReq({ email: "active@example.com", locale: "en" }), res, { fetchImpl, resendImpl: resend });
+    expect(res.body).toEqual({ ok: true, already_subscribed: true });
+    expect(resend.contacts.create).not.toHaveBeenCalled();
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it("get-by-email unavailable → list fallback still detects active → already_subscribed", async () => {
+    const fetchImpl = vi.fn(async () => ({ status: 200, json: async () => ({ status: "sent" }) }));
+    const resend = resendGetThrowsListActive();
+    const res = mockRes();
+    await handler(mockReq({ email: "active@example.com", locale: "en" }), res, { fetchImpl, resendImpl: resend });
+    expect(res.body).toEqual({ ok: true, already_subscribed: true });
+    expect(resend.contacts.list).toHaveBeenCalled();
+    expect(resend.contacts.create).not.toHaveBeenCalled();
     expect(fetchImpl).not.toHaveBeenCalled();
   });
 
