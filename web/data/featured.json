@@ -18,8 +18,8 @@
       "pick_count": 3
     }
   },
-  "picked_at": "2026-07-10T07:25:34.493098+00:00",
-  "expires_at": "2026-07-11T00:00:00+00:00",
+  "picked_at": "2026-07-12T06:33:18.924203+00:00",
+  "expires_at": "2026-07-13T00:00:00+00:00",
   "tier": "elite",
   "listing_id": "citymax|156276",
   "rank_score": 80.06,
@@ -58,7 +58,7 @@
     },
     {
       "listing_id": "bienesraices|2191",
-      "rank_score": 75.85,
+      "rank_score": 75.89,
       "hero_photo_quality_score": 100,
       "photos_count": 19
     }
