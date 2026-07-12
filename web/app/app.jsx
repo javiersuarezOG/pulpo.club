@@ -1633,10 +1633,15 @@ function App() {
           setUser((u) => (u ? { ...u, profile: priorProfile || {} } : u));
           track("account.profile_sync_failed", {
             keys: Object.keys(patch).join(","),
-            reason: (err && err.code) || (err && err.message) || "unknown",
+            reason: (err && (err.reason || err.detail || err.code)) || "unknown",
             status: (err && err.status) || 0,
+            bytes: (err && err.bytes) || null,
           });
-          showToast(t("account.profile.sync_failed", locale));
+          // Surface the actual server reason when we have one — an error must
+          // say what went wrong, not just "try again" (CLAUDE.md). Falls back
+          // to the generic copy when the server didn't return a detail.
+          const base = t("account.profile.sync_failed", locale);
+          showToast(err && err.detail ? `${base} — ${err.detail}` : base);
         });
     }
   }, [clerkActions, showToast, locale]);
