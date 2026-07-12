@@ -1779,6 +1779,7 @@ export const UI_STRINGS = {
   "access.free.cta":                   { en: "Send me my top 3 →",            es: "Envíame mi top 3 →" },
   "access.free.cta_loading":           { en: "Joining…",                      es: "Uniéndote…" },
   "access.free.note":                  { en: "No account, no card — just your email", es: "Sin cuenta, sin tarjeta — solo tu correo" },
+  "access.free.already":               { en: "You're already on the list — see you Sunday.", es: "Ya estás en la lista — nos vemos el domingo." },
   "access.go_pro.cta":                 { en: "Unlock everything — $9.99/mo",  es: "Desbloquea todo — $9.99/mes" },
   "access.go_pro.cta_loading":         { en: "Taking you to checkout…",       es: "Llevándote al pago…" },
   "access.go_pro.sub":                 { en: "Every listing + all 10 of our weekly picks. First month's on us.", es: "Todas las propiedades + las 10 selecciones de la semana. El primer mes va por nuestra cuenta." },

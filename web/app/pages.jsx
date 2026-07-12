@@ -4691,6 +4691,14 @@ function ProUpsellModal({ app, trigger, urlCode, utms, onClose }) {
   // postCheckout / soft-fail-on-bad-code retry / rate-limited / network
   // error / redirect chain. Lives in lib/stripe-modal-checkout.ts.
   const onCta = async () => {
+    // Already Pro → manage the existing subscription, never open a second
+    // checkout (double-charge risk; webhook only catches it post-payment).
+    // Defense-in-depth alongside the upstream gating. Mirrors start.jsx.
+    if (isPaid(app.user)) {
+      track("pro_upsell.already_pro", { trigger });
+      window.location.assign("/account/subscription");
+      return;
+    }
     setError(null);
     track("pro_upsell.cta_clicked", { trigger, had_promo_code: !!urlCode });
     setSubmitting(true);

@@ -34,7 +34,14 @@ export async function subscribeEmail(
       body: JSON.stringify({ email: value, source: opts.source, locale: opts.locale, utms }),
     });
     const body = await r.json().catch(() => ({} as Record<string, unknown>));
-    if (r.ok) return { kind: body.resubscribed ? "already" : "success" };
+    // "already" covers BOTH server signals: `resubscribed` (was unsubscribed,
+    // welcome-back sent) AND `already_subscribed` (still active, idempotent
+    // no-op). Reading only `resubscribed` was the gap that let an already-
+    // active subscriber be classed as `success` on the default hero
+    // (AccessBlock) + EmailCaptureModal → the QA bug-3 octopus celebration
+    // replayed there even after the inline-EmailCapture fix. Both callers pass
+    // this through to becomeFreeMember({returning}) which suppresses the reveal.
+    if (r.ok) return { kind: (body.resubscribed || body.already_subscribed) ? "already" : "success" };
     if (r.status === 429) return { kind: "rate_limited" };
     if (body && body.error === "invalid_email") return { kind: "invalid" };
     return { kind: "error" };
