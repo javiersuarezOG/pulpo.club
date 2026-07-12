@@ -81,8 +81,8 @@ def test_every_day_is_bilingual_and_on_palette():
 
 def test_every_slide_type_is_renderable():
     for p in ig_campaign.PLAN:
-        # topic posts carry 3 design cards + 1 appended ★ listing slide
-        assert 1 <= len(p["slides"]) <= 4
+        # topic posts: 3 design cards + ★ listing photo + detail spec card
+        assert 1 <= len(p["slides"]) <= 5
         for spec in p["slides"]:
             assert spec["t"] in _DISPATCH, spec["t"]
             color = CATEGORY_COLORS[p["color_key"]]
@@ -101,6 +101,20 @@ def test_photo_slides_reference_committed_source_frames():
                 assert Path(spec["img"]).exists(), spec["img"]
                 assert spec.get("ribbon")
     assert seen_photo, "expected at least one photo (Top-10) slide"
+
+
+def test_design_days_span_listing_over_photo_plus_detail():
+    # Every design-only day (has a detail card) shows its listing across a
+    # ★ photo slide AND an evocative detail card — the "at least 2 pics for
+    # the listing" request. The detail card must not be a bare spec dump.
+    design = [p for p in ig_campaign.PLAN if p["kind"] != "top10"]
+    assert len(design) == 8, len(design)
+    for p in design:
+        kinds = [s["t"] for s in p["slides"]]
+        assert kinds[-2:] == ["photo", "detail"], (p["day"], kinds)
+        detail = p["slides"][-1]
+        assert detail.get("price") and detail.get("facts") and detail.get("loc")
+        assert detail.get("color_key") == p["slides"][-2].get("color_key")  # matches its photo
 
 
 def test_top10_day_item_shape(no_browser):
@@ -132,9 +146,9 @@ def test_render_post_day1_item_shape(no_browser):
     assert item["day"] == 201
     assert item["selector"] == "campaign_v1"
     assert item["approved"] is True and item["posted"] is False
-    # 4 slides (3 design cards + ★ listing) → poster_path + 3 carousel photos
+    # 5 slides (3 design cards + ★ listing photo + detail card) → poster + 4 carousel
     assert item["poster_path"].endswith("slide1.png")
-    assert len(item["carousel_photo_paths"]) == 3
+    assert len(item["carousel_photo_paths"]) == 4
     # bilingual wire: ES then EN joined by the divider, hashtags on comment
     assert ig_campaign.DIV in item["caption"]
     assert "oceanfront" in item["caption"].lower()
