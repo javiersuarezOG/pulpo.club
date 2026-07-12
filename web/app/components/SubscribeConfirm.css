@@ -1,0 +1,102 @@
+/* "Already on the list" confirmation — treatment B. Colors are token-only
+   (CLAUDE.md bans hex/rgb literals under web/app); motion uses the shared
+   easing tokens. Staggered mount reveal: card rises, badge springs, check
+   draws, headline + line fade up in sequence. */
+
+.subscribe-confirm {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  animation: sc-rise 0.5s var(--ease-spring) both;
+}
+.subscribe-confirm.is-compact {
+  align-items: center;
+  text-align: center;
+}
+
+.subscribe-confirm-badge {
+  width: 52px;
+  height: 52px;
+  border-radius: 999px;
+  background: var(--color-bg-sage);
+  border: 1px solid var(--color-bg-sage-2);
+  color: var(--color-forest-deep);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+  animation: sc-pop 0.5s var(--ease-spring) 0.04s both;
+}
+.subscribe-confirm-check {
+  stroke-dasharray: 26;
+  stroke-dashoffset: 26;
+  animation: sc-draw 0.42s cubic-bezier(0.6, 0, 0.3, 1) 0.18s forwards;
+}
+
+.subscribe-confirm-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 27px;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--color-ink-primary);
+  text-wrap: balance;
+  animation: sc-fade 0.4s var(--ease-out) 0.14s both;
+}
+.subscribe-confirm-body {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-ink-secondary);
+  margin: var(--space-2) 0 0;
+  max-width: 30ch;
+  animation: sc-fade 0.4s var(--ease-out) 0.24s both;
+}
+
+@keyframes sc-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sc-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes sc-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sc-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .subscribe-confirm,
+  .subscribe-confirm * {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0s !important;
+  }
+}

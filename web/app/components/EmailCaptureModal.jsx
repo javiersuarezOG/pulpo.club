@@ -13,6 +13,7 @@ import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
 import { Icon, PulpoMark } from "../components.jsx";
 import { subscribeEmail, NL_EMAIL_RE } from "../lib/newsletter-signup";
+import { SubscribeConfirm } from "./SubscribeConfirm";
 
 /**
  * @param {object} props
@@ -53,10 +54,12 @@ export function EmailCaptureModal({ app, locale: lc, cfg, onClose }) {
     try { track("email_capture.submitted", { reason, email_domain_only: domain, result: result.kind }); } catch { /* ignore */ }
     if (result.kind === "success" || result.kind === "already") {
       try { track("free_member_created", { reason, via: "email_capture" }); } catch { /* ignore */ }
-      // Become a Free member; opens the stashed top-3 (if any) once state
-      // lands, and fires the app-level JoinCelebration reveal.
+      // Become a Free member; opens the stashed top-3 (if any) once state lands.
+      // New join → JoinCelebration octopus (close so it isn't covered).
+      // Returning member → no octopus; show the confirmation card, auto-close.
       app.becomeFreeMember({ email: value, openListingId: reason === "top3" ? (cfg && cfg.listingId) || null : null, returning: result.kind === "already" });
-      onClose();
+      if (result.kind === "already") { setStatus("already"); setTimeout(onClose, 1900); }
+      else onClose();
       return;
     }
     setStatus(result.kind === "invalid" ? "invalid" : "error");
@@ -91,6 +94,9 @@ export function EmailCaptureModal({ app, locale: lc, cfg, onClose }) {
         <div className="modal-brand-mark" style={{ color: "var(--accent)" }}>
           <PulpoMark size={36} />
         </div>
+        {status === "already" ? (
+          <SubscribeConfirm locale={lc} compact />
+        ) : (<>
         <h2 className="free-month-modal-headline">{t("email_capture.headline", lc)}</h2>
         <p className="free-month-modal-body">{t("email_capture.body", lc)}</p>
 
@@ -127,6 +133,7 @@ export function EmailCaptureModal({ app, locale: lc, cfg, onClose }) {
         <button type="button" className="free-month-modal-dismiss link-btn" onClick={() => dismiss("not_now")}>
           {t("email_capture.dismiss", lc)}
         </button>
+        </>)}
       </div>
     </div>
   );

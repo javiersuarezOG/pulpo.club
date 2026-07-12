@@ -22,6 +22,7 @@ import { Icon, PulpoMark } from "../components.jsx";
 import { useListings } from "../data/use-listings";
 import { pickTopRanked } from "../lib/free-view";
 import { AccessBlock } from "../components/AccessBlock.jsx";
+import { SubscribeConfirm } from "../components/SubscribeConfirm";
 import versions from "./versions.json";
 
 const HERO_V5_VERSION = versions.blocks.hero_v5 || "unknown";
@@ -246,14 +247,20 @@ function EmailCapture({ app, locale }) {
     }
   }, [email, locale, app]);
 
-  if (status.kind === "success" || status.kind === "already") {
+  // Returning member → the shared confirmation card (treatment B), identical to
+  // the AccessBlock hero + modals. Brand-new joins keep the existing done row
+  // (the JoinCelebration octopus plays over it).
+  if (status.kind === "already") {
+    return <SubscribeConfirm locale={locale} />;
+  }
+  if (status.kind === "success") {
     return (
       <div className="hv6-done" role="status">
         <span className="hv6-done-mark"><PulpoMarkInline size={20} /></span>
         <div>
           <div className="hv6-done-ttl">{t("home.hero.v5.nl_success_title", locale)}</div>
           <div className="hv6-done-body">
-            {t(status.kind === "already" ? "home.hero.v5.nl_already" : "home.hero.v5.nl_success", locale)}
+            {t("home.hero.v5.nl_success", locale)}
           </div>
         </div>
       </div>
