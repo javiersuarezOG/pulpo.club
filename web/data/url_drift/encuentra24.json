@@ -2,13 +2,13 @@
   "source": "encuentra24",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-07-11T19:38:47.371018+00:00",
+  "probed_at": "2026-07-12T13:59:42.869536+00:00",
   "last_probe": {
     "probed_url": "https://www.encuentra24.com/el-salvador-es/bienes-raices",
     "status_code": 200,
     "final_url": "https://www.encuentra24.com/el-salvador-es/bienes-raices",
     "response_size_bytes": null,
-    "duration_ms": 1173,
+    "duration_ms": 1109,
     "error": null
   },
   "baseline": {
@@ -17,6 +17,6 @@
     "final_url": "https://www.encuentra24.com/el-salvador-es/bienes-raices",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-07-11T19:38:47.371050+00:00"
+    "last_ok_at": "2026-07-12T13:59:42.869573+00:00"
   }
 }
