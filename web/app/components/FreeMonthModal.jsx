@@ -20,6 +20,7 @@ import { Icon, PulpoMark } from "../components.jsx";
 import { priceForCountry, fetchPriceForCurrentGeo } from "../lib/pricing";
 import { useCampaignParams } from "../lib/campaign";
 import { startCheckoutFromModal } from "../lib/stripe-modal-checkout";
+import { isPaid } from "../lib/gating";
 
 /**
  * @param {object} props
@@ -108,6 +109,15 @@ export function FreeMonthModal({ app, trigger, onClose }) {
 
   // ── CTA submit ──────────────────────────────────────────────────────
   const onCtaClick = async () => {
+    // Already Pro → manage the existing subscription, never open a second
+    // checkout (double-charge risk). Defense-in-depth: this modal is normally
+    // gated away from Pro users upstream, but the guard makes it safe if it
+    // ever slips through. Mirrors start.jsx / AccessBlock.
+    if (isPaid(app.user)) {
+      try { track("free_month_modal.already_pro", { trigger }); } catch { /* ignore */ }
+      window.location.assign("/account/subscription");
+      return;
+    }
     setError(null);
     try { track("free_month_modal.cta_clicked", { trigger, has_code: !!urlCode }); } catch { /* ignore */ }
     setSubmitting(true);
