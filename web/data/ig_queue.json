@@ -232,17 +232,18 @@
       "caption_status": "clean",
       "carousel_photo_paths": [
         "web/data/ig_assets/campaign/d01_escasez/slide2.png",
-        "web/data/ig_assets/campaign/d01_escasez/slide3.png"
+        "web/data/ig_assets/campaign/d01_escasez/slide3.png",
+        "web/data/ig_assets/campaign/d01_escasez/slide4.png"
       ],
-      "listing_ids": [],
-      "primary_listing_id": null,
+      "listing_ids": [
+        "citymax_sc_terreno-residencial-en-venta-isla-san-blas"
+      ],
+      "primary_listing_id": "citymax_sc_terreno-residencial-en-venta-isla-san-blas",
       "status": "scheduled",
       "approved": true,
-      "posted": true,
-      "posted_at": "2026-07-11T12:02:20.074333+00:00",
-      "posted_media_id": "17880008943476568",
-      "comment_posted": true,
-      "comment_id": "17896314681514215"
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     },
     {
       "day": 106,
@@ -291,15 +292,15 @@
         "web/data/ig_assets/campaign/d02_casas_playa/slide2.png",
         "web/data/ig_assets/campaign/d02_casas_playa/slide3.png"
       ],
-      "listing_ids": [],
-      "primary_listing_id": null,
+      "listing_ids": [
+        "goodlife_new-ocean-view-home-in-gated-community-cerromar-el-sunzal"
+      ],
+      "primary_listing_id": "goodlife_new-ocean-view-home-in-gated-community-cerromar-el-sunzal",
       "status": "scheduled",
       "approved": true,
-      "posted": true,
-      "posted_at": "2026-07-12T03:51:22.878904+00:00",
-      "posted_media_id": "18096226243995708",
-      "comment_posted": true,
-      "comment_id": "17916699126204722"
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     },
     {
       "day": 107,
@@ -347,10 +348,13 @@
       "caption_status": "clean",
       "carousel_photo_paths": [
         "web/data/ig_assets/campaign/d03_como_funciona/slide2.png",
-        "web/data/ig_assets/campaign/d03_como_funciona/slide3.png"
+        "web/data/ig_assets/campaign/d03_como_funciona/slide3.png",
+        "web/data/ig_assets/campaign/d03_como_funciona/slide4.png"
       ],
-      "listing_ids": [],
-      "primary_listing_id": null,
+      "listing_ids": [
+        "oceanside_15561"
+      ],
+      "primary_listing_id": "oceanside_15561",
       "status": "scheduled",
       "approved": true,
       "posted": false,
@@ -404,8 +408,10 @@
         "web/data/ig_assets/campaign/d04_terrenos_playa/slide2.png",
         "web/data/ig_assets/campaign/d04_terrenos_playa/slide3.png"
       ],
-      "listing_ids": [],
-      "primary_listing_id": null,
+      "listing_ids": [
+        "bienesraices_1529"
+      ],
+      "primary_listing_id": "bienesraices_1529",
       "status": "scheduled",
       "approved": true,
       "posted": false,
@@ -458,10 +464,13 @@
       "caption_status": "clean",
       "carousel_photo_paths": [
         "web/data/ig_assets/campaign/d05_descubrimiento/slide2.png",
-        "web/data/ig_assets/campaign/d05_descubrimiento/slide3.png"
+        "web/data/ig_assets/campaign/d05_descubrimiento/slide3.png",
+        "web/data/ig_assets/campaign/d05_descubrimiento/slide4.png"
       ],
-      "listing_ids": [],
-      "primary_listing_id": null,
+      "listing_ids": [
+        "citymax_sc_casa-en-venta-residencial-san-carlos-sonzacate"
+      ],
+      "primary_listing_id": "citymax_sc_casa-en-venta-residencial-san-carlos-sonzacate",
       "status": "scheduled",
       "approved": true,
       "posted": false,
@@ -515,8 +524,10 @@
         "web/data/ig_assets/campaign/d06_casas_lago/slide2.png",
         "web/data/ig_assets/campaign/d06_casas_lago/slide3.png"
       ],
-      "listing_ids": [],
-      "primary_listing_id": null,
+      "listing_ids": [
+        "encuentra24_32059471"
+      ],
+      "primary_listing_id": "encuentra24_32059471",
       "status": "scheduled",
       "approved": true,
       "posted": false,
@@ -569,10 +580,13 @@
       "caption_status": "clean",
       "carousel_photo_paths": [
         "web/data/ig_assets/campaign/d07_por_que_rankeado/slide2.png",
-        "web/data/ig_assets/campaign/d07_por_que_rankeado/slide3.png"
+        "web/data/ig_assets/campaign/d07_por_que_rankeado/slide3.png",
+        "web/data/ig_assets/campaign/d07_por_que_rankeado/slide4.png"
       ],
-      "listing_ids": [],
-      "primary_listing_id": null,
+      "listing_ids": [
+        "oceanside_12809"
+      ],
+      "primary_listing_id": "oceanside_12809",
       "status": "scheduled",
       "approved": true,
       "posted": false,
@@ -597,8 +611,10 @@
         "web/data/ig_assets/campaign/d08_apartamentos/slide2.png",
         "web/data/ig_assets/campaign/d08_apartamentos/slide3.png"
       ],
-      "listing_ids": [],
-      "primary_listing_id": null,
+      "listing_ids": [
+        "goodlife_2-bed-condominium-at-zonset-el-zonte-445694"
+      ],
+      "primary_listing_id": "goodlife_2-bed-condominium-at-zonset-el-zonte-445694",
       "status": "scheduled",
       "approved": true,
       "posted": false,
@@ -621,10 +637,13 @@
       "caption_status": "clean",
       "carousel_photo_paths": [
         "web/data/ig_assets/campaign/d09_demanda/slide2.png",
-        "web/data/ig_assets/campaign/d09_demanda/slide3.png"
+        "web/data/ig_assets/campaign/d09_demanda/slide3.png",
+        "web/data/ig_assets/campaign/d09_demanda/slide4.png"
       ],
-      "listing_ids": [],
-      "primary_listing_id": null,
+      "listing_ids": [
+        "oceanside_12288"
+      ],
+      "primary_listing_id": "oceanside_12288",
       "status": "scheduled",
       "approved": true,
       "posted": false,
@@ -649,8 +668,10 @@
         "web/data/ig_assets/campaign/d10_terrenos_lago/slide2.png",
         "web/data/ig_assets/campaign/d10_terrenos_lago/slide3.png"
       ],
-      "listing_ids": [],
-      "primary_listing_id": null,
+      "listing_ids": [
+        "bienesraices_2229"
+      ],
+      "primary_listing_id": "bienesraices_2229",
       "status": "scheduled",
       "approved": true,
       "posted": false,
@@ -673,10 +694,13 @@
       "caption_status": "clean",
       "carousel_photo_paths": [
         "web/data/ig_assets/campaign/d11_herencia/slide2.png",
-        "web/data/ig_assets/campaign/d11_herencia/slide3.png"
+        "web/data/ig_assets/campaign/d11_herencia/slide3.png",
+        "web/data/ig_assets/campaign/d11_herencia/slide4.png"
       ],
-      "listing_ids": [],
-      "primary_listing_id": null,
+      "listing_ids": [
+        "bienesraices_2156"
+      ],
+      "primary_listing_id": "bienesraices_2156",
       "status": "scheduled",
       "approved": true,
       "posted": false,
@@ -701,8 +725,10 @@
         "web/data/ig_assets/campaign/d12_casas_playa_destacada/slide2.png",
         "web/data/ig_assets/campaign/d12_casas_playa_destacada/slide3.png"
       ],
-      "listing_ids": [],
-      "primary_listing_id": null,
+      "listing_ids": [
+        "encuentra24_31372098"
+      ],
+      "primary_listing_id": "encuentra24_31372098",
       "status": "scheduled",
       "approved": true,
       "posted": false,
@@ -725,10 +751,13 @@
       "caption_status": "clean",
       "carousel_photo_paths": [
         "web/data/ig_assets/campaign/d13_noticias/slide2.png",
-        "web/data/ig_assets/campaign/d13_noticias/slide3.png"
+        "web/data/ig_assets/campaign/d13_noticias/slide3.png",
+        "web/data/ig_assets/campaign/d13_noticias/slide4.png"
       ],
-      "listing_ids": [],
-      "primary_listing_id": null,
+      "listing_ids": [
+        "citymax_sc_se-vende-terreno-con-vista-al-mar-en-surf-city"
+      ],
+      "primary_listing_id": "citymax_sc_se-vende-terreno-con-vista-al-mar-en-surf-city",
       "status": "scheduled",
       "approved": true,
       "posted": false,
@@ -751,10 +780,13 @@
       "caption_status": "clean",
       "carousel_photo_paths": [
         "web/data/ig_assets/campaign/d14_cierre/slide2.png",
-        "web/data/ig_assets/campaign/d14_cierre/slide3.png"
+        "web/data/ig_assets/campaign/d14_cierre/slide3.png",
+        "web/data/ig_assets/campaign/d14_cierre/slide4.png"
       ],
-      "listing_ids": [],
-      "primary_listing_id": null,
+      "listing_ids": [
+        "oceanside_11468"
+      ],
+      "primary_listing_id": "oceanside_11468",
       "status": "scheduled",
       "approved": true,
       "posted": false,

@@ -77,7 +77,13 @@ PLAN: list[dict] = [{'day': 201,
              {'t': 'usp',
               'eyebrow': 'Cómo ayuda Pulpo',
               'title': 'Las tenemos todas.',
-              'body': 'Rankeadas por valor, en un solo lugar. Vos escogés sin perder tiempo.'}],
+              'body': 'Rankeadas por valor, en un solo lugar. Vos escogés sin perder tiempo.'},
+             {'t': 'photo',
+              'img': 'web/data/ig_assets/campaign/_src/L201.jpg',
+              'ribbon': 'TERRENOS DE PLAYA',
+              'star': True,
+              'badge': 'La Libertad · $195,000',
+              'color_key': 'terrenos_playa'}],
   'capES': '**La tierra frente al mar no se fabrica. Y ya casi no queda.**\n'
            '\n'
            'De cada 1,916 propiedades a la venta en El Salvador, solo 139 están de verdad frente al mar. Menos '
@@ -104,7 +110,9 @@ PLAN: list[dict] = [{'day': 201,
            'Ranked. The Top 10 in your inbox every Sunday.\n'
            '\n'
            'pulpo.club',
-  'tags': '#ElSalvador #BienesRaices #FrenteAlMar #SurfCity #Terrenos #PlayasDeElSalvador #TuPedazoDeParaiso'},
+  'tags': '#ElSalvador #BienesRaices #FrenteAlMar #SurfCity #Terrenos #PlayasDeElSalvador #TuPedazoDeParaiso',
+  'primary_listing_id': 'citymax_sc_terreno-residencial-en-venta-isla-san-blas',
+  'listing_ids': ['citymax_sc_terreno-residencial-en-venta-isla-san-blas']},
  {'day': 202,
   'slug': 'd02_casas_playa',
   'kind': 'top10',
@@ -161,7 +169,9 @@ PLAN: list[dict] = [{'day': 201,
            '\n'
            'Only 176 beach homes in the whole country. Ranked. The Top 10 in your inbox every Sunday 👉 '
            'pulpo.club',
-  'tags': '#CasasDePlaya #BeachHomes #ElSunzal #SurfCity #ElSalvador #BienesRaices'},
+  'tags': '#CasasDePlaya #BeachHomes #ElSunzal #SurfCity #ElSalvador #BienesRaices',
+  'primary_listing_id': 'goodlife_new-ocean-view-home-in-gated-community-cerromar-el-sunzal',
+  'listing_ids': ['goodlife_new-ocean-view-home-in-gated-community-cerromar-el-sunzal']},
  {'day': 203,
   'slug': 'd03_como_funciona',
   'kind': 'inspira',
@@ -177,7 +187,13 @@ PLAN: list[dict] = [{'day': 201,
               'bad': 'Encuentra24, ReMax, grupos de Face, el cuñado que “conoce a alguien”…',
               'good': 'Pulpo: todas juntas y rankeadas.',
               'note': 'Todas las propiedades de El Salvador, en un solo lugar.'},
-             {'t': 'cta', 'big': '1 solo\nlugar', 'sub': 'pulpo.club · link en bio'}],
+             {'t': 'cta', 'big': '1 solo\nlugar', 'sub': 'pulpo.club · link en bio'},
+             {'t': 'photo',
+              'img': 'web/data/ig_assets/campaign/_src/L203.jpg',
+              'ribbon': 'CASAS DE PLAYA',
+              'star': True,
+              'badge': 'El Tunco · $350,000',
+              'color_key': 'casas_playa'}],
   'capES': '**Dejá de revisar 20 sitios para encontrar tu terreno.**\n'
            '\n'
            'Encuentra24, ReMax, grupos de Facebook, el conocido que “vende barato”… agotador.\n'
@@ -204,7 +220,9 @@ PLAN: list[dict] = [{'day': 201,
            'Ranked. The Top 10 in your inbox every Sunday.\n'
            '\n'
            'pulpo.club',
-  'tags': '#ElSalvador #BienesRaices #Terrenos #PulpoClub #SurfCity #TuPedazoDeParaiso'},
+  'tags': '#ElSalvador #BienesRaices #Terrenos #PulpoClub #SurfCity #TuPedazoDeParaiso',
+  'primary_listing_id': 'oceanside_15561',
+  'listing_ids': ['oceanside_15561']},
  {'day': 204,
   'slug': 'd04_terrenos_playa',
   'kind': 'top10',
@@ -258,7 +276,9 @@ PLAN: list[dict] = [{'day': 201,
            '…and 5 more.\n'
            '\n'
            '501 beach lots compared. Ranked. The Top 10 in your inbox every Sunday 👉 pulpo.club',
-  'tags': '#TerrenosDePlaya #BeachLand #ElTunco #SurfCity #ElSalvador #BienesRaices'},
+  'tags': '#TerrenosDePlaya #BeachLand #ElTunco #SurfCity #ElSalvador #BienesRaices',
+  'primary_listing_id': 'bienesraices_1529',
+  'listing_ids': ['bienesraices_1529']},
  {'day': 205,
   'slug': 'd05_descubrimiento',
   'kind': 'inspira',
@@ -271,24 +291,29 @@ PLAN: list[dict] = [{'day': 201,
              {'t': 'usp',
               'eyebrow': 'Lo que significa',
               'title': 'Más ojos, más valor.',
-              'body': 'Cuando el mundo descubre un lugar, la buena tierra frente al mar se vuelve '
-                      'escasa.'},
+              'body': 'Cuando el mundo descubre un lugar, la buena tierra frente al mar se vuelve escasa.'},
              {'t': 'usp',
               'eyebrow': 'Tu ventaja',
               'title': 'Llegá primero.',
-              'body': 'La diáspora y los de afuera ya están comprando. En Pulpo ves lo mejor antes '
-                      'que la fila crezca.'}],
+              'body': 'La diáspora y los de afuera ya están comprando. En Pulpo ves lo mejor antes que la fila '
+                      'crezca.'},
+             {'t': 'photo',
+              'img': 'web/data/ig_assets/campaign/_src/L205.jpg',
+              'ribbon': 'CASAS DE PLAYA',
+              'star': True,
+              'badge': 'La Libertad · $325,000',
+              'color_key': 'casas_playa'}],
   'capES': '**El mundo entero está descubriendo El Salvador — 3.9 millones de visitantes en 2024, un '
            'récord.**\n'
            '\n'
-           'Cuando un lugar así se pone de moda, la buena tierra frente al mar se vuelve escasa. Vos '
-           'naciste aquí: llegás primero.\n'
+           'Cuando un lugar así se pone de moda, la buena tierra frente al mar se vuelve escasa. Vos naciste '
+           'aquí: llegás primero.\n'
            '\n'
            'pulpo.club · link en bio',
   'capEN': '**The whole world is discovering El Salvador — a record 3.9 million visitors in 2024.**\n'
            '\n'
-           'When a place takes off like this, good oceanfront land gets scarce. You were born here — '
-           'you arrive first.\n'
+           'When a place takes off like this, good oceanfront land gets scarce. You were born here — you '
+           'arrive first.\n'
            '\n'
            'pulpo.club · link in bio',
   'comES': 'Nosotros juntamos todo el mercado y lo rankeamos, para que llegués primero a lo mejor.\n'
@@ -301,7 +326,9 @@ PLAN: list[dict] = [{'day': 201,
            'Ranked. The Top 10 in your inbox every Sunday.\n'
            '\n'
            'pulpo.club',
-  'tags': '#ElSalvador #SurfCity #TuPedazoDeParaiso #PlayasDeElSalvador #SalvadorenosPorElMundo #BienesRaices'},
+  'tags': '#ElSalvador #SurfCity #TuPedazoDeParaiso #PlayasDeElSalvador #SalvadorenosPorElMundo #BienesRaices',
+  'primary_listing_id': 'citymax_sc_casa-en-venta-residencial-san-carlos-sonzacate',
+  'listing_ids': ['citymax_sc_casa-en-venta-residencial-san-carlos-sonzacate']},
  {'day': 206,
   'slug': 'd06_casas_lago',
   'kind': 'top10',
@@ -353,7 +380,9 @@ PLAN: list[dict] = [{'day': 201,
            '\n'
            'Only 12 lake homes in the whole country. Ranked. The Top 10 in your inbox every Sunday 👉 '
            'pulpo.club',
-  'tags': '#CasasDeLago #LagoDeCoatepeque #Coatepeque #ElSalvador #BienesRaices'},
+  'tags': '#CasasDeLago #LagoDeCoatepeque #Coatepeque #ElSalvador #BienesRaices',
+  'primary_listing_id': 'encuentra24_32059471',
+  'listing_ids': ['encuentra24_32059471']},
  {'day': 207,
   'slug': 'd07_por_que_rankeado',
   'kind': 'inspira',
@@ -369,7 +398,13 @@ PLAN: list[dict] = [{'day': 201,
               'title': 'Precio · zona · acceso',
               'body': 'Comparamos cada propiedad del país con las demás de su tipo. Solo las mejores suben al '
                       'Top 10.'},
-             {'t': 'cta', 'big': 'Sin perder\ntiempo', 'sub': 'en las malas · pulpo.club'}],
+             {'t': 'cta', 'big': 'Sin perder\ntiempo', 'sub': 'en las malas · pulpo.club'},
+             {'t': 'photo',
+              'img': 'web/data/ig_assets/campaign/_src/L207.jpg',
+              'ribbon': 'TERRENOS DE PLAYA',
+              'star': True,
+              'badge': 'Las Flores · $299,000',
+              'color_key': 'terrenos_playa'}],
   'capES': '**No perdás tiempo viendo terrenos malos.**\n'
            '\n'
            'Pulpo compara cada propiedad de El Salvador —precio, zona, acceso, distancia al mar— contra las de '
@@ -390,7 +425,9 @@ PLAN: list[dict] = [{'day': 201,
            'pulpo.club · link in bio',
   'comES': 'Rankeadas por valor. El Top 10 en tu correo cada domingo, gratis.\n\npulpo.club',
   'comEN': 'Ranked by value. The Top 10 in your inbox every Sunday, free.\n\npulpo.club',
-  'tags': '#ElSalvador #BienesRaices #PulpoClub #RankeadoPorValor #Terrenos #SurfCity'},
+  'tags': '#ElSalvador #BienesRaices #PulpoClub #RankeadoPorValor #Terrenos #SurfCity',
+  'primary_listing_id': 'oceanside_12809',
+  'listing_ids': ['oceanside_12809']},
  {'day': 208,
   'slug': 'd08_apartamentos',
   'kind': 'top10',
@@ -442,7 +479,9 @@ PLAN: list[dict] = [{'day': 201,
            '…and more.\n'
            '\n'
            'Only 29 oceanfront apartments. Ranked. The Top 10 in your inbox every Sunday 👉 pulpo.club',
-  'tags': '#Apartamentos #ElZonte #BitcoinBeach #SurfCity #ElSalvador #BienesRaices'},
+  'tags': '#Apartamentos #ElZonte #BitcoinBeach #SurfCity #ElSalvador #BienesRaices',
+  'primary_listing_id': 'goodlife_2-bed-condominium-at-zonset-el-zonte-445694',
+  'listing_ids': ['goodlife_2-bed-condominium-at-zonset-el-zonte-445694']},
  {'day': 209,
   'slug': 'd09_demanda',
   'kind': 'inspira',
@@ -460,7 +499,13 @@ PLAN: list[dict] = [{'day': 201,
              {'t': 'usp',
               'eyebrow': 'Tu ventaja',
               'title': 'Llegá primero.',
-              'body': 'Todo el mercado, rankeado, en un solo lugar. Lo bueno se vende de primero.'}],
+              'body': 'Todo el mercado, rankeado, en un solo lugar. Lo bueno se vende de primero.'},
+             {'t': 'photo',
+              'img': 'web/data/ig_assets/campaign/_src/L209.jpg',
+              'ribbon': 'CASAS DE PLAYA',
+              'star': True,
+              'badge': 'El Tunco · $755,000',
+              'color_key': 'casas_playa'}],
   'capES': '**El mundo descubrió El Salvador. Vos naciste aquí.**\n'
            '\n'
            'Surf City puso nuestras playas en el mapa: gente de Estados Unidos, de Europa, y hermanos que se '
@@ -487,7 +532,9 @@ PLAN: list[dict] = [{'day': 201,
            'Ranked. The Top 10 in your inbox every Sunday.\n'
            '\n'
            'pulpo.club',
-  'tags': '#ElSalvador #SurfCity #SalvadorenosPorElMundo #BitcoinCountry #BienesRaices #TuPedazoDeParaiso'},
+  'tags': '#ElSalvador #SurfCity #SalvadorenosPorElMundo #BitcoinCountry #BienesRaices #TuPedazoDeParaiso',
+  'primary_listing_id': 'oceanside_12288',
+  'listing_ids': ['oceanside_12288']},
  {'day': 210,
   'slug': 'd10_terrenos_lago',
   'kind': 'top10',
@@ -536,7 +583,9 @@ PLAN: list[dict] = [{'day': 201,
            '…and more.\n'
            '\n'
            'Only 18 lots in all of Coatepeque. Ranked. The Top 10 in your inbox every Sunday 👉 pulpo.club',
-  'tags': '#TerrenosDeLago #LagoDeCoatepeque #Coatepeque #ElSalvador #BienesRaices'},
+  'tags': '#TerrenosDeLago #LagoDeCoatepeque #Coatepeque #ElSalvador #BienesRaices',
+  'primary_listing_id': 'bienesraices_2229',
+  'listing_ids': ['bienesraices_2229']},
  {'day': 211,
   'slug': 'd11_herencia',
   'kind': 'inspira',
@@ -548,7 +597,13 @@ PLAN: list[dict] = [{'day': 201,
               'l2': 'a dejar?',
               'punch': 'La tierra no se gasta.'},
              {'t': 'stat', 'big': '+ valor', 'label': 'un buen terreno crece\nmientras dormís', 'src': None},
-             {'t': 'cta', 'big': 'Sembrá algo\nque dure', 'sub': 'pulpo.club · link en bio'}],
+             {'t': 'cta', 'big': 'Sembrá algo\nque dure', 'sub': 'pulpo.club · link en bio'},
+             {'t': 'photo',
+              'img': 'web/data/ig_assets/campaign/_src/L211.jpg',
+              'ribbon': 'CASAS DE PLAYA',
+              'star': True,
+              'badge': 'San Diego · $787,000',
+              'color_key': 'casas_playa'}],
   'capES': '**¿Qué les vas a dejar a tus hijos?**\n'
            '\n'
            'Un terreno frente al mar o al lago no es un gasto: es lo único que no se devalúa, que crece '
@@ -576,7 +631,9 @@ PLAN: list[dict] = [{'day': 201,
            'The Top 10 in your inbox every Sunday, free.\n'
            '\n'
            'pulpo.club',
-  'tags': '#Herencia #ElSalvador #Terrenos #LagoDeCoatepeque #SurfCity #TuPedazoDeParaiso'},
+  'tags': '#Herencia #ElSalvador #Terrenos #LagoDeCoatepeque #SurfCity #TuPedazoDeParaiso',
+  'primary_listing_id': 'bienesraices_2156',
+  'listing_ids': ['bienesraices_2156']},
  {'day': 212,
   'slug': 'd12_casas_playa_destacada',
   'kind': 'top10',
@@ -621,7 +678,9 @@ PLAN: list[dict] = [{'day': 201,
            'access.\n'
            '\n'
            'Ranked. The Top 10 in your inbox every Sunday 👉 pulpo.club',
-  'tags': '#CasasDePlaya #ElPalmarcito #ElTunco #SurfCity #ElSalvador #BienesRaices'},
+  'tags': '#CasasDePlaya #ElPalmarcito #ElTunco #SurfCity #ElSalvador #BienesRaices',
+  'primary_listing_id': 'encuentra24_31372098',
+  'listing_ids': ['encuentra24_31372098']},
  {'day': 213,
   'slug': 'd13_noticias',
   'kind': 'inspira',
@@ -636,7 +695,13 @@ PLAN: list[dict] = [{'day': 201,
               'eyebrow': 'Qué significa para vos',
               'title': 'Menos viaje, más valor.',
               'body': 'Mejor acceso a El Tunco y La Libertad sube el valor de la tierra en la costa.'},
-             {'t': 'cta', 'big': 'En Pulpo\nPro', 'sub': 'las noticias que mueven el precio · pulpo.club'}],
+             {'t': 'cta', 'big': 'En Pulpo\nPro', 'sub': 'las noticias que mueven el precio · pulpo.club'},
+             {'t': 'photo',
+              'img': 'web/data/ig_assets/campaign/_src/L213.jpg',
+              'ribbon': 'TERRENOS DE PLAYA',
+              'star': True,
+              'badge': 'La Libertad · $500,000',
+              'color_key': 'terrenos_playa'}],
   'capES': '**Buena noticia para quien tiene (o quiere) tierra en la costa.**\n'
            '\n'
            'El Ministerio de Obras Públicas avanza en la ampliación de Los Chorros, la carretera que conecta '
@@ -663,7 +728,9 @@ PLAN: list[dict] = [{'day': 201,
            'your inbox.\n'
            '\n'
            'pulpo.club · Source: La Página, Jun 2026',
-  'tags': '#ElSalvador #LosChorros #SurfCity #LaLibertad #ElTunco #BienesRaices #PulpoPro'},
+  'tags': '#ElSalvador #LosChorros #SurfCity #LaLibertad #ElTunco #BienesRaices #PulpoPro',
+  'primary_listing_id': 'citymax_sc_se-vende-terreno-con-vista-al-mar-en-surf-city',
+  'listing_ids': ['citymax_sc_se-vende-terreno-con-vista-al-mar-en-surf-city']},
  {'day': 214,
   'slug': 'd14_cierre',
   'kind': 'wrap',
@@ -675,7 +742,13 @@ PLAN: list[dict] = [{'day': 201,
               'l2': 'dónde buscar.',
               'punch': 'Playa, lago, casas, lotes, apartamentos.'},
              {'t': 'cta', 'big': 'Rankeadas.', 'sub': 'El Top 10 en tu correo cada domingo.'},
-             {'t': 'cta', 'big': 'pulpo.club', 'sub': 'link en bio · gratis'}],
+             {'t': 'cta', 'big': 'pulpo.club', 'sub': 'link en bio · gratis'},
+             {'t': 'photo',
+              'img': 'web/data/ig_assets/campaign/_src/L214.jpg',
+              'ribbon': 'CASAS DE PLAYA',
+              'star': True,
+              'badge': 'La Libertad · $565,000',
+              'color_key': 'casas_playa'}],
   'capES': '**Dos semanas, todo El Salvador rankeado.**\n'
            '\n'
            'Playa y lago, casas, lotes y apartamentos — comparados y ordenados de mejor a peor, en un solo '
@@ -694,7 +767,9 @@ PLAN: list[dict] = [{'day': 201,
            'pulpo.club · link in bio',
   'comES': 'Suscribite gratis: el Top 10 de El Salvador, cada domingo, sin spam.\n\npulpo.club',
   'comEN': 'Subscribe free: the Top 10 of El Salvador, every Sunday, no spam.\n\npulpo.club',
-  'tags': '#ElSalvador #BienesRaices #SurfCity #LagoDeCoatepeque #TuPedazoDeParaiso #PulpoClub'}]
+  'tags': '#ElSalvador #BienesRaices #SurfCity #LagoDeCoatepeque #TuPedazoDeParaiso #PulpoClub',
+  'primary_listing_id': 'oceanside_11468',
+  'listing_ids': ['oceanside_11468']}]
 
 PLAN_BY_DAY = {p["day"]: p for p in PLAN}
 
@@ -711,7 +786,11 @@ def render_post(post: dict) -> dict:
     slide_paths: list[str] = []
     for i, spec in enumerate(post["slides"], start=1):
         path = out_dir / f"slide{i}.png"
-        render_slide(spec, color, path)
+        # A slide may override the post color (e.g. the ★ listing slide
+        # appended to a topic post renders in its category color — blue
+        # TERRENOS DE PLAYA — not the post's inspiration hue).
+        slide_color = CATEGORY_COLORS.get(spec.get("color_key"), color)
+        render_slide(spec, slide_color, path)
         slide_paths.append(str(path).replace("\\", "/"))
 
     caption = _bilingual(post["capES"], post["capEN"])
@@ -732,8 +811,8 @@ def render_post(post: dict) -> dict:
         "lint_violations": [],
         "caption_status": "clean",
         "carousel_photo_paths": slide_paths[1:],
-        "listing_ids": [],
-        "primary_listing_id": None,
+        "listing_ids": post.get("listing_ids", []),
+        "primary_listing_id": post.get("primary_listing_id"),
         "status": "scheduled",
         "approved": True,
         "posted": False,
