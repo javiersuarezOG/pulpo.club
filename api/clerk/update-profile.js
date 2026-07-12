@@ -258,15 +258,17 @@ module.exports = async (req, res) => {
   // the `profile` sub-object. Without the read step we'd clobber any
   // sibling field (e.g. `plan`) on every write. Clerk's
   // updateUserMetadata REPLACES publicMetadata wholesale.
+  let currentPublic = {};
+  let nextProfile = null;
   try {
     const clerk = clerkClient();
     const user = await clerk.users.getUser(userId);
-    const currentPublic = (user && user.publicMetadata) || {};
+    currentPublic = (user && user.publicMetadata) || {};
     const currentProfile =
       (currentPublic.profile && typeof currentPublic.profile === "object")
         ? currentPublic.profile
         : {};
-    const nextProfile = { ...currentProfile, ...patch };
+    nextProfile = { ...currentProfile, ...patch };
 
     await clerk.users.updateUserMetadata(userId, {
       publicMetadata: {
@@ -281,13 +283,28 @@ module.exports = async (req, res) => {
     });
     return res.status(200).json({ profile: nextProfile });
   } catch (err) {
+    // Clerk SDK errors carry a structured `errors` array ({ code, message,
+    // longMessage }) + an HTTP `status`; the bare `err.message` is often just
+    // "Unprocessable Entity". Surface the specific message + the serialized
+    // publicMetadata size so a stuck account — e.g. metadata over Clerk's
+    // ~8 KB cap — is diagnosable at a glance (both logged AND returned).
+    const clerkErrors = err && Array.isArray(err.errors) ? err.errors : [];
+    const primary = clerkErrors[0] || {};
+    const detail = (primary.longMessage || primary.message || (err && err.message) || "unknown").slice(0, 300);
+    let bytes = -1;
+    try { bytes = JSON.stringify({ ...currentPublic, profile: nextProfile || {} }).length; } catch { /* ignore */ }
     logApi("clerk.update_profile", {
       status: 500, ms: Date.now() - t0, reason: "write_failed",
-      error: err && err.message,
+      clerk_status: (err && err.status) || 0,
+      clerk_code: primary.code || "-",
+      bytes,
+      error: detail,
     });
     return res.status(500).json({
       error: "write_failed",
-      detail: err && err.message,
+      reason: primary.code || "clerk_error",
+      detail,
+      bytes,
     });
   }
 };

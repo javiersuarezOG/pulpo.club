@@ -271,6 +271,12 @@ function ClerkActionsBinder({ onActions }) {
           );
           err.status = res.status;
           err.code = detail && detail.error;
+          // The server now returns the specific Clerk reason + the serialized
+          // metadata size on a write failure — carry them so the caller can
+          // show a real message instead of "please try again".
+          err.detail = (detail && detail.detail) || null;
+          err.reason = (detail && detail.reason) || null;
+          err.bytes = detail && typeof detail.bytes === "number" ? detail.bytes : null;
           throw err;
         }
         const data = await res.json();
