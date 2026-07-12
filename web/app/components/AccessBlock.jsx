@@ -15,6 +15,7 @@ import { subscribeEmail, NL_EMAIL_RE } from "../lib/newsletter-signup";
 import { startCheckoutFromModal } from "../lib/stripe-modal-checkout";
 import { accessOptionsFor } from "../config/access";
 import { isPaid } from "../lib/gating";
+import { SubscribeConfirm } from "./SubscribeConfirm";
 
 /**
  * @param {object} props
@@ -42,17 +43,22 @@ export function AccessBlock({ app, locale: lc, surface, cfg, onDone }) {
     try { track("access.free_submitted", { surface, reason, email_domain_only: domain, result: result.kind }); } catch { /* ignore */ }
     if (result.kind === "success" || result.kind === "already") {
       try { track("free_member_created", { surface, reason, via: "access_block" }); } catch { /* ignore */ }
-      // becomeFreeMember fires the app-level JoinCelebration reveal.
+      // becomeFreeMember fires the app-level JoinCelebration octopus (new joins).
       app.becomeFreeMember({ email: value, openListingId: reason === "top3" ? (cfg && cfg.listingId) || null : null, returning: result.kind === "already" });
-      if (typeof onDone === "function") onDone();
-      // Inline surfaces (hero) have no modal to unmount. A brand-new join is
-      // taken over by the celebration overlay (reset the button). An "already a
-      // member" resubmit gets NO celebration (becomeFreeMember suppresses it
-      // for `returning`), so show an inline acknowledgment instead of a silent
-      // reset — otherwise a returning member's resubmit looks like it did
-      // nothing (GAP B).
-      else if (result.kind === "already") { setStatus("already"); setEmail(""); }
-      else { setStatus("idle"); setEmail(""); }
+      if (result.kind === "already") {
+        // Returning member → no octopus (suppressed for `returning`). Show the
+        // SubscribeConfirm card (treatment B) everywhere. In a modal it plays
+        // then auto-advances; inline (hero) it persists.
+        setStatus("already"); setEmail("");
+        if (typeof onDone === "function") setTimeout(onDone, 1900);
+      } else if (typeof onDone === "function") {
+        // Brand-new join in a modal → the celebration overlay is the
+        // confirmation; close the modal so it isn't covered.
+        onDone();
+      } else {
+        // Brand-new join inline → celebration takes over; reset the button.
+        setStatus("idle"); setEmail("");
+      }
       return;
     }
     setStatus(result.kind === "invalid" ? "invalid" : "error");
@@ -110,7 +116,12 @@ export function AccessBlock({ app, locale: lc, surface, cfg, onDone }) {
       rows.push(<div className="access-or" key={`or-${id}`}>{t("access.or", lc)}</div>);
     }
     if (id === "free_email") {
+      // Returning member → the form dissolves and the confirmation card rises
+      // in its place (treatment B). Same component on every signup route.
       rows.push(
+        status === "already" ? (
+          <SubscribeConfirm key="free" locale={lc} compact={typeof onDone === "function"} />
+        ) : (
         <form className="access-free" key="free" onSubmit={onJoinFree} noValidate>
           <input
             type="email"
@@ -125,15 +136,13 @@ export function AccessBlock({ app, locale: lc, surface, cfg, onDone }) {
             {t(status === "loading" ? "access.free.cta_loading" : "access.free.cta", lc)}
           </button>
           <div className="access-free-note">{t("access.free.note", lc)}</div>
-          {status === "already" && (
-            <p className="access-free-note" role="status">{t("access.free.already", lc)}</p>
-          )}
           {(status === "invalid" || status === "error") && (
             <p className="access-error" role="alert">
               {t(status === "invalid" ? "access.error.invalid" : "access.error.generic", lc)}
             </p>
           )}
-        </form>,
+        </form>
+        ),
       );
     } else if (id === "go_pro") {
       rows.push(

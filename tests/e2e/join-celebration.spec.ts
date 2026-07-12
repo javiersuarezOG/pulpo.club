@@ -66,3 +66,23 @@ for (const vp of VIEWPORTS) {
     });
   });
 }
+
+// Returning member (server → already_subscribed) gets the SubscribeConfirm card
+// (treatment B), NOT the octopus celebration. Same behaviour on every route;
+// the hero is the representative surface.
+test.describe("already-subscribed confirmation · mobile 375", () => {
+  test("shows the confirmation card and NOT the celebration", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.route("**/api/newsletter", (route) =>
+      route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true, already_subscribed: true }) }),
+    );
+    await seedConsent(page);
+    await page.goto("/", { waitUntil: "networkidle" });
+    await page.locator(".access-input, .hv6-signup-input").first().fill("returning-tester@pulpo.club");
+    await page.locator(".access-cta-free, .hv6-signup-btn").first().click();
+
+    await expect(page.locator(".subscribe-confirm"), "confirmation card must show").toBeVisible();
+    await expect(page.locator(".subscribe-confirm-title")).toContainText("already on the list");
+    await expect(page.locator(".jc-panel"), "octopus celebration must NOT play for a returning member").toHaveCount(0);
+  });
+});
