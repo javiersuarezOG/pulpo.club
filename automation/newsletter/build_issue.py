@@ -286,7 +286,12 @@ def detect_cohort(recipient: Recipient) -> Cohort:
         or recipient.preference.max_price_usd
     )
     if not recipient.has_account:
-        return "anonymous"
+        # Email-only free members can now set a filter via the login-free
+        # newsletter-prefs page (stored on the Resend contact's last_name).
+        # With a filter → personalized top-N (free_prefs); without one → the
+        # broad cohort fallback (anonymous). Before this feature, free always
+        # meant no prefs, so has_account=False unconditionally meant anonymous.
+        return "free_prefs" if has_prefs else "anonymous"
     if recipient.tier in ("pro", "agency") and has_prefs:
         return "pro_prefs"
     if recipient.tier in ("pro", "agency") and not has_prefs:
@@ -1163,7 +1168,10 @@ def build_issue(
     })
 
     # ── URLs ────────────────────────────────────────────────────────────
-    settings_url = f"{site_root.rstrip('/')}/account?ref=newsletter_issue_{issue_number}"
+    # settings_url ("Change filters" footer pill) is built below, AFTER the
+    # shared unsubscribe token — the email-only variant reuses that token to
+    # authenticate the login-free /api/newsletter-prefs page.
+    #
     # The visible footer Unsubscribe link must match the URL pattern the
     # `/api/unsubscribe` handler accepts: `/api/unsubscribe?r=<hash>&i=<n>&t=<hmac>`.
     # Two bugs the prior path had:
@@ -1181,6 +1189,19 @@ def build_issue(
     UNSUBSCRIBE_SECRET_ENV = "PULPO_UNSUBSCRIBE_SECRET"
     _unsub_secret = os.environ.get(UNSUBSCRIBE_SECRET_ENV, "")
     _unsub_t = _unsub_token(recipient.email_hash, issue_number, _unsub_secret) if _unsub_secret else ""
+    # "Change filters" target. Logged-in members (Clerk account) manage their
+    # filter in the account UI. Email-only free members have no login — they
+    # get the token-verified, login-free /api/newsletter-prefs page, which
+    # writes the Resend last_name side-channel the pipeline reads. Reuses the
+    # same signed r|i|t as unsubscribe (the token proves address ownership;
+    # the endpoint decides the action). e/l are cosmetic, outside the HMAC.
+    if recipient.has_account:
+        settings_url = f"{site_root.rstrip('/')}/account?ref=newsletter_issue_{issue_number}"
+    else:
+        settings_url = (
+            f"{site_root.rstrip('/')}/api/newsletter-prefs"
+            f"?r={recipient.email_hash}&i={issue_number}&t={_unsub_t}&l={locale}"
+        )
     # Base unsubscribe URL: r|i|t only. The `&e=<edition>&l=<locale>`
     # cosmetic params that pick the free-vs-pro confirmation page are
     # appended at RENDER time by `_footer_html`, NOT here — because the
