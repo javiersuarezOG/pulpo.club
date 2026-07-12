@@ -296,16 +296,57 @@ async function handler(req, res, { fetchImpl, resendImpl } = {}) {
     return res.status(503).json({ error: "service_unavailable" });
   }
 
-  // ── Resend Audiences contact create ─────────────────────────────
-  // Resend's contacts.create handles dedup server-side — sending the
-  // same email twice returns 200 the first time and a structured
-  // error the second. On dedup we attempt an update to flip
-  // `unsubscribed: false`; without that step, a previously-unsubscribed
-  // contact who re-enters their email at the homepage form would stay
-  // unsubscribed (the create no-ops on dup, the previous state sticks)
-  // and the "Changed your mind?" CTA on the unsubscribe page would be
-  // a lie. Falling back to 409 only when the update itself fails.
+  // ── Resend Audiences: check-existence-FIRST, then create ─────────
+  // Resend's contacts.create UPSERTS — for an email that already exists it
+  // returns SUCCESS (no error), NOT the "already exists" validation error the
+  // dedup catch-block below was written for. That made the catch dead code:
+  // every re-submit returned {ok:true}, re-firing the welcome email + the
+  // client-side octopus celebration (the original QA "repeat submission not
+  // validated" bug). So look the contact up by email FIRST and only create
+  // when it is genuinely absent.
   try {
+    // Existence check by email (GET /audiences/:id/contacts/:email). O(1),
+    // no pagination surface. A clean 404 (data:null) → genuinely new.
+    let existing = null;
+    let getFailed = false;
+    try {
+      const got = await client.contacts.get({ audienceId, email });
+      existing = got && got.data ? got.data : null;
+    } catch { getFailed = true; }
+    // Belt-and-suspenders: if get-by-email is unavailable (throws), fall back
+    // to the list scan api/unsubscribe.js uses (proven in prod) so dedup can
+    // never silently break the way create-error dedup did. Only on get-throw,
+    // so the common new-signup path stays a single fast lookup.
+    if (!existing && getFailed) {
+      try {
+        const listed = await client.contacts.list({ audienceId });
+        const rows = (listed && listed.data && Array.isArray(listed.data.data) ? listed.data.data
+                    : listed && Array.isArray(listed.data) ? listed.data : []);
+        existing = rows.find((c) => ((c && c.email) || "").toLowerCase() === email.toLowerCase()) || null;
+      } catch { /* list also unavailable → treat as new */ }
+    }
+    if (existing) {
+      if (!existing.unsubscribed) {
+        // Already an active subscriber → idempotent no-op. No email; the
+        // client reads already_subscribed → returning:true → suppresses the
+        // celebration (post-#1024).
+        await fireSignupTelemetry({ email, source, locale, utms, status: "already" });
+        logApi({ status: 200, ms: Date.now() - t0, reason: "already_subscribed_noop", domain: emailDomain(email), source });
+        return res.status(200).json({ ok: true, already_subscribed: true });
+      }
+      // Was unsubscribed → genuine re-subscribe: flip the flag + welcome-back.
+      try {
+        await client.contacts.update({ audienceId, email, unsubscribed: false });
+        await fireFreeWelcome({ email, locale, variant: "free_welcome_back", source: "resend_resubscribe", fetchImpl });
+        await fireSignupTelemetry({ email, source, locale, utms, status: "resubscribed" });
+        logApi({ status: 200, ms: Date.now() - t0, reason: "resubscribed", domain: emailDomain(email), source, locale });
+        return res.status(200).json({ ok: true, resubscribed: true });
+      } catch (updateErr) {
+        logApi({ status: 409, ms: Date.now() - t0, reason: "already_subscribed_update_failed", err_name: updateErr && updateErr.name, domain: emailDomain(email), source });
+        return res.status(409).json({ error: "already_subscribed" });
+      }
+    }
+    // Not in the audience → create as new.
     // LEARNING: locale side-channel via the Resend `first_name` field.
     // Pulpo's newsletter templates render `display_name` from Clerk's
     // first_name, NOT from Resend's — so this field is free for us to
