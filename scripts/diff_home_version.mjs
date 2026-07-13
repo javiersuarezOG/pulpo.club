@@ -44,6 +44,9 @@ try {
   // shows in the PR's "Files changed" tab.
   const out = execSync(`git diff --name-only ${BASE_SHA}...HEAD`, {
     encoding: "utf8",
+    // 64MB: a huge diff (e.g. a mass photo-cache prune of 197k files)
+    // overflows the default 1MB execSync buffer and false-fails the guard.
+    maxBuffer: 64 * 1024 * 1024,
   });
   changed = out.trim().split("\n").filter(Boolean);
 } catch (err) {
