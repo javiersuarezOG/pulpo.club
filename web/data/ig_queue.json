@@ -357,9 +357,11 @@
       "primary_listing_id": "oceanside_15561",
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-07-13T16:14:47.382283+00:00",
+      "posted_media_id": "17898871737531799",
+      "comment_posted": true,
+      "comment_id": "18131814103617406"
     },
     {
       "day": 108,
