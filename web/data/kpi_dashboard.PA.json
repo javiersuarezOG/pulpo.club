@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-10T08:03:28.169687+00:00",
+  "computed_at": "2026-07-13T07:21:12.244376+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 1,
@@ -81,7 +81,7 @@
       },
       "encuentra24": {
         "coverage_pct_vs_discovered": 1.2,
-        "kept": 35,
+        "kept": 34,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -168,7 +168,7 @@
     "registered_sources": 19,
     "shelves_rendering": 0,
     "shelves_total": 6,
-    "total_in_dataset": 35,
+    "total_in_dataset": 34,
     "total_visible_listings": 5
   },
   "min_real_listings": 4
