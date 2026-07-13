@@ -83,6 +83,12 @@ PLAN: list[dict] = [{'day': 201,
               'ribbon': 'TERRENOS DE PLAYA',
               'star': True,
               'badge': 'La Libertad · $195,000',
+              'color_key': 'terrenos_playa'},
+             {'t': 'detail',
+              'eyebrow': 'Disponible ahora',
+              'price': '$195,000',
+              'facts': 'Tu pedazo de mar, antes que se acabe.',
+              'loc': 'San Blas · Surf City',
               'color_key': 'terrenos_playa'}],
   'capES': '**La tierra frente al mar no se fabrica. Y ya casi no queda.**\n'
            '\n'
@@ -193,6 +199,12 @@ PLAN: list[dict] = [{'day': 201,
               'ribbon': 'CASAS DE PLAYA',
               'star': True,
               'badge': 'El Tunco · $350,000',
+              'color_key': 'casas_playa'},
+             {'t': 'detail',
+              'eyebrow': 'Disponible ahora',
+              'price': '$350,000',
+              'facts': 'Despertar a pasos de las olas de El Tunco.',
+              'loc': 'El Tunco · La Libertad',
               'color_key': 'casas_playa'}],
   'capES': '**Dejá de revisar 20 sitios para encontrar tu terreno.**\n'
            '\n'
@@ -302,6 +314,12 @@ PLAN: list[dict] = [{'day': 201,
               'ribbon': 'CASAS DE PLAYA',
               'star': True,
               'badge': 'La Libertad · $325,000',
+              'color_key': 'casas_playa'},
+             {'t': 'detail',
+              'eyebrow': 'Disponible ahora',
+              'price': '$325,000',
+              'facts': 'Vivir en el corazón de Surf City.',
+              'loc': 'La Libertad · Surf City',
               'color_key': 'casas_playa'}],
   'capES': '**El mundo entero está descubriendo El Salvador — 3.9 millones de visitantes en 2024, un '
            'récord.**\n'
@@ -404,6 +422,12 @@ PLAN: list[dict] = [{'day': 201,
               'ribbon': 'TERRENOS DE PLAYA',
               'star': True,
               'badge': 'Las Flores · $299,000',
+              'color_key': 'terrenos_playa'},
+             {'t': 'detail',
+              'eyebrow': 'Disponible ahora',
+              'price': '$299,000',
+              'facts': 'Casi 12,000 m² frente al mar, a $25 el metro.',
+              'loc': 'Corral de Mulas · La Unión',
               'color_key': 'terrenos_playa'}],
   'capES': '**No perdás tiempo viendo terrenos malos.**\n'
            '\n'
@@ -505,6 +529,12 @@ PLAN: list[dict] = [{'day': 201,
               'ribbon': 'CASAS DE PLAYA',
               'star': True,
               'badge': 'El Tunco · $755,000',
+              'color_key': 'casas_playa'},
+             {'t': 'detail',
+              'eyebrow': 'Disponible ahora',
+              'price': '$755,000',
+              'facts': 'El Pacífico desde tu sala, cada mañana.',
+              'loc': 'Residencial Solimar · El Tunco',
               'color_key': 'casas_playa'}],
   'capES': '**El mundo descubrió El Salvador. Vos naciste aquí.**\n'
            '\n'
@@ -603,6 +633,12 @@ PLAN: list[dict] = [{'day': 201,
               'ribbon': 'CASAS DE PLAYA',
               'star': True,
               'badge': 'San Diego · $787,000',
+              'color_key': 'casas_playa'},
+             {'t': 'detail',
+              'eyebrow': 'Disponible ahora',
+              'price': '$787,000',
+              'facts': '10 habitaciones frente al mar, para toda la familia.',
+              'loc': 'Playa San Diego · La Libertad',
               'color_key': 'casas_playa'}],
   'capES': '**¿Qué les vas a dejar a tus hijos?**\n'
            '\n'
@@ -701,6 +737,12 @@ PLAN: list[dict] = [{'day': 201,
               'ribbon': 'TERRENOS DE PLAYA',
               'star': True,
               'badge': 'La Libertad · $500,000',
+              'color_key': 'terrenos_playa'},
+             {'t': 'detail',
+              'eyebrow': 'Disponible ahora',
+              'price': '$500,000',
+              'facts': 'El lote con la vista que todos quieren.',
+              'loc': 'La Libertad · Surf City',
               'color_key': 'terrenos_playa'}],
   'capES': '**Buena noticia para quien tiene (o quiere) tierra en la costa.**\n'
            '\n'
@@ -748,6 +790,12 @@ PLAN: list[dict] = [{'day': 201,
               'ribbon': 'CASAS DE PLAYA',
               'star': True,
               'badge': 'La Libertad · $565,000',
+              'color_key': 'casas_playa'},
+             {'t': 'detail',
+              'eyebrow': 'Disponible ahora',
+              'price': '$565,000',
+              'facts': 'Piscina, 3 recámaras y el mar de fondo.',
+              'loc': 'La Libertad · Costa del Pacífico',
               'color_key': 'casas_playa'}],
   'capES': '**Dos semanas, todo El Salvador rankeado.**\n'
            '\n'
@@ -829,6 +877,12 @@ def patch_queue(item: dict, queue_path: Path = QUEUE_PATH) -> None:
     still-unposted item that isn't part of campaign_v1.  Posted items are
     left untouched (history).  Idempotent: re-running replaces the same
     day id rather than duplicating it.
+
+    NEVER un-posts: if the day already published (posted=True in the queue),
+    the freshly-rendered item inherits that posted state instead of resetting
+    it to posted=False.  Rebuilding the plan (e.g. to tweak slides) must not
+    resurrect an already-live post and make the publisher re-post it — that
+    is exactly how day 201 got queued for a 3rd publish after a slide edit.
     """
     data = json.loads(queue_path.read_text(encoding="utf-8"))
     items = data.get("items", [])
@@ -843,6 +897,16 @@ def patch_queue(item: dict, queue_path: Path = QUEUE_PATH) -> None:
             it["approved"] = False
             it["status"] = "superseded_campaign_v1"
             superseded += 1
+
+    prior = next((it for it in items if it.get("day") == item["day"]), None)
+    if prior and prior.get("posted"):
+        item = {
+            **item,
+            "posted": True,
+            "posted_at": prior.get("posted_at"),
+            "posted_media_id": prior.get("posted_media_id"),
+            "status": prior.get("status") or "posted",
+        }
 
     items = [it for it in items if it.get("day") != item["day"]]
     items.append(item)

@@ -81,8 +81,8 @@ def test_every_day_is_bilingual_and_on_palette():
 
 def test_every_slide_type_is_renderable():
     for p in ig_campaign.PLAN:
-        # topic posts carry 3 design cards + 1 appended ★ listing slide
-        assert 1 <= len(p["slides"]) <= 4
+        # topic posts: 3 design cards + ★ listing photo + detail spec card
+        assert 1 <= len(p["slides"]) <= 5
         for spec in p["slides"]:
             assert spec["t"] in _DISPATCH, spec["t"]
             color = CATEGORY_COLORS[p["color_key"]]
@@ -101,6 +101,20 @@ def test_photo_slides_reference_committed_source_frames():
                 assert Path(spec["img"]).exists(), spec["img"]
                 assert spec.get("ribbon")
     assert seen_photo, "expected at least one photo (Top-10) slide"
+
+
+def test_design_days_span_listing_over_photo_plus_detail():
+    # Every design-only day (has a detail card) shows its listing across a
+    # ★ photo slide AND an evocative detail card — the "at least 2 pics for
+    # the listing" request. The detail card must not be a bare spec dump.
+    design = [p for p in ig_campaign.PLAN if p["kind"] != "top10"]
+    assert len(design) == 8, len(design)
+    for p in design:
+        kinds = [s["t"] for s in p["slides"]]
+        assert kinds[-2:] == ["photo", "detail"], (p["day"], kinds)
+        detail = p["slides"][-1]
+        assert detail.get("price") and detail.get("facts") and detail.get("loc")
+        assert detail.get("color_key") == p["slides"][-2].get("color_key")  # matches its photo
 
 
 def test_top10_day_item_shape(no_browser):
@@ -132,9 +146,9 @@ def test_render_post_day1_item_shape(no_browser):
     assert item["day"] == 201
     assert item["selector"] == "campaign_v1"
     assert item["approved"] is True and item["posted"] is False
-    # 4 slides (3 design cards + ★ listing) → poster_path + 3 carousel photos
+    # 5 slides (3 design cards + ★ listing photo + detail card) → poster + 4 carousel
     assert item["poster_path"].endswith("slide1.png")
-    assert len(item["carousel_photo_paths"]) == 3
+    assert len(item["carousel_photo_paths"]) == 4
     # bilingual wire: ES then EN joined by the divider, hashtags on comment
     assert ig_campaign.DIV in item["caption"]
     assert "oceanfront" in item["caption"].lower()
@@ -177,3 +191,24 @@ def test_patch_queue_supersedes_and_is_idempotent(no_browser, tmp_path):
     ig_campaign.patch_queue(item, queue_path=queue)
     data2 = json.loads(queue.read_text(encoding="utf-8"))
     assert sum(1 for it in data2["items"] if it["day"] == 201) == 1
+
+
+def test_patch_queue_never_unposts_a_published_day(no_browser, tmp_path):
+    # Rebuilding the plan (fresh render_post → posted=False) must NOT reset a
+    # day the publisher already posted, or the publisher re-posts it. This is
+    # the day-201 3rd-publish regression.
+    queue = tmp_path / "ig_queue.json"
+    queue.write_text(json.dumps({"items": [
+        {"day": 201, "selector": "campaign_v1", "approved": True, "posted": True,
+         "posted_at": "2026-07-11T12:02:24+00:00", "posted_media_id": "17880008943476568",
+         "status": "posted", "scheduled_for": "2026-07-11T01:00:00+00:00"},
+    ]}), encoding="utf-8")
+
+    fresh = ig_campaign.render_post(ig_campaign.PLAN_BY_DAY[201])
+    assert fresh["posted"] is False                              # a fresh build is unposted…
+    ig_campaign.patch_queue(fresh, queue_path=queue)
+
+    day201 = [it for it in json.loads(queue.read_text())["items"] if it["day"] == 201][0]
+    assert day201["posted"] is True                              # …but the queue keeps it posted
+    assert day201["posted_media_id"] == "17880008943476568"
+    assert day201["status"] == "posted"
