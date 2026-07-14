@@ -2,13 +2,13 @@
   "source": "century21",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-07-14T03:40:37.691707+00:00",
+  "probed_at": "2026-07-14T08:31:01.591170+00:00",
   "last_probe": {
     "probed_url": "https://www.century21elsalvador.com",
     "status_code": 200,
     "final_url": "https://www.century21elsalvador.com",
     "response_size_bytes": null,
-    "duration_ms": 913,
+    "duration_ms": 1005,
     "error": null
   },
   "baseline": {
@@ -17,6 +17,6 @@
     "final_url": "https://www.century21elsalvador.com",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-07-14T03:40:37.691741+00:00"
+    "last_ok_at": "2026-07-14T08:31:01.591218+00:00"
   }
 }
