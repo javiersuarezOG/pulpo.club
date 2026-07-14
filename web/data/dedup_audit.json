@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-10T07:00:29.055228+00:00",
+  "computed_at": "2026-07-14T05:47:30.736469+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -407,6 +407,80 @@
       ]
     },
     {
+      "count": 3,
+      "cross_source": false,
+      "fingerprint": "acd51d255aeae4378cf8d70dae7442bc07b3168e",
+      "samples": [
+        {
+          "area_m2": null,
+          "price_usd": 60000.0,
+          "source": "realestate_au_sv",
+          "source_id": "porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340881",
+          "title": "Porción 1 lotes 251 y 252 lotificacion arcos del espino cantón el espino, JUCURAN USULUTAN ESTE, Jucuaran, Usulután, Jucuaran, Usulutan Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340881/",
+          "zone": "el-espino"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 60000.0,
+          "source": "realestate_au_sv",
+          "source_id": "porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340859",
+          "title": "Porción 1 lotes 251 y 252 lotificacion arcos del espino cantón el espino, JUCURAN USULUTAN ESTE, Jucuaran, Usulután, Jucuaran, Usulutan Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340859/",
+          "zone": "el-espino"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 60000.0,
+          "source": "realestate_au_sv",
+          "source_id": "porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340880",
+          "title": "Porción 1 lotes 251 y 252 lotificacion arcos del espino cantón el espino, JUCURAN USULUTAN ESTE, Jucuaran, Usulután, Jucuaran, Usulutan Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340880/",
+          "zone": "el-espino"
+        }
+      ],
+      "sources": [
+        "realestate_au_sv"
+      ]
+    },
+    {
+      "count": 3,
+      "cross_source": false,
+      "fingerprint": "cad82211d638e4d5b8df26b5b637c6aa95f51492",
+      "samples": [
+        {
+          "area_m2": 300.0,
+          "price_usd": 60000.0,
+          "source": "remax",
+          "source_id": "002524082017",
+          "title": "Lot for sale",
+          "url": "https://www.remax-elsalvador.com/002524082017",
+          "zone": "el-espino"
+        },
+        {
+          "area_m2": 300.0,
+          "price_usd": 60000.0,
+          "source": "remax",
+          "source_id": "002524082016",
+          "title": "Lot for sale",
+          "url": "https://www.remax-elsalvador.com/002524082016",
+          "zone": "el-espino"
+        },
+        {
+          "area_m2": 300.0,
+          "price_usd": 60000.0,
+          "source": "remax",
+          "source_id": "002524082015",
+          "title": "Lot for sale",
+          "url": "https://www.remax-elsalvador.com/002524082015",
+          "zone": "el-espino"
+        }
+      ],
+      "sources": [
+        "remax"
+      ]
+    },
+    {
       "count": 2,
       "cross_source": false,
       "fingerprint": "0515a84d8ac00d7a9afb615902edf7f36c639f7c",
@@ -717,29 +791,29 @@
     {
       "count": 2,
       "cross_source": false,
-      "fingerprint": "560d0b3ada36080a89213064cd6c45cbedf3e508",
+      "fingerprint": "5ac1f26a2ec92c72b887aaf62090374b809373ed",
       "samples": [
         {
           "area_m2": null,
-          "price_usd": 35638.0,
-          "source": "realestate_au_sv",
-          "source_id": "carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310094614617",
-          "title": "Carretera a Ahuachapán , Cantón Ayutepeque, Chalchupa, Santa Ana, Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310094614617/",
-          "zone": "santa-ana"
+          "price_usd": 155000.0,
+          "source": "csbr",
+          "source_id": "venta-terreno-en-residencial-las-luces-zaragoza-2",
+          "title": "VENTA TERRENO RESIDENCIAL LAS LUCES ZARAGOZA",
+          "url": "https://www.camarabienesraices.com.sv/propiedad/venta-terreno-en-residencial-las-luces-zaragoza-2/",
+          "zone": "zaragoza"
         },
         {
           "area_m2": null,
-          "price_usd": 35926.0,
-          "source": "realestate_au_sv",
-          "source_id": "carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310093383392",
-          "title": "Carretera a Ahuachapán , Cantón Ayutepeque, Chalchupa, Santa Ana, Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310093383392/",
-          "zone": "santa-ana"
+          "price_usd": 155000.0,
+          "source": "csbr",
+          "source_id": "venta-terreno-en-residencial-las-luces-zaragoza",
+          "title": "VENTA TERRENO RESIDENCIAL LAS LUCES ZARAGOZA",
+          "url": "https://www.camarabienesraices.com.sv/propiedad/venta-terreno-en-residencial-las-luces-zaragoza/",
+          "zone": "zaragoza"
         }
       ],
       "sources": [
-        "realestate_au_sv"
+        "csbr"
       ]
     },
     {
@@ -1138,10 +1212,10 @@
   "overlap_matrix": {},
   "per_source": {
     "bienesraices": {
-      "kept_as_unique": 508,
-      "raw": 509,
+      "kept_as_unique": 509,
+      "raw": 510,
       "shared_with_others": 0,
-      "unique_in_source": 508
+      "unique_in_source": 509
     },
     "century21": {
       "kept_as_unique": 14,
@@ -1156,28 +1230,22 @@
       "unique_in_source": 33
     },
     "citymax_sc": {
-      "kept_as_unique": 157,
-      "raw": 157,
+      "kept_as_unique": 158,
+      "raw": 158,
       "shared_with_others": 0,
-      "unique_in_source": 157
+      "unique_in_source": 158
     },
     "csbr": {
-      "kept_as_unique": 257,
-      "raw": 259,
+      "kept_as_unique": 265,
+      "raw": 268,
       "shared_with_others": 0,
-      "unique_in_source": 257
-    },
-    "elagente": {
-      "kept_as_unique": 2,
-      "raw": 2,
-      "shared_with_others": 0,
-      "unique_in_source": 2
+      "unique_in_source": 265
     },
     "encuentra24": {
-      "kept_as_unique": 21,
-      "raw": 21,
+      "kept_as_unique": 25,
+      "raw": 25,
       "shared_with_others": 0,
-      "unique_in_source": 21
+      "unique_in_source": 25
     },
     "essurf": {
       "kept_as_unique": 35,
@@ -1186,10 +1254,10 @@
       "unique_in_source": 35
     },
     "goodlife": {
-      "kept_as_unique": 35,
-      "raw": 35,
+      "kept_as_unique": 34,
+      "raw": 34,
       "shared_with_others": 0,
-      "unique_in_source": 35
+      "unique_in_source": 34
     },
     "nexo": {
       "kept_as_unique": 8,
@@ -1204,28 +1272,22 @@
       "unique_in_source": 24
     },
     "realestate_au_sv": {
-      "kept_as_unique": 284,
-      "raw": 316,
+      "kept_as_unique": 286,
+      "raw": 319,
       "shared_with_others": 0,
-      "unique_in_source": 284
-    },
-    "realtyelsalvador": {
-      "kept_as_unique": 123,
-      "raw": 123,
-      "shared_with_others": 0,
-      "unique_in_source": 123
+      "unique_in_source": 286
     },
     "remax": {
-      "kept_as_unique": 315,
-      "raw": 330,
+      "kept_as_unique": 318,
+      "raw": 335,
       "shared_with_others": 0,
-      "unique_in_source": 315
+      "unique_in_source": 318
     },
     "santizo": {
-      "kept_as_unique": 91,
-      "raw": 91,
+      "kept_as_unique": 93,
+      "raw": 93,
       "shared_with_others": 0,
-      "unique_in_source": 91
+      "unique_in_source": 93
     },
     "vivolatam": {
       "kept_as_unique": 156,
@@ -1240,6 +1302,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2146,
-  "total_unique_fingerprints": 2092
+  "total_in_dataset": 2045,
+  "total_unique_fingerprints": 1987
 }
