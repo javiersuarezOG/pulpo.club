@@ -477,9 +477,11 @@
       "primary_listing_id": "citymax_sc_casa-en-venta-residencial-san-carlos-sonzacate",
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-07-15T03:28:41.994941+00:00",
+      "posted_media_id": "17967057617940005",
+      "comment_posted": true,
+      "comment_id": "18080664272273924"
     },
     {
       "day": 110,
