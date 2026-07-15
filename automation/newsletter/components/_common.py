@@ -87,13 +87,18 @@ from ..types import Issue
 #       guard. Rendered output is BYTE-IDENTICAL (verified by a before/after
 #       dry-run diff across all cohorts incl. favorites + ES); the bump only
 #       satisfies the render-file-change guard. No recipient-visible change.
-TEMPLATE_VERSION = "newsletter-v5.6-2026-07-12"
+#   v5.7 (2026-07-27) — Pro price drop $9.99 → $4.99: paywall CTA
+#       ("Go Pro — $4.99/month →") + locked-pick CTA ("Unlock this pick —
+#       $4.99/mo →") in i18n.py, plus the paywall.py contract comment.
+#       Rendered paywall band + locked-pick CTA change in BOTH locales for
+#       Free recipients of the General digest (2026-07 price experiment).
+TEMPLATE_VERSION = "newsletter-v5.7-2026-07-27"
 
 # Human-readable timestamp surfaced in component docs + the admin
 # widget so collaborators can see when the locked design was last
 # revised without trawling git log. Matches the `vN.N (date)` line at
 # the top of the revision history above.
-LAST_UPDATED = "2026-07-12"
+LAST_UPDATED = "2026-07-27"
 
 
 # ─────────────────────────────────────────────────────────────────────

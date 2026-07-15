@@ -74,9 +74,11 @@ STRINGS: dict[str, dict[Locale, str]] = {
     # and matches the locked mockup. The heart glyph is rendered by
     # `_pick_card_html` outside this string for layout flexibility.
     "pick.cta_save":               {"en": "Save",                                         "es": "Guardar"},
-    # Price-anchored unlock — "$9.99/mo" matches the canonical pricing
-    # source-of-truth (project_post_stripe_activation_series memory).
-    "pick.cta_locked":             {"en": "Unlock this pick — $9.99/mo →",                "es": "Desbloquear esta selección — $9.99/mes →"},
+    # Price-anchored unlock — "$4.99/mo" mirrors the canonical pricing
+    # source-of-truth (web/app/lib/pricing.ts). Update both when the price
+    # rotates; the newsletter is a separate (Python) render path and can't
+    # import the TS source.
+    "pick.cta_locked":             {"en": "Unlock this pick — $4.99/mo →",                "es": "Desbloquear esta selección — $4.99/mes →"},
     "pick.paywall_blurb":          {"en": "Pulpo Pro reveals the address, the broker file, and the full underwriting. Free members see the photo and the headline.",
                                      "es": "Pulpo Pro revela la dirección, la ficha del corredor y el análisis completo. Los miembros gratuitos ven foto y titular."},
     "shortlist.eyebrow":           {"en": "{n} more worth a look",                        "es": "{n} más que valen la pena"},
@@ -208,10 +210,11 @@ STRINGS: dict[str, dict[Locale, str]] = {
     "paywall.headline":            {"en": "Pro goes deeper on every pick.",               "es": "Pro profundiza en cada selección."},
     "paywall.body":                {"en": "You're seeing all 10 picks, ranked. Pulpo Pro adds what closes a deal — the address, the broker contact, the full underwriting, the negotiation lever the seller doesn't know we know about, plus the full read on this week's news. Same weekly cadence, the complete file.",
                                      "es": "Estás viendo las 10 selecciones, clasificadas. Pulpo Pro suma lo que cierra un trato — la dirección, el contacto del corredor, el análisis completo, la palanca de negociación que el vendedor no sabe que conocemos, y el análisis completo de la noticia de la semana. Misma cadencia semanal, el archivo completo."},
-    # Aligned with the canonical $9.99/mo price (web/app/lib/pricing.ts +
+    # Aligned with the canonical $4.99/mo price (web/app/lib/pricing.ts +
     # web/app/config/legal-content.ts). The v2.1 newsletter shipped with
-    # $19/month which was stale drift — fixed in v2.2.
-    "paywall.cta":                 {"en": "Go Pro — $9.99/month →",                       "es": "Hacete Pro — $9.99/mes →"},
+    # $19/month which was stale drift — fixed in v2.2; price dropped to
+    # $4.99 in the 2026-07 price experiment.
+    "paywall.cta":                 {"en": "Go Pro — $4.99/month →",                       "es": "Hacete Pro — $4.99/mes →"},
     # ── Footer ──
     "footer.tagline":              {"en": f"Every beach and lake home in {_country_en}, ranked by value.",
                                      "es": f"Cada casa frente al mar y al lago en {_country_es}, clasificada por valor."},

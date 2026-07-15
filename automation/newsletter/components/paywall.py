@@ -8,7 +8,7 @@ when `issue.paywall_banner == True`.
 Locked contract for v4:
   • Forest-green band, paper text
   • Eyebrow "FREE EDITION" + serif H2 "You're seeing the public cut."
-  • Body paragraph + price-anchored "Go Pro — $9.99/month →" CTA
+  • Body paragraph + price-anchored "Go Pro — $4.99/month →" CTA
   • Links to `issue.paywall_target_url` (Stripe checkout entrypoint)
 
 Skipped entirely for Pro / Agency / Pro-Preview recipients —

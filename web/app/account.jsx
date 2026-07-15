@@ -41,6 +41,7 @@ import { splitFullName, joinFullName } from "./lib/name-split";
 import { routeCtaForState, trackCtaRouted, dispatchCentralBranch } from "./lib/cta-routing";
 import { readFeatureFlag } from "./lib/feature-flag";
 import { deriveSubscriptionState, graceDaysLeft } from "./lib/subscription";
+import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
 import {
   pollPortalReturnState,
   subscriptionRefreshSnapshot,
@@ -250,6 +251,14 @@ function FreeMemberAccount({ app }) {
   const lc = app.locale;
   const email = (app.user && app.user.email) || "";
 
+  // Geo-derived display price for the go_pro CTA ({price} placeholder).
+  const [price, setPrice] = aUseState(() => priceForCountry(null));
+  aUseEffect(() => {
+    let cancelled = false;
+    fetchPriceForCurrentGeo().then((p) => { if (!cancelled) setPrice(p); });
+    return () => { cancelled = true; };
+  }, []);
+
   aUseEffect(() => {
     try { track("account.free_view_shown", {}); } catch { /* ignore */ }
   }, []);
@@ -275,7 +284,7 @@ function FreeMemberAccount({ app }) {
             <span className="account-free-badge">{t("account.free.badge", lc)}</span>
             <p className="account-free-value">{t("account.free.value", lc)}</p>
             <button type="button" className="btn-pro lg block" onClick={onGoPro}>
-              {t("access.go_pro.cta", lc)}
+              {t("access.go_pro.cta", lc, { price: price.displayString })}
             </button>
             <div className="access-pro-sub">{t("access.go_pro.sub", lc)}</div>
           </section>
