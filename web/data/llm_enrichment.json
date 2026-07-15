@@ -124246,5 +124246,1824 @@
     "cost_usd": 0.00141689,
     "finish_reason": "stop",
     "latency_ms": 4485
+  },
+  "csbr|terrenos-en-venta-a-5-minutos-de-res-la-hacienda-san-jose-villanueva-la-libertad": {
+    "ts": "2026-07-15T05:46:04.420185+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near San José Villanueva",
+      "es": "Terrenos en Venta cerca de San José Villanueva"
+    },
+    "short_description_canonical": {
+      "en": "Land parcels for sale 5 minutes from Res. La Hacienda, San José Villanueva, La Libertad. Listed on the Salvadoran Chamber of Real Estate. Price: $60,000.",
+      "es": "Terrenos en venta a 5 minutos de Res. La Hacienda, San José Villanueva, La Libertad. Publicado en la Cámara Salvadoreña de Bienes Raíces. Precio: $60,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "5 min from Res. La Hacienda",
+        "es": "5 min de Res. La Hacienda"
+      },
+      {
+        "en": "Listed on official chamber",
+        "es": "Publicado en cámara oficial"
+      },
+      {
+        "en": "Price: $60,000",
+        "es": "Precio: $60,000"
+      }
+    ],
+    "lat": 13.6333,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San José Villanueva, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3083,
+    "tokens_out": 400,
+    "cost_usd": 0.00127241,
+    "finish_reason": "stop",
+    "latency_ms": 3597
+  },
+  "citymax_sc|invierte-en-4-15-manzanas-ruta-panoramica": {
+    "ts": "2026-07-15T05:46:04.465214+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale on Ruta Panorámica, San Juan Tepezontes",
+      "es": "Terreno en Venta sobre Ruta Panorámica, San Juan Tepezontes"
+    },
+    "short_description_canonical": {
+      "en": "Land lot with direct road access on Ruta Panorámica in San Juan Tepezontes, La Paz. Priced at $195,880. Ideal for commercial or residential development with highway frontage.",
+      "es": "Terreno con acceso directo sobre la Ruta Panorámica en San Juan Tepezontes, La Paz. Precio de $195,880. Ideal para desarrollo comercial o residencial con frente a carretera."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct access on Ruta Panorámica",
+        "es": "Acceso directo sobre la Ruta Panorámica"
+      },
+      {
+        "en": "Located in San Juan Tepezontes",
+        "es": "Ubicado en San Juan Tepezontes"
+      },
+      {
+        "en": "Highway frontage for visibility",
+        "es": "Frente a carretera para visibilidad"
+      }
+    ],
+    "lat": 13.5167,
+    "lng": -89.0333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Juan Tepezontes, La Paz",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3084,
+    "tokens_out": 412,
+    "cost_usd": 0.00128588,
+    "finish_reason": "stop",
+    "latency_ms": 3643
+  },
+  "bienesraices|2418": {
+    "ts": "2026-07-15T05:46:05.010729+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "98 mz Beachfront Land, 700m Ocean Front, Sonsonate",
+      "es": "98 mz Terreno Frente al Mar, 700m Frente Oceánico, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "124 mz land parcel in Sonsonate, ahead of Mizata beach. 98 mz are beachfront with 700 m ocean frontage and 600 m river frontage; 26 mz are mountain-side. Flat terrain with river, estuary, and mangrove. Free of liens.",
+      "es": "Lote de 124 mz en Sonsonate, adelante de Mizata. 98 mz son frente al mar con 700 m de frente oceánico y 600 m de frente al río; 26 mz lado montaña. Terreno plano con río, bocana y manglar. Libre de gravámenes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "700 m ocean frontage",
+        "es": "700 m de frente oceánico"
+      },
+      {
+        "en": "600 m river frontage",
+        "es": "600 m de frente al río"
+      },
+      {
+        "en": "Flat terrain with estuary",
+        "es": "Terreno plano con bocana"
+      },
+      {
+        "en": "Free of liens",
+        "es": "Libre de gravámenes"
+      }
+    ],
+    "lat": 13.53,
+    "lng": -89.7,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Mizata beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3187,
+    "tokens_out": 458,
+    "cost_usd": 0.00136429,
+    "finish_reason": "stop",
+    "latency_ms": 4190
+  },
+  "bienesraices|2429": {
+    "ts": "2026-07-15T05:46:05.253539+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4 Contiguous Lots in Lotificación San Luis, El Paisnal",
+      "es": "4 Lotes Contiguos en Lotificación San Luis, El Paisnal"
+    },
+    "short_description_canonical": {
+      "en": "Four contiguous residential lots totaling 800 m² in Lotificación San Luis, El Paisnal, San Salvador Norte. Each 200 m² lot has independent title, direct street access, and utility feasibility for electricity and water. Priced at $72,000 for all four lots, below $90/m².",
+      "es": "Cuatro lotes residenciales contiguos de 800 m² totales en Lotificación San Luis, El Paisnal, San Salvador Norte. Cada lote de 200 m² tiene escritura independiente, acceso directo a la calle y factibilidad de luz y agua. Precio de $72,000 por los cuatro lotes, por debajo de $90/m²."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "4 contiguous lots, 800 m² total",
+        "es": "4 lotes contiguos, 800 m² totales"
+      },
+      {
+        "en": "Each lot has independent title",
+        "es": "Cada lote con escritura independiente"
+      },
+      {
+        "en": "Direct street access, flat terrain",
+        "es": "Acceso directo a calle, terreno plano"
+      },
+      {
+        "en": "Electricity and water feasibility ready",
+        "es": "Factibilidad de luz y agua lista"
+      },
+      {
+        "en": "Below $90/m², clear title",
+        "es": "Por debajo de $90/m², título limpio"
+      }
+    ],
+    "lat": 13.7833,
+    "lng": -89.2167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Paisnal, San Salvador, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3462,
+    "tokens_out": 533,
+    "cost_usd": 0.00152104,
+    "finish_reason": "stop",
+    "latency_ms": 4433
+  },
+  "csbr|venta-terreno-en-residencial-las-luces-zaragoza-3": {
+    "ts": "2026-07-15T05:46:06.891279+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Zaragoza, La Libertad",
+      "es": "Terreno en Venta en Zaragoza, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land lot for sale in Zaragoza, on the road to Surf City, La Libertad. Price: $155,000. Located in a developing area near the coast.",
+      "es": "Terreno en venta en Zaragoza, carretera a Surf City, La Libertad. Precio: $155,000. Ubicado en zona en desarrollo cerca de la costa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "On road to Surf City",
+        "es": "Sobre carretera a Surf City"
+      },
+      {
+        "en": "Near La Libertad coast",
+        "es": "Cerca de la costa de La Libertad"
+      },
+      {
+        "en": "Developing area potential",
+        "es": "Potencial en zona en desarrollo"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3075,
+    "tokens_out": 372,
+    "cost_usd": 0.00123945,
+    "finish_reason": "stop",
+    "latency_ms": 2823
+  },
+  "csbr|terrenos-frente-al-mar-en-venta-playa-maculis-la-union": {
+    "ts": "2026-07-15T05:46:06.991706+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Land for Sale, Playa Maculís",
+      "es": "Terrenos Frente al Mar en Venta, Playa Maculís"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront lot of 388.12 m² at Playa Maculís, La Unión. Direct ocean access with no buildings between you and the sea. Priced at $125,000.",
+      "es": "Lote frente al mar de 388.12 m² en Playa Maculís, La Unión. Acceso directo al océano sin construcciones entre usted y el mar. Precio de $125,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront first row",
+        "es": "Primera fila frente al mar"
+      },
+      {
+        "en": "388.12 m² lot",
+        "es": "Lote de 388.12 m²"
+      },
+      {
+        "en": "Listed on CSBR",
+        "es": "Listado en CSBR"
+      }
+    ],
+    "lat": 13.205,
+    "lng": -87.842,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Maculís",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3085,
+    "tokens_out": 387,
+    "cost_usd": 0.00125865,
+    "finish_reason": "stop",
+    "latency_ms": 3207
+  },
+  "csbr|venta-terreno-en-residencial-las-luces-zaragoza-2": {
+    "ts": "2026-07-15T05:46:07.375820+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Residential Lot for Sale in Las Luces, Zaragoza",
+      "es": "Terreno Residencial en Venta en Las Luces, Zaragoza"
+    },
+    "short_description_canonical": {
+      "en": "Residential lot in Las Luces, Zaragoza, La Libertad. Lot is located in a residential area. Price: $155,000.",
+      "es": "Terreno residencial en Las Luces, Zaragoza, La Libertad. El lote está ubicado en una zona residencial. Precio: $155,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Residential zone in Las Luces",
+        "es": "Zona residencial en Las Luces"
+      },
+      {
+        "en": "Located in Zaragoza, La Libertad",
+        "es": "Ubicado en Zaragoza, La Libertad"
+      },
+      {
+        "en": "Price: $155,000",
+        "es": "Precio: $155,000"
+      }
+    ],
+    "lat": 13.5833,
+    "lng": -89.2667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Zaragoza, La Libertad, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3071,
+    "tokens_out": 386,
+    "cost_usd": 0.00125377,
+    "finish_reason": "stop",
+    "latency_ms": 2955
+  },
+  "csbr|rancho-en-venta-conchalio-la-libertad": {
+    "ts": "2026-07-15T05:46:07.523701+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "941 m² Lot in Conchalío, La Libertad",
+      "es": "Terreno de 941 m² en Conchalío, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Flat 941 m² residential lot in Conchalío, La Libertad. Located in a residential area near the beach. Priced at $339,000.",
+      "es": "Terreno residencial plano de 941 m² en Conchalío, La Libertad. Ubicado en zona residencial cerca de la playa. Precio de $339,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "941 m² flat lot",
+        "es": "Terreno plano de 941 m²"
+      },
+      {
+        "en": "Near beach in Conchalío",
+        "es": "Cerca de la playa en Conchalío"
+      },
+      {
+        "en": "Residential area",
+        "es": "Zona residencial"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3079,
+    "tokens_out": 371,
+    "cost_usd": 0.00123943,
+    "finish_reason": "stop",
+    "latency_ms": 3058
+  },
+  "realestate_au_sv|lotificacion-yaguatique-canton-elprogreso-san-miguel-san-miguel-san-miguel-san-miguel-310119364471": {
+    "ts": "2026-07-15T05:46:08.113125+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land Lot in Yaguatique, San Miguel",
+      "es": "Lote en Yaguatique, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Land lot in Lotificación Yaguatique, Cantón El Progreso, San Miguel. 25,000 USD. No further details on size or utilities provided.",
+      "es": "Lote en Lotificación Yaguatique, Cantón El Progreso, San Miguel. 25,000 USD. Sin más detalles sobre tamaño o servicios."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "25,000 USD price",
+        "es": "Precio de 25,000 USD"
+      },
+      {
+        "en": "Located in San Miguel",
+        "es": "Ubicado en San Miguel"
+      },
+      {
+        "en": "Lotificación Yaguatique area",
+        "es": "Área de Lotificación Yaguatique"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3085,
+    "tokens_out": 362,
+    "cost_usd": 0.00123115,
+    "finish_reason": "stop",
+    "latency_ms": 3035
+  },
+  "realestate_au_sv|porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340881": {
+    "ts": "2026-07-15T05:46:08.324338+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land lot in Arcos del Espino, Jucuaran",
+      "es": "Terreno en Arcos del Espino, Jucuaran"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Arcos del Espino, canton El Espino, Jucuaran, Usulutan. Lot 251 and 252 portion 1, priced at $60,000. Located in a residential development.",
+      "es": "Porción de terreno en Arcos del Espino, cantón El Espino, Jucuaran, Usulután. Lotes 251 y 252 porción 1, precio $60,000. Ubicado en una lotificación."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Part of a residential development",
+        "es": "Parte de una lotificación residencial"
+      },
+      {
+        "en": "Two contiguous lots",
+        "es": "Dos lotes contiguos"
+      },
+      {
+        "en": "Located in Jucuaran, Usulutan",
+        "es": "Ubicado en Jucuaran, Usulután"
+      }
+    ],
+    "lat": 13.25,
+    "lng": -88.25,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Jucuaran, Usulutan",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3112,
+    "tokens_out": 406,
+    "cost_usd": 0.00128684,
+    "finish_reason": "stop",
+    "latency_ms": 3156
+  },
+  "realestate_au_sv|canton-san-jose-la-majada-lote-sin-numero-porcion-4-juayua-sonsonate-norte-sonsonate-juayua-sonsonate-juayua-sonsonate-310119340911": {
+    "ts": "2026-07-15T05:46:08.521651+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² lot in Juayúa, Sonsonate",
+      "es": "Lote de 850 m² en Juayúa, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Flat 850 m² residential lot in Cantón San José La Majada, Juayúa, Sonsonate. Located in a quiet area with access to local services. Priced at $250,000.",
+      "es": "Lote residencial plano de 850 m² en Cantón San José La Majada, Juayúa, Sonsonate. Ubicado en zona tranquila con acceso a servicios locales. Precio de $250,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "850 m² flat lot",
+        "es": "Lote plano de 850 m²"
+      },
+      {
+        "en": "Located in Juayúa, Sonsonate",
+        "es": "Ubicado en Juayúa, Sonsonate"
+      },
+      {
+        "en": "Quiet residential area",
+        "es": "Zona residencial tranquila"
+      }
+    ],
+    "lat": 13.8436,
+    "lng": -89.7453,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Juayúa, Sonsonate",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3107,
+    "tokens_out": 390,
+    "cost_usd": 0.00126789,
+    "finish_reason": "stop",
+    "latency_ms": 3267
+  },
+  "realestate_au_sv|porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340859": {
+    "ts": "2026-07-15T05:46:10.061161+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land lot in Arcos del Espino, Jucuarán",
+      "es": "Lote en Arcos del Espino, Jucuarán"
+    },
+    "short_description_canonical": {
+      "en": "Land lot in Arcos del Espino, cantón El Espino, Jucuarán, Usulután. Lot 251 and 252, 60000 USD. No further details provided.",
+      "es": "Lote en Arcos del Espino, cantón El Espino, Jucuarán, Usulután. Lotes 251 y 252, 60000 USD. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Arcos del Espino",
+        "es": "Ubicado en Arcos del Espino"
+      },
+      {
+        "en": "Two contiguous lots",
+        "es": "Dos lotes contiguos"
+      },
+      {
+        "en": "Price 60000 USD",
+        "es": "Precio 60000 USD"
+      }
+    ],
+    "lat": 13.25,
+    "lng": -88.5,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Jucuarán, Usulután",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3112,
+    "tokens_out": 387,
+    "cost_usd": 0.00126594,
+    "finish_reason": "stop",
+    "latency_ms": 3169
+  },
+  "realestate_au_sv|blvd-costa-del-sol-km-65-san-luis-la-herradura-los-blancos-la-paz-los-blancos-la-paz-department-310119340860": {
+    "ts": "2026-07-15T05:46:10.202171+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale on Costa del Sol Blvd",
+      "es": "Terreno en Venta en Blvd. Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel on Blvd. Costa del Sol Km 65, Los Blancos, San Luis La Herradura, La Paz. Flat lot suitable for development. Paved road access and utilities available.",
+      "es": "Terreno en Blvd. Costa del Sol Km 65, Los Blancos, San Luis La Herradura, La Paz. Lote plano apto para desarrollo. Acceso por carretera pavimentada y servicios disponibles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Costa del Sol beachfront area",
+        "es": "Zona frente a la playa Costa del Sol"
+      },
+      {
+        "en": "Paved road access",
+        "es": "Acceso por carretera pavimentada"
+      },
+      {
+        "en": "Utilities available on site",
+        "es": "Servicios disponibles en el lugar"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3089,
+    "tokens_out": 380,
+    "cost_usd": 0.00125203,
+    "finish_reason": "stop",
+    "latency_ms": 3210
+  },
+  "realestate_au_sv|porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340880": {
+    "ts": "2026-07-15T05:46:10.712142+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Arcos del Espino, Jucuarán",
+      "es": "Terreno en Arcos del Espino, Jucuarán"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Arcos del Espino, canton El Espino, Jucuarán, Usulután. Lot 251 and 252, part of a residential development. Priced at $60,000.",
+      "es": "Porción de terreno en Arcos del Espino, cantón El Espino, Jucuarán, Usulután. Lotes 251 y 252, parte de una lotificación. Precio de $60,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Two adjacent lots, 251 and 252",
+        "es": "Dos lotes contiguos, 251 y 252"
+      },
+      {
+        "en": "Located in Arcos del Espino development",
+        "es": "Ubicado en la lotificación Arcos del Espino"
+      },
+      {
+        "en": "Price: $60,000",
+        "es": "Precio: $60,000"
+      }
+    ],
+    "lat": 13.25,
+    "lng": -88.5,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Jucuarán, Usulután",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3112,
+    "tokens_out": 411,
+    "cost_usd": 0.00129234,
+    "finish_reason": "stop",
+    "latency_ms": 3335
+  },
+  "realestate_au_sv|calle-los-conacastes-lote-19-complejo-turistico-salinitas-3ra-etapa-acajutla-sonsonate-acajutla-sonsonate-acajutla-sonsonate-310109311474": {
+    "ts": "2026-07-15T05:46:10.811305+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Salinitas Complex, Acajutla, Sonsonate",
+      "es": "Terreno en Complejo Salinitas, Acajutla, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Lot 19 on Calle Los Conacastes in Salinitas tourist complex, 3rd stage, Acajutla, Sonsonate. This land is priced at $165,000. Located within a gated tourist development.",
+      "es": "Lote 19 en Calle Los Conacastes en complejo turístico Salinitas, 3ra etapa, Acajutla, Sonsonate. Este terreno está valorado en $165,000. Ubicado dentro de un desarrollo turístico cerrado."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "In Salinitas tourist complex",
+        "es": "En complejo turístico Salinitas"
+      },
+      {
+        "en": "Third stage development",
+        "es": "Tercera etapa del desarrollo"
+      },
+      {
+        "en": "Priced at $165,000",
+        "es": "Valorado en $165,000"
+      }
+    ],
+    "lat": 13.5928,
+    "lng": -89.8275,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Acajutla",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3104,
+    "tokens_out": 405,
+    "cost_usd": 0.00128358,
+    "finish_reason": "stop",
+    "latency_ms": 3287
+  },
+  "realestate_au_sv|porcion-2-b-marcado-como-segundo-cton-san-jose-sacare-correspondiente-a-la-ubicacion-geografica-de-san-jose-sacare-la-palma-chalatenango-norte-chalatenango-la-palma-chalatenango-la-palma-chalatenango-310109311478": {
+    "ts": "2026-07-15T05:46:11.265006+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in San Jose Sacare, La Palma",
+      "es": "Terreno en San José Sacare, La Palma"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in San Jose Sacare, La Palma, Chalatenango. 2-B portion marked as second. Listed for sale at $90,000.",
+      "es": "Porción de terreno en San José Sacare, La Palma, Chalatenango. Porción 2-B marcada como segundo. En venta por $90,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in San Jose Sacare",
+        "es": "Ubicado en San José Sacare"
+      },
+      {
+        "en": "Price: $90,000",
+        "es": "Precio: $90,000"
+      },
+      {
+        "en": "In La Palma, Chalatenango",
+        "es": "En La Palma, Chalatenango"
+      }
+    ],
+    "lat": 14.2833,
+    "lng": -89.1667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Palma, Chalatenango",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3129,
+    "tokens_out": 364,
+    "cost_usd": 0.00124523,
+    "finish_reason": "stop",
+    "latency_ms": 3151
+  },
+  "realestate_au_sv|canto-el-jicaro-isla-el-arco-jucuaran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310109311466": {
+    "ts": "2026-07-15T05:46:11.623484+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Jucuarán, Usulután",
+      "es": "Terreno en Venta en Jucuarán, Usulután"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Canto El Jícaro, Isla El Arco, Jucuarán, Usulután. Located in a rural area of Usulután Este. Priced at $130,000.",
+      "es": "Terreno en Canto El Jícaro, Isla El Arco, Jucuarán, Usulután. Ubicado en zona rural de Usulután Este. Precio de $130,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Jucuarán, Usulután",
+        "es": "Ubicado en Jucuarán, Usulután"
+      },
+      {
+        "en": "Price: $130,000",
+        "es": "Precio: $130,000"
+      },
+      {
+        "en": "Rural land in Usulután Este",
+        "es": "Terreno rural en Usulután Este"
+      }
+    ],
+    "lat": 13.25,
+    "lng": -88.25,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Jucuarán, Usulután",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3103,
+    "tokens_out": 415,
+    "cost_usd": 0.00129431,
+    "finish_reason": "stop",
+    "latency_ms": 3298
+  },
+  "realestate_au_sv|carretera-panamericana-km-73-hacia-candelaria-la-frontera-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310109311476": {
+    "ts": "2026-07-15T05:46:11.655434+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Land for Sale, Santa Ana",
+      "es": "Terreno de 850 m² en Venta, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Flat 850 m² residential lot on Carretera Panamericana, km 73 toward Candelaria la Frontera, Santa Ana. Paved road access, utilities available. Zoned for residential use with clear title.",
+      "es": "Lote residencial plano de 850 m² sobre Carretera Panamericana, km 73 hacia Candelaria la Frontera, Santa Ana. Acceso por carretera pavimentada, servicios disponibles. Zonificado para uso residencial con título claro."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Paved road frontage on Panamerican Highway",
+        "es": "Frente pavimentado sobre Carretera Panamericana"
+      },
+      {
+        "en": "Flat 850 m² lot, ready to build",
+        "es": "Lote plano de 850 m², listo para construir"
+      },
+      {
+        "en": "Utilities available at site",
+        "es": "Servicios disponibles en el sitio"
+      },
+      {
+        "en": "Clear title, residential zoning",
+        "es": "Título claro, zonificación residencial"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3087,
+    "tokens_out": 439,
+    "cost_usd": 0.00131639,
+    "finish_reason": "stop",
+    "latency_ms": 3554
+  },
+  "realestate_au_sv|calle-san-roque-lote-s-n-mejicanos-san-salvador-san-salvador-san-salvador-san-salvador-310109311465": {
+    "ts": "2026-07-15T05:46:11.935662+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Land in Mejicanos, San Salvador",
+      "es": "Terreno de 850 m² en Mejicanos, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "850 m² residential lot on Calle San Roque, Mejicanos, San Salvador. Flat terrain with road access. Priced at $49,000, below zone average per m².",
+      "es": "Lote residencial de 850 m² en Calle San Roque, Mejicanos, San Salvador. Terreno plano con acceso vial. Precio de $49,000, por debajo del promedio de la zona por m²."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "850 m² flat lot",
+        "es": "Lote plano de 850 m²"
+      },
+      {
+        "en": "Road access on Calle San Roque",
+        "es": "Acceso vial en Calle San Roque"
+      },
+      {
+        "en": "Below zone median price per m²",
+        "es": "Precio por m² por debajo de la mediana de la zona"
+      },
+      {
+        "en": "Residential zoning in Mejicanos",
+        "es": "Zonificación residencial en Mejicanos"
+      }
+    ],
+    "lat": 13.6833,
+    "lng": -89.2167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Mejicanos, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3080,
+    "tokens_out": 442,
+    "cost_usd": 0.0013178,
+    "finish_reason": "stop",
+    "latency_ms": 3413
+  },
+  "realestate_au_sv|calle-a-portezuelo-juayua-sonsonate-juayua-sonsonate-310100830048": {
+    "ts": "2026-07-15T05:46:13.231472+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Juayua, Sonsonate",
+      "es": "Terreno en Venta en Juayua, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel on Calle a Portezuelo in Juayua, Sonsonate. Priced at $175,000. No further details on size or features provided.",
+      "es": "Terreno en Calle a Portezuelo en Juayua, Sonsonate. Precio de $175,000. No se proporcionan más detalles sobre tamaño o características."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Juayua, Sonsonate",
+        "es": "Ubicado en Juayua, Sonsonate"
+      },
+      {
+        "en": "Priced at $175,000",
+        "es": "Precio de $175,000"
+      },
+      {
+        "en": "On Calle a Portezuelo",
+        "es": "En Calle a Portezuelo"
+      }
+    ],
+    "lat": 13.8433,
+    "lng": -89.7453,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Juayua, Sonsonate",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3078,
+    "tokens_out": 378,
+    "cost_usd": 0.00124686,
+    "finish_reason": "stop",
+    "latency_ms": 3169
+  },
+  "remax|002523093003": {
+    "ts": "2026-07-15T05:46:14.243546+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Lot in Golden Lake, Costa del Sol",
+      "es": "Lote Plano en Golden Lake, Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Flat 460.63 m² lot in Golden Lake, Costa del Sol, La Paz. Fully registered with CNR, free of liens, with two-street frontage. Option for Tesoro Beach Hotel membership at US$80/month.",
+      "es": "Lote plano de 460.63 m² en Golden Lake, Costa del Sol, La Paz. Registrado en CNR, libre de gravámenes, con frente a dos calles. Opción de membresía al Tesoro Beach Hotel por US$80/mes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "460.63 m² flat lot, ready to build",
+        "es": "Lote plano de 460.63 m², listo para construir"
+      },
+      {
+        "en": "Two-street frontage for flexible design",
+        "es": "Frente a dos calles para diseño flexible"
+      },
+      {
+        "en": "Access to lake, dock, clubhouse, tennis",
+        "es": "Acceso a lago, muelle, club house, tenis"
+      },
+      {
+        "en": "24/7 gated security in Golden Lake",
+        "es": "Seguridad 24/7 en Golden Lake"
+      },
+      {
+        "en": "Tesoro Beach Hotel membership available",
+        "es": "Membresía Tesoro Beach Hotel disponible"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3367,
+    "tokens_out": 492,
+    "cost_usd": 0.00145029,
+    "finish_reason": "stop",
+    "latency_ms": 4040
+  },
+  "remax|003284460008": {
+    "ts": "2026-07-15T05:46:14.288370+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "250 m² lot in Yaguatique, San Miguel",
+      "es": "Lote de 250 m² en Yaguatique, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Flat 250 m² residential lot in Yaguatique subdivision, San Miguel, 5 minutes from Walmart. Each lot measures 10 x 25 meters with easy access to shops and transportation. Strategic location in a high-appreciation area.",
+      "es": "Lote residencial plano de 250 m² en la urbanización Yaguatique, San Miguel, a 5 minutos de Walmart. Cada lote mide 10 x 25 metros con fácil acceso a tiendas y transporte. Ubicación estratégica en zona de alta plusvalía."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "5 minutes from Walmart",
+        "es": "5 minutos de Walmart"
+      },
+      {
+        "en": "250 m² lot, 10x25 meters",
+        "es": "Lote de 250 m², 10x25 metros"
+      },
+      {
+        "en": "High-appreciation area in San Miguel",
+        "es": "Zona de alta plusvalía en San Miguel"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel city centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3145,
+    "tokens_out": 419,
+    "cost_usd": 0.00131005,
+    "finish_reason": "stop",
+    "latency_ms": 3476
+  },
+  "remax|003284460007": {
+    "ts": "2026-07-15T05:46:14.354105+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "250 m² Lot in San Miguel, Near Walmart",
+      "es": "Lote de 250 m² en San Miguel, Cerca de Walmart"
+    },
+    "short_description_canonical": {
+      "en": "250 m² flat lot in Yaguatique subdivision, San Miguel, 5 minutes from Walmart. Each lot measures 10 x 25 meters with easy access to shops and services. Priced at $25,000 in a high-appreciation area.",
+      "es": "Lote plano de 250 m² en urbanización Yaguatique, San Miguel, a 5 minutos de Walmart. Cada lote mide 10 x 25 metros con fácil acceso a comercios y servicios. Precio de $25,000 en zona de alta plusvalía."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "5 minutes from Walmart",
+        "es": "5 minutos de Walmart"
+      },
+      {
+        "en": "250 m² flat lot",
+        "es": "Lote plano de 250 m²"
+      },
+      {
+        "en": "High-appreciation area",
+        "es": "Zona de alta plusvalía"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3136,
+    "tokens_out": 403,
+    "cost_usd": 0.00129002,
+    "finish_reason": "stop",
+    "latency_ms": 3088
+  },
+  "remax|001462845095": {
+    "ts": "2026-07-15T05:46:15.086664+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4 plots for sale, Panamerican road, Sonsonate",
+      "es": "4 terrenos en venta, carretera Panamericana, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Four plots of land totaling 720 m² (861 varas) on the Panamerican road at the entrance to San Julián, Sonsonate, facing the San Julián Dairy Products Factory. Immediate access to the Occident, La Libertad, and San Salvador. Suitable for apartment tower, medical center, shopping center, school, church, or family residences.",
+      "es": "Cuatro terrenos que suman 720 m² (861 varas) sobre la carretera Panamericana en la entrada a San Julián, Sonsonate, frente a la Fábrica de Productos Lácteos San Julián. Acceso inmediato al Occidente, La Libertad y San Salvador. Apto para torre de apartamentos, centro médico, centro comercial, escuela, iglesia o residencias familiares."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "720 m² total, divisible into 4 plots",
+        "es": "720 m² total, divisible en 4 terrenos"
+      },
+      {
+        "en": "Facing San Julián Dairy Factory",
+        "es": "Frente a la Fábrica de Productos Lácteos San Julián"
+      },
+      {
+        "en": "On Panamerican road, high visibility",
+        "es": "Sobre carretera Panamericana, alta visibilidad"
+      },
+      {
+        "en": "Immediate access to Occident and La Libertad",
+        "es": "Acceso inmediato al Occidente y La Libertad"
+      },
+      {
+        "en": "Multiple development possibilities",
+        "es": "Múltiples posibilidades de desarrollo"
+      }
+    ],
+    "lat": 13.65,
+    "lng": -89.55,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Julián, Sonsonate",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3227,
+    "tokens_out": 553,
+    "cost_usd": 0.00147959,
+    "finish_reason": "stop",
+    "latency_ms": 4374
+  },
+  "remax|002284175005": {
+    "ts": "2026-07-15T05:46:15.403271+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Premium Lot in Golden Lake, Costa del Sol",
+      "es": "Lote Premium en Golden Lake, Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 928.7 varas² (approx. 776 m²) in Golden Lake, Costa del Sol. Includes private estuary access with dock, tennis court, and artificial lagoon. Complimentary 12-month beach membership for four at Hotel Tesoro Beach.",
+      "es": "Terreno de 928.7 varas² (aprox. 776 m²) en Golden Lake, Costa del Sol. Incluye acceso privado al estero con muelle, cancha de tenis y laguna artificial. Membresía gratuita de 12 meses para cuatro personas en Hotel Tesoro Beach."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private estuary access with dock",
+        "es": "Acceso privado al estero con muelle"
+      },
+      {
+        "en": "928.7 varas² lot in exclusive condominium",
+        "es": "Lote de 928.7 varas² en condominio exclusivo"
+      },
+      {
+        "en": "Complimentary 12-month beach membership included",
+        "es": "Membresía de playa gratuita por 12 meses incluida"
+      },
+      {
+        "en": "Tennis court and artificial lagoon amenities",
+        "es": "Cancha de tenis y laguna artificial como amenidades"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3269,
+    "tokens_out": 478,
+    "cost_usd": 0.00140843,
+    "finish_reason": "stop",
+    "latency_ms": 3747
+  },
+  "remax|002523089031": {
+    "ts": "2026-07-15T05:46:15.484358+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "15-Manana Farm in Gualache, Tecapán, Usulután",
+      "es": "Finca de 15 Manzanas en Gualache, Tecapán, Usulután"
+    },
+    "short_description_canonical": {
+      "en": "15-manzana (104,834 m²) farm in Gualache, Tecapán, Usulután. Fertile soil ideal for agriculture or reforestation, with inventory of timber trees. Easy access near main road, suitable for tourism or productive development.",
+      "es": "Finca de 15 manzanas (104,834 m²) en Gualache, Tecapán, Usulután. Suelo fértil ideal para agricultura o reforestación, con inventario de árboles maderables. Fácil acceso cerca de carretera principal, apta para turismo o desarrollo productivo."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "15 manzanas (104,834 m²) of land",
+        "es": "15 manzanas (104,834 m²) de terreno"
+      },
+      {
+        "en": "Fertile soil for agriculture",
+        "es": "Suelo fértil para agricultura"
+      },
+      {
+        "en": "Inventory of timber trees",
+        "es": "Inventario de árboles maderables"
+      },
+      {
+        "en": "Easy access near main road",
+        "es": "Fácil acceso cerca de carretera principal"
+      },
+      {
+        "en": "Suitable for tourism or development",
+        "es": "Apto para turismo o desarrollo"
+      }
+    ],
+    "lat": 13.4667,
+    "lng": -88.4667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Tecapán, Usulután, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3515,
+    "tokens_out": 524,
+    "cost_usd": 0.00152545,
+    "finish_reason": "stop",
+    "latency_ms": 3860
+  },
+  "remax|002524082017": {
+    "ts": "2026-07-15T05:46:15.813999+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "300 m² Lot Near Playa El Espino, Usulután",
+      "es": "Lote de 300 m² Cerca de Playa El Espino, Usulután"
+    },
+    "short_description_canonical": {
+      "en": "300 m² lot on the third row from the beach in Playa El Espino, Usulután. Walking distance to the shoreline, with easy access to shops and restaurants. High-growth tourism area ideal for a beach home or rental investment.",
+      "es": "Lote de 300 m² en la tercera fila de la playa en Playa El Espino, Usulután. A poca distancia caminando de la orilla, con fácil acceso a tiendas y restaurantes. Zona turística de alto crecimiento ideal para casa de playa o inversión de alquiler."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "300 m² lot, 10×30 meters",
+        "es": "Lote de 300 m², 10×30 metros"
+      },
+      {
+        "en": "Short walk to the beach",
+        "es": "Corta caminata a la playa"
+      },
+      {
+        "en": "High-growth tourism area",
+        "es": "Zona turística de alto crecimiento"
+      },
+      {
+        "en": "Near shops and restaurants",
+        "es": "Cerca de tiendas y restaurantes"
+      }
+    ],
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Espino, Usulután",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3244,
+    "tokens_out": 467,
+    "cost_usd": 0.00138958,
+    "finish_reason": "stop",
+    "latency_ms": 3877
+  },
+  "remax|002524082016": {
+    "ts": "2026-07-15T05:46:16.996819+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Lot in Playa El Espino, Usulután",
+      "es": "Lote frente a la playa en Playa El Espino, Usulután"
+    },
+    "short_description_canonical": {
+      "en": "300 m² lot on the third row from the beach in Playa El Espino, Usulután. Walking distance to the shoreline, with easy access to shops and restaurants. Ideal for a beach home or investment in a high-growth tourism area.",
+      "es": "Lote de 300 m² en tercera fila de la playa en Playa El Espino, Usulután. A poca distancia caminando de la orilla, con fácil acceso a tiendas y restaurantes. Ideal para casa de playa o inversión en zona turística de alto crecimiento."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "300 m² lot, 10x30 meters",
+        "es": "Lote de 300 m², 10x30 metros"
+      },
+      {
+        "en": "Walking distance to the beach",
+        "es": "A poca distancia de la playa"
+      },
+      {
+        "en": "High-growth tourism area",
+        "es": "Zona turística de alto crecimiento"
+      },
+      {
+        "en": "Near shops and restaurants",
+        "es": "Cerca de tiendas y restaurantes"
+      }
+    ],
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Espino, Usulután",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3244,
+    "tokens_out": 461,
+    "cost_usd": 0.00138298,
+    "finish_reason": "stop",
+    "latency_ms": 3764
+  },
+  "remax|002524082015": {
+    "ts": "2026-07-15T05:46:17.798926+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "300 m² Beachfront Lot, Playa El Espino",
+      "es": "Lote de 300 m² frente a la playa, Playa El Espino"
+    },
+    "short_description_canonical": {
+      "en": "300 m² lot on the third row from the beach in Playa El Espino, Usulután. Walking distance to the shoreline, with easy access to shops and restaurants. Ideal for a beach home or investment in a high-growth tourism area.",
+      "es": "Lote de 300 m² en la tercera fila de la playa en Playa El Espino, Usulután. A poca distancia caminando de la orilla, con fácil acceso a tiendas y restaurantes. Ideal para casa de playa o inversión en zona turística de alto crecimiento."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "300 m² lot, 10x30 meters",
+        "es": "Lote de 300 m², 10x30 metros"
+      },
+      {
+        "en": "Walking distance to the beach",
+        "es": "A poca distancia caminando de la playa"
+      },
+      {
+        "en": "High-growth tourism area",
+        "es": "Zona turística de alto crecimiento"
+      },
+      {
+        "en": "Near shops and restaurants",
+        "es": "Cerca de tiendas y restaurantes"
+      }
+    ],
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Espino",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3244,
+    "tokens_out": 456,
+    "cost_usd": 0.00137748,
+    "finish_reason": "stop",
+    "latency_ms": 3554
+  },
+  "santizo|10146235": {
+    "ts": "2026-07-15T05:46:18.250646+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in Residencial Veranda, Santa Tecla",
+      "es": "Casa en Venta en Residencial Veranda, Santa Tecla"
+    },
+    "short_description_canonical": {
+      "en": "House for sale in Residencial Veranda, Santa Tecla. It features a living room, dining room, social bathroom, terrace, full service area, two junior bedrooms with shared bathroom, master bedroom with bathroom and closet, and covered parking for two vehicles. Amenities include clubhouse, gym, soccer and basketball courts, green areas, walking paths, playgrounds, and 24/7 security.",
+      "es": "Casa en venta en Residencial Veranda, Santa Tecla. Cuenta con sala, comedor, baño social, terraza, área de servicio completa, dos habitaciones junior con baño compartido, habitación master con baño y closet, y cochera techada para dos vehículos. Amenidades incluyen casa club, gimnasio, canchas de fútbol y baloncesto, áreas verdes, senderos, juegos infantiles y seguridad 24/7."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Residencial cerrado con seguridad 24/7"
+      },
+      {
+        "en": "Clubhouse, gym, sports courts",
+        "es": "Casa club, gimnasio, canchas deportivas"
+      },
+      {
+        "en": "Covered parking for two vehicles",
+        "es": "Cochera techada para dos vehículos"
+      },
+      {
+        "en": "Master bedroom with private bathroom",
+        "es": "Habitación master con baño privado"
+      }
+    ],
+    "lat": 13.674,
+    "lng": -89.279,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": null,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3427,
+    "tokens_out": 545,
+    "cost_usd": 0.00152479,
+    "finish_reason": "stop",
+    "latency_ms": 3961
+  },
+  "encuentra24|32433221": {
+    "ts": "2026-07-15T06:30:47.791968+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Luxury House in Andromeda Ocean Estates, Pedasí",
+      "es": "Casa de lujo frente al mar en Andromeda Ocean Estates, Pedasí"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront house of 1,018 m² built on 1,506 m² lot in Andromeda Ocean Estates, Pedasí. 5 bedrooms, 5 bathrooms, infinity pool, direct beach access, and 24/7 security. Modern architecture with floor-to-ceiling windows and high-end finishes.",
+      "es": "Casa frente al mar de 1,018 m² construidos en 1,506 m² de terreno en Andromeda Ocean Estates, Pedasí. 5 recámaras, 5 baños, piscina infinity, acceso directo a la playa y seguridad 24/7. Arquitectura moderna con ventanales de piso a techo y acabados de alta gama."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront with direct beach access",
+        "es": "Frente al mar con acceso directo a la playa"
+      },
+      {
+        "en": "1,018 m² built, 1,506 m² lot",
+        "es": "1,018 m² construidos, 1,506 m² de terreno"
+      },
+      {
+        "en": "Infinity pool with ocean view",
+        "es": "Piscina infinity con vista al océano"
+      },
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Comunidad cerrada con seguridad 24/7"
+      },
+      {
+        "en": "Private beach club and restaurant",
+        "es": "Club de playa privado y restaurante"
+      }
+    ],
+    "lat": 7.5333,
+    "lng": -80.0333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Andromeda Ocean Estates, Pedasí, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 5,
+      "bathrooms": 5.0,
+      "built_area_m2": 1018.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2619,
+    "tokens_out": 571,
+    "cost_usd": 0.00133523,
+    "finish_reason": "stop",
+    "latency_ms": 4373
+  },
+  "encuentra24|32019451": {
+    "ts": "2026-07-15T06:30:47.831967+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront House in Bristol, Buenaventura",
+      "es": "Casa frente a la laguna en Bristol, Buenaventura"
+    },
+    "short_description_canonical": {
+      "en": "House in Bristol, Buenaventura, 400 m² built on 2 levels. 4 bedrooms each with private bath, plus guest bath and service quarters. Open kitchen, balcony, pool, BBQ area, furnished, 2 parking spaces. Located in a resort complex with golf, marina, restaurants, and beach access.",
+      "es": "Casa en Bristol, Buenaventura, 400 m² construidos en 2 niveles. 4 recámaras cada una con baño privado, más baño de visitas y cuarto de servicio. Cocina abierta, balcón, piscina, área de BBQ, amueblada, 2 estacionamientos. Ubicada en un complejo resort con golf, marina, restaurantes y acceso a la playa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "400 m² built, 4 bedrooms",
+        "es": "400 m² construidos, 4 recámaras"
+      },
+      {
+        "en": "Furnished, turnkey ready",
+        "es": "Amueblada, lista para entrar"
+      },
+      {
+        "en": "Resort amenities: golf, marina",
+        "es": "Amenidades resort: golf, marina"
+      },
+      {
+        "en": "Pool and BBQ area",
+        "es": "Piscina y área de BBQ"
+      },
+      {
+        "en": "1h40 from Panama City",
+        "es": "1h40 de la Ciudad de Panamá"
+      }
+    ],
+    "lat": 8.4,
+    "lng": -79.1,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bristol, Buenaventura, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 5.5,
+      "built_area_m2": 400.0,
+      "parking_spaces": 2,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2488,
+    "tokens_out": 540,
+    "cost_usd": 0.00126576,
+    "finish_reason": "stop",
+    "latency_ms": 4413
+  },
+  "encuentra24|32683066": {
+    "ts": "2026-07-15T06:30:48.245821+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Buenaventura Riverfront House with Pool, 4BR",
+      "es": "Casa frente al río en Buenaventura con piscina, 4 hab"
+    },
+    "short_description_canonical": {
+      "en": "House in Buenaventura, a private Pacific beach community, with 353 m² total built area including terraces. Features 4 bedrooms, 4.5 bathrooms, staff quarters, 2 parking spaces, pool, BBQ station, and riverfront location. Part of an exclusive resort with golf, marina, and white sand beach.",
+      "es": "Casa en Buenaventura, comunidad privada de playa en el Pacífico, con 353 m² de área total construida incluyendo terrazas. Cuenta con 4 recámaras, 4.5 baños, cuarto de servicio, 2 estacionamientos, piscina, estación BBQ y frente al río. Parte de un resort exclusivo con golf, marina y playa de arena blanca."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Riverfront with pool and BBQ",
+        "es": "Frente al río con piscina y BBQ"
+      },
+      {
+        "en": "4 bedrooms, 4.5 bathrooms",
+        "es": "4 recámaras, 4.5 baños"
+      },
+      {
+        "en": "Exclusive Buenaventura beach community",
+        "es": "Comunidad exclusiva de playa Buenaventura"
+      },
+      {
+        "en": "353 m² total built area",
+        "es": "353 m² de área total construida"
+      },
+      {
+        "en": "Golf, marina, and amenities included",
+        "es": "Golf, marina y amenidades incluidas"
+      }
+    ],
+    "lat": 8.0,
+    "lng": -80.0,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Buenaventura, Pacific coast, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.5,
+      "built_area_m2": 353.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2502,
+    "tokens_out": 564,
+    "cost_usd": 0.00129594,
+    "finish_reason": "stop",
+    "latency_ms": 4828
+  },
+  "encuentra24|31268996": {
+    "ts": "2026-07-15T06:30:48.309073+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4BR House in Coronado Golf Club, 1250m² lot",
+      "es": "Casa 4 hab. en Club de Golf Coronado, lote 1250m²"
+    },
+    "short_description_canonical": {
+      "en": "House in Club de Golf de Coronado on a 1250 m² lot, with option to buy adjacent 1250 m² lot. 600 m² built area, 4 bedrooms each with private bath and walk-in closet, plus maid's room and bath. Renovated kitchen, pool with heater and jacuzzi, BBQ area, 6 parking spaces. 10-minute drive to beach, 5-minute walk to golf club.",
+      "es": "Casa en Club de Golf de Coronado en lote de 1250 m², con opción de comprar lote colindante de 1250 m². 600 m² construidos, 4 recámaras cada una con baño privado y walk-in closet, más cuarto y baño de empleada. Cocina remodelada, piscina con calentador y jacuzzi, área de BBQ, 6 estacionamientos. 10 minutos en auto a la playa, 5 minutos caminando al club de golf."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Adjacent 1250 m² lot available",
+        "es": "Lote colindante de 1250 m² disponible"
+      },
+      {
+        "en": "Renovated kitchen, pool with jacuzzi",
+        "es": "Cocina remodelada, piscina con jacuzzi"
+      },
+      {
+        "en": "5 min walk to golf club",
+        "es": "5 min caminando al club de golf"
+      },
+      {
+        "en": "10 min drive to beach",
+        "es": "10 min en auto a la playa"
+      },
+      {
+        "en": "6 parking spaces, 4 bedrooms en suite",
+        "es": "6 estacionamientos, 4 recámaras en suite"
+      }
+    ],
+    "lat": 8.5333,
+    "lng": -79.8833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Coronado, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.5,
+      "built_area_m2": 600.0,
+      "parking_spaces": 6,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2633,
+    "tokens_out": 612,
+    "cost_usd": 0.00138411,
+    "finish_reason": "stop",
+    "latency_ms": 4890
+  },
+  "encuentra24|32620394": {
+    "ts": "2026-07-15T06:30:48.325503+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "5-Bed Country Estate on Juan Hombrón Road",
+      "es": "Finca Campestre de 5 Hab. sobre Carretera a Juan Hombrón"
+    },
+    "short_description_canonical": {
+      "en": "Country estate on the road to Playa Juan Hombrón, with 20,696 m² of land and a 5-bedroom main house. The property includes a private pool, staff quarters, stable, generator, well, and water tank. Ideal for family residence, recreational farm, or tourism investment.",
+      "es": "Propiedad campestre sobre la carretera hacia Playa Juan Hombrón, con 20,696 m² de terreno y casa principal de 5 recámaras. Incluye piscina privada, vivienda para personal, establo, planta eléctrica, pozo y tanque de agua. Ideal para residencia familiar, finca recreativa o inversión turística."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "20,696 m² land with development potential",
+        "es": "20,696 m² de terreno con potencial de desarrollo"
+      },
+      {
+        "en": "Private pool and outdoor social area",
+        "es": "Piscina privada y área social exterior"
+      },
+      {
+        "en": "Stable for 2 horses, staff quarters",
+        "es": "Establo para 2 caballos, vivienda para personal"
+      },
+      {
+        "en": "Self-sufficient: generator, well, water tank",
+        "es": "Autosuficiente: planta, pozo, tanque de agua"
+      },
+      {
+        "en": "On main road to Playa Juan Hombrón",
+        "es": "Sobre carretera hacia Playa Juan Hombrón"
+      }
+    ],
+    "lat": 8.0333,
+    "lng": -80.4167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Chirú, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 5,
+      "bathrooms": 5.0,
+      "built_area_m2": null,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2624,
+    "tokens_out": 555,
+    "cost_usd": 0.00131898,
+    "finish_reason": "stop",
+    "latency_ms": 4906
   }
 }

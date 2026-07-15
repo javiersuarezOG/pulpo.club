@@ -1,0 +1,14 @@
+{
+  "failure_id": "7c13bb85",
+  "source": "elagente",
+  "ts": "2026-07-15T04:53:18.999014+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 2.74,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}

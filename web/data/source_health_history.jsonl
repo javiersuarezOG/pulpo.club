@@ -1286,3 +1286,43 @@
 {"ts": "2026-07-10T06:05:23.174609+00:00", "source": "xitios", "phase": "post_validation", "status": "green", "scraped": 31, "kept": 29, "dropped_at_validation": 2}
 {"ts": "2026-07-10T07:25:38.935435+00:00", "source": "encuentra24", "status": "green", "count": 36, "duration_s": 2190.24, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": null}
 {"ts": "2026-07-10T07:25:38.935435+00:00", "source": "encuentra24", "phase": "post_validation", "status": "green", "scraped": 36, "kept": 35, "dropped_at_validation": 1}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "agentiz", "status": "red", "count": 0, "duration_s": 8.39, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": "48c09a62"}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "bienesraices", "status": "green", "count": 581, "duration_s": 1711.89, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": null}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "century21", "status": "green", "count": 15, "duration_s": 42.96, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": null}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "citymax", "status": "green", "count": 31, "duration_s": 57.13, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": null}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "citymax_sc", "status": "green", "count": 163, "duration_s": 373.8, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": null}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "csbr", "status": "green", "count": 309, "duration_s": 1047.06, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": null}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "elagente", "status": "red", "count": 0, "duration_s": 2.74, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": "7c13bb85"}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "encuentra24", "status": "green", "count": 24, "duration_s": 3142.48, "error_class": null, "error_msg": "", "max_pages_hit": true, "limit_hit": false, "failure_id": null}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "essurf", "status": "green", "count": 36, "duration_s": 22.51, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": null}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "goodlife", "status": "green", "count": 65, "duration_s": 313.75, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": null}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "jamesedition", "status": "red", "count": 0, "duration_s": 1.18, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": "ae44ee4a"}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "nexo", "status": "green", "count": 8, "duration_s": 22.59, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": null}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "oceanside", "status": "green", "count": 49, "duration_s": 4.73, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": null}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "realestate_au_sv", "status": "green", "count": 322, "duration_s": 672.06, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": null}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "realtyelsalvador", "status": "red", "count": 0, "duration_s": 0.76, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": "250e696d"}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "remax", "status": "green", "count": 364, "duration_s": 1218.25, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": null}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "santizo", "status": "green", "count": 120, "duration_s": 346.24, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": null}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "vivolatam", "status": "green", "count": 169, "duration_s": 339.57, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": null}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "xitios", "status": "green", "count": 31, "duration_s": 68.81, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": null}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "agentiz", "phase": "post_validation", "status": "skipped", "scraped": 0, "kept": 0, "dropped_at_validation": 0}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "bienesraices", "phase": "post_validation", "status": "green", "scraped": 581, "kept": 510, "dropped_at_validation": 71}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "century21", "phase": "post_validation", "status": "green", "scraped": 15, "kept": 15, "dropped_at_validation": 0}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "citymax", "phase": "post_validation", "status": "green", "scraped": 31, "kept": 31, "dropped_at_validation": 0}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "citymax_sc", "phase": "post_validation", "status": "green", "scraped": 163, "kept": 157, "dropped_at_validation": 6}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "csbr", "phase": "post_validation", "status": "green", "scraped": 309, "kept": 268, "dropped_at_validation": 41}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "elagente", "phase": "post_validation", "status": "skipped", "scraped": 0, "kept": 0, "dropped_at_validation": 0}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "encuentra24", "phase": "post_validation", "status": "green", "scraped": 24, "kept": 23, "dropped_at_validation": 1}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "essurf", "phase": "post_validation", "status": "green", "scraped": 36, "kept": 35, "dropped_at_validation": 1}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "goodlife", "phase": "post_validation", "status": "green", "scraped": 65, "kept": 34, "dropped_at_validation": 31}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "jamesedition", "phase": "post_validation", "status": "skipped", "scraped": 0, "kept": 0, "dropped_at_validation": 0}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "nexo", "phase": "post_validation", "status": "green", "scraped": 8, "kept": 8, "dropped_at_validation": 0}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "oceanside", "phase": "post_validation", "status": "green", "scraped": 49, "kept": 24, "dropped_at_validation": 25}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "realestate_au_sv", "phase": "post_validation", "status": "green", "scraped": 322, "kept": 321, "dropped_at_validation": 1}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "realtyelsalvador", "phase": "post_validation", "status": "skipped", "scraped": 0, "kept": 0, "dropped_at_validation": 0}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "remax", "phase": "post_validation", "status": "green", "scraped": 364, "kept": 336, "dropped_at_validation": 28}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "santizo", "phase": "post_validation", "status": "green", "scraped": 120, "kept": 93, "dropped_at_validation": 27}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "vivolatam", "phase": "post_validation", "status": "green", "scraped": 169, "kept": 159, "dropped_at_validation": 10}
+{"ts": "2026-07-15T04:53:07.685624+00:00", "source": "xitios", "phase": "post_validation", "status": "green", "scraped": 31, "kept": 29, "dropped_at_validation": 2}
+{"ts": "2026-07-15T05:55:16.805425+00:00", "source": "encuentra24", "status": "green", "count": 29, "duration_s": 2125.09, "error_class": null, "error_msg": "", "max_pages_hit": false, "limit_hit": false, "failure_id": null}
+{"ts": "2026-07-15T05:55:16.805425+00:00", "source": "encuentra24", "phase": "post_validation", "status": "green", "scraped": 29, "kept": 29, "dropped_at_validation": 0}
