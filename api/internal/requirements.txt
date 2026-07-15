@@ -23,3 +23,12 @@
 # and Vercel runtime behave identically. Bump in lockstep.
 httpx==0.27.2
 posthog>=3.0,<4.0
+# --- Vercel Python runtime pin (workaround, 2026-07-15) ---
+# vercel_runtime 0.16.0 ships a broken .dist-info/licenses/ that copies its
+# own src tree; Vercel's build-time bytecode compile then dies with
+# `ENOENT ... vercel_runtime-0.16.0.dist-info/licenses/.../__pycache__/__init__.cpython-312.pyc`,
+# failing EVERY Python-function deploy (prod + preview) regardless of cache
+# or tree size. Confirmed on a clean 400MB no-cache build (1m13s fail).
+# 0.15.0 is the last good release. Vercel Support case: 01QGyoEPWLy3yBKc.
+# Remove once Vercel patches the builder.
+vercel_runtime==0.15.0
