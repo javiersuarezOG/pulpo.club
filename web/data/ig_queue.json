@@ -233,8 +233,7 @@
       "carousel_photo_paths": [
         "web/data/ig_assets/campaign/d01_escasez/slide2.png",
         "web/data/ig_assets/campaign/d01_escasez/slide3.png",
-        "web/data/ig_assets/campaign/d01_escasez/slide4.png",
-        "web/data/ig_assets/campaign/d01_escasez/slide5.png"
+        "web/data/ig_assets/campaign/d01_escasez/slide4.png"
       ],
       "listing_ids": [
         "citymax_sc_terreno-residencial-en-venta-isla-san-blas"
@@ -350,8 +349,7 @@
       "carousel_photo_paths": [
         "web/data/ig_assets/campaign/d03_como_funciona/slide2.png",
         "web/data/ig_assets/campaign/d03_como_funciona/slide3.png",
-        "web/data/ig_assets/campaign/d03_como_funciona/slide4.png",
-        "web/data/ig_assets/campaign/d03_como_funciona/slide5.png"
+        "web/data/ig_assets/campaign/d03_como_funciona/slide4.png"
       ],
       "listing_ids": [
         "oceanside_15561"
@@ -359,9 +357,11 @@
       "primary_listing_id": "oceanside_15561",
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-07-13T16:14:47.382283+00:00",
+      "posted_media_id": "17898871737531799",
+      "comment_posted": true,
+      "comment_id": "18131814103617406"
     },
     {
       "day": 108,
@@ -416,9 +416,11 @@
       "primary_listing_id": "bienesraices_1529",
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-07-14T03:28:21.678666+00:00",
+      "posted_media_id": "18087996203541432",
+      "comment_posted": true,
+      "comment_id": "17870482359626455"
     },
     {
       "day": 109,
@@ -467,8 +469,7 @@
       "carousel_photo_paths": [
         "web/data/ig_assets/campaign/d05_descubrimiento/slide2.png",
         "web/data/ig_assets/campaign/d05_descubrimiento/slide3.png",
-        "web/data/ig_assets/campaign/d05_descubrimiento/slide4.png",
-        "web/data/ig_assets/campaign/d05_descubrimiento/slide5.png"
+        "web/data/ig_assets/campaign/d05_descubrimiento/slide4.png"
       ],
       "listing_ids": [
         "citymax_sc_casa-en-venta-residencial-san-carlos-sonzacate"
@@ -476,9 +477,11 @@
       "primary_listing_id": "citymax_sc_casa-en-venta-residencial-san-carlos-sonzacate",
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-07-15T03:28:41.994941+00:00",
+      "posted_media_id": "17967057617940005",
+      "comment_posted": true,
+      "comment_id": "18080664272273924"
     },
     {
       "day": 110,
@@ -584,8 +587,7 @@
       "carousel_photo_paths": [
         "web/data/ig_assets/campaign/d07_por_que_rankeado/slide2.png",
         "web/data/ig_assets/campaign/d07_por_que_rankeado/slide3.png",
-        "web/data/ig_assets/campaign/d07_por_que_rankeado/slide4.png",
-        "web/data/ig_assets/campaign/d07_por_que_rankeado/slide5.png"
+        "web/data/ig_assets/campaign/d07_por_que_rankeado/slide4.png"
       ],
       "listing_ids": [
         "oceanside_12809"
@@ -642,8 +644,7 @@
       "carousel_photo_paths": [
         "web/data/ig_assets/campaign/d09_demanda/slide2.png",
         "web/data/ig_assets/campaign/d09_demanda/slide3.png",
-        "web/data/ig_assets/campaign/d09_demanda/slide4.png",
-        "web/data/ig_assets/campaign/d09_demanda/slide5.png"
+        "web/data/ig_assets/campaign/d09_demanda/slide4.png"
       ],
       "listing_ids": [
         "oceanside_12288"
@@ -700,8 +701,7 @@
       "carousel_photo_paths": [
         "web/data/ig_assets/campaign/d11_herencia/slide2.png",
         "web/data/ig_assets/campaign/d11_herencia/slide3.png",
-        "web/data/ig_assets/campaign/d11_herencia/slide4.png",
-        "web/data/ig_assets/campaign/d11_herencia/slide5.png"
+        "web/data/ig_assets/campaign/d11_herencia/slide4.png"
       ],
       "listing_ids": [
         "bienesraices_2156"
@@ -758,8 +758,7 @@
       "carousel_photo_paths": [
         "web/data/ig_assets/campaign/d13_noticias/slide2.png",
         "web/data/ig_assets/campaign/d13_noticias/slide3.png",
-        "web/data/ig_assets/campaign/d13_noticias/slide4.png",
-        "web/data/ig_assets/campaign/d13_noticias/slide5.png"
+        "web/data/ig_assets/campaign/d13_noticias/slide4.png"
       ],
       "listing_ids": [
         "citymax_sc_se-vende-terreno-con-vista-al-mar-en-surf-city"
@@ -788,8 +787,7 @@
       "carousel_photo_paths": [
         "web/data/ig_assets/campaign/d14_cierre/slide2.png",
         "web/data/ig_assets/campaign/d14_cierre/slide3.png",
-        "web/data/ig_assets/campaign/d14_cierre/slide4.png",
-        "web/data/ig_assets/campaign/d14_cierre/slide5.png"
+        "web/data/ig_assets/campaign/d14_cierre/slide4.png"
       ],
       "listing_ids": [
         "oceanside_11468"
