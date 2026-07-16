@@ -536,9 +536,11 @@
       "primary_listing_id": "encuentra24_32059471",
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-07-16T03:33:16.795948+00:00",
+      "posted_media_id": "18100547845908624",
+      "comment_posted": true,
+      "comment_id": "18141315148480866"
     },
     {
       "day": 111,
