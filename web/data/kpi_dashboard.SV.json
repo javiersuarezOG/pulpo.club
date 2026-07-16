@@ -1,19 +1,19 @@
 {
-  "computed_at": "2026-07-10T07:25:23.561883+00:00",
+  "computed_at": "2026-07-16T06:15:25.259923+00:00",
   "filter_strictness": "moderate",
   "kpi": {
-    "active_sources": 17,
+    "active_sources": 14,
     "per_shelf_visible": {
       "beach_condos": {
         "count": 22,
         "renders_on_homepage": true
       },
       "beach_homes": {
-        "count": 152,
+        "count": 150,
         "renders_on_homepage": true
       },
       "beach_land": {
-        "count": 487,
+        "count": 467,
         "renders_on_homepage": true
       },
       "lake_condos": {
@@ -39,49 +39,49 @@
       },
       "bienesraices": {
         "coverage_pct_vs_discovered": null,
-        "kept": 426,
+        "kept": 427,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
       },
       "century21": {
         "coverage_pct_vs_discovered": null,
-        "kept": 14,
-        "status": "green",
+        "kept": 0,
+        "status": "skipped",
         "target_discovered": null,
         "target_prd": null
       },
       "citymax": {
         "coverage_pct_vs_discovered": null,
-        "kept": 33,
+        "kept": 34,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
       },
       "citymax_sc": {
-        "coverage_pct_vs_discovered": 49.7,
-        "kept": 149,
+        "coverage_pct_vs_discovered": 48.0,
+        "kept": 144,
         "status": "green",
         "target_discovered": null,
         "target_prd": 300
       },
       "csbr": {
-        "coverage_pct_vs_discovered": 242.0,
-        "kept": 242,
+        "coverage_pct_vs_discovered": 250.0,
+        "kept": 250,
         "status": "green",
         "target_discovered": null,
         "target_prd": 100
       },
       "elagente": {
         "coverage_pct_vs_discovered": null,
-        "kept": 2,
-        "status": "green",
+        "kept": 0,
+        "status": "skipped",
         "target_discovered": null,
         "target_prd": null
       },
       "encuentra24": {
-        "coverage_pct_vs_discovered": 0.7,
-        "kept": 21,
+        "coverage_pct_vs_discovered": 0.8,
+        "kept": 24,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -95,7 +95,7 @@
       },
       "goodlife": {
         "coverage_pct_vs_discovered": null,
-        "kept": 33,
+        "kept": 32,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -116,35 +116,35 @@
       },
       "oceanside": {
         "coverage_pct_vs_discovered": null,
-        "kept": 24,
+        "kept": 25,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
       },
       "realestate_au_sv": {
         "coverage_pct_vs_discovered": null,
-        "kept": 306,
+        "kept": 310,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
       },
       "realtyelsalvador": {
         "coverage_pct_vs_discovered": null,
-        "kept": 109,
-        "status": "green",
+        "kept": 0,
+        "status": "skipped",
         "target_discovered": null,
         "target_prd": null
       },
       "remax": {
         "coverage_pct_vs_discovered": null,
-        "kept": 274,
+        "kept": 282,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
       },
       "santizo": {
-        "coverage_pct_vs_discovered": 60.7,
-        "kept": 91,
+        "coverage_pct_vs_discovered": 62.0,
+        "kept": 93,
         "status": "green",
         "target_discovered": null,
         "target_prd": 150
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 5,
     "shelves_total": 6,
-    "total_in_dataset": 1948,
-    "total_visible_listings": 1700
+    "total_in_dataset": 1845,
+    "total_visible_listings": 1632
   },
   "min_real_listings": 4
 }
