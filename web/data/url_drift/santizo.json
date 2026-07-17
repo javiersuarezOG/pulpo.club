@@ -2,13 +2,13 @@
   "source": "santizo",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-07-17T08:31:41.209393+00:00",
+  "probed_at": "2026-07-17T14:07:19.500151+00:00",
   "last_probe": {
     "probed_url": "https://santizorealestate.com/s/ventas",
     "status_code": 200,
     "final_url": "https://santizorealestate.com/s/ventas",
     "response_size_bytes": null,
-    "duration_ms": 1808,
+    "duration_ms": 2192,
     "error": null
   },
   "baseline": {
@@ -17,6 +17,6 @@
     "final_url": "https://santizorealestate.com/s/ventas",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-07-17T08:31:41.209425+00:00"
+    "last_ok_at": "2026-07-17T14:07:19.500180+00:00"
   }
 }
