@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-10T08:03:28.169687+00:00",
+  "computed_at": "2026-07-17T07:02:23.867813+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 1,
@@ -9,7 +9,7 @@
         "renders_on_homepage": false
       },
       "beach_homes": {
-        "count": 3,
+        "count": 1,
         "renders_on_homepage": false
       },
       "beach_land": {
@@ -75,13 +75,13 @@
       "elagente": {
         "coverage_pct_vs_discovered": null,
         "kept": 0,
-        "status": "green",
+        "status": "skipped",
         "target_discovered": null,
         "target_prd": null
       },
       "encuentra24": {
-        "coverage_pct_vs_discovered": 1.2,
-        "kept": 35,
+        "coverage_pct_vs_discovered": 1.0,
+        "kept": 29,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -131,7 +131,7 @@
       "realtyelsalvador": {
         "coverage_pct_vs_discovered": null,
         "kept": 0,
-        "status": "green",
+        "status": "skipped",
         "target_discovered": null,
         "target_prd": null
       },
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 0,
     "shelves_total": 6,
-    "total_in_dataset": 35,
-    "total_visible_listings": 5
+    "total_in_dataset": 29,
+    "total_visible_listings": 2
   },
   "min_real_listings": 4
 }

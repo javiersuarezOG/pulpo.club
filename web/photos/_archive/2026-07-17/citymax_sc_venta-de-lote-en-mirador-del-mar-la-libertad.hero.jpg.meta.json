@@ -1,0 +1,17 @@
+{
+  "width": 720,
+  "height": 540,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 125.6,
+  "hero_eligible": false,
+  "card_eligible": false,
+  "hires_eligible": false,
+  "computed_at": "2026-07-10T07:16:30.853201+00:00",
+  "derivative_width": 720,
+  "derivative_height": 540,
+  "hero_photo_quality_score": 0,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://api.obriencrm.com/assets/images/fotos-destacados//e765297b664ce70791c1e88a4ebac44e.jpg",
+  "candidate_count": 1
+}

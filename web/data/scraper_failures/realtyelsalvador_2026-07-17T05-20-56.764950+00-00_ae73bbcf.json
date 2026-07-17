@@ -1,0 +1,14 @@
+{
+  "failure_id": "ae73bbcf",
+  "source": "realtyelsalvador",
+  "ts": "2026-07-17T05:20:56.764950+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 0.83,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
