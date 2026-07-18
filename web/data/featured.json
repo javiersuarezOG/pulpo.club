@@ -18,8 +18,8 @@
       "pick_count": 3
     }
   },
-  "picked_at": "2026-07-10T07:25:34.493098+00:00",
-  "expires_at": "2026-07-11T00:00:00+00:00",
+  "picked_at": "2026-07-18T05:54:55.932568+00:00",
+  "expires_at": "2026-07-19T00:00:00+00:00",
   "tier": "elite",
   "listing_id": "citymax|156276",
   "rank_score": 80.06,
@@ -46,19 +46,25 @@
     },
     {
       "listing_id": "bienesraices|1783",
-      "rank_score": 76.07,
+      "rank_score": 76.53,
       "hero_photo_quality_score": 100,
       "photos_count": 21
     },
     {
+      "listing_id": "bienesraices|2191",
+      "rank_score": 75.98,
+      "hero_photo_quality_score": 100,
+      "photos_count": 19
+    },
+    {
       "listing_id": "bienesraices|1875",
-      "rank_score": 76.07,
+      "rank_score": 75.75,
       "hero_photo_quality_score": 100,
       "photos_count": 30
     },
     {
-      "listing_id": "bienesraices|2191",
-      "rank_score": 75.85,
+      "listing_id": "bienesraices|2258",
+      "rank_score": 75.07,
       "hero_photo_quality_score": 100,
       "photos_count": 19
     }
@@ -75,7 +81,7 @@
     },
     {
       "listing_id": "citymax|152836",
-      "rank_score": 81.23,
+      "rank_score": 81.13,
       "master_category": null,
       "subcategory": "land",
       "star_rating": 4.5,
@@ -84,7 +90,7 @@
     },
     {
       "listing_id": "remax|002282623028",
-      "rank_score": 78.57,
+      "rank_score": 80.53,
       "master_category": "beach",
       "subcategory": "land",
       "star_rating": 4.5,
