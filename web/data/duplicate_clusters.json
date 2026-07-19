@@ -2,61 +2,6 @@
   {
     "count": 6,
     "cross_source": false,
-    "fingerprint": "686d604b9fe406a31ce6eeca15db6789bd151a65",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 214133.0,
-        "source": "realestate_au_sv",
-        "source_id": "condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807329",
-        "title": "CONDADO DE SANTA JULIA, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807329/",
-        "zone": "masahuat"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 214133.0,
-        "source": "realestate_au_sv",
-        "source_id": "condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807330",
-        "title": "CONDADO DE SANTA JULIA, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807330/",
-        "zone": "masahuat"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 214133.0,
-        "source": "realestate_au_sv",
-        "source_id": "condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807334",
-        "title": "CONDADO DE SANTA JULIA, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807334/",
-        "zone": "masahuat"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 214133.0,
-        "source": "realestate_au_sv",
-        "source_id": "condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807314",
-        "title": "CONDADO DE SANTA JULIA, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807314/",
-        "zone": "masahuat"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 214140.0,
-        "source": "realestate_au_sv",
-        "source_id": "condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807318",
-        "title": "CONDADO DE SANTA JULIA, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807318/",
-        "zone": "masahuat"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 6,
-    "cross_source": false,
     "fingerprint": "fbd9d3caa832090c02ba0b8b624b4de8263a8eac",
     "samples": [
       {
@@ -112,98 +57,6 @@
   {
     "count": 4,
     "cross_source": false,
-    "fingerprint": "af1c47b381fa8dcc7f7222d6e2cfd9d5eee33fa8",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 108131.0,
-        "source": "realestate_au_sv",
-        "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705298",
-        "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705298/",
-        "zone": "santa-ana"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 107999.0,
-        "source": "realestate_au_sv",
-        "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705288",
-        "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705288/",
-        "zone": "santa-ana"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 108349.0,
-        "source": "realestate_au_sv",
-        "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705271",
-        "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705271/",
-        "zone": "santa-ana"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 107999.0,
-        "source": "realestate_au_sv",
-        "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705262",
-        "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705262/",
-        "zone": "santa-ana"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 4,
-    "cross_source": false,
-    "fingerprint": "d22995138e01c8dafd983e5d27718f8594a12e0d",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 19975.0,
-        "source": "realestate_au_sv",
-        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310108217901",
-        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310108217901/",
-        "zone": "chalatenango"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 20099.0,
-        "source": "realestate_au_sv",
-        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310107705305",
-        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310107705305/",
-        "zone": "chalatenango"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 20140.0,
-        "source": "realestate_au_sv",
-        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371",
-        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371/",
-        "zone": "chalatenango"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 20032.0,
-        "source": "realestate_au_sv",
-        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310104492647",
-        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310104492647/",
-        "zone": "chalatenango"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 4,
-    "cross_source": false,
     "fingerprint": "d7c862965143e5bc53c0c215d758a8c0f3007df6",
     "samples": [
       {
@@ -248,126 +101,6 @@
     ]
   },
   {
-    "count": 4,
-    "cross_source": false,
-    "fingerprint": "eb1b0b1225c4307e0c98913d56e17ef5705736f3",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 39000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650181",
-        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650181/",
-        "zone": "suchitoto"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 39000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650153",
-        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650153/",
-        "zone": "suchitoto"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 39000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650144",
-        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650144/",
-        "zone": "suchitoto"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 39000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650148",
-        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650148/",
-        "zone": "suchitoto"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 3,
-    "cross_source": false,
-    "fingerprint": "5ac1715b27660425918c957d315f912f2c8c37d2",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 112354.0,
-        "source": "realestate_au_sv",
-        "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705263",
-        "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705263/",
-        "zone": "santa-ana"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 112499.0,
-        "source": "realestate_au_sv",
-        "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705253",
-        "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705253/",
-        "zone": "santa-ana"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 112499.0,
-        "source": "realestate_au_sv",
-        "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705242",
-        "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705242/",
-        "zone": "santa-ana"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 3,
-    "cross_source": false,
-    "fingerprint": "792e6d97495876ab15bbfa0ab9225e44401178f6",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 56183.0,
-        "source": "realestate_au_sv",
-        "source_id": "lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251520",
-        "title": "Lotificacion San Juan Buenavista, Huizucar, La Libertad, Huizucar, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251520/",
-        "zone": "la-libertad"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 56157.0,
-        "source": "realestate_au_sv",
-        "source_id": "lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251508",
-        "title": "Lotificacion San Juan Buenavista, Huizucar, La Libertad, Huizucar, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251508/",
-        "zone": "la-libertad"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 56069.0,
-        "source": "realestate_au_sv",
-        "source_id": "lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251511",
-        "title": "Lotificacion San Juan Buenavista, Huizucar, La Libertad, Huizucar, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251511/",
-        "zone": "la-libertad"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
     "count": 3,
     "cross_source": false,
     "fingerprint": "8d81038dfd1f31e943738a51bbf3d7a166cc18e5",
@@ -405,31 +138,40 @@
     ]
   },
   {
-    "count": 2,
+    "count": 3,
     "cross_source": false,
-    "fingerprint": "0515a84d8ac00d7a9afb615902edf7f36c639f7c",
+    "fingerprint": "cad82211d638e4d5b8df26b5b637c6aa95f51492",
     "samples": [
       {
-        "area_m2": null,
-        "price_usd": 70000.0,
-        "source": "realestate_au_sv",
-        "source_id": "terreno-en-venta-en-residencial-senderos-del-mar-el-palmarcito-tamanique-la-libertad-tamanique-la-libertad-department-310105814172",
-        "title": "Terreno en venta, en Residencial Senderos del mar, El Palmarcito., Tamanique, La Libertad, Tamanique, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/terreno-en-venta-en-residencial-senderos-del-mar-el-palmarcito-tamanique-la-libertad-tamanique-la-libertad-department-310105814172/",
-        "zone": "la-libertad"
+        "area_m2": 300.0,
+        "price_usd": 60000.0,
+        "source": "remax",
+        "source_id": "002524082017",
+        "title": "Lot for sale",
+        "url": "https://www.remax-elsalvador.com/002524082017",
+        "zone": "el-espino"
       },
       {
-        "area_m2": null,
-        "price_usd": 70000.0,
-        "source": "realestate_au_sv",
-        "source_id": "terreno-en-venta-en-residencial-senderos-del-mar-el-palmarcito-tamanique-la-libertad-tamanique-la-libertad-department-310105814156",
-        "title": "Terreno en venta, en Residencial Senderos del mar, El Palmarcito., Tamanique, La Libertad, Tamanique, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/terreno-en-venta-en-residencial-senderos-del-mar-el-palmarcito-tamanique-la-libertad-tamanique-la-libertad-department-310105814156/",
-        "zone": "la-libertad"
+        "area_m2": 300.0,
+        "price_usd": 60000.0,
+        "source": "remax",
+        "source_id": "002524082016",
+        "title": "Lot for sale",
+        "url": "https://www.remax-elsalvador.com/002524082016",
+        "zone": "el-espino"
+      },
+      {
+        "area_m2": 300.0,
+        "price_usd": 60000.0,
+        "source": "remax",
+        "source_id": "002524082015",
+        "title": "Lot for sale",
+        "url": "https://www.remax-elsalvador.com/002524082015",
+        "zone": "el-espino"
       }
     ],
     "sources": [
-      "realestate_au_sv"
+      "remax"
     ]
   },
   {
@@ -454,6 +196,34 @@
         "title": "FOR SALE PROPERTY AT EL ZONTE  (Ideal for Investors)",
         "url": "https://www.remax-elsalvador.com/001461962092",
         "zone": "el-zonte"
+      }
+    ],
+    "sources": [
+      "remax"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "10b41cc4ee33e62d556f15b0e40ef9b101bce5f8",
+    "samples": [
+      {
+        "area_m2": 730.19,
+        "price_usd": 440422.1,
+        "source": "remax",
+        "source_id": "001462660113",
+        "title": "ALTOS DE LAS PILETAS, EXCLUSIVE RESIDENTIAL DEVELOPMENT, LOT 40, 20 x 36.51 m. 1044.78 V2",
+        "url": "https://www.remax-elsalvador.com/001462660113",
+        "zone": "las-flores"
+      },
+      {
+        "area_m2": 730.19,
+        "price_usd": 440422.1,
+        "source": "remax",
+        "source_id": "001462660094",
+        "title": "ALTOS DE LAS PILETAS, EXCLUSIVE RESIDENTIAL DEVELOPMENT, LOT 40, 20 x 36.51 m. 1044.78 V2",
+        "url": "https://www.remax-elsalvador.com/001462660094",
+        "zone": "las-flores"
       }
     ],
     "sources": [
@@ -491,141 +261,29 @@
   {
     "count": 2,
     "cross_source": false,
-    "fingerprint": "2d9da77ef06b09af1f7a238cce5b622f2995f965",
+    "fingerprint": "41d515a61719aef9bb7965ac13a70a998abd3b51",
     "samples": [
       {
-        "area_m2": null,
-        "price_usd": 550000.0,
-        "source": "realestate_au_sv",
-        "source_id": "las-arcas-armenia-sonsonate-armenia-sonsonate-armenia-sonsonate-310108376987",
-        "title": "Las Arcas Armenia Sonsonate, Armenia, Sonsonate, Armenia, Sonsonate Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/las-arcas-armenia-sonsonate-armenia-sonsonate-armenia-sonsonate-310108376987/",
-        "zone": "armenia"
+        "area_m2": 550.0,
+        "price_usd": 213463.0,
+        "source": "csbr",
+        "source_id": "casco-de-finca-en-venta-en-la-geortermica-de-ahuachapan-2",
+        "title": "CASCO DE FINCA EN VENTA - AHUCHAPÁN",
+        "url": "https://www.camarabienesraices.com.sv/propiedad/casco-de-finca-en-venta-en-la-geortermica-de-ahuachapan-2/",
+        "zone": "ahuachapan"
       },
       {
-        "area_m2": null,
-        "price_usd": 550000.0,
-        "source": "realestate_au_sv",
-        "source_id": "las-arcas-armenia-sonsonate-armenia-sonsonate-armenia-sonsonate-310100522448",
-        "title": "Las Arcas Armenia Sonsonate, Armenia, Sonsonate, Armenia, Sonsonate Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/las-arcas-armenia-sonsonate-armenia-sonsonate-armenia-sonsonate-310100522448/",
-        "zone": "armenia"
+        "area_m2": 550.0,
+        "price_usd": 213463.0,
+        "source": "csbr",
+        "source_id": "casco-de-finca-en-venta-en-la-geortermica-de-ahuachapan",
+        "title": "CASCO DE FINCA EN VENTA - AHUCHAPÁN",
+        "url": "https://www.camarabienesraices.com.sv/propiedad/casco-de-finca-en-venta-en-la-geortermica-de-ahuachapan/",
+        "zone": "ahuachapan"
       }
     ],
     "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "2f9f137f1e3a0de43e2a0f753ab1d542f4cc6293",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 3625000.0,
-        "source": "realestate_au_sv",
-        "source_id": "inm-1-parcela-06-poligono-1-el-zonte-chiltiupan-la-libertad-costa-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108763442",
-        "title": "INM. 1 PARCELA#06, POLIGONO 1, EL ZONTE, CHILTIUPAN, LA LIBERTAD COSTA, LA LIBERTAD, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/inm-1-parcela-06-poligono-1-el-zonte-chiltiupan-la-libertad-costa-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108763442/",
-        "zone": "el-zonte"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 3625000.0,
-        "source": "realestate_au_sv",
-        "source_id": "inm-1-parcela-06-poligono-1-el-zonte-chiltiupan-la-libertad-costa-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108733289",
-        "title": "INM. 1 PARCELA#06, POLIGONO 1, EL ZONTE, CHILTIUPAN, LA LIBERTAD COSTA, LA LIBERTAD, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/inm-1-parcela-06-poligono-1-el-zonte-chiltiupan-la-libertad-costa-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108733289/",
-        "zone": "el-zonte"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "3695c504c47f59c1971316eaee4df9d48cd620eb",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 275000.0,
-        "source": "realestate_au_sv",
-        "source_id": "nejapa-nejapa-san-salvador-nejapa-san-salvador-310101864518",
-        "title": "Nejapa, Nejapa, San Salvador, Nejapa, San Salvador Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/nejapa-nejapa-san-salvador-nejapa-san-salvador-310101864518/",
-        "zone": "nejapa"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 275000.0,
-        "source": "realestate_au_sv",
-        "source_id": "nejapa-nejapa-san-salvador-nejapa-san-salvador-310101864512",
-        "title": "Nejapa, Nejapa, San Salvador, Nejapa, San Salvador Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/nejapa-nejapa-san-salvador-nejapa-san-salvador-310101864512/",
-        "zone": "nejapa"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "3a2fdf644646a6f80a0eb9fa2d617250b3907cf6",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 411236.0,
-        "source": "realestate_au_sv",
-        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287054",
-        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287054/",
-        "zone": "santa-tecla"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 411236.0,
-        "source": "realestate_au_sv",
-        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109225053",
-        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109225053/",
-        "zone": "santa-tecla"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "47358c262122fda1b60afe7d00265a889dd0c1a3",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 66891.0,
-        "source": "realestate_au_sv",
-        "source_id": "lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251521",
-        "title": "Lotificacion San Juan Buenavista, Huizucar, La Libertad, Huizucar, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251521/",
-        "zone": "la-libertad"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 67212.0,
-        "source": "realestate_au_sv",
-        "source_id": "lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251512",
-        "title": "Lotificacion San Juan Buenavista, Huizucar, La Libertad, Huizucar, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251512/",
-        "zone": "la-libertad"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
+      "csbr"
     ]
   },
   {
@@ -687,6 +345,34 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "52dbb87addab041f3b421b6ab736a558f7ff0ce2",
+    "samples": [
+      {
+        "area_m2": 250.2,
+        "price_usd": 35000.0,
+        "source": "remax",
+        "source_id": "00146166103",
+        "title": "LAND FOR SALE IN SAN CRISTOBAL I SAN LUIS TALPA",
+        "url": "https://www.remax-elsalvador.com/00146166103",
+        "zone": "san-luis-talpa"
+      },
+      {
+        "area_m2": 250.2,
+        "price_usd": 35000.0,
+        "source": "remax",
+        "source_id": "00146166102",
+        "title": "LAND FOR SALE IN SAN CRISTOBAL I SAN LUIS TALPA",
+        "url": "https://www.remax-elsalvador.com/00146166102",
+        "zone": "san-luis-talpa"
+      }
+    ],
+    "sources": [
+      "remax"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "53b99fd00af920a8ded47a9bb7803b340b6bce68",
     "samples": [
       {
@@ -715,29 +401,29 @@
   {
     "count": 2,
     "cross_source": false,
-    "fingerprint": "560d0b3ada36080a89213064cd6c45cbedf3e508",
+    "fingerprint": "5ac1f26a2ec92c72b887aaf62090374b809373ed",
     "samples": [
       {
         "area_m2": null,
-        "price_usd": 35638.0,
-        "source": "realestate_au_sv",
-        "source_id": "carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310094614617",
-        "title": "Carretera a Ahuachapán , Cantón Ayutepeque, Chalchupa, Santa Ana, Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310094614617/",
-        "zone": "santa-ana"
+        "price_usd": 155000.0,
+        "source": "csbr",
+        "source_id": "venta-terreno-en-residencial-las-luces-zaragoza-2",
+        "title": "VENTA TERRENO RESIDENCIAL LAS LUCES ZARAGOZA",
+        "url": "https://www.camarabienesraices.com.sv/propiedad/venta-terreno-en-residencial-las-luces-zaragoza-2/",
+        "zone": "zaragoza"
       },
       {
         "area_m2": null,
-        "price_usd": 35926.0,
-        "source": "realestate_au_sv",
-        "source_id": "carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310093383392",
-        "title": "Carretera a Ahuachapán , Cantón Ayutepeque, Chalchupa, Santa Ana, Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/carretera-a-ahuachapan-canton-ayutepeque-chalchupa-santa-ana-310093383392/",
-        "zone": "santa-ana"
+        "price_usd": 155000.0,
+        "source": "csbr",
+        "source_id": "venta-terreno-en-residencial-las-luces-zaragoza",
+        "title": "VENTA TERRENO RESIDENCIAL LAS LUCES ZARAGOZA",
+        "url": "https://www.camarabienesraices.com.sv/propiedad/venta-terreno-en-residencial-las-luces-zaragoza/",
+        "zone": "zaragoza"
       }
     ],
     "sources": [
-      "realestate_au_sv"
+      "csbr"
     ]
   },
   {
@@ -766,34 +452,6 @@
     ],
     "sources": [
       "vivolatam"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "5e782636c68e1dc7a437d09431c26d59eb447aad",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 49775.0,
-        "source": "realestate_au_sv",
-        "source_id": "san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813079",
-        "title": "SAN DIEGO,  LA  Libertad, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813079/",
-        "zone": "san-diego"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 50000.0,
-        "source": "realestate_au_sv",
-        "source_id": "san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813067",
-        "title": "SAN DIEGO,  LA  Libertad, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813067/",
-        "zone": "san-diego"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
     ]
   },
   {
@@ -855,34 +513,6 @@
   {
     "count": 2,
     "cross_source": false,
-    "fingerprint": "852358878e1b3b3d308b7215e0192ac66efaaf89",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 350000.0,
-        "source": "realestate_au_sv",
-        "source_id": "hacienda-santa-emilia-lote-numero-15-el-block-b-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108529944",
-        "title": "Hacienda Santa Emilia, Lote Número 15 el Block B, La Libertad, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/hacienda-santa-emilia-lote-numero-15-el-block-b-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108529944/",
-        "zone": "la-libertad"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 350000.0,
-        "source": "realestate_au_sv",
-        "source_id": "hacienda-santa-emilia-lote-numero-15-el-block-b-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310107834170",
-        "title": "Hacienda Santa Emilia, Lote Número 15 el Block B, La Libertad, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/hacienda-santa-emilia-lote-numero-15-el-block-b-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310107834170/",
-        "zone": "la-libertad"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
     "fingerprint": "866ea58a91262863898a9b55f926f810f14fefa5",
     "samples": [
       {
@@ -906,34 +536,6 @@
     ],
     "sources": [
       "csbr"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "96d710c04954c8a931ac500c6b20ae53886a5401",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 82965.0,
-        "source": "realestate_au_sv",
-        "source_id": "lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251519",
-        "title": "Lotificacion San Juan Buenavista, Huizucar, La Libertad, Huizucar, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251519/",
-        "zone": "la-libertad"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 82940.0,
-        "source": "realestate_au_sv",
-        "source_id": "lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251513",
-        "title": "Lotificacion San Juan Buenavista, Huizucar, La Libertad, Huizucar, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251513/",
-        "zone": "la-libertad"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
     ]
   },
   {
@@ -967,90 +569,6 @@
   {
     "count": 2,
     "cross_source": false,
-    "fingerprint": "ac65702194f016d384f516624d5e994fce1c85eb",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 70786.0,
-        "source": "realestate_au_sv",
-        "source_id": "lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251522",
-        "title": "Lotificacion San Juan Buenavista, Huizucar, La Libertad, Huizucar, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251522/",
-        "zone": "la-libertad"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 71040.0,
-        "source": "realestate_au_sv",
-        "source_id": "lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251510",
-        "title": "Lotificacion San Juan Buenavista, Huizucar, La Libertad, Huizucar, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251510/",
-        "zone": "la-libertad"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "cb03a3731d32af6f95d7d969621533b08e4d5888",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 90000.0,
-        "source": "realestate_au_sv",
-        "source_id": "jiboa-country-club-san-pedro-masahuat-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310103716161",
-        "title": "Jiboa Country Club, San Pedro Masahuat, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/jiboa-country-club-san-pedro-masahuat-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310103716161/",
-        "zone": "masahuat"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 90000.0,
-        "source": "realestate_au_sv",
-        "source_id": "jiboa-country-club-san-pedro-masahuat-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310103716159",
-        "title": "Jiboa Country Club, San Pedro Masahuat, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/jiboa-country-club-san-pedro-masahuat-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310103716159/",
-        "zone": "masahuat"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "d5b0d52d133374ef1574de6ba5cd127534441a53",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 20860.0,
-        "source": "realestate_au_sv",
-        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310108188618",
-        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310108188618/",
-        "zone": "chalatenango"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 21177.0,
-        "source": "realestate_au_sv",
-        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310104492653",
-        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310104492653/",
-        "zone": "chalatenango"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
     "fingerprint": "e8176ce03478e9b55b12d03f7f896f4e42f4f622",
     "samples": [
       {
@@ -1074,34 +592,6 @@
     ],
     "sources": [
       "remax"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "e9298aa949d411c4a8936dd5466f267d83d1e7b5",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 120000.0,
-        "source": "realestate_au_sv",
-        "source_id": "los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-santa-ana-310108329908",
-        "title": "Los Naranjos, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-santa-ana-310108329908/",
-        "zone": "chalchuapa"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 120000.0,
-        "source": "realestate_au_sv",
-        "source_id": "los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-santa-ana-310108329892",
-        "title": "Los Naranjos, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-santa-ana-310108329892/",
-        "zone": "chalchuapa"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
     ]
   },
   {
