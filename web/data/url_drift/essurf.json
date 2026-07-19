@@ -2,13 +2,13 @@
   "source": "essurf",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-07-19T13:57:38.287984+00:00",
+  "probed_at": "2026-07-19T19:36:40.785203+00:00",
   "last_probe": {
     "probed_url": "https://elsalvadorsurfrealestate.com",
     "status_code": 200,
     "final_url": "https://elsalvadorsurfrealestate.com",
     "response_size_bytes": null,
-    "duration_ms": 269,
+    "duration_ms": 244,
     "error": null
   },
   "baseline": {
@@ -17,6 +17,6 @@
     "final_url": "https://elsalvadorsurfrealestate.com",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-07-19T13:57:38.288015+00:00"
+    "last_ok_at": "2026-07-19T19:36:40.785234+00:00"
   }
 }
