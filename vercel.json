@@ -22,13 +22,13 @@
       "memory": 1024,
       "maxDuration": 30,
       "includeFiles": "pulpo/countries/*.json,web/data/ranked.json",
-      "excludeFiles": "web/photos*/**"
+      "excludeFiles": "{web/photos*/**,web/data/ig_assets/**,web/data/*.jsonl,web/data/ranked.list*.json,web/data/llm_enrichment.json,vendor/**}"
     },
     "api/internal/free-welcome-send.py": {
       "memory": 1024,
       "maxDuration": 30,
       "includeFiles": "pulpo/countries/*.json,web/data/ranked.json",
-      "excludeFiles": "web/photos*/**"
+      "excludeFiles": "{web/photos*/**,web/data/ig_assets/**,web/data/*.jsonl,web/data/ranked.list*.json,web/data/llm_enrichment.json,vendor/**}"
     },
     "api/cron/webhook-health.py": {
       "memory": 512,
