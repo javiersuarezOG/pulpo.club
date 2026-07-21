@@ -42,6 +42,9 @@ let changed;
 try {
   const out = execSync(`git diff --name-only ${BASE_SHA}...HEAD`, {
     encoding: "utf8",
+    // 64MB: a mass diff (e.g. removing the 196k-file web/photos/_archive)
+    // overflows the default 1MB execSync buffer (ENOBUFS) and false-fails.
+    maxBuffer: 64 * 1024 * 1024,
   });
   changed = out.trim().split("\n").filter(Boolean);
 } catch (err) {
