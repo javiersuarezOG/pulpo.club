@@ -1,0 +1,14 @@
+{
+  "failure_id": "adc8576d",
+  "source": "elagente",
+  "ts": "2026-07-21T05:22:12.605568+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 2.28,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
