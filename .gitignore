@@ -74,3 +74,8 @@ Pulpo Legal Document Suite.pdf
 
 # stripe-welcometopulpo-discount.png — local screenshot
 stripe-welcometopulpo-discount.png
+
+# Orphaned-photo archive — same-run recovery cache only (restore_archived_photos.py
+# reads today's dir); never served (/photos/:file is one segment) and never needed
+# across runs. Keeping it in git bloated the repo to 11GB / broke deploys.
+web/photos/_archive/
