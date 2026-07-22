@@ -124246,5 +124246,5128 @@
     "cost_usd": 0.00141689,
     "finish_reason": "stop",
     "latency_ms": 4485
+  },
+  "citymax_sc|terreno-con-vista-al-mar-en-surf-city-la-libertad": {
+    "ts": "2026-07-22T06:14:00.466616+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Surf City, La Libertad",
+      "es": "Terrenos en venta en Surf City, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land for sale in Surf City, La Libertad. Located in San Blas, La Libertad. Price: $250,000.",
+      "es": "Terrenos en venta en Surf City, La Libertad. Ubicado en San Blas, La Libertad. Precio: $250,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Surf City location",
+        "es": "Ubicación en Surf City"
+      },
+      {
+        "en": "San Blas beach area",
+        "es": "Zona de playa San Blas"
+      },
+      {
+        "en": "La Libertad department",
+        "es": "Departamento de La Libertad"
+      }
+    ],
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Blas beach",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3077,
+    "tokens_out": 351,
+    "cost_usd": 0.00121689,
+    "finish_reason": "stop",
+    "latency_ms": 3282
+  },
+  "citymax_sc|lote-en-venta-golden-lake-costa-del-sol": {
+    "ts": "2026-07-22T06:14:00.622926+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beach Land for Sale, Costa del Sol",
+      "es": "Terreno de playa en venta, Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Residential lot for sale in Costa del Sol, San Luis La Herradura, La Paz. Flat terrain with beach access and utilities available. Priced at $99,000.",
+      "es": "Lote residencial en venta en Costa del Sol, San Luis La Herradura, La Paz. Terreno plano con acceso a la playa y servicios disponibles. Precio de $99,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location, Costa del Sol",
+        "es": "Ubicación frente a la playa, Costa del Sol"
+      },
+      {
+        "en": "Flat terrain, ready to build",
+        "es": "Terreno plano, listo para construir"
+      },
+      {
+        "en": "Utilities available on site",
+        "es": "Servicios disponibles en el lugar"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3076,
+    "tokens_out": 379,
+    "cost_usd": 0.00124742,
+    "finish_reason": "stop",
+    "latency_ms": 3439
+  },
+  "citymax_sc|terreno-residencial-en-venta-la-palma-chalatenango": {
+    "ts": "2026-07-22T06:14:00.884901+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in La Palma, Chalatenango",
+      "es": "Terreno en Venta en La Palma, Chalatenango"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel for sale in La Palma, Chalatenango. Located in a mountain area, ideal for building a cabin. Price: $65,000.",
+      "es": "Terreno en venta en La Palma, Chalatenango. Ubicado en zona montañosa, ideal para construir cabaña. Precio: $65,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in La Palma, Chalatenango",
+        "es": "Ubicado en La Palma, Chalatenango"
+      },
+      {
+        "en": "Mountain setting for cabin",
+        "es": "Entorno montañoso para cabaña"
+      },
+      {
+        "en": "Price: $65,000",
+        "es": "Precio: $65,000"
+      }
+    ],
+    "lat": 14.3333,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Palma, Chalatenango",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3075,
+    "tokens_out": 372,
+    "cost_usd": 0.00123945,
+    "finish_reason": "stop",
+    "latency_ms": 3700
+  },
+  "citymax_sc|invierte-en-4-15-manzanas-ruta-panoramica": {
+    "ts": "2026-07-22T06:14:01.026302+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land on Panoramic Route, San Juan Tepezontes",
+      "es": "Terreno en Ruta Panorámica, San Juan Tepezontes"
+    },
+    "short_description_canonical": {
+      "en": "Land for sale with direct road access on the Panoramic Route in San Juan Tepezontes, La Paz. The property offers excellent location along this scenic highway. Priced at $195,880.",
+      "es": "Terreno en venta con acceso directo sobre la carretera en la Ruta Panorámica, San Juan Tepezontes, La Paz. La propiedad ofrece excelente ubicación a lo largo de esta carretera escénica. Precio: $195,880."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct access on Panoramic Route",
+        "es": "Acceso directo sobre Ruta Panorámica"
+      },
+      {
+        "en": "Excellent location in San Juan Tepezontes",
+        "es": "Excelente ubicación en San Juan Tepezontes"
+      },
+      {
+        "en": "Priced at $195,880",
+        "es": "Precio de $195,880"
+      }
+    ],
+    "lat": 13.5333,
+    "lng": -89.0333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Juan Tepezontes, La Paz",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3084,
+    "tokens_out": 416,
+    "cost_usd": 0.00129028,
+    "finish_reason": "stop",
+    "latency_ms": 3841
+  },
+  "bienesraices|2429": {
+    "ts": "2026-07-22T06:14:01.629216+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4 Contiguous Lots in Lotificación San Luis, El Paisnal",
+      "es": "4 Lotes Contiguos en Lotificación San Luis, El Paisnal"
+    },
+    "short_description_canonical": {
+      "en": "Four contiguous residential lots totaling 800 m² in Lotificación San Luis, El Paisnal, San Salvador Norte. Each 200 m² lot has independent title and direct street access. Electricity and water feasibility available; total price $72,000.",
+      "es": "Cuatro lotes residenciales contiguos de 800 m² totales en Lotificación San Luis, El Paisnal, San Salvador Norte. Cada lote de 200 m² con escritura independiente y acceso directo a calle. Factibilidad de luz y agua; precio total $72,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "4 contiguous lots, 800 m² total",
+        "es": "4 lotes contiguos, 800 m² totales"
+      },
+      {
+        "en": "Each lot has independent title",
+        "es": "Cada lote con escritura independiente"
+      },
+      {
+        "en": "Direct street access on main road",
+        "es": "Acceso directo a calle principal"
+      },
+      {
+        "en": "Electricity and water feasibility ready",
+        "es": "Factibilidad de luz y agua lista"
+      },
+      {
+        "en": "Total price $72,000 for all four",
+        "es": "Precio total $72,000 por los cuatro"
+      }
+    ],
+    "lat": 13.95,
+    "lng": -89.2167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Paisnal, San Salvador, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3462,
+    "tokens_out": 501,
+    "cost_usd": 0.00148584,
+    "finish_reason": "stop",
+    "latency_ms": 4446
+  },
+  "citymax_sc|amplia-casa-en-venta-en-zacatecoluca-colonia-27-marzo": {
+    "ts": "2026-07-22T06:14:02.932767+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in Zacatecoluca, La Paz",
+      "es": "Casa en Venta en Zacatecoluca, La Paz"
+    },
+    "short_description_canonical": {
+      "en": "House for sale in Zacatecoluca, La Paz department. Price: $75,000. No further details provided.",
+      "es": "Casa en venta en Zacatecoluca, departamento de La Paz. Precio: $75,000. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Affordable price: $75,000",
+        "es": "Precio asequible: $75,000"
+      },
+      {
+        "en": "Located in Zacatecoluca",
+        "es": "Ubicada en Zacatecoluca"
+      },
+      {
+        "en": "La Paz department",
+        "es": "Departamento de La Paz"
+      }
+    ],
+    "lat": 13.5,
+    "lng": -88.8667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Zacatecoluca, La Paz",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3078,
+    "tokens_out": 358,
+    "cost_usd": 0.00122486,
+    "finish_reason": "stop",
+    "latency_ms": 2871
+  },
+  "csbr|venta-terreno-lourdes-carretera-panamericana-ideal-bodegas-2": {
+    "ts": "2026-07-22T06:14:03.884245+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land on Panamericana Highway, Lourdes, ideal for warehouses",
+      "es": "Terreno en Carretera Panamericana, Lourdes, ideal para bodegas"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel on the Panamericana Highway in Lourdes, suitable for warehouse development. Located on a major commercial corridor with high visibility and easy access. Priced at $708,000.",
+      "es": "Terreno sobre la Carretera Panamericana en Lourdes, apto para desarrollo de bodegas. Ubicado en un corredor comercial importante con alta visibilidad y fácil acceso. Precio de $708,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "On Panamericana Highway, high traffic",
+        "es": "Sobre Carretera Panamericana, alto tráfico"
+      },
+      {
+        "en": "Ideal for warehouse construction",
+        "es": "Ideal para construcción de bodegas"
+      },
+      {
+        "en": "Priced at $708,000",
+        "es": "Precio de $708,000"
+      }
+    ],
+    "lat": 13.6667,
+    "lng": -89.3333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Lourdes, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3061,
+    "tokens_out": 400,
+    "cost_usd": 0.00126647,
+    "finish_reason": "stop",
+    "latency_ms": 3417
+  },
+  "csbr|venta-terreno-apopa-atras-cc-plaza-mundo-2": {
+    "ts": "2026-07-22T06:14:04.194281+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Apopa, Behind Plaza Mundo",
+      "es": "Terreno en Venta en Apopa, Detrás de Plaza Mundo"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel for sale in Apopa, behind Plaza Mundo shopping center. The property is located in a commercial area with road access and utilities available. Priced at USD 1,436,683.",
+      "es": "Terreno en venta en Apopa, detrás del centro comercial Plaza Mundo. La propiedad está ubicada en una zona comercial con acceso vial y servicios disponibles. Precio: USD 1,436,683."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Behind Plaza Mundo, high traffic",
+        "es": "Detrás de Plaza Mundo, alto tráfico"
+      },
+      {
+        "en": "Commercial zone, Apopa",
+        "es": "Zona comercial, Apopa"
+      },
+      {
+        "en": "Road access and utilities",
+        "es": "Acceso vial y servicios"
+      }
+    ],
+    "lat": 13.7167,
+    "lng": -89.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Apopa, San Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3069,
+    "tokens_out": 379,
+    "cost_usd": 0.00124553,
+    "finish_reason": "stop",
+    "latency_ms": 3309
+  },
+  "csbr|venta-terreno-ideal-desarrollo-inmobiliario-lourdes-colon-2": {
+    "ts": "2026-07-22T06:14:04.538774+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Lourdes, Colón, for Development",
+      "es": "Terreno en Lourdes, Colón, para Desarrollo"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Lourdes, Colón, La Libertad, ideal for real estate development. Price listed at $2,858,784. Located in a growing area with access to main roads.",
+      "es": "Terreno en Lourdes, Colón, La Libertad, ideal para desarrollo inmobiliario. Precio listado en $2,858,784. Ubicado en una zona en crecimiento con acceso a vías principales."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Lourdes, Colón",
+        "es": "Ubicado en Lourdes, Colón"
+      },
+      {
+        "en": "Ideal for real estate development",
+        "es": "Ideal para desarrollo inmobiliario"
+      },
+      {
+        "en": "Price: $2,858,784",
+        "es": "Precio: $2,858,784"
+      }
+    ],
+    "lat": 13.7167,
+    "lng": -89.3667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Colón, La Libertad, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3073,
+    "tokens_out": 401,
+    "cost_usd": 0.00127081,
+    "finish_reason": "stop",
+    "latency_ms": 3512
+  },
+  "csbr|terreno-venta-rancho-de-playa-las-veraneras-los-cobanos-2": {
+    "ts": "2026-07-22T06:14:04.721078+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Land in Los Cóbanos, Sonsonate",
+      "es": "Terreno frente al mar en Los Cóbanos, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "170 m² beachfront lot in Las Veraneras, Los Cóbanos, Sonsonate. Flat terrain with direct beach access. Priced at $525,000.",
+      "es": "Lote frente al mar de 170 m² en Las Veraneras, Los Cóbanos, Sonsonate. Terreno plano con acceso directo a la playa. Precio de $525,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront lot in Los Cóbanos",
+        "es": "Lote frente al mar en Los Cóbanos"
+      },
+      {
+        "en": "170 m² flat terrain",
+        "es": "170 m² de terreno plano"
+      },
+      {
+        "en": "Direct beach access",
+        "es": "Acceso directo a la playa"
+      }
+    ],
+    "lat": 13.541,
+    "lng": -89.805,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Los Cóbanos beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3082,
+    "tokens_out": 384,
+    "cost_usd": 0.00125454,
+    "finish_reason": "stop",
+    "latency_ms": 3091
+  },
+  "csbr|casco-de-finca-en-venta-en-la-geortermica-de-ahuachapan-2": {
+    "ts": "2026-07-22T06:14:04.889526+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "550 m² Farm Lot for Sale in Ahuachapán",
+      "es": "Solar de 550 m² en Venta en Ahuachapán"
+    },
+    "short_description_canonical": {
+      "en": "550 m² farm lot for sale in Ahuachapán, Ahuachapán department. Flat terrain with road access and utilities available. Priced at $213,463.",
+      "es": "Solar de 550 m² en venta en Ahuachapán, departamento de Ahuachapán. Terreno plano con acceso vial y servicios disponibles. Precio: $213,463."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "550 m² flat lot in Ahuachapán",
+        "es": "Terreno plano de 550 m² en Ahuachapán"
+      },
+      {
+        "en": "Road access and utilities available",
+        "es": "Acceso vial y servicios disponibles"
+      },
+      {
+        "en": "Priced at $213,463",
+        "es": "Precio: $213,463"
+      }
+    ],
+    "lat": 13.9213,
+    "lng": -89.8453,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ahuachapán municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3082,
+    "tokens_out": 396,
+    "cost_usd": 0.00126774,
+    "finish_reason": "stop",
+    "latency_ms": 3282
+  },
+  "csbr|venta-terreno-de-playa-izacuyo-la-libertad": {
+    "ts": "2026-07-22T06:14:05.978761+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beach Land for Sale in Izacuyo, La Libertad",
+      "es": "Terreno de Playa en Venta en Izacuyo, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront land for sale in Izacuyo, La Libertad. The lot offers direct beach access and is located in a sought-after coastal area. Priced at $1,400,000, this is a rare opportunity to own beachfront property.",
+      "es": "Terreno frente al mar en venta en Izacuyo, La Libertad. El lote ofrece acceso directo a la playa y está ubicado en una zona costera codiciada. Precio de $1,400,000, una oportunidad única de poseer propiedad frente al mar."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in Izacuyo",
+        "es": "Ubicación frente al mar en Izacuyo"
+      },
+      {
+        "en": "Direct beach access",
+        "es": "Acceso directo a la playa"
+      },
+      {
+        "en": "Priced at $1,400,000",
+        "es": "Precio de $1,400,000"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3071,
+    "tokens_out": 433,
+    "cost_usd": 0.00130547,
+    "finish_reason": "stop",
+    "latency_ms": 3580
+  },
+  "csbr|terrenos-en-venta-a-5-minutos-de-res-la-hacienda-san-jose-villanueva-la-libertad": {
+    "ts": "2026-07-22T06:14:06.141843+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near San José Villanueva",
+      "es": "Terrenos en Venta cerca de San José Villanueva"
+    },
+    "short_description_canonical": {
+      "en": "Land parcels for sale 5 minutes from Res. La Hacienda in San José Villanueva, La Libertad. Listed on the Salvadoran Chamber of Real Estate. Price: $60,000.",
+      "es": "Terrenos en venta a 5 minutos de Res. La Hacienda en San José Villanueva, La Libertad. Publicado en la Cámara Salvadoreña de Bienes Raíces. Precio: $60,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "5 min from Res. La Hacienda",
+        "es": "5 min de Res. La Hacienda"
+      },
+      {
+        "en": "Listed on official chamber",
+        "es": "Publicado en cámara oficial"
+      },
+      {
+        "en": "San José Villanueva location",
+        "es": "Ubicación en San José Villanueva"
+      }
+    ],
+    "lat": 13.5833,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San José Villanueva, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3083,
+    "tokens_out": 401,
+    "cost_usd": 0.00127351,
+    "finish_reason": "stop",
+    "latency_ms": 3208
+  },
+  "csbr|terrenos-frente-al-mar-en-venta-playa-maculis-la-union": {
+    "ts": "2026-07-22T06:14:06.620478+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Land for Sale in Playa Maculís",
+      "es": "Terrenos Frente al Mar en Venta en Playa Maculís"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront land lot of 388.12 m² in Playa Maculís, La Unión. Direct ocean access with no buildings between you and the sea. Listed on the Salvadoran Chamber of Real Estate.",
+      "es": "Lote de terreno frente al mar de 388.12 m² en Playa Maculís, La Unión. Acceso directo al océano sin construcciones entre usted y el mar. Publicado en la Cámara Salvadoreña de Bienes Raíces."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront first row",
+        "es": "Primera fila frente al mar"
+      },
+      {
+        "en": "388.12 m² lot",
+        "es": "Lote de 388.12 m²"
+      },
+      {
+        "en": "Listed on official chamber",
+        "es": "Publicado en cámara oficial"
+      }
+    ],
+    "lat": 13.205,
+    "lng": -87.842,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Maculís",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3085,
+    "tokens_out": 404,
+    "cost_usd": 0.00127735,
+    "finish_reason": "stop",
+    "latency_ms": 3052
+  },
+  "csbr|venta-terreno-en-residencial-las-luces-zaragoza-3": {
+    "ts": "2026-07-22T06:14:07.129780+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Zaragoza, La Libertad",
+      "es": "Terreno en Venta en Zaragoza, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land lot for sale in Zaragoza, on the road to Surf City, La Libertad. Price: $155,000. Located in a developing area near the coast.",
+      "es": "Terreno en venta en Zaragoza, sobre la carretera a Surf City, La Libertad. Precio: $155,000. Ubicado en zona en desarrollo cerca de la costa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "On road to Surf City",
+        "es": "Sobre carretera a Surf City"
+      },
+      {
+        "en": "Near La Libertad coast",
+        "es": "Cerca de la costa de La Libertad"
+      },
+      {
+        "en": "Price: $155,000",
+        "es": "Precio: $155,000"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3075,
+    "tokens_out": 379,
+    "cost_usd": 0.00124715,
+    "finish_reason": "stop",
+    "latency_ms": 3245
+  },
+  "csbr|rancho-en-venta-conchalio-la-libertad": {
+    "ts": "2026-07-22T06:14:07.701341+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "941 m² lot for sale in Conchalío, La Libertad",
+      "es": "Terreno de 941 m² en venta en Conchalío, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Flat 941.66 m² residential lot in Conchalío, La Libertad. Located in a residential area near the coast. Priced at $339,000.",
+      "es": "Terreno residencial plano de 941.66 m² en Conchalío, La Libertad. Ubicado en zona residencial cercana a la costa. Precio: $339,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "941 m² flat lot",
+        "es": "Terreno plano de 941 m²"
+      },
+      {
+        "en": "Residential area in Conchalío",
+        "es": "Zona residencial en Conchalío"
+      },
+      {
+        "en": "Near La Libertad coast",
+        "es": "Cerca de la costa de La Libertad"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3079,
+    "tokens_out": 386,
+    "cost_usd": 0.00125593,
+    "finish_reason": "stop",
+    "latency_ms": 3162
+  },
+  "encuentra24|32694426": {
+    "ts": "2026-07-22T06:14:08.674505+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront House 400 m², 3 Bedrooms, La Libertad",
+      "es": "Casa frente al mar 400 m², 3 recámaras, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Modern beachfront house on a 758 m² lot with 400 m² construction in La Libertad. Features 3 bedrooms each with private bathroom, infinity pool, and covered parking for 5 vehicles. Less than 30 minutes from the new airport.",
+      "es": "Casa moderna frente al mar en terreno de 758 m² con 400 m² de construcción en La Libertad. Cuenta con 3 recámaras cada una con baño privado, piscina infinita y cochera techada para 5 vehículos. A menos de 30 minutos del nuevo aeropuerto."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront first row",
+        "es": "Primera fila frente al mar"
+      },
+      {
+        "en": "Infinity pool overlooking ocean",
+        "es": "Piscina infinita con vista al mar"
+      },
+      {
+        "en": "Less than 30 min to airport",
+        "es": "A menos de 30 min del aeropuerto"
+      },
+      {
+        "en": "Covered parking for 5 cars",
+        "es": "Cochera techada para 5 autos"
+      },
+      {
+        "en": "24-hour security",
+        "es": "Seguridad las 24 horas"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 4.0,
+      "built_area_m2": 400.0,
+      "parking_spaces": 5,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3331,
+    "tokens_out": 506,
+    "cost_usd": 0.00145597,
+    "finish_reason": "stop",
+    "latency_ms": 3784
+  },
+  "encuentra24|32715202": {
+    "ts": "2026-07-22T06:14:08.818071+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Residential House in Miramar, near Surf City",
+      "es": "Casa Residencial en Miramar, cerca de Surf City"
+    },
+    "short_description_canonical": {
+      "en": "Two-level house in Miramar condominium, San José Villanueva, near La Libertad and El Tunco. Built area 169 m² on a 300 var² lot, with 3 bedrooms, 2.5 bathrooms, open parking for 2 vehicles. Condominium includes green areas, parks, basketball and football courts, and children's playground.",
+      "es": "Casa de dos niveles en condominio Miramar, San José Villanueva, cerca de La Libertad y El Tunco. Área construida 169 m² en terreno de 300 vr², con 3 habitaciones, 2.5 baños, cochera abierta para 2 vehículos. El condominio cuenta con áreas verdes, parques, canchas de baloncesto y fútbol, y juegos infantiles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Near El Tunco and Surf City",
+        "es": "Cerca de El Tunco y Surf City"
+      },
+      {
+        "en": "Condominium with sports courts",
+        "es": "Condominio con canchas deportivas"
+      },
+      {
+        "en": "169 m² built on 300 var² lot",
+        "es": "169 m² construidos en 300 vr² de terreno"
+      },
+      {
+        "en": "Open parking for 2 vehicles",
+        "es": "Cochera abierta para 2 vehículos"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.5,
+      "built_area_m2": 169.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3275,
+    "tokens_out": 531,
+    "cost_usd": 0.00146835,
+    "finish_reason": "stop",
+    "latency_ms": 4096
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395389": {
+    "ts": "2026-07-22T06:14:10.010203+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 12,500 m² located at Km 12.5 on the Comasagua road, Santa Tecla, La Libertad. The property is offered for sale at $319,752. No further details on utilities or zoning are provided.",
+      "es": "Terreno de 12,500 m² ubicado en el Km 12.5 de la carretera a Comasagua, Santa Tecla, La Libertad. Se ofrece en venta por $319,752. No se proporcionan más detalles sobre servicios públicos o zonificación."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "12,500 m² lot near Santa Tecla",
+        "es": "Lote de 12,500 m² cerca de Santa Tecla"
+      },
+      {
+        "en": "Located on Comasagua highway",
+        "es": "Ubicado en carretera a Comasagua"
+      },
+      {
+        "en": "Price at $319,752 USD",
+        "es": "Precio de $319,752 USD"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 435,
+    "cost_usd": 0.00131496,
+    "finish_reason": "stop",
+    "latency_ms": 3867
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395392": {
+    "ts": "2026-07-22T06:14:10.117229+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the Comasagua road, Santa Tecla, La Libertad. Lot size not specified. Located in a developing area with road access.",
+      "es": "Parcela de terreno en el Km 12.5 de la carretera a Comasagua, Santa Tecla, La Libertad. Tamaño del lote no especificado. Ubicado en una zona en desarrollo con acceso vial."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 Comasagua road location",
+        "es": "Ubicación en Km 12.5 carretera a Comasagua"
+      },
+      {
+        "en": "Near Santa Tecla city center",
+        "es": "Cerca del centro de Santa Tecla"
+      },
+      {
+        "en": "Good road access",
+        "es": "Buen acceso vial"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 399,
+    "cost_usd": 0.00127536,
+    "finish_reason": "stop",
+    "latency_ms": 3496
+  },
+  "oceanside|15735": {
+    "ts": "2026-07-22T06:14:10.305872+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3 Panoramic Lots Near El Tunco, La Libertad",
+      "es": "3 Lotes Panorámicos Cerca de El Tunco, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Three residential lots totaling 1,782 m² on scenic ridges minutes from El Tunco, La Libertad. Lot 1: 886.80 m² at $169,000; Lot 2: 447.78 m² at $109,000; Lot 3: 447.78 m² at $99,000. All lots offer unobstructed ocean views and are a 3-4 minute drive from El Tunco's surf breaks and dining.",
+      "es": "Tres lotes residenciales que suman 1,782 m² en crestas escénicas a minutos de El Tunco, La Libertad. Lote 1: 886.80 m² a $169,000; Lote 2: 447.78 m² a $109,000; Lote 3: 447.78 m² a $99,000. Todos los lotes ofrecen vistas al mar sin obstrucciones y están a 3-4 minutos en auto de las olas y restaurantes de El Tunco."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3-4 min drive to El Tunco",
+        "es": "3-4 min en auto a El Tunco"
+      },
+      {
+        "en": "Unobstructed ocean views",
+        "es": "Vistas al mar sin obstrucciones"
+      },
+      {
+        "en": "Flexible purchase: single or all",
+        "es": "Compra flexible: individual o todos"
+      },
+      {
+        "en": "High-demand tourist corridor",
+        "es": "Corredor turístico de alta demanda"
+      }
+    ],
+    "lat": 13.487,
+    "lng": -89.6133,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Tunco",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3376,
+    "tokens_out": 552,
+    "cost_usd": 0.00151872,
+    "finish_reason": "stop",
+    "latency_ms": 4326
+  },
+  "realestate_au_sv|19a-calle-poniente-y-6a-av-sur-santa-ana-centro-santa-v-santa-ana-santa-ana-santa-ana-santa-ana-310119395400": {
+    "ts": "2026-07-22T06:14:10.604089+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Land in Santa Ana Centro",
+      "es": "Terreno 850 m² en Santa Ana Centro"
+    },
+    "short_description_canonical": {
+      "en": "850 m² residential lot at 19a Calle Poniente and 6a Av. Sur, Santa Ana Centro. Flat terrain with road access and utilities available. Zoned for residential use with clear title.",
+      "es": "Lote residencial de 850 m² en 19a Calle Poniente y 6a Av. Sur, Santa Ana Centro. Terreno plano con acceso vial y servicios disponibles. Zona residencial con título claro."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "850 m² flat lot",
+        "es": "Lote plano de 850 m²"
+      },
+      {
+        "en": "Corner location in Santa Ana Centro",
+        "es": "Ubicación esquinera en Santa Ana Centro"
+      },
+      {
+        "en": "Road access and utilities available",
+        "es": "Acceso vial y servicios disponibles"
+      }
+    ],
+    "lat": 13.9947,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana Centro, Santa Ana",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3091,
+    "tokens_out": 384,
+    "cost_usd": 0.00125697,
+    "finish_reason": "stop",
+    "latency_ms": 3575
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395381": {
+    "ts": "2026-07-22T06:14:10.882734+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the Comasagua road, Santa Tecla, La Libertad. No further details provided. Price: $421,741.",
+      "es": "Terreno en el Km 12.5 de la carretera a Comasagua, Santa Tecla, La Libertad. Sin más detalles. Precio: $421,741."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located on Comasagua road, Km 12.5",
+        "es": "Ubicado en carretera a Comasagua, Km 12.5"
+      },
+      {
+        "en": "Near Santa Tecla, La Libertad",
+        "es": "Cerca de Santa Tecla, La Libertad"
+      },
+      {
+        "en": "Listed by RE/MAX CENTRAL",
+        "es": "Listado por RE/MAX CENTRAL"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 399,
+    "cost_usd": 0.00127536,
+    "finish_reason": "stop",
+    "latency_ms": 3180
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395379": {
+    "ts": "2026-07-22T06:14:11.104247+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 12,500 m² located at Km 12.5 on the Comasagua Road, Santa Tecla, La Libertad. Priced at $448,100. Suitable for development with road frontage.",
+      "es": "Terreno de 12,500 m² ubicado en el Km 12.5 de la Carretera a Comasagua, Santa Tecla, La Libertad. Precio de $448,100. Apto para desarrollo con frente a carretera."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "12,500 m² lot near Santa Tecla",
+        "es": "Lote de 12,500 m² cerca de Santa Tecla"
+      },
+      {
+        "en": "Located on Comasagua Road, Km 12.5",
+        "es": "Ubicado en Carretera a Comasagua, Km 12.5"
+      },
+      {
+        "en": "Priced at $448,100 USD",
+        "es": "Precio de $448,100 USD"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 435,
+    "cost_usd": 0.00131496,
+    "finish_reason": "stop",
+    "latency_ms": 3974
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395393": {
+    "ts": "2026-07-22T06:14:12.209937+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale, Km 12.5 Comasagua Road, Santa Tecla",
+      "es": "Terreno en Venta, Km 12.5 Carretera a Comasagua, Santa Tecla"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 456,864 USD on Km 12.5 Comasagua Road, Santa Tecla, La Libertad. Located in a developing area with road access. Ideal for residential or commercial development.",
+      "es": "Terreno de 456,864 USD en Km 12.5 Carretera a Comasagua, Santa Tecla, La Libertad. Ubicado en zona en desarrollo con acceso vial. Ideal para desarrollo residencial o comercial."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 Comasagua Road location",
+        "es": "Ubicación en Km 12.5 Carretera a Comasagua"
+      },
+      {
+        "en": "Near Santa Tecla city center",
+        "es": "Cerca del centro de Santa Tecla"
+      },
+      {
+        "en": "Road access available",
+        "es": "Acceso vial disponible"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 418,
+    "cost_usd": 0.00129626,
+    "finish_reason": "stop",
+    "latency_ms": 3535
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109422560": {
+    "ts": "2026-07-22T06:14:12.718299+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale, Km 12.5 Comasagua Road, Santa Tecla",
+      "es": "Terreno en Venta, Km 12.5 Carretera a Comasagua, Santa Tecla"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 12,500 m² located at Km 12.5 on the Comasagua Road in Santa Tecla, La Libertad. The property is priced at USD 525,519. No further details on zoning, utilities, or access are provided.",
+      "es": "Terreno de 12,500 m² ubicado en el Km 12.5 de la Carretera a Comasagua en Santa Tecla, La Libertad. El precio es de USD 525,519. No se proporcionan más detalles sobre zonificación, servicios o acceso."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "12,500 m² lot near Santa Tecla",
+        "es": "Lote de 12,500 m² cerca de Santa Tecla"
+      },
+      {
+        "en": "Priced at USD 525,519",
+        "es": "Precio de USD 525,519"
+      },
+      {
+        "en": "Located on Comasagua Road",
+        "es": "Ubicado en Carretera a Comasagua"
+      }
+    ],
+    "lat": 13.6722,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 454,
+    "cost_usd": 0.00133586,
+    "finish_reason": "stop",
+    "latency_ms": 3899
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395391": {
+    "ts": "2026-07-22T06:14:13.570064+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 12.5 km on the Comasagua road, Santa Tecla, La Libertad. Located in a developing area with road access. Priced at $391,026.",
+      "es": "Parcela de terreno en el km 12.5 carretera a Comasagua, Santa Tecla, La Libertad. Ubicado en zona en desarrollo con acceso vial. Precio de $391,026."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "12.5 km from Santa Tecla",
+        "es": "A 12.5 km de Santa Tecla"
+      },
+      {
+        "en": "Road access on Comasagua highway",
+        "es": "Acceso vial en carretera a Comasagua"
+      },
+      {
+        "en": "Priced at $391,026",
+        "es": "Precio de $391,026"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 406,
+    "cost_usd": 0.00128306,
+    "finish_reason": "stop",
+    "latency_ms": 3559
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395398": {
+    "ts": "2026-07-22T06:14:13.709609+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 12,500 m² located at Km 12.5 on the Comasagua road, Santa Tecla, La Libertad. Priced at USD 305,262. Suitable for development with road access.",
+      "es": "Parcela de terreno de 12,500 m² ubicada en el Km 12.5 de la carretera a Comasagua, Santa Tecla, La Libertad. Precio de USD 305,262. Apto para desarrollo con acceso vial."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "12,500 m² lot near Santa Tecla",
+        "es": "Lote de 12,500 m² cerca de Santa Tecla"
+      },
+      {
+        "en": "Located on Comasagua highway",
+        "es": "Ubicado en carretera a Comasagua"
+      },
+      {
+        "en": "Priced at USD 305,262",
+        "es": "Precio de USD 305,262"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 426,
+    "cost_usd": 0.00130506,
+    "finish_reason": "stop",
+    "latency_ms": 3591
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395384": {
+    "ts": "2026-07-22T06:14:13.766491+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 12,500 m² located at Km 12.5 on the Comasagua road, Santa Tecla, La Libertad. Price: $440,422. Ideal for development with road access.",
+      "es": "Terreno de 12,500 m² ubicado en el Km 12.5 de la carretera a Comasagua, Santa Tecla, La Libertad. Precio: $440,422. Ideal para desarrollo con acceso vial."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "12,500 m² lot near Santa Tecla",
+        "es": "Lote de 12,500 m² cerca de Santa Tecla"
+      },
+      {
+        "en": "Km 12.5 on Comasagua road",
+        "es": "Km 12.5 en carretera a Comasagua"
+      },
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Listado por RE/MAX Central"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 422,
+    "cost_usd": 0.00130066,
+    "finish_reason": "stop",
+    "latency_ms": 3460
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395394": {
+    "ts": "2026-07-22T06:14:14.080378+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the Comasagua Highway, Santa Tecla, La Libertad. The property is located in a developing area with road access. Price: USD 433,812.",
+      "es": "Parcela de terreno en el Km 12.5 de la Carretera a Comasagua, Santa Tecla, La Libertad. La propiedad está ubicada en una zona en desarrollo con acceso por carretera. Precio: USD 433,812."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 Comasagua Highway location",
+        "es": "Ubicación en Km 12.5 Carretera a Comasagua"
+      },
+      {
+        "en": "Near Santa Tecla city center",
+        "es": "Cerca del centro de Santa Tecla"
+      },
+      {
+        "en": "Road access available",
+        "es": "Acceso por carretera disponible"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 414,
+    "cost_usd": 0.00129186,
+    "finish_reason": "stop",
+    "latency_ms": 3475
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395395": {
+    "ts": "2026-07-22T06:14:14.383799+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the Comasagua Road, Santa Tecla, La Libertad. The property is located in a developing area with road access. No further details on utilities or zoning are provided.",
+      "es": "Parcela de terreno en el Km 12.5 de la Carretera a Comasagua, Santa Tecla, La Libertad. La propiedad está ubicada en una zona en desarrollo con acceso vial. No se proporcionan más detalles sobre servicios públicos o zonificación."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 Comasagua Road location",
+        "es": "Ubicación en Km 12.5 Carretera a Comasagua"
+      },
+      {
+        "en": "Near Santa Tecla city",
+        "es": "Cerca de la ciudad de Santa Tecla"
+      },
+      {
+        "en": "Road access available",
+        "es": "Acceso vial disponible"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 412,
+    "cost_usd": 0.00128966,
+    "finish_reason": "stop",
+    "latency_ms": 3500
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109422559": {
+    "ts": "2026-07-22T06:14:14.470852+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the Comasagua Road, Santa Tecla, La Libertad. Located in a developing area with road access. Priced at $442,020.",
+      "es": "Parcela de terreno en el Km 12.5 de la Carretera a Comasagua, Santa Tecla, La Libertad. Ubicado en una zona en desarrollo con acceso vial. Precio de $442,020."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 Comasagua Road location",
+        "es": "Ubicación en Km 12.5 Carretera a Comasagua"
+      },
+      {
+        "en": "Developing area near Santa Tecla",
+        "es": "Zona en desarrollo cerca de Santa Tecla"
+      },
+      {
+        "en": "Road access available",
+        "es": "Acceso vial disponible"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 401,
+    "cost_usd": 0.00127756,
+    "finish_reason": "stop",
+    "latency_ms": 3366
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395388": {
+    "ts": "2026-07-22T06:14:15.689850+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale, Km 12.5 Comasagua Road, Santa Tecla",
+      "es": "Terreno en Venta, Km 12.5 Carretera a Comasagua, Santa Tecla"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 1,200 m² on Km 12.5 Comasagua Road, Santa Tecla, La Libertad. Paved road access, utilities available. Price: $419,448.",
+      "es": "Terreno de 1,200 m² en Km 12.5 Carretera a Comasagua, Santa Tecla, La Libertad. Acceso por carretera pavimentada, servicios disponibles. Precio: $419,448."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1,200 m² lot on main road",
+        "es": "Lote de 1,200 m² sobre carretera principal"
+      },
+      {
+        "en": "Paved access, utilities available",
+        "es": "Acceso pavimentado, servicios disponibles"
+      },
+      {
+        "en": "Near Santa Tecla city center",
+        "es": "Cerca del centro de Santa Tecla"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 423,
+    "cost_usd": 0.00130176,
+    "finish_reason": "stop",
+    "latency_ms": 3479
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395383": {
+    "ts": "2026-07-22T06:14:16.337587+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 12,500 m² located at Km 12.5 Carretera a Comasagua, Santa Tecla, La Libertad. Priced at USD 596,450. Suitable for development with road frontage.",
+      "es": "Terreno de 12,500 m² ubicado en Km 12.5 Carretera a Comasagua, Santa Tecla, La Libertad. Precio de USD 596,450. Apto para desarrollo con frente a carretera."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "12,500 m² lot near Santa Tecla",
+        "es": "Lote de 12,500 m² cerca de Santa Tecla"
+      },
+      {
+        "en": "Located on Carretera a Comasagua",
+        "es": "Ubicado en Carretera a Comasagua"
+      },
+      {
+        "en": "Priced at USD 596,450",
+        "es": "Precio de USD 596,450"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 428,
+    "cost_usd": 0.00130726,
+    "finish_reason": "stop",
+    "latency_ms": 3618
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395386": {
+    "ts": "2026-07-22T06:14:16.951343+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel at Km 12.5 on the Comasagua road, Santa Tecla, La Libertad. Located in a developing area with road access. Priced at $503,209.",
+      "es": "Terreno en el Km 12.5 de la carretera a Comasagua, Santa Tecla, La Libertad. Ubicado en una zona en desarrollo con acceso vial. Precio de $503,209."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 Comasagua road location",
+        "es": "Ubicación en Km 12.5 carretera a Comasagua"
+      },
+      {
+        "en": "Near Santa Tecla, La Libertad",
+        "es": "Cerca de Santa Tecla, La Libertad"
+      },
+      {
+        "en": "Road access available",
+        "es": "Acceso vial disponible"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 403,
+    "cost_usd": 0.00127976,
+    "finish_reason": "stop",
+    "latency_ms": 3380
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109422556": {
+    "ts": "2026-07-22T06:14:17.300824+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Santa Tecla, La Libertad",
+      "es": "Terreno en Venta cerca de Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 12,500 m² located at Km 12.5 on the Comasagua Road, Santa Tecla, La Libertad. Priced at $464,270. Ideal for development or investment.",
+      "es": "Terreno de 12,500 m² ubicado en el Km 12.5 de la Carretera a Comasagua, Santa Tecla, La Libertad. Precio de $464,270. Ideal para desarrollo o inversión."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "12,500 m² lot near Santa Tecla",
+        "es": "Lote de 12,500 m² cerca de Santa Tecla"
+      },
+      {
+        "en": "Priced at $464,270",
+        "es": "Precio de $464,270"
+      },
+      {
+        "en": "Located on Comasagua Road",
+        "es": "Ubicado en Carretera a Comasagua"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 417,
+    "cost_usd": 0.00129516,
+    "finish_reason": "stop",
+    "latency_ms": 3533
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109422558": {
+    "ts": "2026-07-22T06:14:17.342734+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "12.5 km Comasagua Road Land, Santa Tecla",
+      "es": "Terreno en km 12.5 Carretera a Comasagua, Santa Tecla"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 12.5 km on Comasagua Road, Santa Tecla, La Libertad. Located in a developing area with road access. Priced at $413,510.",
+      "es": "Terreno en el km 12.5 de la Carretera a Comasagua, Santa Tecla, La Libertad. Ubicado en zona en desarrollo con acceso vial. Precio: $413,510."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "12.5 km from Santa Tecla",
+        "es": "A 12.5 km de Santa Tecla"
+      },
+      {
+        "en": "On main Comasagua Road",
+        "es": "Sobre carretera principal a Comasagua"
+      },
+      {
+        "en": "Priced at $413,510",
+        "es": "Precio: $413,510"
+      }
+    ],
+    "lat": 13.6739,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 408,
+    "cost_usd": 0.00128526,
+    "finish_reason": "stop",
+    "latency_ms": 3632
+  },
+  "realestate_au_sv|hacienda-salamar-lot-san-cristobal-i-lote-50-polg-j-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310109383335": {
+    "ts": "2026-07-22T06:14:17.622886+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Hacienda Salamar Lot, San Pedro Masahuat, La Paz",
+      "es": "Lote Hacienda Salamar, San Pedro Masahuat, La Paz"
+    },
+    "short_description_canonical": {
+      "en": "Land lot in Hacienda Salamar, San Pedro Masahuat, La Paz. Lot 50, Polígono J, 1,000 m² (approx.). Paved road access, water and electricity available. Below $35,000 price.",
+      "es": "Lote de terreno en Hacienda Salamar, San Pedro Masahuat, La Paz. Lote 50, Polígono J, 1,000 m² (aprox.). Acceso pavimentado, agua y electricidad disponibles. Precio inferior a $35,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Paved road access",
+        "es": "Acceso pavimentado"
+      },
+      {
+        "en": "Water and electricity available",
+        "es": "Agua y electricidad disponibles"
+      },
+      {
+        "en": "Below $35,000 price",
+        "es": "Precio inferior a $35,000"
+      }
+    ],
+    "lat": 13.4333,
+    "lng": -89.0333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Pedro Masahuat, La Paz",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3108,
+    "tokens_out": 416,
+    "cost_usd": 0.00129676,
+    "finish_reason": "stop",
+    "latency_ms": 3542
+  },
+  "realestate_au_sv|residencial-golden-lake-costa-del-sol-san-luis-la-herradura-departamento-de-la-paz-el-salvador-la-herradura-la-paz-la-herradura-la-paz-department-310119378411": {
+    "ts": "2026-07-22T06:14:17.824534+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Condo in Golden Lake, Costa del Sol",
+      "es": "Condominio en Golden Lake, Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Condo in Residencial Golden Lake, Costa del Sol, San Luis La Herradura, La Paz. Built area not specified, bedrooms and bathrooms not listed. Located in a residential complex near the beach.",
+      "es": "Condominio en Residencial Golden Lake, Costa del Sol, San Luis La Herradura, La Paz. Área construida no especificada, dormitorios y baños no listados. Ubicado en un complejo residencial cerca de la playa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Costa del Sol beach area",
+        "es": "Ubicado en la zona de playa Costa del Sol"
+      },
+      {
+        "en": "Gated residential community Golden Lake",
+        "es": "Comunidad residencial cerrada Golden Lake"
+      },
+      {
+        "en": "Near San Luis La Herradura amenities",
+        "es": "Cerca de servicios de San Luis La Herradura"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3099,
+    "tokens_out": 407,
+    "cost_usd": 0.00128443,
+    "finish_reason": "stop",
+    "latency_ms": 3353
+  },
+  "realestate_au_sv|hacienda-salamar-lotificacion-san-cristobal-i-lote-4-poligono-j-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310109383328": {
+    "ts": "2026-07-22T06:14:17.955140+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land Lot in San Pedro Masahuat, La Paz",
+      "es": "Lote de Terreno en San Pedro Masahuat, La Paz"
+    },
+    "short_description_canonical": {
+      "en": "Flat land lot in Hacienda Salamar, San Cristóbal I, San Pedro Masahuat, La Paz. Lot 4, Polygon J, priced at $35,000. Suitable for residential development.",
+      "es": "Lote de terreno plano en Hacienda Salamar, San Cristóbal I, San Pedro Masahuat, La Paz. Lote 4, Polígono J, valorado en $35,000. Apto para desarrollo residencial."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Priced at $35,000",
+        "es": "Valorado en $35,000"
+      },
+      {
+        "en": "Located in Hacienda Salamar",
+        "es": "Ubicado en Hacienda Salamar"
+      },
+      {
+        "en": "Flat lot, Polygon J",
+        "es": "Lote plano, Polígono J"
+      }
+    ],
+    "lat": 13.4333,
+    "lng": -89.0333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Pedro Masahuat, La Paz",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3111,
+    "tokens_out": 402,
+    "cost_usd": 0.00128217,
+    "finish_reason": "stop",
+    "latency_ms": 3571
+  },
+  "realestate_au_sv|lotificacion-piedras-negras-san-julian-sonsonate-san-julian-sonsonate-san-julian-sonsonate-310109344770": {
+    "ts": "2026-07-22T06:14:18.778135+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot in Piedras Negras, San Julian, Sonsonate",
+      "es": "Lote en Piedras Negras, San Julián, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Land lot in Lotificación Piedras Negras, San Julian, Sonsonate. Flat terrain, suitable for construction. Priced at $32,000.",
+      "es": "Terreno en Lotificación Piedras Negras, San Julián, Sonsonate. Terreno plano, apto para construcción. Precio de $32,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in San Julian, Sonsonate",
+        "es": "Ubicado en San Julián, Sonsonate"
+      },
+      {
+        "en": "Price: $32,000",
+        "es": "Precio: $32,000"
+      },
+      {
+        "en": "Flat terrain ready to build",
+        "es": "Terreno plano listo para construir"
+      }
+    ],
+    "lat": 13.6567,
+    "lng": -89.5667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Julian, Sonsonate",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3086,
+    "tokens_out": 368,
+    "cost_usd": 0.00123802,
+    "finish_reason": "stop",
+    "latency_ms": 3087
+  },
+  "realestate_au_sv|finca-ayala-gualache-tecapan-usulutan-aguacayo-usulutan-aguacayo-usulutan-310119364476": {
+    "ts": "2026-07-22T06:14:19.522747+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Finca Ayala Land for Sale in Tecapán, Usulután",
+      "es": "Terreno Finca Ayala en Venta en Tecapán, Usulután"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Gualache, Tecapán, Usulután. Located in the Aguacayo area. Priced at $375,000.",
+      "es": "Terreno en Gualache, Tecapán, Usulután. Ubicado en la zona de Aguacayo. Precio de $375,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Tecapán, Usulután",
+        "es": "Ubicado en Tecapán, Usulután"
+      },
+      {
+        "en": "Price: $375,000",
+        "es": "Precio: $375,000"
+      },
+      {
+        "en": "Listed by RE/MAX ELITE",
+        "es": "Listado por RE/MAX ELITE"
+      }
+    ],
+    "lat": 13.3333,
+    "lng": -88.5,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Tecapán, Usulután",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3090,
+    "tokens_out": 392,
+    "cost_usd": 0.0012655,
+    "finish_reason": "stop",
+    "latency_ms": 3184
+  },
+  "realestate_au_sv|lotificacion-yaguatique-canton-elprogreso-san-miguel-san-miguel-san-miguel-san-miguel-310119364471": {
+    "ts": "2026-07-22T06:14:20.008083+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Lotificación Yaguatique, San Miguel",
+      "es": "Terreno en Lotificación Yaguatique, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Lot in Lotificación Yaguatique, Cantón El Progreso, San Miguel. Price: $25,000. No further details provided.",
+      "es": "Lote en Lotificación Yaguatique, Cantón El Progreso, San Miguel. Precio: $25,000. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Price: $25,000",
+        "es": "Precio: $25,000"
+      },
+      {
+        "en": "Located in San Miguel",
+        "es": "Ubicado en San Miguel"
+      },
+      {
+        "en": "Lotificación Yaguatique area",
+        "es": "Área de Lotificación Yaguatique"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3085,
+    "tokens_out": 362,
+    "cost_usd": 0.00123115,
+    "finish_reason": "stop",
+    "latency_ms": 3056
+  },
+  "realestate_au_sv|lotificacion-yaguatique-canton-elprogreso-san-miguel-san-miguel-san-miguel-san-miguel-310109328914": {
+    "ts": "2026-07-22T06:14:20.567437+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Lotificacion Yaguatique, San Miguel",
+      "es": "Terreno en Lotificación Yaguatique, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Lotificacion Yaguatique, Canton El Progreso, San Miguel. Located in the municipality of San Miguel, department of San Miguel. Priced at $25,000.",
+      "es": "Lote en Lotificación Yaguatique, Cantón El Progreso, San Miguel. Ubicado en el municipio de San Miguel, departamento de San Miguel. Precio de $25,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Lotificacion Yaguatique",
+        "es": "Ubicado en Lotificación Yaguatique"
+      },
+      {
+        "en": "Price: $25,000",
+        "es": "Precio: $25,000"
+      },
+      {
+        "en": "Canton El Progreso area",
+        "es": "Área de Cantón El Progreso"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3085,
+    "tokens_out": 392,
+    "cost_usd": 0.00126415,
+    "finish_reason": "stop",
+    "latency_ms": 3266
+  },
+  "realestate_au_sv|porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340881": {
+    "ts": "2026-07-22T06:14:20.606140+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land lot in Jucuarán, Usulután",
+      "es": "Terreno en Jucuarán, Usulután"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Arcos del Espino, Cantón El Espino, Jucuarán, Usulután. 2 lots (251 and 252) in a residential development. Priced at $60,000.",
+      "es": "Porción de terreno en Arcos del Espino, Cantón El Espino, Jucuarán, Usulután. 2 lotes (251 y 252) en lotificación residencial. Precio de $60,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "2 lots in Arcos del Espino",
+        "es": "2 lotes en Arcos del Espino"
+      },
+      {
+        "en": "Residential development location",
+        "es": "Ubicación en lotificación residencial"
+      },
+      {
+        "en": "Priced at $60,000",
+        "es": "Precio de $60,000"
+      }
+    ],
+    "lat": 13.25,
+    "lng": -88.4,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Jucuarán, Usulután, El Salvador",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3112,
+    "tokens_out": 405,
+    "cost_usd": 0.00128574,
+    "finish_reason": "stop",
+    "latency_ms": 3263
+  },
+  "realestate_au_sv|canton-san-jose-la-majada-lote-sin-numero-porcion-4-juayua-sonsonate-norte-sonsonate-juayua-sonsonate-juayua-sonsonate-310119340911": {
+    "ts": "2026-07-22T06:14:20.825105+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Lot in Juayúa, Sonsonate",
+      "es": "Lote de 850 m² en Juayúa, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Flat 850 m² residential lot in Cantón San José La Majada, Juayúa, Sonsonate. Located in a quiet area with road access and nearby utilities. Priced at $250,000.",
+      "es": "Lote residencial plano de 850 m² en Cantón San José La Majada, Juayúa, Sonsonate. Ubicado en zona tranquila con acceso vial y servicios cercanos. Precio de $250,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "850 m² flat lot",
+        "es": "Lote plano de 850 m²"
+      },
+      {
+        "en": "Quiet area in Juayúa",
+        "es": "Zona tranquila en Juayúa"
+      },
+      {
+        "en": "Road access available",
+        "es": "Acceso vial disponible"
+      }
+    ],
+    "lat": 13.8433,
+    "lng": -89.7461,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Juayúa, Sonsonate",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3107,
+    "tokens_out": 387,
+    "cost_usd": 0.00126459,
+    "finish_reason": "stop",
+    "latency_ms": 3201
+  },
+  "realestate_au_sv|blvd-costa-del-sol-km-65-san-luis-la-herradura-los-blancos-la-paz-los-blancos-la-paz-department-310119340860": {
+    "ts": "2026-07-22T06:14:21.106033+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale on Costa del Sol Blvd.",
+      "es": "Terreno en Venta sobre Blvd. Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel on Blvd. Costa del Sol Km 65, Los Blancos, San Luis La Herradura, La Paz. Price: $190,000. Located in a developing area near the coast.",
+      "es": "Terreno sobre Blvd. Costa del Sol Km 65, Los Blancos, San Luis La Herradura, La Paz. Precio: $190,000. Ubicado en zona en desarrollo cerca de la costa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "On Costa del Sol Blvd.",
+        "es": "Sobre Blvd. Costa del Sol"
+      },
+      {
+        "en": "Near beach and amenities",
+        "es": "Cerca de playa y servicios"
+      },
+      {
+        "en": "Good road access",
+        "es": "Buen acceso vial"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3089,
+    "tokens_out": 371,
+    "cost_usd": 0.00124213,
+    "finish_reason": "stop",
+    "latency_ms": 3150
+  },
+  "realestate_au_sv|porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340859": {
+    "ts": "2026-07-22T06:14:21.225283+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land lot in Arcos del Espino, Jucuarán",
+      "es": "Terreno en Arcos del Espino, Jucuarán"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Arcos del Espino, canton El Espino, Jucuarán, Usulután. Lot 251 and 252 portion 1. Priced at $60,000.",
+      "es": "Porción de terreno en Arcos del Espino, cantón El Espino, Jucuarán, Usulután. Lotes 251 y 252 porción 1. Precio de $60,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Arcos del Espino",
+        "es": "Ubicado en Arcos del Espino"
+      },
+      {
+        "en": "Two lots combined",
+        "es": "Dos lotes combinados"
+      },
+      {
+        "en": "Price $60,000",
+        "es": "Precio $60,000"
+      }
+    ],
+    "lat": 13.25,
+    "lng": -88.35,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Jucuarán, Usulután",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3112,
+    "tokens_out": 388,
+    "cost_usd": 0.00126704,
+    "finish_reason": "stop",
+    "latency_ms": 3400
+  },
+  "realestate_au_sv|porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340880": {
+    "ts": "2026-07-22T06:14:22.125594+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land lot in Arcos del Espino, Jucuaran",
+      "es": "Terreno en Arcos del Espino, Jucuaran"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Arcos del Espino, canton El Espino, Jucuaran, Usulutan. Lot 251 and 252, priced at $60,000. Located in a residential development area.",
+      "es": "Porción de terreno en Arcos del Espino, cantón El Espino, Jucuaran, Usulután. Lotes 251 y 252, precio de $60,000. Ubicado en zona de desarrollo residencial."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Two adjacent lots combined",
+        "es": "Dos lotes contiguos combinados"
+      },
+      {
+        "en": "Priced at $60,000 total",
+        "es": "Precio total de $60,000"
+      },
+      {
+        "en": "In gated community Arcos del Espino",
+        "es": "En comunidad cerrada Arcos del Espino"
+      }
+    ],
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Espino, Jucuaran",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3112,
+    "tokens_out": 407,
+    "cost_usd": 0.00128794,
+    "finish_reason": "stop",
+    "latency_ms": 3347
+  },
+  "realestate_au_sv|carretera-panamericana-km-73-hacia-candelaria-la-frontera-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310109311476": {
+    "ts": "2026-07-22T06:14:23.195386+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale on Pan-American Highway, Santa Ana",
+      "es": "Terreno en Venta en Carretera Panamericana, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel on Pan-American Highway km 73 near Candelaria la Frontera, Santa Ana. No built area, bedrooms, or bathrooms. Priced at $2,450,000.",
+      "es": "Terreno en Carretera Panamericana km 73 hacia Candelaria la Frontera, Santa Ana. Sin área construida, habitaciones ni baños. Precio de $2,450,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "On Pan-American Highway, km 73",
+        "es": "Sobre Carretera Panamericana, km 73"
+      },
+      {
+        "en": "Near Candelaria la Frontera",
+        "es": "Cerca de Candelaria la Frontera"
+      },
+      {
+        "en": "Priced at $2,450,000",
+        "es": "Precio de $2,450,000"
+      }
+    ],
+    "lat": 14.031,
+    "lng": -89.557,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3087,
+    "tokens_out": 395,
+    "cost_usd": 0.00126799,
+    "finish_reason": "stop",
+    "latency_ms": 3186
+  },
+  "realestate_au_sv|calle-los-conacastes-lote-19-complejo-turistico-salinitas-3ra-etapa-acajutla-sonsonate-acajutla-sonsonate-acajutla-sonsonate-310109311474": {
+    "ts": "2026-07-22T06:14:23.430112+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Lot in Salinitas, Acajutla",
+      "es": "Lote de 850 m² en Salinitas, Acajutla"
+    },
+    "short_description_canonical": {
+      "en": "Flat 850 m² residential lot in Complejo Turístico Salinitas 3ra. Etapa, Acajutla, Sonsonate. Located on Calle Los Conacastes, lot 19. Paved road access, utilities available, tourist zone with beach proximity.",
+      "es": "Lote residencial plano de 850 m² en Complejo Turístico Salinitas 3ra. Etapa, Acajutla, Sonsonate. Ubicado en Calle Los Conacastes, lote 19. Acceso pavimentado, servicios disponibles, zona turística cercana a la playa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "850 m² flat lot",
+        "es": "Lote plano de 850 m²"
+      },
+      {
+        "en": "Tourist complex with beach access",
+        "es": "Complejo turístico con acceso a playa"
+      },
+      {
+        "en": "Paved road and utilities",
+        "es": "Calle pavimentada y servicios"
+      },
+      {
+        "en": "Acajutla, Sonsonate location",
+        "es": "Ubicación en Acajutla, Sonsonate"
+      }
+    ],
+    "lat": 13.5928,
+    "lng": -89.8275,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Acajutla, Sonsonate",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3104,
+    "tokens_out": 466,
+    "cost_usd": 0.00135068,
+    "finish_reason": "stop",
+    "latency_ms": 3907
+  },
+  "realestate_au_sv|calle-a-portezuelo-juayua-sonsonate-juayua-sonsonate-310100830048": {
+    "ts": "2026-07-22T06:14:23.950849+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Juayua, Sonsonate",
+      "es": "Terreno en Venta en Juayua, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel located on Calle a Portezuelo, Juayua, Sonsonate. The property is a flat lot suitable for development. Price: $175,000.",
+      "es": "Terreno ubicado en Calle a Portezuelo, Juayua, Sonsonate. La propiedad es un lote plano apto para desarrollo. Precio: $175,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Juayua, Sonsonate",
+        "es": "Ubicado en Juayua, Sonsonate"
+      },
+      {
+        "en": "Flat lot for development",
+        "es": "Lote plano para desarrollo"
+      },
+      {
+        "en": "Price: $175,000",
+        "es": "Precio: $175,000"
+      }
+    ],
+    "lat": 13.8431,
+    "lng": -89.7453,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Juayua, Sonsonate",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3078,
+    "tokens_out": 374,
+    "cost_usd": 0.00124246,
+    "finish_reason": "stop",
+    "latency_ms": 3125
+  },
+  "realestate_au_sv|calle-san-roque-lote-s-n-mejicanos-san-salvador-san-salvador-san-salvador-san-salvador-310109311465": {
+    "ts": "2026-07-22T06:14:24.076216+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Lot in Mejicanos, San Salvador",
+      "es": "Lote de 850 m² en Mejicanos, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Flat 850 m² residential lot on Calle San Roque, Mejicanos, San Salvador. Located in a consolidated urban area with access to utilities and public transport. Priced at $49,000, below typical zone rates.",
+      "es": "Lote residencial plano de 850 m² en Calle San Roque, Mejicanos, San Salvador. Ubicado en zona urbana consolidada con acceso a servicios y transporte público. Precio de $49,000, por debajo del promedio de la zona."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "850 m² flat lot",
+        "es": "Lote plano de 850 m²"
+      },
+      {
+        "en": "Urban area with utilities",
+        "es": "Zona urbana con servicios"
+      },
+      {
+        "en": "Below-zone price $49,000",
+        "es": "Precio bajo zona $49,000"
+      }
+    ],
+    "lat": 13.6833,
+    "lng": -89.2167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Mejicanos, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3080,
+    "tokens_out": 411,
+    "cost_usd": 0.0012837,
+    "finish_reason": "stop",
+    "latency_ms": 3469
+  },
+  "remax|003093244031": {
+    "ts": "2026-07-22T06:14:25.285493+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Lot in Golden Lake, Costa del Sol",
+      "es": "Lote Plano en Golden Lake, Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Flat 349.5 m² residential lot in Golden Lake community, Km 65 Costa del Sol Boulevard, San Luis La Herradura. Lot size 500 varas², 15 m frontage, level topography ready for development. Gated community with clubhouse, tennis court, private dock, and access to Hotel Tesoro Beach.",
+      "es": "Lote residencial plano de 349.5 m² en comunidad Golden Lake, Km 65 del Bulevar Costa del Sol, San Luis La Herradura. Tamaño 500 varas², 15 m de frente, topografía nivelada lista para desarrollar. Comunidad cerrada con casa club, cancha de tenis, muelle privado y acceso al Hotel Tesoro Beach."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Comunidad cerrada con seguridad 24/7"
+      },
+      {
+        "en": "Private dock on Jaltepeque Estuary",
+        "es": "Muelle privado en el Estero Jaltepeque"
+      },
+      {
+        "en": "Level lot, ready to build",
+        "es": "Lote nivelado, listo para construir"
+      },
+      {
+        "en": "Access to Hotel Tesoro Beach amenities",
+        "es": "Acceso a amenidades del Hotel Tesoro Beach"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3398,
+    "tokens_out": 497,
+    "cost_usd": 0.00146416,
+    "finish_reason": "stop",
+    "latency_ms": 4059
+  },
+  "remax|002472129101": {
+    "ts": "2026-07-22T06:14:25.792992+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots, La Ceiba Subdivision, Nueva Concepción",
+      "es": "Lotes Residenciales Planos, La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 sq varas (202.73 m²) in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Phase 1 offers 95 lots with individual deeds, water connection, and electricity. Located 1 km from Central Park and across from Turicentro Splash.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas (202.73 m²) en La Ceiba, Nueva Concepción, Chalatenango. Fase 1 ofrece 95 lotes con escrituras individuales, conexión de agua y electricidad. Ubicado a 1 km del Parque Central y frente a Turicentro Splash."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Individual deeds, verified in Land Registry",
+        "es": "Escrituras individuales, verificadas en el Registro"
+      },
+      {
+        "en": "1 km from Central Park, 700 m from Blvd. Arturo Gutiérrez",
+        "es": "1 km del Parque Central, 700 m del Blvd. Arturo Gutiérrez"
+      },
+      {
+        "en": "Water connection with individual meter included",
+        "es": "Conexión de agua con medidor individual incluida"
+      },
+      {
+        "en": "Bank financing available (BFA, FEDECREDITO, ACACYPAC)",
+        "es": "Financiamiento bancario disponible (BFA, FEDECREDITO, ACACYPAC)"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3472,
+    "tokens_out": 539,
+    "cost_usd": 0.00153034,
+    "finish_reason": "stop",
+    "latency_ms": 4686
+  },
+  "remax|002523093004": {
+    "ts": "2026-07-22T06:14:26.025642+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Corner Lot with Volcano Views, Nahuizalco",
+      "es": "Lote Esquinero con Vistas al Volcán, Nahuizalco"
+    },
+    "short_description_canonical": {
+      "en": "Corner lot of 345.77 m² in Quintas Montecristo, Nahuizalco, along the Sonsonate–Santa Ana Highway. Gentle slope, cobblestone streets, water and electricity available. Panoramic views of Izalco Volcano, Acajutla, and the Pacific Ocean.",
+      "es": "Lote esquinero de 345.77 m² en Quintas Montecristo, Nahuizalco, sobre la Carretera Sonsonate–Santa Ana. Pendiente suave, calles adoquinadas, agua y electricidad disponibles. Vistas panorámicas al Volcán de Izalco, Acajutla y el Océano Pacífico."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Corner lot, double frontage",
+        "es": "Lote esquinero, doble frente"
+      },
+      {
+        "en": "Panoramic volcano and ocean views",
+        "es": "Vistas panorámicas al volcán y océano"
+      },
+      {
+        "en": "Water and electricity available",
+        "es": "Agua y electricidad disponibles"
+      },
+      {
+        "en": "Clear title, ready to close",
+        "es": "Título limpio, listo para escriturar"
+      }
+    ],
+    "lat": 13.7833,
+    "lng": -89.7333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nahuizalco, Sonsonate",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3343,
+    "tokens_out": 487,
+    "cost_usd": 0.00143831,
+    "finish_reason": "stop",
+    "latency_ms": 3899
+  },
+  "remax|001462660113": {
+    "ts": "2026-07-22T06:14:27.384642+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 40 in Altos de Las Piletas, Intipucá",
+      "es": "Lote 40 en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "Lot 40, 730 m² (20 m frontage), in Altos de Las Piletas residential development, Intipucá, La Unión. Underground utilities, individual water connection, and recreational areas included. Over 40% of the project dedicated to green and common areas.",
+      "es": "Lote 40, 730 m² (20 m de frente), en el desarrollo residencial Altos de Las Piletas, Intipucá, La Unión. Incluye servicios subterráneos, conexión de agua individual y áreas recreativas. Más del 40% del proyecto dedicado a áreas verdes y comunes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "20 m frontage, 36.51 m depth",
+        "es": "20 m de frente, 36.51 m de fondo"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, La Floresta"
+      },
+      {
+        "en": "Over 40% green and common areas",
+        "es": "Más del 40% áreas verdes y comunes"
+      },
+      {
+        "en": "Security gatehouse and visitor parking",
+        "es": "Caseta de seguridad y estacionamiento para visitantes"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3416,
+    "tokens_out": 539,
+    "cost_usd": 0.00151522,
+    "finish_reason": "stop",
+    "latency_ms": 3954
+  },
+  "remax|001462660114": {
+    "ts": "2026-07-22T06:14:27.706847+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 41 in Altos de Las Piletas, Intipucá",
+      "es": "Lote 41 en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "Lot 41, 834 m² residential lot in Altos de Las Piletas, Intipucá, La Unión. 20 m frontage, 41.72 m depth. Development features underground utilities, security gatehouse, recreational area, and green spaces. Over 40% of project dedicated to common areas.",
+      "es": "Lote 41, lote residencial de 834 m² en Altos de Las Piletas, Intipucá, La Unión. 20 m de frente, 41.72 m de fondo. El desarrollo cuenta con servicios subterráneos, caseta de seguridad, área recreativa y zonas verdes. Más del 40% del proyecto dedicado a áreas comunes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "834 m² lot, 20 m frontage",
+        "es": "Lote de 834 m², 20 m de frente"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y servicios subterráneos"
+      },
+      {
+        "en": "Security gatehouse and visitor parking",
+        "es": "Caseta de seguridad y estacionamiento para visitas"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, Colegio La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, Colegio La Floresta"
+      },
+      {
+        "en": "Over 40% common areas, green zones",
+        "es": "Más del 40% áreas comunes, zonas verdes"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3411,
+    "tokens_out": 561,
+    "cost_usd": 0.00153807,
+    "finish_reason": "stop",
+    "latency_ms": 4511
+  },
+  "remax|001462660112": {
+    "ts": "2026-07-22T06:14:28.160499+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 39 in Altos de Las Piletas, Intipucá",
+      "es": "Lote 39 en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "Lot 39, 742.93 m² residential lot in Altos de Las Piletas, Intipucá, La Unión. 20 m frontage, 37.15 m depth. Gated community with security, underground utilities, and recreational areas. 40% of project dedicated to green spaces.",
+      "es": "Lote 39, 742.93 m² de terreno residencial en Altos de Las Piletas, Intipucá, La Unión. 20 m de frente, 37.15 m de fondo. Comunidad cerrada con seguridad, servicios subterráneos y áreas recreativas. 40% del proyecto dedicado a áreas verdes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "20 m frontage, 37.15 m depth",
+        "es": "20 m de frente, 37.15 m de fondo"
+      },
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Comunidad cerrada con seguridad 24/7"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y servicios subterráneos"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, Colegio La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, Colegio La Floresta"
+      },
+      {
+        "en": "Over 40% green and recreational areas",
+        "es": "Más del 40% áreas verdes y recreativas"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3409,
+    "tokens_out": 557,
+    "cost_usd": 0.00153313,
+    "finish_reason": "stop",
+    "latency_ms": 4378
+  },
+  "remax|001462660110": {
+    "ts": "2026-07-22T06:14:28.404610+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 34 in Altos de Las Piletas, Comasagua",
+      "es": "Lote 34 en Altos de Las Piletas, Comasagua"
+    },
+    "short_description_canonical": {
+      "en": "Lot 34, 993 m² residential lot in Altos de Las Piletas, Km 12.5 road to Comasagua. 8 m frontage, 124.16 m depth. Development includes security gatehouse, recreational area, green zone, underground utilities. Over 40% of project dedicated to green areas.",
+      "es": "Lote 34, lote residencial de 993 m² en Altos de Las Piletas, Km 12.5 carretera a Comasagua. 8 m de frente, 124.16 m de fondo. El desarrollo incluye caseta de seguridad, área recreativa, zona verde, servicios subterráneos. Más del 40% del proyecto dedicado a áreas verdes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "8 m frontage, 124.16 m depth",
+        "es": "8 m de frente, 124.16 m de fondo"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, La Floresta"
+      },
+      {
+        "en": "Over 40% green areas in development",
+        "es": "Más del 40% de áreas verdes en el desarrollo"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3414,
+    "tokens_out": 533,
+    "cost_usd": 0.00150808,
+    "finish_reason": "stop",
+    "latency_ms": 4327
+  },
+  "remax|001462660111": {
+    "ts": "2026-07-22T06:14:28.668969+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 34 in Altos de Las Piletas, Comasagua",
+      "es": "Lote 34 en Altos de Las Piletas, Comasagua"
+    },
+    "short_description_canonical": {
+      "en": "Lot 34, 8.40 m x 104.80 m (approx. 880 m²), in Altos de Las Piletas residential development at Km 12.5 on the road to Comasagua. The development includes underground utilities, security gatehouse, recreational area, and eco-friendly green zone. Each lot has individual water connection rights and requires a septic tank.",
+      "es": "Lote 34, 8.40 m x 104.80 m (aprox. 880 m²), en el desarrollo residencial Altos de Las Piletas en el Km 12.5 carretera a Comasagua. El desarrollo incluye servicios subterráneos, caseta de seguridad, área recreativa y zona verde ecológica. Cada lote tiene derecho individual de conexión de agua potable y requiere tanque séptico."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 12.5 road to Comasagua",
+        "es": "Km 12.5 carretera a Comasagua"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, La Floresta"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Security gatehouse and visitor parking",
+        "es": "Caseta de seguridad y estacionamiento para visitantes"
+      },
+      {
+        "en": "Individual potable water connection rights",
+        "es": "Derechos individuales de conexión de agua potable"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3420,
+    "tokens_out": 587,
+    "cost_usd": 0.0015691,
+    "finish_reason": "stop",
+    "latency_ms": 4717
+  },
+  "remax|001462660109": {
+    "ts": "2026-07-22T06:14:29.572722+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 35 in Altos de Las Piletas, Intipucá",
+      "es": "Lote 35 en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "797 m² residential lot in Altos de Las Piletas, Intipucá, La Unión. Lot 35 has an 8-meter frontage and 99.64-meter depth. The development includes security, underground utilities, and a recreational area.",
+      "es": "Lote residencial de 797 m² en Altos de Las Piletas, Intipucá, La Unión. El lote 35 tiene 8 metros de frente y 99.64 metros de fondo. El desarrollo incluye seguridad, servicios subterráneos y área recreativa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "8m frontage, 99.64m depth lot",
+        "es": "Lote de 8m de frente y 99.64m de fondo"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Security gatehouse and visitor parking",
+        "es": "Caseta de seguridad y estacionamiento para visitantes"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, La Floresta"
+      },
+      {
+        "en": "Over 40% of project dedicated to green areas",
+        "es": "Más del 40% del proyecto dedicado a áreas verdes"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3414,
+    "tokens_out": 534,
+    "cost_usd": 0.00150918,
+    "finish_reason": "stop",
+    "latency_ms": 4286
+  },
+  "remax|001462660108": {
+    "ts": "2026-07-22T06:14:30.675592+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 34 in Altos de Las Piletas, Intipucá",
+      "es": "Lote 34 en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "Lot 34, 704 m² residential lot in Altos de Las Piletas, Intipucá, La Unión. Features 8 m frontage, 88 m depth, underground utilities, and access to recreational areas. Over 40% of the project is dedicated to green and common areas.",
+      "es": "Lote 34, lote residencial de 704 m² en Altos de Las Piletas, Intipucá, La Unión. Cuenta con 8 m de frente, 88 m de fondo, servicios subterráneos y acceso a áreas recreativas. Más del 40% del proyecto está dedicado a áreas verdes y comunes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "704 m² lot, 8 m frontage",
+        "es": "Lote de 704 m², 8 m de frente"
+      },
+      {
+        "en": "Underground utilities included",
+        "es": "Servicios subterráneos incluidos"
+      },
+      {
+        "en": "Close to ESEN and top schools",
+        "es": "Cerca de ESEN y colegios de primer nivel"
+      },
+      {
+        "en": "Over 40% green and common areas",
+        "es": "Más del 40% áreas verdes y comunes"
+      },
+      {
+        "en": "Security gatehouse and visitor parking",
+        "es": "Caseta de seguridad y estacionamiento para visitas"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3415,
+    "tokens_out": 529,
+    "cost_usd": 0.00150395,
+    "finish_reason": "stop",
+    "latency_ms": 4882
+  },
+  "remax|001462660107": {
+    "ts": "2026-07-22T06:14:30.796273+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 31 in Altos de Las Piletas, Comasagua",
+      "es": "Lote 31 en Altos de Las Piletas, Comasagua"
+    },
+    "short_description_canonical": {
+      "en": "Lot 31, 719 m² residential lot in Altos de Las Piletas, Km 12.5 Comasagua road. Features 20.80 m frontage, 34.58 m depth, underground utilities, and individual water rights. Includes access to recreational areas, green zones, and security gatehouse.",
+      "es": "Lote 31, terreno residencial de 719 m² en Altos de Las Piletas, Km 12.5 carretera a Comasagua. Cuenta con 20.80 m de frente, 34.58 m de fondo, servicios subterráneos y derecho individual de agua potable. Incluye acceso a áreas recreativas, zonas verdes y garita de seguridad."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "719 m² lot, 20.80 m frontage",
+        "es": "Lote de 719 m², 20.80 m de frente"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, La Floresta"
+      },
+      {
+        "en": "Security gatehouse and recreational area",
+        "es": "Garita de seguridad y área recreativa"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3419,
+    "tokens_out": 528,
+    "cost_usd": 0.00150393,
+    "finish_reason": "stop",
+    "latency_ms": 4770
+  },
+  "remax|001462660106": {
+    "ts": "2026-07-22T06:14:31.885473+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 25 in Altos de Las Piletas, Intipucá",
+      "es": "Lote 25 en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "Lot 25, 458.85 m² residential lot in Altos de Las Piletas, Intipucá, La Unión. 18.80 m frontage, 34.92 m depth. Development includes security gatehouse, recreational area, green zone, underground utilities, and individual water rights. Over 40% of project dedicated to green areas.",
+      "es": "Lote 25, 458.85 m² de terreno residencial en Altos de Las Piletas, Intipucá, La Unión. 18.80 m de frente, 34.92 m de fondo. El desarrollo incluye garita de seguridad, área recreativa, zona verde, servicios subterráneos y derechos de agua individuales. Más del 40% del proyecto dedicado a áreas verdes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "18.80 m frontage, 34.92 m depth",
+        "es": "18.80 m de frente, 34.92 m de fondo"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Security gatehouse at entrance",
+        "es": "Garita de seguridad en la entrada"
+      },
+      {
+        "en": "Individual potable water connection rights",
+        "es": "Derechos de conexión de agua potable individual"
+      },
+      {
+        "en": "Over 40% of project is green area",
+        "es": "Más del 40% del proyecto es área verde"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3416,
+    "tokens_out": 563,
+    "cost_usd": 0.00154162,
+    "finish_reason": "stop",
+    "latency_ms": 4500
+  },
+  "remax|001462660105": {
+    "ts": "2026-07-22T06:14:32.948091+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 24 in Altos de Las Piletas, 375 m²",
+      "es": "Lote 24 en Altos de Las Piletas, 375 m²"
+    },
+    "short_description_canonical": {
+      "en": "Lot 24, 375 m² residential lot in Altos de Las Piletas, Km 12.5 road to Comasagua, La Libertad. 18 m frontage, 29.83 m depth. Development includes security gatehouse, recreational area, underground utilities, and individual water connection rights. Over 40% of the project dedicated to green and common areas.",
+      "es": "Lote 24, lote residencial de 375 m² en Altos de Las Piletas, Km 12.5 carretera a Comasagua, La Libertad. 18 m de frente, 29.83 m de fondo. El desarrollo incluye garita de seguridad, área recreativa, servicios subterráneos y derechos de conexión de agua individuales. Más del 40% del proyecto dedicado a áreas verdes y comunes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "18 m frontage, 29.83 m depth",
+        "es": "18 m de frente, 29.83 m de fondo"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, La Floresta"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Over 40% green and common areas",
+        "es": "Más del 40% de áreas verdes y comunes"
+      },
+      {
+        "en": "Individual water connection rights included",
+        "es": "Derechos de conexión de agua individuales incluidos"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Unión bay, La Unión department",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3411,
+    "tokens_out": 588,
+    "cost_usd": 0.00156777,
+    "finish_reason": "stop",
+    "latency_ms": 5240
+  },
+  "remax|001462660103": {
+    "ts": "2026-07-22T06:14:33.012187+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 17 in Altos de Las Piletas, 754 m²",
+      "es": "Lote 17 en Altos de Las Piletas, 754 m²"
+    },
+    "short_description_canonical": {
+      "en": "Lot 17, 754 m² residential lot in Altos de Las Piletas, Km 12.5 road to Comasagua. Features 17 m frontage, 44.56 m depth, underground utilities, and access to recreational areas. Over 40% of the project dedicated to green and common areas.",
+      "es": "Lote 17, lote residencial de 754 m² en Altos de Las Piletas, Km 12.5 carretera a Comasagua. Cuenta con 17 m de frente, 44.56 m de fondo, servicios subterráneos y acceso a áreas recreativas. Más del 40% del proyecto dedicado a áreas verdes y comunes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "17 m frontage, 44.56 m depth",
+        "es": "17 m de frente, 44.56 m de fondo"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, La Floresta"
+      },
+      {
+        "en": "Over 40% green and common areas",
+        "es": "Más del 40% áreas verdes y comunes"
+      },
+      {
+        "en": "Security gatehouse and visitor parking",
+        "es": "Caseta de seguridad y estacionamiento para visitantes"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3411,
+    "tokens_out": 555,
+    "cost_usd": 0.00153147,
+    "finish_reason": "stop",
+    "latency_ms": 4607
+  },
+  "remax|001462660104": {
+    "ts": "2026-07-22T06:14:33.176492+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 23 in Altos de Las Piletas, Intipucá",
+      "es": "Lote 23 en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "Lot 23, 358 m² residential lot in Altos de Las Piletas, Intipucá, La Unión. Features 19.45 m frontage, 26.49 m depth, underground utilities, and access to a recreational area. Over 40% of the project is dedicated to green and common areas.",
+      "es": "Lote 23, terreno residencial de 358 m² en Altos de Las Piletas, Intipucá, La Unión. Cuenta con 19.45 m de frente, 26.49 m de fondo, servicios subterráneos y acceso a área recreativa. Más del 40% del proyecto está dedicado a áreas verdes y comunes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "358 m² lot, 19.45 m frontage",
+        "es": "Lote de 358 m², 19.45 m de frente"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Over 40% green and common areas",
+        "es": "Más del 40% áreas verdes y comunes"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, Colegio La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, Colegio La Floresta"
+      },
+      {
+        "en": "Security gatehouse and visitor parking",
+        "es": "Caseta de seguridad y estacionamiento para visitantes"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3418,
+    "tokens_out": 561,
+    "cost_usd": 0.00153996,
+    "finish_reason": "stop",
+    "latency_ms": 5015
+  },
+  "remax|001462660102": {
+    "ts": "2026-07-22T06:14:33.185351+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 13 in Altos de Las Piletas, Comasagua",
+      "es": "Lote 13 en Altos de Las Piletas, Comasagua"
+    },
+    "short_description_canonical": {
+      "en": "769.74 m² residential lot in Altos de Las Piletas, Km 12.5 road to Comasagua. Lot 13 has 18 m frontage and 42.76 m length. Development includes security gatehouse, recreational area, green zone, underground utilities, and individual water connection rights.",
+      "es": "Lote residencial de 769.74 m² en Altos de Las Piletas, Km 12.5 carretera a Comasagua. Lote 13 tiene 18 m de frente y 42.76 m de fondo. El desarrollo incluye garita de seguridad, área recreativa, zona verde, servicios subterráneos y derechos de conexión de agua individual."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "18 m frontage, 42.76 m length",
+        "es": "18 m de frente, 42.76 m de fondo"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Security gatehouse and visitor parking",
+        "es": "Garita de seguridad y estacionamiento para visitantes"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, La Floresta"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3411,
+    "tokens_out": 522,
+    "cost_usd": 0.00149517,
+    "finish_reason": "stop",
+    "latency_ms": 4516
+  },
+  "remax|001462660101": {
+    "ts": "2026-07-22T06:14:33.293864+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 13 in Altos de Las Piletas, Intipucá",
+      "es": "Lote 13 en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "Lot 13, 732.85 m² residential lot in Altos de Las Piletas, Intipucá, La Unión. 10 m frontage, 73.29 m depth. Development includes security gatehouse, recreational area, green zone, underground utilities, and individual water connection rights.",
+      "es": "Lote 13, lote residencial de 732.85 m² en Altos de Las Piletas, Intipucá, La Unión. 10 m de frente, 73.29 m de fondo. El desarrollo incluye garita de seguridad, área recreativa, zona verde, servicios subterráneos y derechos de conexión de agua individual."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "10 m frontage, 73.29 m depth",
+        "es": "10 m de frente, 73.29 m de fondo"
+      },
+      {
+        "en": "Gated community with security gatehouse",
+        "es": "Comunidad cerrada con garita de seguridad"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, Colegio La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, Colegio La Floresta"
+      },
+      {
+        "en": "Individual water connection rights included",
+        "es": "Derechos de conexión de agua individual incluidos"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3411,
+    "tokens_out": 549,
+    "cost_usd": 0.00152487,
+    "finish_reason": "stop",
+    "latency_ms": 3720
+  },
+  "remax|001462660099": {
+    "ts": "2026-07-22T06:14:34.723222+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 2 in Altos de Las Piletas, 685 m²",
+      "es": "Lote 2 en Altos de Las Piletas, 685 m²"
+    },
+    "short_description_canonical": {
+      "en": "Lot 2, 685.58 m² residential lot in Altos de Las Piletas, Km 12.5 road to Comasagua, La Unión. The development offers underground utilities, security gatehouse, and recreational areas. Over 40% of the project is dedicated to green spaces.",
+      "es": "Lote 2, 685.58 m² de terreno residencial en Altos de Las Piletas, Km 12.5 carretera a Comasagua, La Unión. El desarrollo ofrece servicios subterráneos, garita de seguridad y áreas recreativas. Más del 40% del proyecto está dedicado a áreas verdes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "685.58 m² lot, 18 m frontage",
+        "es": "Lote de 685.58 m², 18 m de frente"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Over 40% green and common areas",
+        "es": "Más del 40% de áreas verdes y comunes"
+      },
+      {
+        "en": "Near ESEN, Colegio Lamatepec, La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, La Floresta"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3412,
+    "tokens_out": 518,
+    "cost_usd": 0.00149104,
+    "finish_reason": "stop",
+    "latency_ms": 3926
+  },
+  "remax|001462660100": {
+    "ts": "2026-07-22T06:14:35.589596+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 8 in Altos de Las Piletas, Intipucá",
+      "es": "Lote 8 en Altos de Las Piletas, Intipucá"
+    },
+    "short_description_canonical": {
+      "en": "Lot 8 in Altos de Las Piletas, an exclusive residential development in Intipucá, La Unión. The lot has 8m frontage and 125.18m depth, with 1,001.43 m² of land. Includes underground utilities, security gatehouse, recreational areas, and individual water connection rights.",
+      "es": "Lote 8 en Altos de Las Piletas, un desarrollo residencial exclusivo en Intipucá, La Unión. El lote tiene 8 m de frente y 125.18 m de fondo, con 1,001.43 m² de terreno. Incluye servicios subterráneos, caseta de seguridad, áreas recreativas y derechos de conexión de agua individual."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Exclusive residential development near Comasagua",
+        "es": "Desarrollo residencial exclusivo cerca de Comasagua"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Close to ESEN and top schools",
+        "es": "Cerca de ESEN y colegios de primer nivel"
+      },
+      {
+        "en": "Security gatehouse and recreational areas",
+        "es": "Caseta de seguridad y áreas recreativas"
+      },
+      {
+        "en": "Individual water connection rights included",
+        "es": "Derechos de conexión de agua individual incluidos"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3420,
+    "tokens_out": 544,
+    "cost_usd": 0.0015218,
+    "finish_reason": "stop",
+    "latency_ms": 4913
+  },
+  "remax|00146166103": {
+    "ts": "2026-07-22T06:14:36.236896+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat 250 m² lot near International Airport",
+      "es": "Lote plano de 250 m² cerca del Aeropuerto Internacional"
+    },
+    "short_description_canonical": {
+      "en": "Flat 250 m² lot in San Luis Talpa, La Paz, near the International Airport. Suitable for residential or commercial use with basic services feasibility and main street access. Ideal for a small storage warehouse with option to add more land.",
+      "es": "Lote plano de 250 m² en San Luis Talpa, La Paz, cerca del Aeropuerto Internacional. Apto para uso residencial o comercial con factibilidad de servicios básicos y acceso a calle principal. Ideal para pequeño almacén con opción de agregar más terreno."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat topography, ready to build",
+        "es": "Topografía plana, lista para construir"
+      },
+      {
+        "en": "Near International Airport",
+        "es": "Cerca del Aeropuerto Internacional"
+      },
+      {
+        "en": "Basic services feasibility",
+        "es": "Factibilidad de servicios básicos"
+      },
+      {
+        "en": "Main street access",
+        "es": "Acceso a calle principal"
+      }
+    ],
+    "lat": 13.4667,
+    "lng": -89.0833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Luis Talpa, La Paz",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3137,
+    "tokens_out": 428,
+    "cost_usd": 0.00131779,
+    "finish_reason": "stop",
+    "latency_ms": 3224
+  },
+  "remax|001462660098": {
+    "ts": "2026-07-22T06:14:36.392875+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 1 in Altos de Las Piletas, 682 m²",
+      "es": "Lote 1 en Altos de Las Piletas, 682 m²"
+    },
+    "short_description_canonical": {
+      "en": "Residential lot of 682 m² in Altos de Las Piletas, Km 12.5 road to Comasagua. Lot 1 has 17 m frontage and 40.11 m depth. The development includes security gatehouse, recreational area, green zone, and underground utilities. Over 40% of the project is dedicated to common areas.",
+      "es": "Lote residencial de 682 m² en Altos de Las Piletas, Km 12.5 carretera a Comasagua. Lote 1 tiene 17 m de frente y 40.11 m de fondo. El desarrollo incluye garita de seguridad, área recreativa, zona verde y servicios subterráneos. Más del 40% del proyecto está dedicado a áreas comunes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "17 m frontage, 40.11 m depth",
+        "es": "17 m de frente, 40.11 m de fondo"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Close to ESEN, Colegio Lamatepec, La Floresta",
+        "es": "Cerca de ESEN, Colegio Lamatepec, La Floresta"
+      },
+      {
+        "en": "Over 40% common areas",
+        "es": "Más del 40% de áreas comunes"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3410,
+    "tokens_out": 532,
+    "cost_usd": 0.0015059,
+    "finish_reason": "stop",
+    "latency_ms": 4506
+  },
+  "remax|00146166102": {
+    "ts": "2026-07-22T06:14:36.912904+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat 250 m² lot near International Airport",
+      "es": "Terreno plano 250 m² cerca del Aeropuerto Internacional"
+    },
+    "short_description_canonical": {
+      "en": "Flat 250 m² lot in San Cristóbal, San Luis Talpa, La Paz. Suitable for residential or commercial use with feasibility of basic services and main street access. Ideal for a small storage warehouse, near the International Airport.",
+      "es": "Terreno plano de 250 m² en San Cristóbal, San Luis Talpa, La Paz. Apto para uso residencial o comercial con factibilidad de servicios básicos y acceso a calle principal. Ideal para pequeño almacén, cerca del Aeropuerto Internacional."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat topography, ready to build",
+        "es": "Topografía plana, lista para construir"
+      },
+      {
+        "en": "Basic services feasibility available",
+        "es": "Factibilidad de servicios básicos disponible"
+      },
+      {
+        "en": "Main street access",
+        "es": "Acceso a calle principal"
+      },
+      {
+        "en": "Near International Airport",
+        "es": "Cerca del Aeropuerto Internacional"
+      },
+      {
+        "en": "Expandable with adjacent land",
+        "es": "Ampliable con terreno colindante"
+      }
+    ],
+    "lat": 13.4667,
+    "lng": -89.0833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Luis Talpa, La Paz, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3137,
+    "tokens_out": 458,
+    "cost_usd": 0.00135079,
+    "finish_reason": "stop",
+    "latency_ms": 3736
+  },
+  "remax|002523093003": {
+    "ts": "2026-07-22T06:14:37.213841+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Lot in Golden Lake, Costa del Sol",
+      "es": "Lote plano en Golden Lake, Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Flat 460.63 m² lot in Golden Lake, Costa del Sol, La Paz. Fully registered, free of liens, with two-street frontage. Includes access to artificial lake, dock, clubhouse, tennis court, and 24/7 security. Optional Tesoro Beach Hotel membership for US$80/month.",
+      "es": "Lote plano de 460.63 m² en Golden Lake, Costa del Sol, La Paz. Registrado en CNR, libre de gravámenes, con frente a dos calles. Incluye acceso a lago artificial, muelle, casa club, cancha de tenis y seguridad 24/7. Membresía opcional al Tesoro Beach Hotel por US$80/mes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "One of largest lots in development",
+        "es": "Uno de los lotes más grandes del desarrollo"
+      },
+      {
+        "en": "Two-street frontage for flexible design",
+        "es": "Frente a dos calles para diseño flexible"
+      },
+      {
+        "en": "Resort amenities: lake, dock, clubhouse",
+        "es": "Amenidades resort: lago, muelle, casa club"
+      },
+      {
+        "en": "Fully registered, no liens, ready to build",
+        "es": "Registrado, sin gravámenes, listo para construir"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3367,
+    "tokens_out": 497,
+    "cost_usd": 0.00145579,
+    "finish_reason": "stop",
+    "latency_ms": 4027
+  },
+  "remax|002523757011": {
+    "ts": "2026-07-22T06:14:37.214865+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "740 m² Commercial Lot in Downtown Santa Ana",
+      "es": "Lote comercial de 740 m² en el centro de Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Flat 740 m² commercial lot in downtown Santa Ana, with 17 m frontage and full utilities. Two 50 m² commercial units on site, surrounded by high-traffic businesses. Priced at $425,000, below zone median per m².",
+      "es": "Lote comercial plano de 740 m² en el centro de Santa Ana, con 17 m de frente y servicios completos. Dos unidades comerciales de 50 m² cada una, rodeado de negocios de alto tráfico. Precio de $425,000, por debajo de la mediana de la zona por m²."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "740 m² lot, 17 m frontage",
+        "es": "Lote de 740 m², 17 m de frente"
+      },
+      {
+        "en": "Two 50 m² commercial units included",
+        "es": "Dos unidades comerciales de 50 m² incluidas"
+      },
+      {
+        "en": "Steps from Municipal Market",
+        "es": "A pasos del Mercado Municipal"
+      },
+      {
+        "en": "High pedestrian and vehicle traffic",
+        "es": "Alto tráfico peatonal y vehicular"
+      },
+      {
+        "en": "Below-zone price per m²",
+        "es": "Precio por m² por debajo de la zona"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3367,
+    "tokens_out": 503,
+    "cost_usd": 0.00146239,
+    "finish_reason": "stop",
+    "latency_ms": 4266
+  },
+  "remax|001462845095": {
+    "ts": "2026-07-22T06:14:37.725046+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4 Land Plots on Panamerican Road, Sonsonate",
+      "es": "4 Terrenos sobre Carretera Panamericana, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "4 plots totaling 720 m² (861 varas) on the Panamerican Highway at the entrance to San Julián, Sonsonate, facing the San Julián Dairy Products Factory. The land offers immediate access to the Occident, La Libertad, and San Salvador. Suitable for apartment towers, medical centers, shopping centers, schools, churches, or family residences.",
+      "es": "4 lotes que suman 720 m² (861 varas) sobre la Carretera Panamericana en la entrada a San Julián, Sonsonate, frente a la Fábrica de Productos Lácteos San Julián. El terreno ofrece acceso inmediato al Occidente, La Libertad y San Salvador. Adecuado para torres de apartamentos, centros médicos, centros comerciales, escuelas, iglesias o residencias familiares."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "720 m² total, divisible into 4 plots",
+        "es": "720 m² total, divisible en 4 lotes"
+      },
+      {
+        "en": "Facing San Julián Dairy Factory",
+        "es": "Frente a la Fábrica de Lácteos San Julián"
+      },
+      {
+        "en": "On Panamerican Highway, high visibility",
+        "es": "Sobre Carretera Panamericana, alta visibilidad"
+      },
+      {
+        "en": "Multiple commercial or residential uses",
+        "es": "Múltiples usos comerciales o residenciales"
+      }
+    ],
+    "lat": 13.5833,
+    "lng": -89.5833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Julián, Sonsonate",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3227,
+    "tokens_out": 524,
+    "cost_usd": 0.00144769,
+    "finish_reason": "stop",
+    "latency_ms": 4430
+  },
+  "remax|003284460008": {
+    "ts": "2026-07-22T06:14:38.211065+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "250 m² Lot in Yaguatique, San Miguel",
+      "es": "Lote de 250 m² en Yaguatique, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "250 m² residential lot in Yaguatique subdivision, San Miguel. 5 minutes from Walmart with easy access to shops and services. Priced at $25,000, below zone median.",
+      "es": "Lote residencial de 250 m² en la urbanización Yaguatique, San Miguel. A 5 minutos de Walmart con fácil acceso a comercios y servicios. Precio de $25,000, por debajo de la mediana de la zona."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "5 minutes from Walmart",
+        "es": "A 5 minutos de Walmart"
+      },
+      {
+        "en": "250 m² lot, 10x25 meters",
+        "es": "Lote de 250 m², 10x25 metros"
+      },
+      {
+        "en": "High-appreciation area in San Miguel",
+        "es": "Zona de alta plusvalía en San Miguel"
+      },
+      {
+        "en": "Easy access to shops and transport",
+        "es": "Fácil acceso a comercios y transporte"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3145,
+    "tokens_out": 436,
+    "cost_usd": 0.00132875,
+    "finish_reason": "stop",
+    "latency_ms": 3487
+  },
+  "remax|003284460007": {
+    "ts": "2026-07-22T06:14:39.066699+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "250 m² Lot for Sale in San Miguel",
+      "es": "Lote de 250 m² en Venta en San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "250 m² residential lot in Yaguatique subdivision, San Miguel, 5 minutes from Walmart. Lot measures 10 x 25 meters with easy access to shops and services. Priced at $25,000 in a high-appreciation area.",
+      "es": "Lote residencial de 250 m² en la urbanización Yaguatique, San Miguel, a 5 minutos de Walmart. El lote mide 10 x 25 metros con fácil acceso a tiendas y servicios. Precio de $25,000 en una zona de alta plusvalía."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "5 minutes from Walmart",
+        "es": "A 5 minutos de Walmart"
+      },
+      {
+        "en": "250 m² lot, 10x25 meters",
+        "es": "Lote de 250 m², 10x25 metros"
+      },
+      {
+        "en": "High-appreciation area in San Miguel",
+        "es": "Zona de alta plusvalía en San Miguel"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3136,
+    "tokens_out": 420,
+    "cost_usd": 0.00130872,
+    "finish_reason": "stop",
+    "latency_ms": 3476
+  },
+  "remax|002284175005": {
+    "ts": "2026-07-22T06:14:40.154819+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Premium Lot in Golden Lake, Costa del Sol",
+      "es": "Lote Premium en Golden Lake, Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 649 m² in Golden Lake, Costa del Sol, San Luis La Herradura. Exclusive condominium with private estuary access, dock, tennis court, and artificial lagoon. Includes a complimentary 12-month beach club membership for four at Hotel Tesoro Beach.",
+      "es": "Terreno de 649 m² en Golden Lake, Costa del Sol, San Luis La Herradura. Condominio exclusivo con acceso privado al estero, muelle, cancha de tenis y laguna artificial. Incluye membresía gratuita de 12 meses para cuatro personas al club de playa del Hotel Tesoro Beach."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private estuary access with dock",
+        "es": "Acceso privado al estero con muelle"
+      },
+      {
+        "en": "Tennis court and artificial lagoon",
+        "es": "Cancha de tenis y laguna artificial"
+      },
+      {
+        "en": "Complimentary 12-month beach club membership",
+        "es": "Membresía gratuita de 12 meses al club de playa"
+      },
+      {
+        "en": "928.7 varas² (approx. 776 m²) lot",
+        "es": "Lote de 928.7 varas² (aprox. 776 m²)"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3269,
+    "tokens_out": 486,
+    "cost_usd": 0.00141723,
+    "finish_reason": "stop",
+    "latency_ms": 3761
+  },
+  "remax|002523089031": {
+    "ts": "2026-07-22T06:14:40.298206+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "15-Manana Farm in Gualache, Tecapán, Usulután",
+      "es": "Finca de 15 manzanas en Gualache, Tecapán, Usulután"
+    },
+    "short_description_canonical": {
+      "en": "15-manzana (approx. 104,834 m²) farm in Gualache, Tecapán, Usulután. Fertile soil suitable for agriculture or reforestation, with an inventory of timber trees. Easy access near the main road, ideal for rural development or tourism projects.",
+      "es": "Finca de 15 manzanas (aprox. 104,834 m²) en Gualache, Tecapán, Usulután. Suelo fértil apto para agricultura o reforestación, con inventario de árboles maderables. Fácil acceso cerca de la carretera principal, ideal para desarrollo rural o proyectos turísticos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "15 manzanas (104,834 m²) of land",
+        "es": "15 manzanas (104,834 m²) de terreno"
+      },
+      {
+        "en": "Inventory of timber trees included",
+        "es": "Inventario de árboles maderables incluido"
+      },
+      {
+        "en": "Easy access near main road",
+        "es": "Fácil acceso cerca de carretera principal"
+      },
+      {
+        "en": "Fertile soil for agriculture",
+        "es": "Suelo fértil para agricultura"
+      }
+    ],
+    "lat": 13.4167,
+    "lng": -88.4167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Tecapán, Usulután",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3515,
+    "tokens_out": 507,
+    "cost_usd": 0.00150675,
+    "finish_reason": "stop",
+    "latency_ms": 4060
+  },
+  "remax|002524082017": {
+    "ts": "2026-07-22T06:14:40.336696+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Lot in Playa El Espino, Usulután",
+      "es": "Lote cerca de la playa en Playa El Espino, Usulután"
+    },
+    "short_description_canonical": {
+      "en": "300 m² lot on the third row from the beach in Playa El Espino, Usulután. Walking distance to the shoreline, with easy access to shops and restaurants. Priced at US$60,000 in a high-growth tourism area.",
+      "es": "Lote de 300 m² en la tercera fila de la playa en Playa El Espino, Usulután. A poca distancia caminando de la orilla, con fácil acceso a tiendas y restaurantes. Precio de US$60,000 en una zona turística de alto crecimiento."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "300 m² lot, 10x30 meters",
+        "es": "Lote de 300 m², 10x30 metros"
+      },
+      {
+        "en": "Walking distance to the beach",
+        "es": "A poca distancia de la playa"
+      },
+      {
+        "en": "High-growth tourism area",
+        "es": "Zona turística de alto crecimiento"
+      },
+      {
+        "en": "Near shops and restaurants",
+        "es": "Cerca de tiendas y restaurantes"
+      }
+    ],
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Espino, Usulután",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3244,
+    "tokens_out": 463,
+    "cost_usd": 0.00138518,
+    "finish_reason": "stop",
+    "latency_ms": 3423
+  },
+  "remax|002524082015": {
+    "ts": "2026-07-22T06:14:40.805029+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Lot in Playa El Espino, Usulután",
+      "es": "Lote frente a la playa en Playa El Espino, Usulután"
+    },
+    "short_description_canonical": {
+      "en": "300 m² lot on the third row from the beach in Playa El Espino, Usulután. Walking distance to the shoreline, with easy access to shops and restaurants. Ideal for a beach home or investment in a high-growth area.",
+      "es": "Lote de 300 m² en la tercera fila de la playa en Playa El Espino, Usulután. A poca distancia caminando de la orilla, con fácil acceso a tiendas y restaurantes. Ideal para casa de playa o inversión en zona de alto crecimiento."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "300 m² lot, 10x30 meters",
+        "es": "Lote de 300 m², 10x30 metros"
+      },
+      {
+        "en": "Walking distance to the beach",
+        "es": "A poca distancia caminando de la playa"
+      },
+      {
+        "en": "High-growth tourism area",
+        "es": "Zona turística de alto crecimiento"
+      },
+      {
+        "en": "Near shops and restaurants",
+        "es": "Cerca de tiendas y restaurantes"
+      }
+    ],
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Espino, Jucuarán, Usulután",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3244,
+    "tokens_out": 466,
+    "cost_usd": 0.00138848,
+    "finish_reason": "stop",
+    "latency_ms": 3588
+  },
+  "remax|002524082016": {
+    "ts": "2026-07-22T06:14:40.958821+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Lot in Playa El Espino, Usulután",
+      "es": "Lote frente a la playa en Playa El Espino, Usulután"
+    },
+    "short_description_canonical": {
+      "en": "300 m² lot on the third row from the beach in Playa El Espino, Usulután. Walking distance to shoreline, with easy access to shops and restaurants. Priced at US$60,000 in a high-growth tourism area.",
+      "es": "Lote de 300 m² en la tercera fila de la playa en Playa El Espino, Usulután. A poca distancia caminando de la orilla, con fácil acceso a tiendas y restaurantes. Precio de US$60,000 en una zona turística de alto crecimiento."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "300 m² lot, third row from beach",
+        "es": "Lote de 300 m², tercera fila de la playa"
+      },
+      {
+        "en": "Walking distance to shoreline",
+        "es": "A poca distancia caminando de la orilla"
+      },
+      {
+        "en": "High-growth tourism area",
+        "es": "Zona turística de alto crecimiento"
+      },
+      {
+        "en": "Near local shops and restaurants",
+        "es": "Cerca de tiendas y restaurantes locales"
+      }
+    ],
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Espino, Jucuarán, Usulután",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3244,
+    "tokens_out": 471,
+    "cost_usd": 0.00139398,
+    "finish_reason": "stop",
+    "latency_ms": 3743
+  },
+  "santizo|9574099": {
+    "ts": "2026-07-22T06:14:41.366407+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Casa Bianca: Unique residential community near town center",
+      "es": "Casa Bianca: Comunidad residencial única cerca del town center"
+    },
+    "short_description_canonical": {
+      "en": "Casa Bianca is a residential community designed for tranquility, steps from the town center. Enjoy amenities like restaurants, shopping mall, kids zone, entertainment, clinics, and hospital. This house is part of a unique community.",
+      "es": "Casa Bianca es una comunidad residencial diseñada para la tranquilidad, a pasos del town center. Disfrute de amenidades como restaurantes, centro comercial, zona infantil, entretenimiento, consultorios y hospital. Esta casa es parte de una comunidad única."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Steps from town center amenities",
+        "es": "A pasos de las amenidades del town center"
+      },
+      {
+        "en": "Unique residential community design",
+        "es": "Diseño único de comunidad residencial"
+      },
+      {
+        "en": "Access to restaurants and shopping",
+        "es": "Acceso a restaurantes y centro comercial"
+      },
+      {
+        "en": "Nearby clinics and hospital",
+        "es": "Cerca de consultorios y hospital"
+      }
+    ],
+    "lat": 13.7942,
+    "lng": -88.8965,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Salvador centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3117,
+    "tokens_out": 429,
+    "cost_usd": 0.00131349,
+    "finish_reason": "stop",
+    "latency_ms": 3640
+  },
+  "santizo|9574101": {
+    "ts": "2026-07-22T06:14:41.699481+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury 200 m² Apartment in Costa del Este",
+      "es": "Apartamento de lujo 200 m² en Costa del Este"
+    },
+    "short_description_canonical": {
+      "en": "Luxury apartment of 200 m² in Mirador, Costa del Este, an exclusive area with easy access to schools, supermarkets, and malls. Features views of the central park and green areas. Family-oriented building with children's play areas.",
+      "es": "Apartamento de lujo de 200 m² en Mirador, Costa del Este, zona exclusiva con fácil acceso a colegios, supermercados y centros comerciales. Cuenta con vistas al parque central y áreas verdes. Edificio familiar con áreas de juegos para niños."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "200 m² luxury apartment",
+        "es": "Apartamento de lujo de 200 m²"
+      },
+      {
+        "en": "Exclusive Costa del Este location",
+        "es": "Exclusiva ubicación en Costa del Este"
+      },
+      {
+        "en": "Views of central park",
+        "es": "Vistas al parque central"
+      },
+      {
+        "en": "Family-oriented building",
+        "es": "Edificio orientado a familias"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Este, La Libertad, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": 200.0,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3167,
+    "tokens_out": 447,
+    "cost_usd": 0.00134679,
+    "finish_reason": "stop",
+    "latency_ms": 3487
+  },
+  "santizo|10146235": {
+    "ts": "2026-07-22T06:14:43.066024+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in Residencial Veranda, Santa Tecla",
+      "es": "Casa en Venta en Residencial Veranda, Santa Tecla"
+    },
+    "short_description_canonical": {
+      "en": "House for sale in Residencial Veranda, Santa Tecla. It has a living room, dining room, social bathroom, terrace, service area, two junior bedrooms with shared bathroom, master bedroom with bathroom and closet, and covered parking for two vehicles. Amenities include clubhouse, gym, soccer and basketball courts, green areas, walking paths, playgrounds, and 24/7 security.",
+      "es": "Casa en venta en Residencial Veranda, Santa Tecla. Cuenta con sala, comedor, baño social, terraza, área de servicio, dos habitaciones junior con baño compartido, habitación master con baño y closet, y cochera techada para dos vehículos. Amenidades: casa club, gimnasio, canchas de fútbol y baloncesto, áreas verdes, senderos, juegos infantiles y seguridad 24/7."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Master bedroom with private bath and closet",
+        "es": "Habitación master con baño y closet"
+      },
+      {
+        "en": "Covered parking for two vehicles",
+        "es": "Cochera techada para dos vehículos"
+      },
+      {
+        "en": "Clubhouse, gym, and sports courts",
+        "es": "Casa club, gimnasio y canchas deportivas"
+      },
+      {
+        "en": "24/7 private security with controlled access",
+        "es": "Seguridad privada 24/7 con acceso controlado"
+      }
+    ],
+    "lat": 13.6744,
+    "lng": -89.2794,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": null,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3427,
+    "tokens_out": 547,
+    "cost_usd": 0.00152699,
+    "finish_reason": "stop",
+    "latency_ms": 3998
+  },
+  "santizo|10206110": {
+    "ts": "2026-07-22T06:14:43.910789+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Apartment in Lomas 500, Lomas de San Francisco",
+      "es": "Apartamento en Lomas 500, Lomas de San Francisco"
+    },
+    "short_description_canonical": {
+      "en": "Apartment for sale in Condominio Lomas 500, Lomas de San Francisco. Features 2 junior bedrooms with shared bath, master bedroom with full bath and walk-in closet, living/dining, open kitchen, laundry, social bath, and terrace with panoramic view. Amenities include gym, event hall, coworking, children's play area, and 24/7 security.",
+      "es": "Apartamento en venta en Condominio Lomas 500, Lomas de San Francisco. Cuenta con 2 habitaciones junior con baño compartido, habitación master con baño completo y walking closet, sala-comedor, cocina abierta, lavandería, baño social y terraza con vista panorámica. Amenidades: gimnasio, salón de eventos, coworking, juegos infantiles y seguridad 24/7."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Panoramic terrace view",
+        "es": "Terraza con vista panorámica"
+      },
+      {
+        "en": "Master bedroom with walk-in closet",
+        "es": "Habitación master con walking closet"
+      },
+      {
+        "en": "24/7 security",
+        "es": "Seguridad 24/7"
+      },
+      {
+        "en": "Gym and coworking area",
+        "es": "Gimnasio y área de coworking"
+      }
+    ],
+    "lat": 13.6833,
+    "lng": -89.2333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Lomas de San Francisco, San Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3235,
+    "tokens_out": 511,
+    "cost_usd": 0.00143555,
+    "finish_reason": "stop",
+    "latency_ms": 3755
+  },
+  "encuentra24|32334786": {
+    "ts": "2026-07-22T06:58:34.160136+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury House in Gold Point, Punta Pacifica",
+      "es": "Casa de lujo en Gold Point, Punta Pacífica"
+    },
+    "short_description_canonical": {
+      "en": "Luxurious house for sale in Gold Point, Punta Pacifica, with ocean views. It has 838 m² of construction on a 1,185 m² lot, with 4 bedrooms, 4.5 bathrooms, and 5 parking spaces. Includes private pool, gym, office, and service quarters.",
+      "es": "Lujosa casa en venta en Gold Point, Punta Pacífica, con vista al mar. Cuenta con 838 m² de construcción en un terreno de 1,185 m², 4 recámaras, 4.5 baños y 5 estacionamientos. Incluye piscina privada, gimnasio, oficina y cuarto de servicio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Ocean view from Gold Point",
+        "es": "Vista al mar desde Gold Point"
+      },
+      {
+        "en": "838 m² built on 1,185 m² lot",
+        "es": "838 m² construidos en 1,185 m² de terreno"
+      },
+      {
+        "en": "Private pool and gym",
+        "es": "Piscina privada y gimnasio"
+      },
+      {
+        "en": "5 parking spaces",
+        "es": "5 estacionamientos"
+      },
+      {
+        "en": "4 bedrooms plus office and study",
+        "es": "4 recámaras más oficina y estudio"
+      }
+    ],
+    "lat": 8.9833,
+    "lng": -79.5167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Punta Pacífica, Panama City",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.5,
+      "built_area_m2": 838.0,
+      "parking_spaces": 5,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2417,
+    "tokens_out": 528,
+    "cost_usd": 0.00123339,
+    "finish_reason": "stop",
+    "latency_ms": 4065
+  },
+  "encuentra24|32019451": {
+    "ts": "2026-07-22T06:58:34.219922+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront House in Bristol, Buenaventura",
+      "es": "Casa frente a la laguna en Bristol, Buenaventura"
+    },
+    "short_description_canonical": {
+      "en": "400 m² two-story house in Bristol, Buenaventura, 1h40 from Panama City. 4 bedrooms each with private bath, plus guest bath and service quarters. Furnished, with pool, BBQ area, and 2 parking spaces.",
+      "es": "Casa de 400 m² en dos niveles en Bristol, Buenaventura, a 1h40 de Ciudad de Panamá. 4 recámaras cada una con baño privado, más baño de visitas y cuarto de servicio. Amueblada, con piscina, área de BBQ y 2 estacionamientos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "400 m² built, 4 bedrooms",
+        "es": "400 m² construidos, 4 recámaras"
+      },
+      {
+        "en": "Furnished with pool and BBQ",
+        "es": "Amueblada con piscina y BBQ"
+      },
+      {
+        "en": "1h40 from Panama City",
+        "es": "1h40 de Ciudad de Panamá"
+      },
+      {
+        "en": "Golf, marina, resort access",
+        "es": "Acceso a golf, marina, resort"
+      }
+    ],
+    "lat": 8.3333,
+    "lng": -79.8333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bristol, Buenaventura, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 5.5,
+      "built_area_m2": 400.0,
+      "parking_spaces": 2,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2488,
+    "tokens_out": 480,
+    "cost_usd": 0.00119976,
+    "finish_reason": "stop",
+    "latency_ms": 4125
+  },
+  "encuentra24|32726711": {
+    "ts": "2026-07-22T06:58:34.227727+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Modern Beach House in Río Hato, Playa Blanca",
+      "es": "Casa de Playa Moderna en Río Hato, Playa Blanca"
+    },
+    "short_description_canonical": {
+      "en": "Modern beach house on 1,883 m² lot with 355 m² construction in Río Hato, Playa Blanca, next to Buenaventura. 2 bedrooms, 3.5 bathrooms, heated pool, BBQ area, fully furnished with appliances, alarm, sound system, backup generator. Gated community with direct beach access 500 meters away.",
+      "es": "Casa de playa moderna en lote de 1,883 m² con 355 m² de construcción en Río Hato, Playa Blanca, junto a Buenaventura. 2 recámaras, 3.5 baños, piscina climatizada, área de BBQ, completamente amoblada con línea blanca, alarma, sonido integrado, planta eléctrica. Complejo cerrado con acceso directo a la playa a 500 metros."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Heated pool and BBQ area",
+        "es": "Piscina climatizada y área de BBQ"
+      },
+      {
+        "en": "Fully furnished with appliances",
+        "es": "Completamente amoblada con línea blanca"
+      },
+      {
+        "en": "Gated community, beach 500 m",
+        "es": "Complejo cerrado, playa a 500 m"
+      },
+      {
+        "en": "Backup generator and alarm",
+        "es": "Planta eléctrica y alarma"
+      }
+    ],
+    "lat": 8.3833,
+    "lng": -80.0,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Río Hato, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 2,
+      "bathrooms": 3.5,
+      "built_area_m2": 355.0,
+      "parking_spaces": 3,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2621,
+    "tokens_out": 525,
+    "cost_usd": 0.00128517,
+    "finish_reason": "stop",
+    "latency_ms": 4131
+  },
+  "encuentra24|32661936": {
+    "ts": "2026-07-22T06:58:34.404466+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Furnished 4BR House Near Beach, Bejuco",
+      "es": "Casa Amueblada 4H Cerca Playa, Bejuco"
+    },
+    "short_description_canonical": {
+      "en": "Furnished 4-bedroom, 5-bathroom house with 340 m² built area on two lots in a gated community near Bejuco, Chame. Features include guest house, pool, jacuzzi, gazebo, covered parking, and tropical landscaping. Located close to Punta Chame corridor with community amenities.",
+      "es": "Casa amueblada de 4 habitaciones y 5 baños con 340 m² construidos sobre dos lotes en residencial cerrado cerca de Bejuco, Chame. Cuenta con casa de huéspedes, piscina, jacuzzi, gazebo, estacionamiento cubierto y jardín tropical. Ubicada cerca del corredor hacia Punta Chame con amenidades comunitarias."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Furnished, 4 bedrooms, 5 baths",
+        "es": "Amueblada, 4 habitaciones, 5 baños"
+      },
+      {
+        "en": "Guest house, pool, jacuzzi, gazebo",
+        "es": "Casa de huéspedes, piscina, jacuzzi, gazebo"
+      },
+      {
+        "en": "Gated community near Punta Chame",
+        "es": "Residencial cerrado cerca de Punta Chame"
+      }
+    ],
+    "lat": 8.5167,
+    "lng": -79.8667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Punta Chame, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 5.0,
+      "built_area_m2": 340.0,
+      "parking_spaces": 1,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2609,
+    "tokens_out": 505,
+    "cost_usd": 0.00125993,
+    "finish_reason": "stop",
+    "latency_ms": 4308
+  },
+  "encuentra24|32664152": {
+    "ts": "2026-07-22T06:58:34.736220+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Furnished House in Playa Dorada, Vista Alegre",
+      "es": "Casa Amoblada en Playa Dorada, Vista Alegre"
+    },
+    "short_description_canonical": {
+      "en": "House for sale in Playa Dorada, Vista Alegre, on a 200 m² lot with 110 m² built. 3 bedrooms, 2 bathrooms, terrace, laundry, 2 covered parking, garden. Sold furnished with A/C. Gated community with pool, social areas, parks, sports courts, lake, beach club, gym, restaurants, and commercial area with supermarket.",
+      "es": "Casa en venta en Playa Dorada, Vista Alegre, en lote de 200 m² con 110 m² construidos. 3 habitaciones, 2 baños, terraza, lavandería, 2 estacionamientos cubiertos, jardín. Se vende amoblada con aires acondicionados. Residencial con garita, piscina, áreas sociales, parques, canchas, lago, club de playa, gimnasio, restaurantes y zona comercial con supermercado."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Furnished with A/C included",
+        "es": "Amoblada con aires acondicionados incluidos"
+      },
+      {
+        "en": "Gated community with pool and amenities",
+        "es": "Residencial con garita, piscina y amenidades"
+      },
+      {
+        "en": "3 bedrooms, 2 bathrooms, 110 m² built",
+        "es": "3 habitaciones, 2 baños, 110 m² construidos"
+      },
+      {
+        "en": "2 covered parking spaces",
+        "es": "2 estacionamientos cubiertos"
+      },
+      {
+        "en": "On-site commercial area with supermarket",
+        "es": "Zona comercial interna con supermercado"
+      }
+    ],
+    "lat": 8.3833,
+    "lng": -82.3333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Dorada, Vista Alegre, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 110.0,
+      "parking_spaces": 2,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2380,
+    "tokens_out": 594,
+    "cost_usd": 0.001296,
+    "finish_reason": "stop",
+    "latency_ms": 4640
+  },
+  "encuentra24|32683066": {
+    "ts": "2026-07-22T06:58:34.740320+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Buenaventura Riverfront House with Pool, 4BR",
+      "es": "Casa frente al río en Buenaventura con piscina, 4 hab"
+    },
+    "short_description_canonical": {
+      "en": "House in Buenaventura, a private Pacific beach community, with 353 m² total built area. Features 4 bedrooms, 4.5 bathrooms, 2 parking spaces, pool, BBQ station, and 34 m² covered terrace plus 75 m² terrace with pool. Includes maid's quarters and bath.",
+      "es": "Casa en Buenaventura, comunidad privada de playa en el Pacífico, con 353 m² de área total construida. Cuenta con 4 recámaras, 4.5 baños, 2 estacionamientos, piscina, estación BBQ, terraza techada de 34 m² y terraza con piscina de 75 m². Incluye cuarto y baño de servicio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Riverfront location in Buenaventura",
+        "es": "Ubicación frente al río en Buenaventura"
+      },
+      {
+        "en": "Private pool and BBQ station",
+        "es": "Piscina privada y estación BBQ"
+      },
+      {
+        "en": "Exclusive Pacific beach community",
+        "es": "Comunidad privada de playa en el Pacífico"
+      },
+      {
+        "en": "4 bedrooms plus maid's quarters",
+        "es": "4 recámaras más cuarto de servicio"
+      },
+      {
+        "en": "2 parking spaces with visitor parking",
+        "es": "2 estacionamientos con visitas"
+      }
+    ],
+    "lat": 8.0,
+    "lng": -80.0,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Buenaventura, Pacific coast of Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.5,
+      "built_area_m2": 353.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2502,
+    "tokens_out": 552,
+    "cost_usd": 0.00128274,
+    "finish_reason": "stop",
+    "latency_ms": 4647
+  },
+  "encuentra24|32605504": {
+    "ts": "2026-07-22T06:58:37.458184+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3-Bed Beach House in Ocean Villas, San Carlos",
+      "es": "Casa de Playa 3 Hab en Ocean Villas, San Carlos"
+    },
+    "short_description_canonical": {
+      "en": "House of 668 m² in Ocean Villas, San Carlos, a private community near the beach. 3 bedrooms each with private bath, open kitchen, large terrace, private pool, and 2 parking spaces. Fully furnished and turnkey, with quality finishes.",
+      "es": "Casa de 668 m² en Ocean Villas, San Carlos, comunidad privada cerca de la playa. 3 recámaras cada una con baño privado, cocina abierta, amplia terraza, piscina privada y 2 estacionamientos. Totalmente amoblada y llave en mano, con acabados de calidad."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private pool and gardens",
+        "es": "Piscina privada y jardines"
+      },
+      {
+        "en": "Fully furnished, turnkey",
+        "es": "Totalmente amoblada, llave en mano"
+      },
+      {
+        "en": "3 bedrooms with private baths",
+        "es": "3 recámaras con baño privado"
+      }
+    ],
+    "lat": 8.4833,
+    "lng": -80.0,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Carlos, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": 668.0,
+      "parking_spaces": 2,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2540,
+    "tokens_out": 442,
+    "cost_usd": 0.001172,
+    "finish_reason": "stop",
+    "latency_ms": 3297
+  },
+  "encuentra24|32067657": {
+    "ts": "2026-07-22T06:58:37.480744+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3-Bedroom House for Sale in Villa Lucre",
+      "es": "Casa en Venta en Villa Lucre, 3 Dormitorios"
+    },
+    "short_description_canonical": {
+      "en": "Single-family home for sale in Villa Lucre, a residential area with easy access to services and main roads. The 148 m² house has 3 bedrooms, 1 bathroom, and parking for 3 cars. Ready to move in with potential for future improvements.",
+      "es": "Casa unifamiliar en venta en Villa Lucre, zona residencial con fácil acceso a servicios y vías principales. La vivienda de 148 m² tiene 3 dormitorios, 1 baño y estacionamiento para 3 autos. Lista para habitar con potencial para futuras mejoras."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "148 m² built area",
+        "es": "148 m² de área construida"
+      },
+      {
+        "en": "3 parking spaces",
+        "es": "3 espacios de estacionamiento"
+      },
+      {
+        "en": "Residential zone with easy access",
+        "es": "Zona residencial con fácil acceso"
+      }
+    ],
+    "lat": 9.038,
+    "lng": -79.463,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Villa Lucre, Panama City",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 1.0,
+      "built_area_m2": 148.0,
+      "parking_spaces": 3,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2593,
+    "tokens_out": 426,
+    "cost_usd": 0.00116871,
+    "finish_reason": "stop",
+    "latency_ms": 3252
+  },
+  "encuentra24|31811612": {
+    "ts": "2026-07-22T06:58:38.127520+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury Villa in Sanctuary Garden, Playa Venao",
+      "es": "Villa de lujo en Sanctuary Garden, Playa Venao"
+    },
+    "short_description_canonical": {
+      "en": "Private luxury villa in Sanctuary Garden, Playa Venao. 370 m² living space with 6m ceilings on a 2,800 m² lot. 3 bedrooms, 4 bathrooms, 50 m² studio, pool, 4 parking spaces. 12 minutes from Playa Venao.",
+      "es": "Villa privada de lujo en Sanctuary Garden, Playa Venao. 370 m² de espacio habitable con techos de 6 m en un lote de 2,800 m². 3 habitaciones, 4 baños, estudio de 50 m², piscina, 4 estacionamientos. A 12 minutos de Playa Venao."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "370 m² living, 6m ceilings",
+        "es": "370 m² habitables, techos de 6 m"
+      },
+      {
+        "en": "2,800 m² lot with pool",
+        "es": "Lote de 2,800 m² con piscina"
+      },
+      {
+        "en": "12 minutes from Playa Venao",
+        "es": "12 minutos de Playa Venao"
+      },
+      {
+        "en": "50 m² independent studio",
+        "es": "Estudio independiente de 50 m²"
+      },
+      {
+        "en": "Uninterrupted views to Isla Cañas",
+        "es": "Vistas ininterrumpidas a Isla Cañas"
+      }
+    ],
+    "lat": 7.3983,
+    "lng": -80.1489,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Venao, Panama",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 4.0,
+      "built_area_m2": 370.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2455,
+    "tokens_out": 543,
+    "cost_usd": 0.00126015,
+    "finish_reason": "stop",
+    "latency_ms": 3907
+  },
+  "encuentra24|31517972": {
+    "ts": "2026-07-22T06:58:38.434857+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lakefront Villa in Buenaventura, 3BR, 287m²",
+      "es": "Villa frente al lago en Buenaventura, 3 hab, 287m²"
+    },
+    "short_description_canonical": {
+      "en": "Single-level villa of 287 m² built on a 1,251 m² lakefront lot in Buenaventura, Río Hato, Coclé. 3 bedrooms, 4 bathrooms, private garden with lake views. Located within an exclusive beach and golf community with 24/7 security, golf course, and resort amenities.",
+      "es": "Villa de un solo nivel de 287 m² construidos en un terreno frente al lago de 1,251 m² en Buenaventura, Río Hato, Coclé. 3 recámaras, 4 baños, jardín privado con vistas al lago. Ubicada en una comunidad exclusiva de playa y golf con seguridad 24/7, campo de golf y amenidades de resort."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Lakefront lot, 1,251 m²",
+        "es": "Terreno frente al lago, 1,251 m²"
+      },
+      {
+        "en": "Exclusive Buenaventura community",
+        "es": "Comunidad exclusiva Buenaventura"
+      },
+      {
+        "en": "Jack Nicklaus golf course access",
+        "es": "Acceso a campo de golf Jack Nicklaus"
+      },
+      {
+        "en": "24/7 security and gated",
+        "es": "Seguridad 24/7 y acceso controlado"
+      },
+      {
+        "en": "Single-level, 287 m² built",
+        "es": "Un solo nivel, 287 m² construidos"
+      }
+    ],
+    "lat": 8.3167,
+    "lng": -80.1167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Buenaventura, Río Hato, Coclé",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 4.0,
+      "built_area_m2": 287.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2560,
+    "tokens_out": 565,
+    "cost_usd": 0.0013127,
+    "finish_reason": "stop",
+    "latency_ms": 4030
   }
 }
