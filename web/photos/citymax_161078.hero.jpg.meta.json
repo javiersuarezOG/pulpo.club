@@ -6,12 +6,12 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-07-10T07:15:56.450603+00:00",
+  "computed_at": "2026-07-22T06:21:07.958524+00:00",
   "derivative_width": 754,
   "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
-  "has_marketing_overlay": null,
+  "has_marketing_overlay": false,
   "winning_url": "https://api.obriencrm.com/assets/images/fotos-destacados/0be090d35f36dcff3d63dc0540856890.png",
-  "candidate_count": 2
+  "candidate_count": 4
 }
