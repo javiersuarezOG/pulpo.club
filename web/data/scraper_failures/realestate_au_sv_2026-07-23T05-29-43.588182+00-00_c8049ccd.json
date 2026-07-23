@@ -1,0 +1,18 @@
+{
+  "failure_id": "c8049ccd",
+  "source": "realestate_au_sv",
+  "ts": "2026-07-23T05:29:43.588182+00:00",
+  "kind": "exception",
+  "exception": {
+    "class": "ReadTimeout",
+    "module": "httpx",
+    "repr": "ReadTimeout('The read operation timed out')",
+    "message": "The read operation timed out"
+  },
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 150.6,
+    "offline": false
+  }
+}
