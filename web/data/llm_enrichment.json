@@ -129369,5 +129369,657 @@
     "cost_usd": 0.0013127,
     "finish_reason": "stop",
     "latency_ms": 4030
+  },
+  "csbr|venta-terreno-en-residencial-las-luces-zaragoza-2": {
+    "ts": "2026-07-23T06:23:25.354408+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Residential Lot Las Luces Zaragoza",
+      "es": "Terreno Residencial Las Luces Zaragoza"
+    },
+    "short_description_canonical": {
+      "en": "Residential lot in Las Luces, Zaragoza, La Libertad. Flat terrain with road access and utilities available. Priced at $155,000.",
+      "es": "Terreno residencial en Las Luces, Zaragoza, La Libertad. Terreno plano con acceso vial y servicios disponibles. Precio de $155,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Residential zone Las Luces",
+        "es": "Zona residencial Las Luces"
+      },
+      {
+        "en": "Flat terrain, road access",
+        "es": "Terreno plano, acceso vial"
+      },
+      {
+        "en": "Utilities available on site",
+        "es": "Servicios disponibles en el lugar"
+      }
+    ],
+    "lat": 13.5833,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Zaragoza, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3071,
+    "tokens_out": 359,
+    "cost_usd": 0.00122407,
+    "finish_reason": "stop",
+    "latency_ms": 3212
+  },
+  "remax|003093518032": {
+    "ts": "2026-07-23T06:23:26.103469+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Residential Lot in Ahuachapán, 2,726 m²",
+      "es": "Lote Residencial en Ahuachapán, 2,726 m²"
+    },
+    "short_description_canonical": {
+      "en": "2,726 m² residential lot in a private area 5 minutes from El Arco Durán, Ahuachapán. The lot has underground electricity, water feasibility, and mountain views. Located on a working coffee farm with 24-hour security and trash collection.",
+      "es": "Lote residencial de 2,726 m² en zona privada a 5 minutos de El Arco Durán, Ahuachapán. Cuenta con electricidad subterránea, factibilidad de agua y vistas a la montaña. Ubicado en una finca cafetalera activa con seguridad 24 horas y recolección de basura."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "5 min from El Arco Durán",
+        "es": "5 min de El Arco Durán"
+      },
+      {
+        "en": "Underground electricity and water feasibility",
+        "es": "Electricidad subterránea y factibilidad de agua"
+      },
+      {
+        "en": "24-hour security and trash collection",
+        "es": "Seguridad 24 horas y recolección de basura"
+      },
+      {
+        "en": "Views of Ilamatepec mountain range",
+        "es": "Vistas a la cordillera de Ilamatepec"
+      },
+      {
+        "en": "On a working coffee farm with timber trees",
+        "es": "En finca cafetalera activa con árboles maderables"
+      }
+    ],
+    "lat": 13.921,
+    "lng": -89.845,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ahuachapán municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3240,
+    "tokens_out": 526,
+    "cost_usd": 0.0014534,
+    "finish_reason": "stop",
+    "latency_ms": 3961
+  },
+  "remax|001462657085": {
+    "ts": "2026-07-23T06:23:26.310612+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3,238-vara lot in Nejapa industrial zone",
+      "es": "Lote de 3,238 varas en zona industrial de Nejapa"
+    },
+    "short_description_canonical": {
+      "en": "3,238-vara (2,263 m²) lot for sale in Nejapa, San Salvador, on the highway connecting Nejapa and Quezaltepeque. Second-row location meters from Coca-Cola facility, ideal for industrial warehouses, logistics centers, or offices. Priced at $265,000 in a fast-growing area with high demand.",
+      "es": "Lote de 3,238 varas (2,263 m²) en venta en Nejapa, San Salvador, sobre la carretera que conecta Nejapa y Quezaltepeque. Ubicación de segunda fila a metros de la planta de Coca-Cola, ideal para bodegas industriales, centros logísticos u oficinas. Precio de $265,000 en zona de alto crecimiento y demanda."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3,238-vara lot (2,263 m²)",
+        "es": "Lote de 3,238 varas (2,263 m²)"
+      },
+      {
+        "en": "Meters from Coca-Cola facility",
+        "es": "A metros de la planta de Coca-Cola"
+      },
+      {
+        "en": "Highway frontage, easy access",
+        "es": "Frente a carretera, fácil acceso"
+      },
+      {
+        "en": "Fast-growing industrial area",
+        "es": "Zona industrial en rápido crecimiento"
+      }
+    ],
+    "lat": 13.8167,
+    "lng": -89.2333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nejapa municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3263,
+    "tokens_out": 504,
+    "cost_usd": 0.00143541,
+    "finish_reason": "stop",
+    "latency_ms": 4168
+  },
+  "remax|003093518033": {
+    "ts": "2026-07-23T06:23:26.426819+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3354 m² lot in Ahuachapán, mountain views",
+      "es": "Terreno de 3354 m² en Ahuachapán, vista montaña"
+    },
+    "short_description_canonical": {
+      "en": "Flat 3354.7 m² residential lot in a private area 5 min from El Arco Durán, Ahuachapán. Underground electricity, water feasibility, 24-hour security, trash collection. Located on an active coffee farm with oak and cypress trees, views of the Ilamatepec mountain range.",
+      "es": "Terreno residencial plano de 3354.7 m² en zona privada a 5 min de El Arco Durán, Ahuachapán. Electricidad subterránea, factibilidad de agua, seguridad 24 horas, recolección de basura. Ubicado en cafetal activo con robles y cipreses, vista a la cordillera Ilamatepec."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "5 min from El Arco Durán",
+        "es": "5 min de El Arco Durán"
+      },
+      {
+        "en": "Underground electricity and water feasibility",
+        "es": "Electricidad subterránea y factibilidad de agua"
+      },
+      {
+        "en": "24-hour security and trash collection",
+        "es": "Seguridad 24 horas y recolección de basura"
+      },
+      {
+        "en": "Views of Ilamatepec mountain range",
+        "es": "Vista a la cordillera Ilamatepec"
+      },
+      {
+        "en": "On active coffee farm with timber trees",
+        "es": "En cafetal activo con árboles maderables"
+      }
+    ],
+    "lat": 13.9213,
+    "lng": -89.8453,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ahuachapán municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3240,
+    "tokens_out": 542,
+    "cost_usd": 0.001471,
+    "finish_reason": "stop",
+    "latency_ms": 4284
+  },
+  "remax|002684209008": {
+    "ts": "2026-07-23T06:23:28.205401+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "298 m² Lot in El Portezuelo, Santa Ana",
+      "es": "Lote de 298 m² en El Portezuelo, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Flat 298.26 m² residential lot in El Portezuelo, Santa Ana, behind T.U.D.O. and MC El Brasil. Water and electricity available for connection, not yet installed. Three minutes from Mall Las Ramblas.",
+      "es": "Lote residencial plano de 298.26 m² en El Portezuelo, Santa Ana, detrás de T.U.D.O. y MC El Brasil. Agua y electricidad disponibles para conexión, aún no instaladas. A tres minutos del Mall Las Ramblas."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "298.26 m² flat lot",
+        "es": "Lote plano de 298.26 m²"
+      },
+      {
+        "en": "Utilities available for connection",
+        "es": "Servicios disponibles para conexión"
+      },
+      {
+        "en": "Near shopping, schools, restaurants",
+        "es": "Cerca de centros comerciales, escuelas, restaurantes"
+      },
+      {
+        "en": "Three minutes from Mall Las Ramblas",
+        "es": "A tres minutos del Mall Las Ramblas"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Portezuelo, Santa Ana",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3219,
+    "tokens_out": 450,
+    "cost_usd": 0.00136413,
+    "finish_reason": "stop",
+    "latency_ms": 3305
+  },
+  "remax|002684209007": {
+    "ts": "2026-07-23T06:23:28.459108+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "298 m² Lot in El Portezuelo, Santa Ana",
+      "es": "Terreno de 298 m² en El Portezuelo, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Flat 298.26 m² residential lot in El Portezuelo, Santa Ana, behind T.U.D.O. and MC El Brasil. Water and electricity available for connection. Three minutes from Mall Las Ramblas.",
+      "es": "Terreno residencial plano de 298.26 m² en El Portezuelo, Santa Ana, detrás de T.U.D.O. y MC El Brasil. Agua y electricidad disponibles para conexión. A tres minutos del Mall Las Ramblas."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "298.26 m² flat lot",
+        "es": "Terreno plano de 298.26 m²"
+      },
+      {
+        "en": "Utilities available for connection",
+        "es": "Servicios disponibles para conexión"
+      },
+      {
+        "en": "Near shopping and schools",
+        "es": "Cerca de centros comerciales y escuelas"
+      },
+      {
+        "en": "Three minutes from Mall Las Ramblas",
+        "es": "A tres minutos del Mall Las Ramblas"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5598,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Portezuelo, Santa Ana, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3219,
+    "tokens_out": 439,
+    "cost_usd": 0.00135203,
+    "finish_reason": "stop",
+    "latency_ms": 3141
+  },
+  "remax|002684209006": {
+    "ts": "2026-07-23T06:23:28.510194+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "298 m² Lot in El Portezuelo, Santa Ana",
+      "es": "Lote de 298 m² en El Portezuelo, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Flat 298.26 m² residential lot in El Portezuelo, Santa Ana, behind T.U.D.O. and MC El Brasil. Water and electricity available for connection, not yet installed. Three minutes from Mall Las Ramblas.",
+      "es": "Lote residencial plano de 298.26 m² en El Portezuelo, Santa Ana, detrás de T.U.D.O. y MC El Brasil. Agua y electricidad disponibles para conexión, aún no instaladas. A tres minutos del Mall Las Ramblas."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "298.26 m² flat lot",
+        "es": "Lote plano de 298.26 m²"
+      },
+      {
+        "en": "Utilities available for connection",
+        "es": "Servicios disponibles para conexión"
+      },
+      {
+        "en": "3 minutes from Mall Las Ramblas",
+        "es": "A 3 minutos del Mall Las Ramblas"
+      },
+      {
+        "en": "Easy access to shopping and schools",
+        "es": "Fácil acceso a centros comerciales y escuelas"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Portezuelo, Santa Ana",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3217,
+    "tokens_out": 450,
+    "cost_usd": 0.00136359,
+    "finish_reason": "stop",
+    "latency_ms": 3155
+  },
+  "remax|002684209005": {
+    "ts": "2026-07-23T06:23:29.526891+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "298 m² Lot in El Portezuelo, Santa Ana",
+      "es": "Terreno de 298 m² en El Portezuelo, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Flat 298.26 m² residential lot in El Portezuelo, Santa Ana, three minutes from Mall Las Ramblas. Water and electricity available for connection. Priced at $35,000, below zone median per m².",
+      "es": "Terreno residencial plano de 298.26 m² en El Portezuelo, Santa Ana, a tres minutos del Mall Las Ramblas. Agua y electricidad disponibles para conexión. Precio de $35,000, por debajo de la mediana de la zona por m²."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "298.26 m² flat lot",
+        "es": "Terreno plano de 298.26 m²"
+      },
+      {
+        "en": "Utilities available for connection",
+        "es": "Servicios disponibles para conexión"
+      },
+      {
+        "en": "3 minutes from Mall Las Ramblas",
+        "es": "A 3 minutos del Mall Las Ramblas"
+      },
+      {
+        "en": "Below zone median price per m²",
+        "es": "Precio por m² por debajo de la mediana"
+      }
+    ],
+    "lat": 13.9948,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Portezuelo, Santa Ana",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3214,
+    "tokens_out": 457,
+    "cost_usd": 0.00137048,
+    "finish_reason": "stop",
+    "latency_ms": 3422
+  },
+  "remax|002684209004": {
+    "ts": "2026-07-23T06:23:29.853928+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "298 m² Lot for Sale in El Portezuelo, Santa Ana",
+      "es": "Terreno de 298 m² en Venta en El Portezuelo, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Flat 298.26 m² residential lot in El Portezuelo, Santa Ana, behind T.U.D.O. and MC El Brasil. Water and electricity available for connection. Three minutes from Mall Las Ramblas.",
+      "es": "Terreno residencial plano de 298.26 m² en El Portezuelo, Santa Ana, detrás de T.U.D.O. y MC El Brasil. Agua y electricidad disponibles para conexión. A tres minutos del Mall Las Ramblas."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "298.26 m² flat lot, ready to build",
+        "es": "Terreno plano de 298.26 m², listo para construir"
+      },
+      {
+        "en": "Utilities available for connection",
+        "es": "Servicios disponibles para conexión"
+      },
+      {
+        "en": "3 minutes from Mall Las Ramblas",
+        "es": "A 3 minutos del Mall Las Ramblas"
+      },
+      {
+        "en": "Easy access to shopping and schools",
+        "es": "Fácil acceso a centros comerciales y escuelas"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Portezuelo, Santa Ana",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3217,
+    "tokens_out": 455,
+    "cost_usd": 0.00136909,
+    "finish_reason": "stop",
+    "latency_ms": 3593
+  },
+  "remax|002524497002": {
+    "ts": "2026-07-23T06:23:30.055056+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "6,353 m² Lot with Warehouse, Santiago Texacuangos",
+      "es": "Lote de 6,353 m² con Bodega, Santiago Texacuangos"
+    },
+    "short_description_canonical": {
+      "en": "6,353.57 m² lot with a covered warehouse on the old highway to Zacatecoluca, near Santiago Texacuangos. Direct access to paved road, fenced with retaining walls and metal gate. 30 minutes from El Salvador International Airport and connected to the Pan-American Highway.",
+      "es": "Lote de 6,353.57 m² con bodega cubierta en la carretera antigua a Zacatecoluca, cerca de Santiago Texacuangos. Acceso directo a calle pavimentada, cercado con muros de contención y portón metálico. A 30 minutos del Aeropuerto Internacional de El Salvador y conectado a la Carretera Panamericana."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "6,353 m² lot with covered warehouse",
+        "es": "Lote de 6,353 m² con bodega cubierta"
+      },
+      {
+        "en": "Direct access to paved road",
+        "es": "Acceso directo a calle pavimentada"
+      },
+      {
+        "en": "30 min from international airport",
+        "es": "30 min del aeropuerto internacional"
+      },
+      {
+        "en": "Fenced with retaining walls and gate",
+        "es": "Cercado con muros de contención y portón"
+      },
+      {
+        "en": "Ideal for logistics or agro-industry",
+        "es": "Ideal para logística o agroindustria"
+      }
+    ],
+    "lat": 13.5833,
+    "lng": -89.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santiago Texacuangos, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3267,
+    "tokens_out": 542,
+    "cost_usd": 0.00147829,
+    "finish_reason": "stop",
+    "latency_ms": 3743
+  },
+  "encuentra24|31877567": {
+    "ts": "2026-07-23T07:11:00.563054+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Exclusive 4-Bed Home in Bijao, Coclé",
+      "es": "Exclusiva casa de 4 habs en Bijao, Coclé"
+    },
+    "short_description_canonical": {
+      "en": "Single-family 2-level house on 1,306 m² land with 384 m² built area in Bijao, Coclé. Features 4 bedrooms, 5 bathrooms, marble floors, Calacatta quartz counters, private pool, and parking for 6 cars. Built in 2014, monthly maintenance $520.",
+      "es": "Casa unifamiliar de 2 niveles en terreno de 1,306 m² y 384 m² construidos en Bijao, Coclé. Cuenta con 4 recámaras, 5 baños, pisos de mármol, sobres de cuarzo Calacatta, piscina privada y estacionamiento para 6 autos. Construida en 2014, mantenimiento mensual $520."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "384 m² built on 1,306 m² lot",
+        "es": "384 m² construidos en lote de 1,306 m²"
+      },
+      {
+        "en": "4 bedrooms, 5 bathrooms",
+        "es": "4 recámaras, 5 baños"
+      },
+      {
+        "en": "Private pool and gazebo",
+        "es": "Piscina privada y gazebo"
+      },
+      {
+        "en": "Parking for 6 cars",
+        "es": "Estacionamiento para 6 autos"
+      },
+      {
+        "en": "Built in 2014, low maintenance $520/mo",
+        "es": "Construida en 2014, bajo mantenimiento $520/mes"
+      }
+    ],
+    "lat": 8.3333,
+    "lng": -80.0833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bijao, Coclé, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": 2014,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 5.0,
+      "built_area_m2": 384.0,
+      "parking_spaces": 6,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2519,
+    "tokens_out": 564,
+    "cost_usd": 0.00130053,
+    "finish_reason": "stop",
+    "latency_ms": 4641
+  },
+  "encuentra24|32271728": {
+    "ts": "2026-07-23T07:11:00.782482+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Oceanfront Estate in Punta Barco Viejo",
+      "es": "Estate frente al mar en Punta Barco Viejo"
+    },
+    "short_description_canonical": {
+      "en": "Oceanfront estate in Punta Barco Viejo, Pacific coast, with 4,497 m² land and 1,200 m² built area. Remodeled in 2023, it offers 7 bedrooms, 9 bathrooms, 50 meters direct beachfront, pool, gym, and parking for 5 cars. A turnkey luxury property with modern finishes.",
+      "es": "Estate frente al mar en Punta Barco Viejo, costa del Pacífico, con 4,497 m² de terreno y 1,200 m² construidos. Remodelado en 2023, ofrece 7 recámaras, 9 baños, 50 metros de frente directo al mar, piscina, gimnasio y estacionamiento para 5 autos. Propiedad de lujo lista para habitar."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "50 m direct ocean frontage",
+        "es": "50 m de frente directo al mar"
+      },
+      {
+        "en": "Fully remodeled in 2023",
+        "es": "Completamente remodelado en 2023"
+      },
+      {
+        "en": "7 bedrooms, each with private bath",
+        "es": "7 recámaras, cada una con baño privado"
+      },
+      {
+        "en": "Pool with jacuzzi facing the ocean",
+        "es": "Piscina con jacuzzi frente al océano"
+      },
+      {
+        "en": "Parking for 5 cars",
+        "es": "Estacionamiento para 5 autos"
+      }
+    ],
+    "lat": 8.3333,
+    "lng": -80.0,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Punta Barco Viejo, Pacific coast, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": 2023,
+      "bedrooms": 7,
+      "bathrooms": 9.0,
+      "built_area_m2": 1200.0,
+      "parking_spaces": 5,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2631,
+    "tokens_out": 563,
+    "cost_usd": 0.00132967,
+    "finish_reason": "stop",
+    "latency_ms": 4860
   }
 }
