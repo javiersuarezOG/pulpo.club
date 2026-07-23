@@ -780,9 +780,11 @@
       "primary_listing_id": "citymax_sc_se-vende-terreno-con-vista-al-mar-en-surf-city",
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-07-23T04:27:52.577496+00:00",
+      "posted_media_id": "18143608294534187",
+      "comment_posted": true,
+      "comment_id": "18129292726649187"
     },
     {
       "day": 214,
