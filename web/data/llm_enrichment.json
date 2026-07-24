@@ -130021,5 +130021,364 @@
     "cost_usd": 0.00132967,
     "finish_reason": "stop",
     "latency_ms": 4860
+  },
+  "realestate_au_sv|km-65-boulevard-costa-del-sol-san-luis-la-herradura-san-luis-talpa-la-paz-san-luis-talpa-la-paz-department-310109464447": {
+    "ts": "2026-07-24T06:15:53.638479+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale on Costa del Sol Boulevard",
+      "es": "Terreno en Venta en Boulevard Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel on Km 65 Boulevard Costa del Sol, San Luis La Herradura, La Paz. Located in a coastal area near beaches and amenities. Priced at $115,000.",
+      "es": "Terreno en Km 65 Boulevard Costa del Sol, San Luis La Herradura, La Paz. Ubicado en zona costera cerca de playas y servicios. Precio de $115,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Km 65 Costa del Sol Boulevard",
+        "es": "Km 65 Boulevard Costa del Sol"
+      },
+      {
+        "en": "Near beaches and amenities",
+        "es": "Cerca de playas y servicios"
+      },
+      {
+        "en": "Priced at $115,000",
+        "es": "Precio de $115,000"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3091,
+    "tokens_out": 374,
+    "cost_usd": 0.00124597,
+    "finish_reason": "stop",
+    "latency_ms": 3620
+  },
+  "citymax_sc|san-nicolas-poligono-5-lote-16": {
+    "ts": "2026-07-24T06:15:53.822730+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Santa Ana, San Blas",
+      "es": "Lote en Venta en Santa Ana, San Blas"
+    },
+    "short_description_canonical": {
+      "en": "Land lot for sale in San Blas, Santa Ana. Flat lot suitable for construction. Priced at $37,000.",
+      "es": "Lote de terreno en venta en San Blas, Santa Ana. Terreno plano apto para construcción. Precio de $37,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in San Blas, Santa Ana",
+        "es": "Ubicado en San Blas, Santa Ana"
+      },
+      {
+        "en": "Flat lot, ready to build",
+        "es": "Terreno plano, listo para construir"
+      },
+      {
+        "en": "Priced at $37,000",
+        "es": "Precio de $37,000"
+      }
+    ],
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Blas beach, La Libertad",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3062,
+    "tokens_out": 363,
+    "cost_usd": 0.00122604,
+    "finish_reason": "stop",
+    "latency_ms": 3805
+  },
+  "realestate_au_sv|quintas-montecristo-carretera-sonsonate-santa-ana-los-naranjos-canton-el-canelo-nahuizalco-sonsonate-norte-el-salvador-nahuizalco-sonsonate-nahuizalco-sonsonate-310109444044": {
+    "ts": "2026-07-24T06:15:53.899362+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Lot in Quintas Montecristo, Nahuizalco",
+      "es": "Lote de 850 m² en Quintas Montecristo, Nahuizalco"
+    },
+    "short_description_canonical": {
+      "en": "850 m² residential lot in Quintas Montecristo, Nahuizalco, Sonsonate. Located on the Sonsonate–Santa Ana highway near Los Naranjos. Priced at $52,500.",
+      "es": "Lote residencial de 850 m² en Quintas Montecristo, Nahuizalco, Sonsonate. Ubicado sobre la carretera Sonsonate–Santa Ana cerca de Los Naranjos. Precio de $52,500."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "850 m² lot in gated community",
+        "es": "Lote de 850 m² en comunidad cerrada"
+      },
+      {
+        "en": "On Sonsonate–Santa Ana highway",
+        "es": "Sobre carretera Sonsonate–Santa Ana"
+      },
+      {
+        "en": "Priced at $52,500",
+        "es": "Precio de $52,500"
+      }
+    ],
+    "lat": 13.6667,
+    "lng": -89.6,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nahuizalco, Sonsonate",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3110,
+    "tokens_out": 418,
+    "cost_usd": 0.0012995,
+    "finish_reason": "stop",
+    "latency_ms": 3881
+  },
+  "csbr|2-terrenos-en-venta-cerca-del-desvio-de-ilobasco-acceso-por-carretera-principal-hacia-sensuntepeque-cabanas": {
+    "ts": "2026-07-24T06:15:54.153172+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "2 Land Lots for Sale near Ilobasco, Cabañas",
+      "es": "2 Terrenos en Venta cerca de Ilobasco, Cabañas"
+    },
+    "short_description_canonical": {
+      "en": "Two land lots for sale near the Ilobasco turnoff, with access from the main highway to Sensuntepeque, Cabañas. Listed with the Salvadoran Chamber of Real Estate. Price: $525,000.",
+      "es": "Dos terrenos en venta cerca del desvío de Ilobasco, con acceso por la carretera principal hacia Sensuntepeque, Cabañas. Disponible en la Cámara Salvadoreña de Bienes Raíces. Precio: $525,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Near Ilobasco turnoff, main highway access",
+        "es": "Cerca del desvío de Ilobasco, acceso por carretera principal"
+      },
+      {
+        "en": "Two lots combined, $525,000 total",
+        "es": "Dos terrenos combinados, $525,000 total"
+      },
+      {
+        "en": "Listed with recognized real estate chamber",
+        "es": "Listado en cámara de bienes raíces reconocida"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -88.85,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ilobasco, Cabañas, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3086,
+    "tokens_out": 445,
+    "cost_usd": 0.00132272,
+    "finish_reason": "stop",
+    "latency_ms": 4136
+  },
+  "realestate_au_sv|canto-el-jicaro-isla-el-arco-jucuaran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310109311466": {
+    "ts": "2026-07-24T06:15:57.081771+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Canto El Jícaro, Isla El Arco, Jucuarán",
+      "es": "Terreno en Canto El Jícaro, Isla El Arco, Jucuarán"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Canto El Jícaro, Isla El Arco, Jucuarán, Usulután. Located in a coastal area with beach access. Priced at $130,000.",
+      "es": "Terreno en Canto El Jícaro, Isla El Arco, Jucuarán, Usulután. Ubicado en zona costera con acceso a la playa. Precio de $130,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Coastal location in Isla El Arco",
+        "es": "Ubicación costera en Isla El Arco"
+      },
+      {
+        "en": "Priced at $130,000",
+        "es": "Precio de $130,000"
+      },
+      {
+        "en": "Land for development or investment",
+        "es": "Terreno para desarrollo o inversión"
+      }
+    ],
+    "lat": 13.1894,
+    "lng": -88.3858,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Cuco, Jucuarán",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3103,
+    "tokens_out": 420,
+    "cost_usd": 0.00129981,
+    "finish_reason": "stop",
+    "latency_ms": 3679
+  },
+  "remax|001463593023": {
+    "ts": "2026-07-24T06:15:57.678907+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Urban Lot in Ciudad Arce, La Libertad",
+      "es": "Lote Urbano Plano en Ciudad Arce, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Flat 1,487 m² urban lot on Calle Santa Lucía, Ciudad Arce, La Libertad. Lot is 2,127.65 sq varas with 28 m frontage and 55 m depth. Water and electricity available, paved road access. Across from community center in a residential area.",
+      "es": "Lote urbano plano de 1,487 m² sobre Calle Santa Lucía, Ciudad Arce, La Libertad. Terreno de 2,127.65 varas cuadradas con 28 m de frente y 55 m de fondo. Agua y electricidad disponibles, acceso por calle pavimentada. Frente al centro comunal en zona residencial."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat topography for efficient construction",
+        "es": "Topografía plana para construcción eficiente"
+      },
+      {
+        "en": "28 m frontage on paved road",
+        "es": "28 m de frente sobre calle pavimentada"
+      },
+      {
+        "en": "Water and electricity available",
+        "es": "Agua y electricidad disponibles"
+      },
+      {
+        "en": "Across from community center",
+        "es": "Frente al centro comunal"
+      },
+      {
+        "en": "1,487 m² build-ready lot",
+        "es": "Lote de 1,487 m² listo para construir"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -89.4167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ciudad Arce, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3350,
+    "tokens_out": 509,
+    "cost_usd": 0.0014644,
+    "finish_reason": "stop",
+    "latency_ms": 4166
+  },
+  "encuentra24|25362061": {
+    "ts": "2026-07-24T07:02:03.593428+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Renovated 4-Bed House, Santa Maria Golf & Country Club",
+      "es": "Casa Renovada 4 Dorm., Santa Maria Golf & Country Club"
+    },
+    "short_description_canonical": {
+      "en": "Renovated house at The Woods, Santa Maria Golf & Country Club, Panama. 338 m² built, 4 bedrooms each with en-suite bath, plus family room, living, dining, den, semi-open kitchen with island. Marble floors, glass stairs, Italian kitchen, German faucets. Delivery late 2024 or 2025.",
+      "es": "Casa renovada en The Woods, Santa Maria Golf & Country Club, Panamá. 338 m² construidos, 4 recámaras cada una con baño, sala familiar, sala, comedor, den, cocina semiabierta con isla. Pisos de mármol, escalera de vidrio, cocina italiana, grifería alemana. Entrega final 2024 o 2025."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Renovated luxury finishes throughout",
+        "es": "Acabados de lujo renovados en toda la casa"
+      },
+      {
+        "en": "4 en-suite bedrooms, 338 m² built",
+        "es": "4 recámaras en suite, 338 m² construidos"
+      },
+      {
+        "en": "Lake or park view available",
+        "es": "Vista al lago o al parque disponible"
+      },
+      {
+        "en": "Italian kitchen and German faucets",
+        "es": "Cocina italiana y grifería alemana"
+      },
+      {
+        "en": "Delivery late 2024 or 2025",
+        "es": "Entrega final 2024 o 2025"
+      }
+    ],
+    "lat": 8.9833,
+    "lng": -79.5167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Maria Golf & Country Club, Panama City",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.5,
+      "built_area_m2": 338.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2643,
+    "tokens_out": 566,
+    "cost_usd": 0.00133621,
+    "finish_reason": "stop",
+    "latency_ms": 4424
   }
 }

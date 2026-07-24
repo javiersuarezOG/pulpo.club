@@ -1,19 +1,19 @@
 {
-  "computed_at": "2026-07-23T06:34:15.498874+00:00",
+  "computed_at": "2026-07-24T06:27:07.362578+00:00",
   "filter_strictness": "moderate",
   "kpi": {
-    "active_sources": 14,
+    "active_sources": 15,
     "per_shelf_visible": {
       "beach_condos": {
-        "count": 20,
+        "count": 22,
         "renders_on_homepage": true
       },
       "beach_homes": {
-        "count": 146,
+        "count": 148,
         "renders_on_homepage": true
       },
       "beach_land": {
-        "count": 418,
+        "count": 491,
         "renders_on_homepage": true
       },
       "lake_condos": {
@@ -21,7 +21,7 @@
         "renders_on_homepage": false
       },
       "lake_homes": {
-        "count": 9,
+        "count": 11,
         "renders_on_homepage": true
       },
       "lake_land": {
@@ -53,7 +53,7 @@
       },
       "citymax": {
         "coverage_pct_vs_discovered": null,
-        "kept": 34,
+        "kept": 33,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -66,8 +66,8 @@
         "target_prd": 300
       },
       "csbr": {
-        "coverage_pct_vs_discovered": 261.0,
-        "kept": 261,
+        "coverage_pct_vs_discovered": 262.0,
+        "kept": 262,
         "status": "green",
         "target_discovered": null,
         "target_prd": 100
@@ -80,8 +80,8 @@
         "target_prd": null
       },
       "encuentra24": {
-        "coverage_pct_vs_discovered": 0.7,
-        "kept": 21,
+        "coverage_pct_vs_discovered": 0.8,
+        "kept": 23,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -116,15 +116,15 @@
       },
       "oceanside": {
         "coverage_pct_vs_discovered": null,
-        "kept": 24,
+        "kept": 25,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
       },
       "realestate_au_sv": {
         "coverage_pct_vs_discovered": null,
-        "kept": 0,
-        "status": "skipped",
+        "kept": 325,
+        "status": "green",
         "target_discovered": null,
         "target_prd": null
       },
@@ -137,7 +137,7 @@
       },
       "remax": {
         "coverage_pct_vs_discovered": null,
-        "kept": 293,
+        "kept": 294,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 5,
     "shelves_total": 6,
-    "total_in_dataset": 1559,
-    "total_visible_listings": 1354
+    "total_in_dataset": 1888,
+    "total_visible_listings": 1676
   },
   "min_real_listings": 4
 }
