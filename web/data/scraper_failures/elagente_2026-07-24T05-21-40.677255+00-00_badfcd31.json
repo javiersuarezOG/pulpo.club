@@ -1,0 +1,14 @@
+{
+  "failure_id": "badfcd31",
+  "source": "elagente",
+  "ts": "2026-07-24T05:21:40.677255+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 2.34,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
