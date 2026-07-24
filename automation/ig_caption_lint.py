@@ -8,6 +8,15 @@ The founder brief is explicit about the smells we never want shipped:
   >   Pandering de diáspora forzado ("etiquetá a tu primo", "el hermano
   >   lejano que…"). Si aparece, lo borrás.
 
+**Diaspora override (Javier, 2026-07-24).** For the local-voice IG
+autopilot relaunch, Javier lifted the *diaspora* half of the brief: the
+"hermano lejano" / "etiquetá a tu primo" phrase bans were removed so an
+authentic "para cuando regresés" format can ship (see
+automation/ig_local_series.py). This reverses a rule Sebastian wrote —
+kept as an explicit, dated note rather than a silent deletion so the
+divergence stays auditable. The *listing-speak* and urgency-theatre
+bans below are unchanged; the override is narrow to the diaspora phrases.
+
 This module turns that rule into a pure-function check.  Every caption
 the pipeline produces (template-built OR DeepSeek-generated) flows
 through ``check()`` before it reaches the queue.  A non-empty violations
@@ -58,17 +67,17 @@ BANNED_WORDS: Tuple[str, ...] = (
 # Multi-word banned phrases.  Matched as substrings (after collapsing
 # whitespace) — the diaspora-pandering smells are recognisable even when
 # the surrounding sentence reshuffles.
+#
+# Diaspora phrases ("etiquetá a tu primo", "el hermano lejano", …) were
+# REMOVED here per Javier's 2026-07-24 override (see module docstring) so
+# the "para cuando regresés" format can ship. The listing-speak + urgency
+# bans stay — the override was narrow to the diaspora-pandering category.
 BANNED_PHRASES: Tuple[str, ...] = (
     "no se repite",
     "única en su clase",
     "unica en su clase",
     "oferta única",
     "oferta unica",
-    "etiquetá a tu primo",
-    "etiqueta a tu primo",
-    "el hermano lejano",
-    "tu hermano lejano",
-    "para los hermanos lejanos",
     "no pierda esta",             # urgency theatre
     "no te lo pierdas",
     "última oportunidad",
