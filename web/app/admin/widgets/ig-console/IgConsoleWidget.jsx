@@ -3,9 +3,11 @@
 // Posts are generated + auto-approved by automation/ig_autopilot.py and
 // auto-published by the ig-publish cron. This screen is monitor + one
 // lever (Skip):
-//   1. NEXT UP    — the next post about to auto-publish, with "Skip this
-//                   post" (cancels it; the operator never approves).
-//   2. QUEUE      — the rest of the upcoming posts, one row each, Skip.
+//   1. NEXT 3     — the next three posts about to auto-publish (always
+//                   shown; the autopilot keeps ≥3 queued). The imminent
+//                   one is a hero card; the following two are rows. Each
+//                   has "Skip" (cancels it; the operator never approves).
+//   2. QUEUE      — the rest of the upcoming posts beyond the next 3.
 //   3. ACTIVITY   — a real log of what has actually been published
 //                   (posted / failed), newest first, with a link to IG.
 //
@@ -244,8 +246,12 @@ export function IgConsoleWidget() {
       .filter((it) => it && it.approved === true && it.posted !== true && it.skipped !== true)
       .sort((a, b) => String(a.scheduled_for || "").localeCompare(String(b.scheduled_for || "")));
   }, [items]);
-  const nextUp = upcoming[0] || null;
-  const rest = upcoming.slice(1);
+  // Always surface the next THREE upcoming posts prominently (the autopilot
+  // keeps ≥3 queued via its lookahead); the rest fall into "Later in queue".
+  const nextThree = upcoming.slice(0, 3);
+  const nextUp = nextThree[0] || null;
+  const following = nextThree.slice(1);
+  const rest = upcoming.slice(3);
 
   // Skip writes through the same workflow that commits back to main
   // (~30s), so we notice + auto-refresh once it lands.
@@ -285,41 +291,70 @@ export function IgConsoleWidget() {
       <HealthBar health={health} />
       {notice && <div className="igc-note info">{notice}</div>}
 
-      {/* NEXT UP */}
+      {/* NEXT 3 */}
       <section className="igc-section">
-        <h3 className="igc-h">Next up</h3>
+        <h3 className="igc-h">Next 3 posts</h3>
         {nextUp ? (
-          <div className="igc-next">
-            <PosterThumb item={nextUp} big onOpen={setExpanded} />
-            <div className="igc-next-body">
-              <div className="igc-when">{_fmtDate(nextUp.scheduled_for)}</div>
-              <div className="igc-caption">{_firstLine(nextUp.caption)}</div>
-              <button type="button" className="igc-link-btn" onClick={() => setExpanded(nextUp)}>
-                View full carousel ({_slidesOf(nextUp).length} slides) →
-              </button>
-              <div className="igc-meta">
-                <span className="igc-dot ok" />
-                Auto-posts {_fmtDate(nextUp.scheduled_for)}
-                {" · "}day {nextUp.day} · {1 + (nextUp.carousel_photo_paths || []).length} slides
-              </div>
-              <div className="igc-actions">
-                <button type="button" className="igc-btn"
-                  disabled={busyDay === nextUp.day}
-                  onClick={() => skip(nextUp.day)}>
-                  {busyDay === nextUp.day ? "Working…" : "Skip this post"}
+          <>
+            <div className="igc-next">
+              <span className="igc-slot">1 · Next up</span>
+              <PosterThumb item={nextUp} big onOpen={setExpanded} />
+              <div className="igc-next-body">
+                <div className="igc-when">{_fmtDate(nextUp.scheduled_for)}</div>
+                <div className="igc-caption">{_firstLine(nextUp.caption)}</div>
+                <button type="button" className="igc-link-btn" onClick={() => setExpanded(nextUp)}>
+                  View full carousel ({_slidesOf(nextUp).length} slides) →
                 </button>
+                <div className="igc-meta">
+                  <span className="igc-dot ok" />
+                  Auto-posts {_fmtDate(nextUp.scheduled_for)}
+                  {nextUp.format ? ` · ${nextUp.format}` : ""}
+                  {" · "}day {nextUp.day} · {1 + (nextUp.carousel_photo_paths || []).length} slides
+                </div>
+                <div className="igc-actions">
+                  <button type="button" className="igc-btn"
+                    disabled={busyDay === nextUp.day}
+                    onClick={() => skip(nextUp.day)}>
+                    {busyDay === nextUp.day ? "Working…" : "Skip this post"}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+            {following.length > 0 && (
+              <ul className="igc-list">
+                {following.map((it, i) => (
+                  <li key={it.day} className="igc-row">
+                    <PosterThumb item={it} onOpen={setExpanded} />
+                    <div className="igc-row-body">
+                      <div className="igc-row-top">
+                        <span className="igc-slot sm">{i + 2}</span>
+                        <span className="igc-when sm">{_fmtDate(it.scheduled_for)}</span>
+                        {it.format && <span className="igc-when sm">· {it.format}</span>}
+                        <span className="igc-dot ok" />
+                      </div>
+                      <div className="igc-caption sm">{_firstLine(it.caption)}</div>
+                    </div>
+                    <div className="igc-row-actions">
+                      <button type="button" className="igc-btn sm ghost"
+                        disabled={busyDay === it.day}
+                        onClick={() => skip(it.day)}>
+                        {busyDay === it.day ? "…" : "Skip"}
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
         ) : (
           <div className="igc-note">Nothing queued right now — the autopilot tops up the queue daily.</div>
         )}
       </section>
 
-      {/* QUEUE */}
+      {/* QUEUE (beyond the next 3) */}
       {rest.length > 0 && (
         <section className="igc-section">
-          <h3 className="igc-h">Queue <span className="igc-count">{rest.length}</span></h3>
+          <h3 className="igc-h">Later in queue <span className="igc-count">{rest.length}</span></h3>
           <ul className="igc-list">
             {rest.map((it) => (
               <li key={it.day} className="igc-row">
@@ -427,7 +462,9 @@ const STYLES = `
 .igc-note.info { border-color:color-mix(in oklch, var(--accent) 40%, var(--line)); }
 .igc-note.bad  { color:var(--accent-2); border-color:var(--accent-2); }
 
-.igc-next { display:flex; flex-direction:column; gap:14px; padding:14px; background:var(--paper); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow-1); }
+.igc-next { position:relative; display:flex; flex-direction:column; gap:14px; padding:14px; background:var(--paper); border:1px solid var(--line); border-radius:14px; box-shadow:var(--shadow-1); }
+.igc-slot { position:absolute; top:10px; right:12px; z-index:2; font-size:11px; text-transform:uppercase; letter-spacing:.05em; padding:2px 9px; border-radius:999px; background:var(--paper-2); border:1px solid var(--line); color:color-mix(in oklch, var(--ink) 62%, var(--paper)); }
+.igc-slot.sm { position:static; padding:1px 7px; font-size:11px; font-weight:700; }
 .igc-next-body { display:flex; flex-direction:column; gap:6px; min-width:0; flex:1; }
 .igc-when { font-size:13px; color:color-mix(in oklch, var(--ink) 60%, var(--paper)); }
 .igc-when.sm { font-size:12px; }

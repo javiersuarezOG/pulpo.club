@@ -159,6 +159,16 @@ body{font-family:"Nunito",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
 .brand .wm{font-weight:900;font-size:74px;letter-spacing:-.02em;color:#fff;line-height:.92}
 .brand .wm .club{opacity:.74;font-weight:800}
 .brand .kick{font-weight:800;font-size:25px;letter-spacing:.1em;text-transform:uppercase;color:#fff;opacity:.82;max-width:600px;line-height:1.25}
+/* ---- guess cover (price hidden) + reveal (price shown) ---- */
+/* Higher specificity than `.slide.photo>*` so the overlay can center-absolute. */
+.slide.photo .ghook,.slide.photo .rvl{position:absolute;inset:0;z-index:1;display:flex;
+  flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 90px;gap:22px}
+.ghook .q{font-weight:900;font-size:150px;line-height:.96;letter-spacing:-.02em;text-shadow:0 6px 44px rgba(0,0,0,.55)}
+.ghook .sub{font-weight:800;font-size:58px;line-height:1.15;text-shadow:0 3px 22px rgba(0,0,0,.6)}
+.rvl .kick2{font-weight:800;font-size:58px;opacity:.96;text-shadow:0 3px 22px rgba(0,0,0,.6)}
+.rvl .amt{font-weight:900;font-size:196px;line-height:1;letter-spacing:-.03em;background:#fff;color:#161c20;
+  padding:18px 60px;border-radius:44px;margin-top:8px;box-shadow:0 22px 54px -18px rgba(0,0,0,.6)}
+.rvl .amt.sm{font-size:150px}
 """
 
 
@@ -204,6 +214,48 @@ def _photo(spec: dict, color: str) -> str:
         '<div class="scrim"></div>'
         f'<div class="ptop">{"".join(top)}</div>'
         f'<div class="pbot">{"".join(bot)}</div></div>'
+    )
+
+
+def _guess(spec: dict, color: str) -> str:
+    """Price-guess cover: a real listing photo with a big centered hook and
+    NO price — the whole point is to make people guess in the comments.
+    `hook` defaults to the series question; `sub` is the nudge line."""
+    src = _encode_photo(spec["img"])
+    ribbon = spec.get("ribbon", "")
+    hook = spec.get("hook", "¿Cuánto cuesta?")
+    sub = spec.get("sub", "Adiviná el precio 👇")
+    top = f'<span class="ribbon">{_e(ribbon)}</span>' if ribbon else ""
+    return (
+        f'<div class="slide photo guess" style="--c:{color};background-image:url({src})">'
+        '<div class="scrim"></div>'
+        f'<div class="ptop">{top}</div>'
+        f'<div class="ghook"><div class="q">{_br(hook)}</div>'
+        f'<div class="sub">{_br(sub)}</div></div>'
+        '<div class="pbot"><div class="pfoot">'
+        '<span class="purl">pulpo.club · link en bio</span>'
+        f'<span class="oct">{_OCT}</span></div></div></div>'
+    )
+
+
+def _reveal(spec: dict, color: str) -> str:
+    """Price reveal: the same-style photo with the price finally shown, big,
+    plus a kicker (``¿Le atinaste?``).  Closes the guess carousel."""
+    src = _encode_photo(spec["img"])
+    ribbon = spec.get("ribbon", "")
+    kicker = spec.get("kicker", "¿Le atinaste?")
+    price = spec.get("price", "")
+    amt_cls = "amt sm" if len(str(price)) > 9 else "amt"
+    top = f'<span class="ribbon">{_e(ribbon)}</span>' if ribbon else ""
+    return (
+        f'<div class="slide photo reveal" style="--c:{color};background-image:url({src})">'
+        '<div class="scrim"></div>'
+        f'<div class="ptop">{top}</div>'
+        f'<div class="rvl"><div class="kick2">{_e(kicker)}</div>'
+        f'<div class="{amt_cls}">{_e(price)}</div></div>'
+        '<div class="pbot"><div class="pfoot">'
+        '<span class="purl">pulpo.club · link en bio</span>'
+        f'<span class="oct">{_OCT}</span></div></div></div>'
     )
 
 
@@ -378,6 +430,7 @@ def _detail(spec: dict, color: str) -> str:
 _DISPATCH = {
     "photo": _photo, "statement": _statement, "stat": _stat, "usp": _usp,
     "compare": _compare, "news": _news, "cta": _cta, "detail": _detail,
+    "guess": _guess, "reveal": _reveal,
 }
 
 

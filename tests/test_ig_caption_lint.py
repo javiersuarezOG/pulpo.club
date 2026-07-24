@@ -94,11 +94,8 @@ def test_banned_word_list_includes_brief_canon():
 @pytest.mark.parametrize("phrase", [
     "no se repite",
     "única en su clase",
-    "etiquetá a tu primo",
-    "etiqueta a tu primo",
-    "el hermano lejano",
-    "para los hermanos lejanos",
     "última oportunidad",
+    "no te lo pierdas",
 ])
 def test_each_banned_phrase_flagged(phrase):
     text = f"Mensaje con {phrase} dentro."
@@ -109,20 +106,36 @@ def test_each_banned_phrase_flagged(phrase):
 
 def test_banned_phrase_case_insensitive():
     assert any(v["code"] == BANNED_PHRASE
-               for v in check("ETIQUETÁ A TU PRIMO en este post."))
+               for v in check("NO SE REPITE esta en su clase."))
 
 
 def test_banned_phrase_handles_extra_whitespace():
     """A caption with weird spacing shouldn't smuggle the phrase past."""
     assert any(v["code"] == BANNED_PHRASE
-               for v in check("etiquetá   a   tu primo en este post."))
+               for v in check("no  se   repite  nunca."))
 
 
 def test_banned_phrases_includes_brief_canon():
-    canon = {"no se repite", "etiquetá a tu primo", "el hermano lejano"}
+    """The listing-speak / urgency canon stays banned."""
+    canon = {"no se repite", "única en su clase", "última oportunidad"}
     listed = {p.lower() for p in BANNED_PHRASES}
     missing = canon - listed
     assert not missing, f"BANNED_PHRASES is missing canon brief phrases: {missing}"
+
+
+@pytest.mark.parametrize("phrase", [
+    "el hermano lejano",
+    "para los hermanos lejanos",
+    "etiquetá a tu primo",
+])
+def test_diaspora_phrases_allowed_after_override(phrase):
+    """Javier's 2026-07-24 override lifted the diaspora-pandering bans so
+    the 'para cuando regresés' format can ship. Guard the reversal: these
+    must NOT flag as banned phrases (they may still trip other rules, so we
+    assert specifically that no BANNED_PHRASE fires for the diaspora text)."""
+    text = f"Para el salvadoreño en el extranjero: {phrase} que sueña con volver."
+    codes = [v["code"] for v in check(text)]
+    assert BANNED_PHRASE not in codes, f"phrase {phrase!r} should be allowed post-override"
 
 
 # ── exclamation cascades ───────────────────────────────────────────────

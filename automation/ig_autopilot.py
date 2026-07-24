@@ -1,24 +1,22 @@
-"""ig_autopilot.py — the self-running IG post generator.
+"""ig_autopilot.py — the self-running IG post generator (local-voice).
 
 Keeps `web/data/ig_queue.json` topped up with **approved, scheduled**
 posts so the hourly publisher (automation/ig_publish.py) can post on its
 own.  The operator's only lever is Skip (in /admin/ig) + the IG_PAUSED
 kill switch.
 
-Two rules baked in per the campaign brief:
-  1. EVERY post shows a real listing (photo-gated, from ig_candidates.json
-     — so no broker-watermarked photos leak).
-  2. MIX both content types ongoing:
-       - brand-led   → slide 1 = editorial brand message (TYPO_MAX),
-                       slide 2 = a branded listing card (STICKER).
-       - showcase    → slide 1 = a branded listing card (STICKER),
-                       slide 2 = the listing's hero photo.
-     Alternates by post index so the feed stays varied.
+Content comes from the local-voice engine
+(``automation/ig_local_series.py``): every post is one of three rotating
+formats — ``guess`` (¿Cuánto cuesta?, the comment flywheel), ``numero_uno``
+(El #1 de la semana), ``regreso`` (Para cuando regresés) — rendered as a
+branded carousel via ``automation/ig_campaign_poster.py``.  Each post shows
+a real listing (photo-gated from ig_candidates.json — no broker-watermarked
+photos leak), picked highest-rank-first and not re-featured recently.
 
-Design: reuses the low-level render + caption libs directly
-(ig_poster.render_poster, ig_caption.generate_caption) — the same
-surface ig_queue_builder uses — without the selector/plan machinery.
-Renderers are injectable so tests run offline with skip_render.
+Design: the content engine is pure (decides what each post says + shows);
+this module downloads the listing photos, renders the slides, and shapes
+the queue item.  Renderers + photo-preparer are injectable so tests run
+offline with skip_render.
 
 CLI (run by .github/workflows/ig-autopilot.yml on a daily cron):
     python3 -m automation.ig_autopilot --lookahead 7 --cadence-days 1
@@ -38,81 +36,12 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Callable, Optional
 
-# Reuse the exact render + caption + lint surface the queue builder uses.
-from automation.ig_poster import render_poster as _render_poster
-from automation.ig_poster import TYPO_MAX, STICKER
-from automation.ig_caption import generate_caption as _generate_caption
+# Render via the campaign slide renderer (branded 1080×1350 slides); get
+# each post's copy + slide plan from the local-voice content engine.
+from automation.ig_campaign_poster import render_slide as _render_slide
+from automation.ig_campaign_poster import CATEGORY_COLORS, INSPIRACION
 from automation.ig_caption_lint import check as _lint_check
-from pulpo.countries import active as _active_country
-
-# Country name comes from the active-country manifest, never a hardcoded
-# literal — so the copy follows the platform when a new country is added
-# (and satisfies scripts/check_country_hardcodes.py).
-_COUNTRY = _active_country().name_en  # the active country's display name
-
-# ── evergreen brand messages (slide 1 of brand-led posts) ─────────────
-#
-# Each drives a TYPO_MAX poster (eyebrow/hook/hero/punch) + a complete,
-# lint-clean caption.  Cycled in order; when exhausted it wraps.  Keep
-# every caption through ig_caption_lint (no banned words, no `!`).
-# `{_COUNTRY}` is interpolated from the manifest (see above).
-
-BRAND_MESSAGES: tuple[dict, ...] = (
-    {
-        "eyebrow": _COUNTRY.upper(), "hook": f"Todos los terrenos de {_COUNTRY},",
-        "hero": "rankeados.", "punch": "Cada semana.",
-        "caption": (
-            f"**Todos los terrenos de {_COUNTRY}, rankeados cada semana.**\n\n"
-            "Un solo lugar para ver lo que de verdad vale la pena. Sin listas infinitas.\n\n"
-            "pulpo.club · link en bio"
-        ),
-    },
-    {
-        "eyebrow": "CÓMO FUNCIONA", "hook": "Revisamos cada terreno a la venta.",
-        "hero": "Los 10 mejores.", "punch": "Sin ruido, cada semana.",
-        "caption": (
-            "**No es otra lista de terrenos. Es un ranking.**\n\n"
-            "Calificamos cada terreno por precio, zona y acceso, y publicamos solo los mejores.\n\n"
-            "pulpo.club · link en bio"
-        ),
-    },
-    {
-        "eyebrow": "SIN RUIDO", "hook": "Nada de listas infinitas.",
-        "hero": "Menos ruido.", "punch": "Mejores terrenos.",
-        "caption": (
-            "**Menos ruido, mejores terrenos.**\n\n"
-            "Nada de listas infinitas ni precios inflados. Filtramos el mercado y te mostramos lo que vale.\n\n"
-            "pulpo.club · link en bio"
-        ),
-    },
-    {
-        "eyebrow": "TODO EL PAÍS", "hook": "De la playa a la montaña,",
-        "hero": f"todo {_COUNTRY}.", "punch": "En un solo lugar.",
-        "caption": (
-            f"**De la playa a la montaña, todo {_COUNTRY}.**\n\n"
-            "Surf City, oriente, occidente — cada terreno a la venta, en un solo lugar.\n\n"
-            "pulpo.club · link en bio"
-        ),
-    },
-    {
-        "eyebrow": "CADA DOMINGO", "hook": "Café, terrenos, cero prisa.",
-        "hero": "Domingo de Pulpo.", "punch": "Suscríbete gratis.",
-        "caption": (
-            "**Cada domingo, los mejores terrenos en tu correo.**\n\n"
-            "Gratis. Un resumen tranquilo de lo mejor de la semana, sin prisa.\n\n"
-            "pulpo.club · link en bio"
-        ),
-    },
-    {
-        "eyebrow": "EL TENTÁCULO", "hook": "Buscamos en todo el país,",
-        "hero": "sin parar.", "punch": "Para traerte lo mejor.",
-        "caption": (
-            "**Un pulpo revisa cada terreno a la venta.**\n\n"
-            f"Buscamos en todo {_COUNTRY}, todos los días, para traerte los mejores terrenos.\n\n"
-            "pulpo.club · link en bio"
-        ),
-    },
-)
+from automation import ig_local_series as _series
 
 DEFAULT_QUEUE = Path("web/data/ig_queue.json")
 DEFAULT_CANDIDATES = Path("web/data/ig_candidates.json")
@@ -134,11 +63,6 @@ def _parse_iso(s: Optional[str]) -> Optional[datetime]:
 def _ranked_index(ranked: list) -> dict:
     """Key by `{source}__{source_id}` == candidate.listing_id."""
     return {f"{li.get('source')}__{li.get('source_id')}": li for li in ranked}
-
-
-def _hero_path(candidate: dict) -> str:
-    """Local Vercel-served hero photo for a candidate (single-underscore)."""
-    return f"web/photos/{candidate.get('source')}_{candidate.get('source_id')}.hero.jpg"
 
 
 def _used_listing_ids(items: list, recent: int = 12) -> set:
@@ -206,92 +130,26 @@ def _pick_candidate(candidates: list, used: set) -> Optional[dict]:
     return max(pool, key=lambda c: c.get("rank_score") or c.get("rank") or 0)
 
 
-# ── first comment (posted under each post) ────────────────────────────
+# ── listing photos (real, resolution-checked, 1080×1350) ──────────────
 #
-# IG feed captions stay clean/editorial; the discovery hashtags + the full
-# listing spec live in the FIRST COMMENT so the caption reads well and the
-# comment carries everything the post is about.  `_C` (no-space country)
-# keeps country hashtags off the check_country_hardcodes.py radar and lets
-# them follow the manifest.
-
-_C = _COUNTRY.replace(" ", "")
-
-_CORE_HASHTAGS: tuple[str, ...] = (
-    f"#{_C}", "#Terrenos", "#BienesRaices", f"#TerrenosEn{_C}",
-    f"#InvertirEn{_C}", "#InversionInmobiliaria", "#TerrenoEnVenta",
-    "#SurfCity", f"#PlayasDe{_C}", "#SalvadorenosPorElMundo", "#BitcoinCountry",
-)
-
-
-def _zone_title(zone: Optional[str]) -> str:
-    """"el-tunco" → "El Tunco"."""
-    if not zone:
-        return _COUNTRY
-    return " ".join(w.capitalize() for w in str(zone).replace("_", "-").split("-"))
-
-
-def _zone_hashtag(zone: Optional[str]) -> str:
-    if not zone:
-        return ""
-    return "#" + "".join(w.capitalize() for w in str(zone).replace("_", "-").split("-"))
-
-
-def build_comment(candidate: dict, listing: dict) -> str:
-    """The first comment for a post — references ALL the post's info
-    (size, location, price, price/m², distance to sea) + the CTA +
-    discovery hashtags.  Kept out of the caption so the caption stays
-    clean; this is what the publisher posts as comment #1."""
-    from automation.ig_units import (
-        format_area_m2, format_price_usd, format_price_per_m2, format_distance,
-    )
-    zone = _zone_title(candidate.get("zone"))
-    lines = [f"{format_area_m2(candidate.get('area_m2'))} en {zone}."]
-
-    spec = f"{format_price_usd(candidate.get('price_usd'))}"
-    ppm = candidate.get("price_per_m2")
-    if ppm is not None:
-        spec += f" · {format_price_per_m2(ppm)}"
-    lines.append(spec)
-
-    dist = candidate.get("dist_beach_km")
-    if dist is not None:
-        lines.append("Frente al mar." if dist <= 0.05 else f"A {format_distance(dist)} del mar.")
-
-    lines += [
-        "",
-        f"Los mejores terrenos de {_COUNTRY}, rankeados cada semana.",
-        "Todos los detalles en pulpo.club — link en bio.",
-        "",
-    ]
-
-    tags = list(_CORE_HASHTAGS)
-    zt = _zone_hashtag(candidate.get("zone"))
-    if zt and zt not in tags:
-        tags.insert(8, zt)
-    lines.append(" ".join(tags))
-    return "\n".join(lines)
-
-
-# ── listing photos (2–3 real, resolution-checked, 1080×1350) ──────────
+# Every post shows real photos of the listing at good resolution. Broker
+# photos vary wildly (letterbox 1200×554, hi-res 4000×1848, tiny 661×960),
+# so we download each, reject anything too small to look crisp, and
+# normalise onto a 1080×1350 (4:5 — matches the slide) branded canvas:
+# cover-crop when it fills without notable upscale, else fit + pad on cream.
+# These become the `img` backgrounds the slide renderer composites the
+# ribbon / hook / price pill over.
 #
-# Every post must show 2–3 actual photos of the listing at good
-# resolution. Broker photos vary wildly (letterbox 1200×554, hi-res
-# 4000×1848, tiny 661×960), so we download each, reject anything too small
-# to look crisp, and normalise onto a 1080×1350 (4:5 — matches the poster)
-# branded canvas: cover-crop when it fills without notable upscale, else
-# fit + pad on cream (letterbox, always sharp).
-#
-# Brand safety: only the hero photo is quality-scored (the q100 gate);
-# the extra photos come from the ACCEPTED photo_urls set. The human Skip
-# in /admin/ig — with the full-carousel viewer — is the backstop for any
+# Brand safety: only the hero photo is quality-scored (the q100 gate); the
+# extra photos come from the ACCEPTED photo_urls set. The human Skip in
+# /admin/ig — with the full-carousel viewer — is the backstop for any
 # brand/quality issue in a non-hero photo.
 
 _SLIDE_W, _SLIDE_H = 1080, 1350
 _PAD_BG = (244, 239, 230)          # cream (--color-bg-cream)
 _MIN_COVER_UPSCALE = 1.15          # fill the frame only if upscale ≤ this
 _MIN_FIT_WIDTH = 1000              # else must be ≥ this wide to stay crisp
-PHOTOS_PER_POST = 3                # ideal
-MIN_PHOTOS_PER_POST = 2            # hard floor — skip the listing below this
+PHOTOS_PER_POST = 3                # ideal — enough for the richest format
 
 
 def _download_image(url: str, timeout: int = 20):
@@ -358,11 +216,11 @@ def prepare_listing_photos(
     return out
 
 
-def _predict_photos(listing: dict, assets_dir: Path, slug: str, **_) -> list:
+def _predict_photos(listing: dict, assets_dir: Path, slug: str, want: int = PHOTOS_PER_POST, **_) -> list:
     """Offline stand-in for prepare_listing_photos (no download / no I/O) —
-    used by --skip-render dry runs and tests.  Predicts up to
-    PHOTOS_PER_POST paths from the listing's photo_urls count."""
-    n = min(PHOTOS_PER_POST, len(listing.get("photo_urls") or []))
+    used by --skip-render dry runs and tests.  Predicts up to `want` paths
+    from the listing's photo_urls count."""
+    n = min(want, len(listing.get("photo_urls") or []))
     return [
         f"web/data/ig_assets/autopilot/{slug}/photo_{i + 1}.jpg" for i in range(n)
     ]
@@ -373,76 +231,66 @@ def _predict_photos(listing: dict, assets_dir: Path, slug: str, **_) -> list:
 def build_item(
     *,
     day: int,
-    kind: str,                      # "brand" | "showcase"
+    fmt: str,                       # "guess" | "numero_uno" | "regreso"
     candidate: dict,
     listing: dict,
-    brand_msg: dict,
     scheduled_for: str,
     assets_root: Path,
     skip_render: bool,
-    poster_renderer: Callable = _render_poster,
-    caption_generator: Callable = _generate_caption,
+    slide_renderer: Callable = _render_slide,
     photo_preparer: Callable = prepare_listing_photos,
 ) -> Optional[dict]:
-    """Build one approved queue item with a branded cover + 2–3 real
-    listing photos.  Returns None when the listing can't yield at least
-    MIN_PHOTOS_PER_POST good photos (caller should try another listing).
-
-    brand    → [TYPO_MAX brand poster, STICKER card, photo×2–3]
-    showcase → [STICKER card, photo×2–3]
-    """
-    slug = f"d{day:03d}__{kind}"
+    """Build one approved queue item for `fmt`: a branded carousel of
+    rendered slides + the local-voice caption + first comment.  Returns
+    None when the listing can't yield enough photos for the format (caller
+    should try another listing)."""
+    slug = f"d{day:03d}__{fmt}"
     assets_dir = assets_root / slug
-    palette = candidate.get("palette_suggested") or "ink"
 
-    # 2–3 real, resolution-checked listing photos. Bail early if the
-    # listing is too thin — every post must show at least MIN_PHOTOS.
-    photos = photo_preparer(listing, assets_dir, slug)
-    if len(photos) < MIN_PHOTOS_PER_POST:
+    # Real, resolution-checked listing photos (up to 3). The content engine
+    # decides how many the format needs; bail if the listing is too thin.
+    photos = photo_preparer(listing, assets_dir, slug, want=PHOTOS_PER_POST)
+    post = _series.build_post(fmt, candidate, listing, photos)
+    if post is None:
         print(
             f"[ig_autopilot] d{day} skip {candidate.get('listing_id')}: "
-            f"only {len(photos)} usable photo(s) (need {MIN_PHOTOS_PER_POST})",
+            f"only {len(photos)} usable photo(s) for format {fmt} "
+            f"(need {_series.min_photos(fmt)})",
             file=sys.stderr,
         )
         return None
 
-    def _render(ptype, pal, overrides, name):
-        out = assets_dir / f"poster_{name}.png"
+    color = CATEGORY_COLORS.get(post["color_key"], INSPIRACION)
+    rendered: list = []
+    for i, spec in enumerate(post["slides"]):
+        rel = f"web/data/ig_assets/autopilot/{slug}/slide_{i + 1}.png"
         if not skip_render:
-            poster_renderer(candidate, listing, ptype, pal, out, overrides=overrides)
-        return f"web/data/ig_assets/autopilot/{slug}/poster_{name}.png"
+            slide_renderer(spec, color, assets_dir / f"slide_{i + 1}.png")
+        rendered.append(rel)
 
-    sticker_path = _render(STICKER, palette, {}, f"sticker_{palette}")
-    if kind == "brand":
-        brand_overrides = {
-            "eyebrow": brand_msg["eyebrow"], "hook": brand_msg["hook"],
-            "hero": brand_msg["hero"], "punch": brand_msg["punch"],
-            "price": "pulpo.club", "loc": "link en bio",
-        }
-        poster_path = _render(TYPO_MAX, "cream", brand_overrides, "typo_max_cream")
-        carousel = [sticker_path] + photos
-        caption = brand_msg["caption"]
-    else:  # showcase
-        poster_path = sticker_path
-        carousel = list(photos)
-        caption = caption_generator(candidate, listing, poster_type=STICKER, client=None)
-
+    caption = post["caption"]
     violations = _lint_check(caption)
     return {
         "day": day,
-        "shelf": f"autopilot_{kind}",
+        "shelf": f"autopilot_{fmt}",
+        "format": fmt,
         "selector": "autopilot",
-        "poster_type": STICKER if kind == "showcase" else TYPO_MAX,
-        "palette": palette,
+        "color_key": post["color_key"],
+        # kept for the review widget's summary line (poster_type · palette);
+        # autopilot items normally render in the console, not review.
+        "poster_type": fmt,
+        "palette": post["color_key"],
         "scheduled_for": scheduled_for,
         "assets_dir": f"web/data/ig_assets/autopilot/{slug}",
-        "poster_path": poster_path,
+        # poster_path = cover (slide 1); carousel = the rest — matches what
+        # the publisher (_slide_urls) and the console (_slidesOf) expect.
+        "poster_path": rendered[0],
         "poster_overrides": {},
         "caption": caption,
-        "comment": build_comment(candidate, listing),
+        "comment": post["comment"],
         "lint_violations": violations,
         "caption_status": "clean" if not violations else "lint_failed",
-        "carousel_photo_paths": carousel,
+        "carousel_photo_paths": rendered[1:],
         "listing_ids": [candidate.get("listing_id")],
         "primary_listing_id": candidate.get("listing_id"),
         "status": "scheduled",
@@ -464,16 +312,16 @@ def topup(
     cadence_days: int,
     assets_root: Path,
     skip_render: bool,
-    poster_renderer: Callable = _render_poster,
-    caption_generator: Callable = _generate_caption,
+    slide_renderer: Callable = _render_slide,
     photo_preparer: Callable = prepare_listing_photos,
-    brand_messages: tuple = BRAND_MESSAGES,
 ) -> list:
     """Append approved items until `lookahead` future posts exist.
     Returns the list of newly-added items (also appended to queue).
 
-    A candidate that can't yield MIN_PHOTOS_PER_POST good photos is skipped
-    (added to `failed`) and the next-best listing is tried instead."""
+    Format rotates deterministically over the sequence of autopilot posts
+    (see ig_local_series.FORMAT_ROTATION).  A candidate that can't yield
+    enough photos for the current format is skipped and the next-best
+    listing is tried instead."""
     items = queue.setdefault("items", [])
     added: list = []
     failed: set = set()
@@ -487,24 +335,24 @@ def topup(
             print("[ig_autopilot] no candidates available — stopping topup", file=sys.stderr)
             break
         day = _next_day(items + added)
-        # Alternate brand-led / showcase by post index (mix, per brief).
+        # Rotate format by the count of autopilot posts so far (existing +
+        # this run) so the feed stays varied and the console can preview it.
         autopilot_so_far = sum(1 for it in items + added if str(it.get("selector")) == "autopilot")
-        kind = "brand" if autopilot_so_far % 2 == 0 else "showcase"
-        brand_msg = brand_messages[autopilot_so_far % len(brand_messages)]
+        fmt = _series.format_for_index(autopilot_so_far)
         scheduled = _next_slot(items + added, now, cadence_days).isoformat()
         listing = ranked_index.get(cand.get("listing_id"), {})
         item = build_item(
-            day=day, kind=kind, candidate=cand, listing=listing,
-            brand_msg=brand_msg, scheduled_for=scheduled, assets_root=assets_root,
-            skip_render=skip_render, poster_renderer=poster_renderer,
-            caption_generator=caption_generator, photo_preparer=photo_preparer,
+            day=day, fmt=fmt, candidate=cand, listing=listing,
+            scheduled_for=scheduled, assets_root=assets_root,
+            skip_render=skip_render, slide_renderer=slide_renderer,
+            photo_preparer=photo_preparer,
         )
         if item is None:                    # too few usable photos → try another
             failed.add(cand.get("listing_id"))
             continue
         added.append(item)
         print(
-            f"[ig_autopilot] queued d{day} kind={kind} "
+            f"[ig_autopilot] queued d{day} format={fmt} "
             f"listing={cand.get('listing_id')} scheduled={scheduled} "
             f"slides={1 + len(item['carousel_photo_paths'])} "
             f"caption_status={item['caption_status']}"
