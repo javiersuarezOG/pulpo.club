@@ -816,6 +816,216 @@
       "posted_media_id": "17987059041034410",
       "comment_posted": true,
       "comment_id": "18105594383036065"
+    },
+    {
+      "day": 215,
+      "shelf": "autopilot_regreso",
+      "format": "regreso",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "regreso",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-07-25T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d215__regreso",
+      "poster_path": "web/data/ig_assets/autopilot/d215__regreso/slide_1.png",
+      "poster_overrides": {},
+      "caption": "**Para el salvadoreño que anda lejos y un día quiere volver.**\n\nUn pedazo de El Tunco — para los findes, para la familia, para tener algo que de verdad es tuyo aquí. No es sueño, es un link.\n\n· · ·\n\n*For the Salvadoran living abroad who dreams of coming home. Your piece of the coast is one link away.*\n\npulpo.club · link en bio",
+      "comment": "Todas las propiedades del país, rankeadas por valor, en un solo lugar. Desde donde estés.\npulpo.club\n\n#ElSalvador #BienesRaices #TerrenosEnElSalvador #SurfCity #ElTunco #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d215__regreso/slide_2.png",
+        "web/data/ig_assets/autopilot/d215__regreso/slide_3.png"
+      ],
+      "listing_ids": [
+        "bienesraices__1529"
+      ],
+      "primary_listing_id": "bienesraices__1529",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 216,
+      "shelf": "autopilot_guess",
+      "format": "guess",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "guess",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-07-26T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d216__guess",
+      "poster_path": "web/data/ig_assets/autopilot/d216__guess/slide_1.png",
+      "poster_overrides": {},
+      "caption": "**El Tunco. 1,412 m². ¿Cuánto creés que vale?**\n\nTirá tu número en los comentarios antes de deslizar. Sin googlear.\n\n· · ·\n\n$230,000. 24% bajo el precio de la zona.\n\n¿Muy caro o muy barato? Lo comparamos contra todo el mercado del país y sale de los mejores.\n\npulpo.club · link en bio",
+      "comment": "¿Le atinaste? Tirá tu número 👇\n\nComparamos cada propiedad por precio, zona y acceso, y te mostramos solo las mejores. El Top 10 en tu correo cada domingo.\npulpo.club\n\n#ElSalvador #BienesRaices #TerrenosEnElSalvador #SurfCity #ElTunco #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d216__guess/slide_2.png",
+        "web/data/ig_assets/autopilot/d216__guess/slide_3.png"
+      ],
+      "listing_ids": [
+        "bienesraices__1783"
+      ],
+      "primary_listing_id": "bienesraices__1783",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 217,
+      "shelf": "autopilot_numero_uno",
+      "format": "numero_uno",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "numero_uno",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-07-27T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d217__numero_uno",
+      "poster_path": "web/data/ig_assets/autopilot/d217__numero_uno/slide_1.png",
+      "poster_overrides": {},
+      "caption": "**El #1 de esta semana: El Zonte.**\n\nCada semana comparamos todas las propiedades del país y las ordenamos de mejor a peor. Sin cuñados, sin paja, solo datos.\n\nPor qué está en el #1: 36% bajo el precio de la zona.\n\n¿Vos en cuál te quedás — playa o lago? El Top 10 completo, cada domingo en tu correo.\n\npulpo.club · link en bio",
+      "comment": "Así rankeamos: precio, zona y acceso, cada propiedad del país, cada semana. Vos ves solo lo mejor.\nEl Top 10 en tu correo cada domingo 👉 pulpo.club\n\n#ElSalvador #BienesRaices #TerrenosEnElSalvador #SurfCity #ElZonte #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d217__numero_uno/slide_2.png",
+        "web/data/ig_assets/autopilot/d217__numero_uno/slide_3.png"
+      ],
+      "listing_ids": [
+        "bienesraices__1875"
+      ],
+      "primary_listing_id": "bienesraices__1875",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 218,
+      "shelf": "autopilot_guess",
+      "format": "guess",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "guess",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-07-28T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d218__guess",
+      "poster_path": "web/data/ig_assets/autopilot/d218__guess/slide_1.png",
+      "poster_overrides": {},
+      "caption": "**La Libertad. 23,000 m². ¿Cuánto creés que vale?**\n\nTirá tu número en los comentarios antes de deslizar. Sin googlear.\n\n· · ·\n\n$550,000. 86% bajo el precio de la zona.\n\n¿Muy caro o muy barato? Lo comparamos contra todo el mercado del país y sale de los mejores.\n\npulpo.club · link en bio",
+      "comment": "¿Le atinaste? Tirá tu número 👇\n\nComparamos cada propiedad por precio, zona y acceso, y te mostramos solo las mejores. El Top 10 en tu correo cada domingo.\npulpo.club\n\n#ElSalvador #BienesRaices #TerrenosEnElSalvador #SurfCity #LaLibertad #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d218__guess/slide_2.png",
+        "web/data/ig_assets/autopilot/d218__guess/slide_3.png"
+      ],
+      "listing_ids": [
+        "bienesraices__2191"
+      ],
+      "primary_listing_id": "bienesraices__2191",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 219,
+      "shelf": "autopilot_regreso",
+      "format": "regreso",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "regreso",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-07-29T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d219__regreso",
+      "poster_path": "web/data/ig_assets/autopilot/d219__regreso/slide_1.png",
+      "poster_overrides": {},
+      "caption": "**Para el salvadoreño que anda lejos y un día quiere volver.**\n\nUn pedazo de La Libertad — para los findes, para la familia, para tener algo que de verdad es tuyo aquí. No es sueño, es un link.\n\n· · ·\n\n*For the Salvadoran living abroad who dreams of coming home. Your piece of the coast is one link away.*\n\npulpo.club · link en bio",
+      "comment": "Todas las propiedades del país, rankeadas por valor, en un solo lugar. Desde donde estés.\npulpo.club\n\n#ElSalvador #BienesRaices #TerrenosEnElSalvador #SurfCity #LaLibertad #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d219__regreso/slide_2.png",
+        "web/data/ig_assets/autopilot/d219__regreso/slide_3.png"
+      ],
+      "listing_ids": [
+        "bienesraices__2258"
+      ],
+      "primary_listing_id": "bienesraices__2258",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 220,
+      "shelf": "autopilot_guess",
+      "format": "guess",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "guess",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-07-30T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d220__guess",
+      "poster_path": "web/data/ig_assets/autopilot/d220__guess/slide_1.png",
+      "poster_overrides": {},
+      "caption": "**El Tunco. 3,204 m². ¿Cuánto creés que vale?**\n\nTirá tu número en los comentarios antes de deslizar. Sin googlear.\n\n· · ·\n\n$550,000. 20% bajo el precio de la zona.\n\n¿Muy caro o muy barato? Lo comparamos contra todo el mercado del país y sale de los mejores.\n\npulpo.club · link en bio",
+      "comment": "¿Le atinaste? Tirá tu número 👇\n\nComparamos cada propiedad por precio, zona y acceso, y te mostramos solo las mejores. El Top 10 en tu correo cada domingo.\npulpo.club\n\n#ElSalvador #BienesRaices #TerrenosEnElSalvador #SurfCity #ElTunco #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d220__guess/slide_2.png",
+        "web/data/ig_assets/autopilot/d220__guess/slide_3.png"
+      ],
+      "listing_ids": [
+        "bienesraices__2135"
+      ],
+      "primary_listing_id": "bienesraices__2135",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 221,
+      "shelf": "autopilot_numero_uno",
+      "format": "numero_uno",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "numero_uno",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-07-31T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d221__numero_uno",
+      "poster_path": "web/data/ig_assets/autopilot/d221__numero_uno/slide_1.png",
+      "poster_overrides": {},
+      "caption": "**El #1 de esta semana: El Zonte.**\n\nCada semana comparamos todas las propiedades del país y las ordenamos de mejor a peor. Sin cuñados, sin paja, solo datos.\n\nPor qué está en el #1: 19% bajo el precio de la zona.\n\n¿Vos en cuál te quedás — playa o lago? El Top 10 completo, cada domingo en tu correo.\n\npulpo.club · link en bio",
+      "comment": "Así rankeamos: precio, zona y acceso, cada propiedad del país, cada semana. Vos ves solo lo mejor.\nEl Top 10 en tu correo cada domingo 👉 pulpo.club\n\n#ElSalvador #BienesRaices #TerrenosEnElSalvador #SurfCity #ElZonte #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d221__numero_uno/slide_2.png",
+        "web/data/ig_assets/autopilot/d221__numero_uno/slide_3.png"
+      ],
+      "listing_ids": [
+        "bienesraices__2296"
+      ],
+      "primary_listing_id": "bienesraices__2296",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
