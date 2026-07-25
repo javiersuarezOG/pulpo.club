@@ -1040,6 +1040,223 @@
       "posted_media_id": null,
       "skipped": true,
       "skipped_at": "2026-07-25T10:56:11+00:00"
+    },
+    {
+      "day": 222,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "hora_dorada",
+      "emotion": "lugar",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "hora_dorada",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-08-01T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d222__hora_dorada",
+      "poster_path": "web/data/ig_assets/autopilot/d222__hora_dorada/slide_1.png",
+      "poster_overrides": {},
+      "caption": "Esa media hora en que todo se pone dorado y el mundo baja la velocidad. Imaginá que pasa desde tu terraza.\n\n📍 Conchagua. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "Conchagua · 77,000 m² · $1.1M.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #Conchagua #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d222__hora_dorada/slide_2.png"
+      ],
+      "listing_ids": [
+        "bienesraices__1132"
+      ],
+      "primary_listing_id": "bienesraices__1132",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 223,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "aprendan_nadar",
+      "emotion": "familia",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "aprendan_nadar",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-08-02T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d223__aprendan_nadar",
+      "poster_path": "web/data/ig_assets/autopilot/d223__aprendan_nadar/slide_1.png",
+      "poster_overrides": {},
+      "caption": "No es un terreno: es tardes de sal en el pelo y risas que se oyen desde la casa. Es donde crecen.\n\n📍 El Cuco. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "El Cuco · 49,000 m² · $830,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #ElCuco #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d223__aprendan_nadar/slide_2.png"
+      ],
+      "listing_ids": [
+        "bienesraices__2007"
+      ],
+      "primary_listing_id": "bienesraices__2007",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 224,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "semaforo_marea",
+      "emotion": "cambio",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "semaforo_marea",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-08-03T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d224__semaforo_marea",
+      "poster_path": "web/data/ig_assets/autopilot/d224__semaforo_marea/slide_1.png",
+      "poster_overrides": {},
+      "caption": "El semáforo o la marea. Los dos te hacen esperar; solo uno te devuelve algo. Elegí con calma.\n\n📍 La Libertad. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "La Libertad · 200 m² · $22,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #LaLibertad #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d224__semaforo_marea/slide_2.png"
+      ],
+      "listing_ids": [
+        "bienesraices__2101"
+      ],
+      "primary_listing_id": "bienesraices__2101",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 225,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "algun_dia",
+      "emotion": "empuje",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "algun_dia",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-08-04T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d225__algun_dia",
+      "poster_path": "web/data/ig_assets/autopilot/d225__algun_dia/slide_1.png",
+      "poster_overrides": {},
+      "caption": "Siempre es 'algún día'. Algún día el mar, algún día la casa, algún día volver. Ese día no llega solo.\n\n📍 Lago Ilopango. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "Lago Ilopango · 240,000 m² · $600,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #LagoIlopango #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d225__algun_dia/slide_2.png"
+      ],
+      "listing_ids": [
+        "citymax__153112"
+      ],
+      "primary_listing_id": "citymax__153112",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 226,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "olor_lluvia",
+      "emotion": "pertenencia",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "olor_lluvia",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-08-05T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d226__olor_lluvia",
+      "poster_path": "web/data/ig_assets/autopilot/d226__olor_lluvia/slide_1.png",
+      "poster_overrides": {},
+      "caption": "El primer aguacero sobre tierra que es tuya huele distinto. A principio, a raíz, a que por fin llegaste.\n\n📍 San Jose Villanueva. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "San Jose Villanueva · 7,000 m² · $340,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #SanJoseVillanueva #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d226__olor_lluvia/slide_2.png"
+      ],
+      "listing_ids": [
+        "bienesraices__1244"
+      ],
+      "primary_listing_id": "bienesraices__1244",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 227,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "horizonte",
+      "emotion": "amplitud",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "horizonte",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-08-06T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d227__horizonte",
+      "poster_path": "web/data/ig_assets/autopilot/d227__horizonte/slide_1.png",
+      "poster_overrides": {},
+      "caption": "Sin paredes del vecino, sin ruido ajeno. Solo vos, el aire y una línea de mar hasta donde alcanza la vista.\n\n📍 Punta Mango. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "Punta Mango · 1,830 m² · $300,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #PuntaMango #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d227__horizonte/slide_2.png"
+      ],
+      "listing_ids": [
+        "bienesraices__1580"
+      ],
+      "primary_listing_id": "bienesraices__1580",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 228,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "abuelo",
+      "emotion": "memoria",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "abuelo",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-08-07T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d228__abuelo",
+      "poster_path": "web/data/ig_assets/autopilot/d228__abuelo/slide_1.png",
+      "poster_overrides": {},
+      "caption": "Tu familia conoce esta costa de memoria. Quedártela no es comprar un lugar: es no soltar el hilo.\n\n📍 El Tunco. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "El Tunco · 1,581 m² · $225,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #ElTunco #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d228__abuelo/slide_2.png"
+      ],
+      "listing_ids": [
+        "bienesraices__1529"
+      ],
+      "primary_listing_id": "bienesraices__1529",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
