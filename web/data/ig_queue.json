@@ -906,10 +906,12 @@
       ],
       "primary_listing_id": "bienesraices__1875",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-25T10:56:11+00:00"
     },
     {
       "day": 218,
@@ -968,10 +970,12 @@
       ],
       "primary_listing_id": "bienesraices__2258",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-25T10:56:11+00:00"
     },
     {
       "day": 220,
@@ -998,10 +1002,12 @@
       ],
       "primary_listing_id": "bienesraices__2135",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-25T10:56:11+00:00"
     },
     {
       "day": 221,
@@ -1028,10 +1034,12 @@
       ],
       "primary_listing_id": "bienesraices__2296",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-25T10:56:11+00:00"
     }
   ]
 }
