@@ -18,6 +18,7 @@ from automation.ig_autopilot import (   # noqa: E402
     build_item,
     prepare_listing_photos,
     topup,
+    _beauty,
     _future_approved_count,
     _next_slot,
     _next_day,
@@ -133,6 +134,53 @@ def test_pick_candidate_quality_gate_beats_rank():
     cands = [{"listing_id": "a__1", "hero_photo_quality_score": 80, "rank": 99},
              {"listing_id": "a__2", "hero_photo_quality_score": 100, "rank": 40}]
     assert _pick_candidate(cands, set())["listing_id"] == "a__2"
+
+
+# ── beauty gate (perfect pics) + scheduling ───────────────────────────
+
+def test_beauty_scores_scenic_over_dull():
+    clean_ocean, s1 = _beauty({"has_ocean_view": True, "dist_beach_km": 0.2})
+    clean_dull, s2 = _beauty({"dist_beach_km": 40})
+    flagged, s3 = _beauty({"hires_aesthetic_issues": ["uninteresting"], "has_ocean_view": True})
+    assert clean_ocean and s1 >= 5          # ocean(3)+coast(2)
+    assert clean_dull and s2 == 0
+    assert flagged is False                 # aesthetic issue → not clean
+
+
+def test_pick_candidate_beauty_gate_prefers_scenic_clean():
+    cands = [
+        {"listing_id": "d__1", "hero_photo_quality_score": 100, "rank_score": 99},  # dull, top rank
+        {"listing_id": "s__1", "hero_photo_quality_score": 100, "rank_score": 40},  # scenic+clean
+        {"listing_id": "u__1", "hero_photo_quality_score": 100, "rank_score": 95},  # uninteresting
+    ]
+    rindex = {
+        "d__1": {"dist_beach_km": 50},
+        "s__1": {"has_ocean_view": True, "dist_beach_km": 0.3},
+        "u__1": {"hires_aesthetic_issues": ["uninteresting"], "has_ocean_view": True},
+    }
+    # beauty gate on → the scenic+clean one wins despite lower rank
+    assert _pick_candidate(cands, set(), rindex)["listing_id"] == "s__1"
+    # no ranked_index → falls back to pure rank (back-compat)
+    assert _pick_candidate(cands, set())["listing_id"] == "d__1"
+
+
+def test_pick_candidate_beauty_falls_back_to_clean_when_no_scenic():
+    cands = [{"listing_id": "d__1", "hero_photo_quality_score": 100, "rank_score": 50},
+             {"listing_id": "u__1", "hero_photo_quality_score": 100, "rank_score": 90}]
+    rindex = {"d__1": {"dist_beach_km": 40},                                  # clean, not scenic
+              "u__1": {"hires_aesthetic_issues": ["uninteresting"]}}          # flagged
+    # no scenic option → prefer the merely-clean one over the flagged one
+    assert _pick_candidate(cands, set(), rindex)["listing_id"] == "d__1"
+
+
+def test_next_slot_ignores_skipped_items():
+    # a skipped post scheduled far out must NOT push the next slot past it
+    items = [
+        {"scheduled_for": "2026-07-25T01:00:00+00:00", "posted": True},        # latest real
+        {"scheduled_for": "2026-07-31T01:00:00+00:00", "skipped": True},        # freed slot
+    ]
+    nxt = _next_slot(items, datetime(2026, 7, 25, 12, 0, tzinfo=timezone.utc), 1)
+    assert nxt.date().isoformat() == "2026-07-26"   # backfills, not Aug 1
 
 
 def test_build_item_returns_none_without_a_photo():

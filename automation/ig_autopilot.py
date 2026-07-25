@@ -94,9 +94,15 @@ def _future_approved_count(items: list, now: datetime) -> int:
 
 def _next_slot(items: list, now: datetime, cadence_days: int) -> datetime:
     """Latest scheduled (posted or future) + cadence, floored at
-    now + cadence so the operator always has a skip window."""
+    now + cadence so the operator always has a skip window.
+
+    Skipped items are ignored: skipping a post frees its slot, so the next
+    post should backfill it rather than schedule after the freed date (this
+    is what caused the Jul 26–31 gap when the sales posts were skipped)."""
     latest = None
     for it in items:
+        if it.get("skipped"):
+            continue
         sched = _parse_iso(it.get("scheduled_for"))
         if sched and (latest is None or sched > latest):
             latest = sched
@@ -116,9 +122,41 @@ def _next_slot(items: list, now: datetime, cadence_days: int) -> datetime:
 MIN_PHOTO_QUALITY = 100
 
 
-def _pick_candidate(candidates: list, used: set) -> Optional[dict]:
-    """Highest-rank candidate with a top-quality hero photo, not featured
-    recently."""
+# ── beauty gate (Javier, 2026-07-25 — "perfect pics") ─────────────────
+#
+# Brand-safe is not enough for an INSPIRE feed: the pipeline still lets
+# through technically-clean-but-dull land shots (it even flags them
+# ``hires_aesthetic_issues: ['uninteresting']``). The story feed draws
+# only from listings whose hero is *clean AND scenic* — ocean/mountain view
+# or genuinely coastal — with a graceful fallback to merely-clean so the
+# generator never strands. The join to the ranked listing carries these
+# fields (candidates don't), so beauty is scored via ranked_index.
+
+def _beauty(listing: dict) -> tuple[bool, float]:
+    """Return (is_clean, scenic_score) for a listing's hero.
+
+    is_clean  → no ``hires_aesthetic_issues`` (drops 'uninteresting' etc.).
+    scenic    → ocean view (3) + coastal ≤1km (2) + mountain view (1)."""
+    clean = not (listing.get("hires_aesthetic_issues") or [])
+    score = 0.0
+    if listing.get("has_ocean_view"):
+        score += 3
+    if (listing.get("dist_beach_km") if listing.get("dist_beach_km") is not None else 99) <= 1.0:
+        score += 2
+    if listing.get("has_mountain_view"):
+        score += 1
+    return clean, score
+
+
+def _pick_candidate(
+    candidates: list, used: set, ranked_index: Optional[dict] = None
+) -> Optional[dict]:
+    """Pick the best unused candidate with a top-quality hero.
+
+    When ``ranked_index`` is given (the story feed), apply the beauty gate:
+    prefer clean+scenic listings, fall back to clean, then to any — so the
+    cover is always as beautiful as the inventory allows, never dull-by-
+    default, but the generator still never strands."""
     quality = [
         c for c in candidates
         if (c.get("hero_photo_quality_score") or 0) >= MIN_PHOTO_QUALITY
@@ -127,7 +165,18 @@ def _pick_candidate(candidates: list, used: set) -> Optional[dict]:
     pool = [c for c in base if c.get("listing_id") not in used] or base
     if not pool:
         return None
-    return max(pool, key=lambda c: c.get("rank_score") or c.get("rank") or 0)
+
+    if ranked_index is None:
+        return max(pool, key=lambda c: c.get("rank_score") or c.get("rank") or 0)
+
+    def _b(c):
+        return _beauty(ranked_index.get(c.get("listing_id"), {}))
+
+    scenic_clean = [c for c in pool if (lambda cl, s: cl and s > 0)(*_b(c))]
+    clean = [c for c in pool if _b(c)[0]]
+    tier = scenic_clean or clean or pool
+    # within the chosen tier: most scenic first, then highest rank
+    return max(tier, key=lambda c: (_b(c)[1], c.get("rank_score") or c.get("rank") or 0))
 
 
 # ── listing photos (real, resolution-checked, 1080×1350) ──────────────
@@ -346,7 +395,7 @@ def topup(
     while _future_approved_count(items + added, now) < lookahead and guard < max_iters:
         guard += 1
         used = _used_listing_ids(items + added) | failed
-        cand = _pick_candidate(candidates, used)
+        cand = _pick_candidate(candidates, used, ranked_index)
         if cand is None:
             print("[ig_autopilot] no candidates available — stopping topup", file=sys.stderr)
             break
