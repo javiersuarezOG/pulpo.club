@@ -5,13 +5,13 @@ posts so the hourly publisher (automation/ig_publish.py) can post on its
 own.  The operator's only lever is Skip (in /admin/ig) + the IG_PAUSED
 kill switch.
 
-Content comes from the local-voice engine
-(``automation/ig_local_series.py``): every post is one of three rotating
-formats — ``guess`` (¿Cuánto cuesta?, the comment flywheel), ``numero_uno``
-(El #1 de la semana), ``regreso`` (Para cuando regresés) — rendered as a
-branded carousel via ``automation/ig_campaign_poster.py``.  Each post shows
-a real listing (photo-gated from ig_candidates.json — no broker-watermarked
-photos leak), picked highest-rank-first and not re-featured recently.
+Content comes from the story engine (``automation/ig_story_series.py``):
+**inspire, don't sell.** Every post is a cinematic *story* — a real
+listing's brand-safe hero photo + one poetic line — from a 14-strong library
+that rotates with no repeat inside a cycle, rendered via
+``automation/ig_campaign_poster.py``.  Each post shows a real listing,
+picked highest-rank-first and not re-featured recently; the ONLY photo shown
+is the pipeline-vetted hero (brand-safety: no broker logos / phone numbers).
 
 Design: the content engine is pure (decides what each post says + shows);
 this module downloads the listing photos, renders the slides, and shapes
@@ -41,7 +41,7 @@ from typing import Callable, Optional
 from automation.ig_campaign_poster import render_slide as _render_slide
 from automation.ig_campaign_poster import CATEGORY_COLORS, INSPIRACION
 from automation.ig_caption_lint import check as _lint_check
-from automation import ig_local_series as _series
+from automation import ig_story_series as _series
 
 DEFAULT_QUEUE = Path("web/data/ig_queue.json")
 DEFAULT_CANDIDATES = Path("web/data/ig_candidates.json")
@@ -194,8 +194,20 @@ def prepare_listing_photos(
 ) -> list:
     """Download + normalise up to `want` good listing photos. Returns the
     list of web-relative paths (may be shorter than `want`; empty when the
-    listing has no usable photos)."""
-    urls = listing.get("photo_urls") or []
+    listing has no usable photos).
+
+    Brand safety (Javier, 2026-07-25 — "no broker logos, tel numbers,
+    perfect pics"): photos are taken in the gate's VETTED order —
+    ``order_photo_indices`` leads with the quality-scored hero and DROPS any
+    frame the per-photo picker rejected (broker flyers, logos, text
+    overlays: ``photo_urls_rejected``). This is the fix for the day-218
+    broker-phone cover, which used raw ``photo_urls[0]`` and bypassed all of
+    that. Falls back to raw order only when the listing predates the
+    ordering fields (no photos_count)."""
+    from automation.ig_photo_gate import order_photo_indices
+    all_urls = listing.get("photo_urls") or []
+    idxs = order_photo_indices(listing)
+    urls = [all_urls[i] for i in idxs if 0 <= i < len(all_urls)] or all_urls
     out: list = []
     assets_dir.mkdir(parents=True, exist_ok=True)
     for url in urls:
@@ -231,7 +243,7 @@ def _predict_photos(listing: dict, assets_dir: Path, slug: str, want: int = PHOT
 def build_item(
     *,
     day: int,
-    fmt: str,                       # "guess" | "numero_uno" | "regreso"
+    story: dict,                    # a STORIES entry (ig_story_series)
     candidate: dict,
     listing: dict,
     scheduled_for: str,
@@ -240,22 +252,24 @@ def build_item(
     slide_renderer: Callable = _render_slide,
     photo_preparer: Callable = prepare_listing_photos,
 ) -> Optional[dict]:
-    """Build one approved queue item for `fmt`: a branded carousel of
-    rendered slides + the local-voice caption + first comment.  Returns
-    None when the listing can't yield enough photos for the format (caller
-    should try another listing)."""
-    slug = f"d{day:03d}__{fmt}"
+    """Build one approved queue item for `story`: the cinematic cover (using
+    the brand-safe hero photo) + a photo-free brand closer, an inspirational
+    caption, and a first comment that whispers the listing details. Returns
+    None when the listing yields no usable (brand-safe) photo."""
+    sid = story["id"]
+    slug = f"d{day:03d}__{sid}"
     assets_dir = assets_root / slug
 
-    # Real, resolution-checked listing photos (up to 3). The content engine
-    # decides how many the format needs; bail if the listing is too thin.
-    photos = photo_preparer(listing, assets_dir, slug, want=PHOTOS_PER_POST)
-    post = _series.build_post(fmt, candidate, listing, photos)
+    # ONLY the vetted hero (brand-safe ordering leads with it; rejected
+    # frames dropped). want=1 so no second, less-vetted frame is ever even
+    # downloaded — if the hero URL is dead we skip the listing entirely
+    # rather than fall back to a photo that could carry a broker mark.
+    photos = photo_preparer(listing, assets_dir, slug, want=1)
+    post = _series.build_post(story, candidate, listing, photos)
     if post is None:
         print(
             f"[ig_autopilot] d{day} skip {candidate.get('listing_id')}: "
-            f"only {len(photos)} usable photo(s) for format {fmt} "
-            f"(need {_series.min_photos(fmt)})",
+            f"no usable brand-safe photo for story {sid}",
             file=sys.stderr,
         )
         return None
@@ -272,13 +286,15 @@ def build_item(
     violations = _lint_check(caption)
     return {
         "day": day,
-        "shelf": f"autopilot_{fmt}",
-        "format": fmt,
+        "shelf": "autopilot_story",
+        "format": "story",
+        "story_id": sid,
+        "emotion": post.get("emotion"),
         "selector": "autopilot",
         "color_key": post["color_key"],
         # kept for the review widget's summary line (poster_type · palette);
         # autopilot items normally render in the console, not review.
-        "poster_type": fmt,
+        "poster_type": sid,
         "palette": post["color_key"],
         "scheduled_for": scheduled_for,
         "assets_dir": f"web/data/ig_assets/autopilot/{slug}",
@@ -318,10 +334,10 @@ def topup(
     """Append approved items until `lookahead` future posts exist.
     Returns the list of newly-added items (also appended to queue).
 
-    Format rotates deterministically over the sequence of autopilot posts
-    (see ig_local_series.FORMAT_ROTATION).  A candidate that can't yield
-    enough photos for the current format is skipped and the next-best
-    listing is tried instead."""
+    Stories rotate deterministically over the sequence of autopilot posts
+    (see ig_story_series.story_for_index) — no repeat within a 14-post cycle.
+    A candidate whose photos aren't brand-safe/usable is skipped and the
+    next-best listing is tried instead."""
     items = queue.setdefault("items", [])
     added: list = []
     failed: set = set()
@@ -335,24 +351,25 @@ def topup(
             print("[ig_autopilot] no candidates available — stopping topup", file=sys.stderr)
             break
         day = _next_day(items + added)
-        # Rotate format by the count of autopilot posts so far (existing +
-        # this run) so the feed stays varied and the console can preview it.
+        # Rotate the story by the count of autopilot posts so far (existing +
+        # this run) so no two consecutive days repeat and the console can
+        # preview what's coming.
         autopilot_so_far = sum(1 for it in items + added if str(it.get("selector")) == "autopilot")
-        fmt = _series.format_for_index(autopilot_so_far)
+        story = _series.story_for_index(autopilot_so_far)
         scheduled = _next_slot(items + added, now, cadence_days).isoformat()
         listing = ranked_index.get(cand.get("listing_id"), {})
         item = build_item(
-            day=day, fmt=fmt, candidate=cand, listing=listing,
+            day=day, story=story, candidate=cand, listing=listing,
             scheduled_for=scheduled, assets_root=assets_root,
             skip_render=skip_render, slide_renderer=slide_renderer,
             photo_preparer=photo_preparer,
         )
-        if item is None:                    # too few usable photos → try another
+        if item is None:                    # no brand-safe photo → try another
             failed.add(cand.get("listing_id"))
             continue
         added.append(item)
         print(
-            f"[ig_autopilot] queued d{day} format={fmt} "
+            f"[ig_autopilot] queued d{day} story={story['id']} "
             f"listing={cand.get('listing_id')} scheduled={scheduled} "
             f"slides={1 + len(item['carousel_photo_paths'])} "
             f"caption_status={item['caption_status']}"

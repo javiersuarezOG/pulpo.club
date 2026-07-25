@@ -90,7 +90,9 @@ _BRAND = (
 _FONTS_LINK = (
     '<link rel="preconnect" href="https://fonts.googleapis.com">'
     '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-    '<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">'
+    '<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900'
+    '&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,600;1,9..144,900'
+    '&display=swap" rel="stylesheet">'
 )
 
 _BASE_CSS = """
@@ -169,6 +171,24 @@ body{font-family:"Nunito",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
 .rvl .amt{font-weight:900;font-size:196px;line-height:1;letter-spacing:-.03em;background:#fff;color:#161c20;
   padding:18px 60px;border-radius:44px;margin-top:8px;box-shadow:0 22px 54px -18px rgba(0,0,0,.6)}
 .rvl .amt.sm{font-size:150px}
+/* ---- story (cinematic, editorial serif) — inspire, don't sell ---- */
+.slide.story{padding:0}
+.slide.story .ph{position:absolute;inset:0;background-size:cover;background-position:center}
+.slide.story .sc{position:absolute;inset:0}
+.slide.story .eye{position:absolute;left:80px;z-index:3;font-family:"Nunito",sans-serif;font-weight:800;
+  font-size:29px;letter-spacing:.16em;text-transform:uppercase;opacity:.92;text-shadow:0 2px 14px rgba(0,0,0,.7)}
+.slide.story .tw{position:absolute;left:80px;right:80px;z-index:3}
+.slide.story .ln{font-family:"Fraunces",Georgia,serif;font-weight:900;font-size:100px;line-height:1.02;
+  letter-spacing:-.015em;text-shadow:0 4px 34px rgba(0,0,0,.6)}
+.slide.story .ln.sm{font-size:82px}
+.slide.story .ln b{color:#ff7a5c;font-weight:900;font-style:italic}
+.slide.story .sub{margin-top:26px;font-family:"Fraunces",Georgia,serif;font-weight:500;font-style:italic;
+  font-size:43px;opacity:.95;text-shadow:0 2px 16px rgba(0,0,0,.75)}
+.slide.story .sign{position:absolute;left:80px;bottom:70px;z-index:4;display:flex;align-items:center;gap:16px}
+.slide.story .sign .m{width:66px;height:66px;color:#fff;filter:drop-shadow(0 3px 8px rgba(0,0,0,.6))}
+.slide.story .sign .wm{font-family:"Nunito",sans-serif;font-weight:900;font-size:46px;letter-spacing:-.02em;text-shadow:0 2px 12px rgba(0,0,0,.7)}
+.slide.story .sign .wm .club{opacity:.7;font-weight:800}
+.slide.story .sign .kick{font-family:"Nunito",sans-serif;font-size:22px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;opacity:.72;margin-left:4px}
 """
 
 
@@ -256,6 +276,50 @@ def _reveal(spec: dict, color: str) -> str:
         '<div class="pbot"><div class="pfoot">'
         '<span class="purl">pulpo.club · link en bio</span>'
         f'<span class="oct">{_OCT}</span></div></div></div>'
+    )
+
+
+_SCRIMS = {
+    "down":   "linear-gradient(180deg,rgba(0,0,0,.30),rgba(0,0,0,.02) 42%,rgba(0,0,0,.90))",
+    "up":     "linear-gradient(180deg,rgba(0,0,0,.86),rgba(0,0,0,.05) 46%,rgba(0,0,0,.42))",
+    "center": "linear-gradient(180deg,rgba(0,0,0,.52),rgba(0,0,0,.28) 50%,rgba(0,0,0,.72))",
+}
+_POS = {"bottom": "bottom:190px", "center": "top:50%;transform:translateY(-50%)", "top": "top:150px"}
+
+
+def _story(spec: dict, color: str) -> str:
+    """Cinematic, editorial-serif story slide — inspire, don't sell.  A real
+    listing photo full-bleed, one poetic line (with an optional accented
+    word), a small eyebrow, and the Pulpo sign-off.  No price, no ribbon:
+    the image carries the feeling; details live in the caption/first comment.
+
+    spec: img, eye, line (\\n for breaks), accent (substring to highlight),
+    sub (optional), pos in {bottom,center,top}, scrim in {down,up,center}."""
+    img = _encode_photo(spec["img"])
+    eye = _e(spec.get("eye", ""))
+    line_html = _br(spec.get("line", ""))
+    accent = spec.get("accent")
+    if accent:
+        acc = _e(accent).replace("\n", "<br>")
+        line_html = line_html.replace(acc, f"<b>{acc}</b>", 1)
+    sub = spec.get("sub", "")
+    sub_html = f'<div class="sub">{_e(sub)}</div>' if sub else ""
+    ln_cls = "ln sm" if spec.get("small") else "ln"
+    pos = _POS.get(spec.get("pos", "bottom"), _POS["bottom"])
+    scrim = _SCRIMS.get(spec.get("scrim", "down"), _SCRIMS["down"])
+    eye_top = "70px" if spec.get("pos") != "top" else "70px"
+    sign = (
+        f'<div class="sign"><span class="m">{_OCT}</span>'
+        '<span class="wm">pulpo<span class="club">.club</span></span>'
+        '<span class="kick">tu pedazo de paraíso</span></div>'
+    )
+    return (
+        '<div class="slide story">'
+        f'<div class="ph" style="background-image:url({img})"></div>'
+        f'<div class="sc" style="background:{scrim}"></div>'
+        f'<div class="eye" style="top:{eye_top}">{eye}</div>'
+        f'<div class="tw" style="{pos}"><div class="{ln_cls}">{line_html}</div>{sub_html}</div>'
+        f'{sign}</div>'
     )
 
 
@@ -430,7 +494,7 @@ def _detail(spec: dict, color: str) -> str:
 _DISPATCH = {
     "photo": _photo, "statement": _statement, "stat": _stat, "usp": _usp,
     "compare": _compare, "news": _news, "cta": _cta, "detail": _detail,
-    "guess": _guess, "reveal": _reveal,
+    "guess": _guess, "reveal": _reveal, "story": _story,
 }
 
 
