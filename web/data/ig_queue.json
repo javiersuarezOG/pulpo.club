@@ -843,9 +843,11 @@
       "primary_listing_id": "bienesraices__1529",
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-07-25T04:22:08.536232+00:00",
+      "posted_media_id": "17895647190558908",
+      "comment_posted": true,
+      "comment_id": "18613486525035809"
     },
     {
       "day": 216,
