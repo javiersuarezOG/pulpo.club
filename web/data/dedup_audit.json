@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-24T06:15:48.880570+00:00",
+  "computed_at": "2026-07-25T06:11:22.698743+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -109,6 +109,61 @@
       ],
       "sources": [
         "remax"
+      ]
+    },
+    {
+      "count": 5,
+      "cross_source": false,
+      "fingerprint": "9d3d41d0e424326dc335a37e3f1985f65354bc68",
+      "samples": [
+        {
+          "area_m2": null,
+          "price_usd": 35000.0,
+          "source": "realestate_au_sv",
+          "source_id": "portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485867",
+          "title": "Portezuelo atras de MC El Brasil, Porvenir Jocotillo, Santa Ana, Porvenir Jocotillo, Santa Ana Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485867/",
+          "zone": "santa-ana"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 35000.0,
+          "source": "realestate_au_sv",
+          "source_id": "portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485866",
+          "title": "Portezuelo atras de MC El Brasil, Porvenir Jocotillo, Santa Ana, Porvenir Jocotillo, Santa Ana Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485866/",
+          "zone": "santa-ana"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 35000.0,
+          "source": "realestate_au_sv",
+          "source_id": "portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485860",
+          "title": "Portezuelo atras de MC El Brasil, Porvenir Jocotillo, Santa Ana, Porvenir Jocotillo, Santa Ana Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485860/",
+          "zone": "santa-ana"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 35000.0,
+          "source": "realestate_au_sv",
+          "source_id": "portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485859",
+          "title": "Portezuelo atras de MC El Brasil, Porvenir Jocotillo, Santa Ana, Porvenir Jocotillo, Santa Ana Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485859/",
+          "zone": "santa-ana"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 35000.0,
+          "source": "realestate_au_sv",
+          "source_id": "portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485858",
+          "title": "Portezuelo atras de MC El Brasil, Porvenir Jocotillo, Santa Ana, Porvenir Jocotillo, Santa Ana Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485858/",
+          "zone": "santa-ana"
+        }
+      ],
+      "sources": [
+        "realestate_au_sv"
       ]
     },
     {
@@ -1379,34 +1434,6 @@
     {
       "count": 2,
       "cross_source": false,
-      "fingerprint": "96d710c04954c8a931ac500c6b20ae53886a5401",
-      "samples": [
-        {
-          "area_m2": null,
-          "price_usd": 82965.0,
-          "source": "realestate_au_sv",
-          "source_id": "lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251519",
-          "title": "Lotificacion San Juan Buenavista, Huizucar, La Libertad, Huizucar, La Libertad Department Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251519/",
-          "zone": "la-libertad"
-        },
-        {
-          "area_m2": null,
-          "price_usd": 82940.0,
-          "source": "realestate_au_sv",
-          "source_id": "lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251513",
-          "title": "Lotificacion San Juan Buenavista, Huizucar, La Libertad, Huizucar, La Libertad Department Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251513/",
-          "zone": "la-libertad"
-        }
-      ],
-      "sources": [
-        "realestate_au_sv"
-      ]
-    },
-    {
-      "count": 2,
-      "cross_source": false,
       "fingerprint": "a2239abf184705466f0a047da292a34dbfa01dd9",
       "samples": [
         {
@@ -1482,34 +1509,6 @@
           "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
           "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287046/",
           "zone": "santa-tecla"
-        }
-      ],
-      "sources": [
-        "realestate_au_sv"
-      ]
-    },
-    {
-      "count": 2,
-      "cross_source": false,
-      "fingerprint": "ac65702194f016d384f516624d5e994fce1c85eb",
-      "samples": [
-        {
-          "area_m2": null,
-          "price_usd": 70786.0,
-          "source": "realestate_au_sv",
-          "source_id": "lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251522",
-          "title": "Lotificacion San Juan Buenavista, Huizucar, La Libertad, Huizucar, La Libertad Department Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251522/",
-          "zone": "la-libertad"
-        },
-        {
-          "area_m2": null,
-          "price_usd": 71040.0,
-          "source": "realestate_au_sv",
-          "source_id": "lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251510",
-          "title": "Lotificacion San Juan Buenavista, Huizucar, La Libertad, Huizucar, La Libertad Department Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/lotificacion-san-juan-buenavista-huizucar-la-libertad-huizucar-la-libertad-department-310104251510/",
-          "zone": "la-libertad"
         }
       ],
       "sources": [
@@ -1830,10 +1829,10 @@
       "unique_in_source": 276
     },
     "encuentra24": {
-      "kept_as_unique": 23,
-      "raw": 23,
+      "kept_as_unique": 25,
+      "raw": 25,
       "shared_with_others": 0,
-      "unique_in_source": 23
+      "unique_in_source": 25
     },
     "essurf": {
       "kept_as_unique": 35,
@@ -1860,10 +1859,10 @@
       "unique_in_source": 25
     },
     "realestate_au_sv": {
-      "kept_as_unique": 285,
-      "raw": 335,
+      "kept_as_unique": 288,
+      "raw": 340,
       "shared_with_others": 0,
-      "unique_in_source": 285
+      "unique_in_source": 288
     },
     "remax": {
       "kept_as_unique": 331,
@@ -1890,6 +1889,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2072,
-  "total_unique_fingerprints": 1993
+  "total_in_dataset": 2079,
+  "total_unique_fingerprints": 1998
 }
