@@ -1067,10 +1067,12 @@
       ],
       "primary_listing_id": "bienesraices__1132",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-25T19:29:16+00:00"
     },
     {
       "day": 223,
@@ -1098,10 +1100,12 @@
       ],
       "primary_listing_id": "bienesraices__2007",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-25T19:29:16+00:00"
     },
     {
       "day": 224,
@@ -1129,10 +1133,12 @@
       ],
       "primary_listing_id": "bienesraices__2101",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-25T19:29:16+00:00"
     },
     {
       "day": 225,
@@ -1160,10 +1166,12 @@
       ],
       "primary_listing_id": "citymax__153112",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-25T19:29:16+00:00"
     },
     {
       "day": 226,
@@ -1191,10 +1199,12 @@
       ],
       "primary_listing_id": "bienesraices__1244",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-25T19:29:16+00:00"
     },
     {
       "day": 227,
@@ -1222,10 +1232,12 @@
       ],
       "primary_listing_id": "bienesraices__1580",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-25T19:29:16+00:00"
     },
     {
       "day": 228,
@@ -1253,10 +1265,12 @@
       ],
       "primary_listing_id": "bienesraices__1529",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-25T19:29:16+00:00"
     }
   ]
 }
