@@ -233,58 +233,76 @@ def _fit_slide(img):
     return None                                # too small to look sharp
 
 
-def prepare_listing_photos(
-    listing: dict,
-    assets_dir: Path,
-    slug: str,
-    *,
-    want: int = PHOTOS_PER_POST,
-    fetcher: Callable = _download_image,
-) -> list:
-    """Download + normalise up to `want` good listing photos. Returns the
-    list of web-relative paths (may be shorter than `want`; empty when the
-    listing has no usable photos).
+# ── beautiful-cover selection (the listing's OWN best fresh photo) ────
+#
+# Javier, 2026-07-26: the cover must be a GORGEOUS photo OF the listing
+# (same location, guaranteed), never one used before, no repeats. So for
+# each candidate we score every brand-safe, not-yet-used photo and take the
+# most beautiful — and if the best isn't good enough, we skip the listing
+# entirely (quality over cadence). ``used_urls`` is the no-repeat / never-
+# reused ledger (web/data/ig_used_photos.json).
 
-    Brand safety (Javier, 2026-07-25 — "no broker logos, tel numbers,
-    perfect pics"): photos are taken in the gate's VETTED order —
-    ``order_photo_indices`` leads with the quality-scored hero and DROPS any
-    frame the per-photo picker rejected (broker flyers, logos, text
-    overlays: ``photo_urls_rejected``). This is the fix for the day-218
-    broker-phone cover, which used raw ``photo_urls[0]`` and bypassed all of
-    that. Falls back to raw order only when the listing predates the
-    ordering fields (no photos_count)."""
+DEFAULT_USED_PHOTOS = Path("web/data/ig_used_photos.json")
+_COVER_SCAN_CAP = 8            # photos to score per listing (network budget)
+
+
+def _ordered_fresh_urls(listing: dict, used_urls: frozenset) -> list:
+    """Brand-safe photo URLs (order_photo_indices: hero-first, rejected
+    frames dropped) minus anything already used."""
     from automation.ig_photo_gate import order_photo_indices
     all_urls = listing.get("photo_urls") or []
     idxs = order_photo_indices(listing)
     urls = [all_urls[i] for i in idxs if 0 <= i < len(all_urls)] or all_urls
-    out: list = []
-    assets_dir.mkdir(parents=True, exist_ok=True)
-    for url in urls:
-        if len(out) >= want:
-            break
+    return [u for u in urls if u not in used_urls]
+
+
+def select_beautiful_cover(
+    listing: dict,
+    assets_dir: Path,
+    slug: str,
+    *,
+    used_urls: frozenset = frozenset(),
+    fetcher: Callable = _download_image,
+    scorer: Callable = None,
+    min_score: float = None,
+    cap: int = _COVER_SCAN_CAP,
+) -> Optional[tuple]:
+    """Download + score the listing's brand-safe, unused photos; return
+    ``(web_relative_path, chosen_url)`` for the most beautiful one — or None
+    if the best isn't gorgeous enough (skip the listing)."""
+    from automation.ig_photo_beauty import score_photo, GORGEOUS_MIN
+    scorer = scorer or score_photo
+    min_score = GORGEOUS_MIN if min_score is None else min_score
+
+    best = None                                       # (score, img, url)
+    for url in _ordered_fresh_urls(listing, used_urls)[:cap]:
         try:
             img = fetcher(url)
-            slide = _fit_slide(img)
-        except Exception as e:                                  # noqa: BLE001
-            print(f"[ig_autopilot] photo skip ({e}): {url[:80]}", file=sys.stderr)
+        except Exception as e:                        # noqa: BLE001
+            print(f"[ig_autopilot] cover fetch skip ({e}): {url[:80]}", file=sys.stderr)
             continue
-        if slide is None:
-            continue
-        idx = len(out) + 1
-        fname = f"photo_{idx}.jpg"
-        slide.save(assets_dir / fname, "JPEG", quality=88, optimize=True)
-        out.append(f"web/data/ig_assets/autopilot/{slug}/{fname}")
-    return out
+        sc = scorer(img)
+        if best is None or sc > best[0]:
+            best = (sc, img, url)
+    if best is None or best[0] < min_score:
+        return None
+    slide = _fit_slide(best[1])
+    if slide is None:
+        return None
+    assets_dir.mkdir(parents=True, exist_ok=True)
+    slide.save(assets_dir / "photo_1.jpg", "JPEG", quality=90, optimize=True)
+    print(f"[ig_autopilot] cover beauty={best[0]:.0f} {best[2][:70]}")
+    return f"web/data/ig_assets/autopilot/{slug}/photo_1.jpg", best[2]
 
 
-def _predict_photos(listing: dict, assets_dir: Path, slug: str, want: int = PHOTOS_PER_POST, **_) -> list:
-    """Offline stand-in for prepare_listing_photos (no download / no I/O) —
-    used by --skip-render dry runs and tests.  Predicts up to `want` paths
-    from the listing's photo_urls count."""
-    n = min(want, len(listing.get("photo_urls") or []))
-    return [
-        f"web/data/ig_assets/autopilot/{slug}/photo_{i + 1}.jpg" for i in range(n)
-    ]
+def _predict_cover(listing, assets_dir, slug, *, used_urls=frozenset(), **_) -> Optional[tuple]:
+    """Offline stand-in for select_beautiful_cover (no download / no score) —
+    used by --skip-render dry runs and tests. Returns the first fresh
+    brand-safe url as the 'chosen' cover."""
+    urls = _ordered_fresh_urls(listing, used_urls)
+    if not urls:
+        return None
+    return f"web/data/ig_assets/autopilot/{slug}/photo_1.jpg", urls[0]
 
 
 # ── item construction ─────────────────────────────────────────────────
@@ -298,29 +316,30 @@ def build_item(
     scheduled_for: str,
     assets_root: Path,
     skip_render: bool,
+    used_urls: frozenset = frozenset(),
     slide_renderer: Callable = _render_slide,
-    photo_preparer: Callable = prepare_listing_photos,
+    photo_selector: Callable = select_beautiful_cover,
 ) -> Optional[dict]:
-    """Build one approved queue item for `story`: the cinematic cover (using
-    the brand-safe hero photo) + a photo-free brand closer, an inspirational
-    caption, and a first comment that whispers the listing details. Returns
-    None when the listing yields no usable (brand-safe) photo."""
+    """Build one approved queue item for `story`: the cinematic cover (the
+    listing's OWN most-beautiful, unused, brand-safe photo) + a photo-free
+    brand closer, an inspirational caption, and a first comment that whispers
+    the listing details. Returns None when the listing has no gorgeous-enough
+    unused photo (caller tries another listing)."""
     sid = story["id"]
     slug = f"d{day:03d}__{sid}"
     assets_dir = assets_root / slug
 
-    # ONLY the vetted hero (brand-safe ordering leads with it; rejected
-    # frames dropped). want=1 so no second, less-vetted frame is ever even
-    # downloaded — if the hero URL is dead we skip the listing entirely
-    # rather than fall back to a photo that could carry a broker mark.
-    photos = photo_preparer(listing, assets_dir, slug, want=1)
-    post = _series.build_post(story, candidate, listing, photos)
-    if post is None:
+    sel = photo_selector(listing, assets_dir, slug, used_urls=used_urls)
+    if sel is None:
         print(
             f"[ig_autopilot] d{day} skip {candidate.get('listing_id')}: "
-            f"no usable brand-safe photo for story {sid}",
+            f"no gorgeous unused photo for story {sid}",
             file=sys.stderr,
         )
+        return None
+    cover_path, cover_url = sel
+    post = _series.build_post(story, candidate, listing, [cover_path])
+    if post is None:
         return None
 
     color = CATEGORY_COLORS.get(post["color_key"], INSPIRACION)
@@ -358,6 +377,9 @@ def build_item(
         "carousel_photo_paths": rendered[1:],
         "listing_ids": [candidate.get("listing_id")],
         "primary_listing_id": candidate.get("listing_id"),
+        # the exact photo used — appended to the no-repeat ledger so it's
+        # never reused as a cover again.
+        "cover_photo_url": cover_url,
         "status": "scheduled",
         # Auto-approve model: posts publish on schedule; operator only skips.
         "approved": True,
@@ -377,25 +399,32 @@ def topup(
     cadence_days: int,
     assets_root: Path,
     skip_render: bool,
+    used_urls: Optional[set] = None,
     slide_renderer: Callable = _render_slide,
-    photo_preparer: Callable = prepare_listing_photos,
+    photo_selector: Callable = select_beautiful_cover,
 ) -> list:
     """Append approved items until `lookahead` future posts exist.
     Returns the list of newly-added items (also appended to queue).
 
     Stories rotate deterministically over the sequence of autopilot posts
     (see ig_story_series.story_for_index) — no repeat within a 14-post cycle.
-    A candidate whose photos aren't brand-safe/usable is skipped and the
-    next-best listing is tried instead."""
+    A candidate with no gorgeous, unused, brand-safe photo is skipped and the
+    next-best listing is tried instead.  ``used_urls`` (the never-reuse
+    ledger) grows as covers are chosen, so no photo is used twice."""
     items = queue.setdefault("items", [])
     added: list = []
     failed: set = set()
+    used_photos: set = set(used_urls or set())
+    # seed the ledger with covers already in the queue (prior runs)
+    for it in items:
+        if it.get("cover_photo_url"):
+            used_photos.add(it["cover_photo_url"])
     guard = 0
     max_iters = lookahead * 6 + 4          # room to skip thin listings
     while _future_approved_count(items + added, now) < lookahead and guard < max_iters:
         guard += 1
-        used = _used_listing_ids(items + added) | failed
-        cand = _pick_candidate(candidates, used, ranked_index)
+        used_listings = _used_listing_ids(items + added) | failed
+        cand = _pick_candidate(candidates, used_listings, ranked_index)
         if cand is None:
             print("[ig_autopilot] no candidates available — stopping topup", file=sys.stderr)
             break
@@ -410,12 +439,14 @@ def topup(
         item = build_item(
             day=day, story=story, candidate=cand, listing=listing,
             scheduled_for=scheduled, assets_root=assets_root,
-            skip_render=skip_render, slide_renderer=slide_renderer,
-            photo_preparer=photo_preparer,
+            skip_render=skip_render, used_urls=frozenset(used_photos),
+            slide_renderer=slide_renderer, photo_selector=photo_selector,
         )
-        if item is None:                    # no brand-safe photo → try another
+        if item is None:                    # no gorgeous unused photo → try another
             failed.add(cand.get("listing_id"))
             continue
+        if item.get("cover_photo_url"):     # never reuse this photo again
+            used_photos.add(item["cover_photo_url"])
         added.append(item)
         print(
             f"[ig_autopilot] queued d{day} story={story['id']} "
@@ -438,6 +469,8 @@ def main(argv: Optional[list] = None) -> int:
     p.add_argument("--lookahead", type=int, default=7, help="Keep this many future posts queued (a week at daily cadence).")
     p.add_argument("--cadence-days", type=int, default=1)
     p.add_argument("--skip-render", action="store_true", help="Skip Playwright (queue only).")
+    p.add_argument("--used-photos", type=Path, default=DEFAULT_USED_PHOTOS,
+                   help="Ledger of photo URLs already used as covers (never reused).")
     p.add_argument("--now", default=None, help="ISO 'now' override (tests).")
     args = p.parse_args(argv)
 
@@ -455,17 +488,34 @@ def main(argv: Optional[list] = None) -> int:
         if args.queue.exists() else {"version": 1, "batch": "autopilot", "items": []}
     )
 
+    # Never-reuse ledger: every photo ever used as a cover.
+    used_urls: set = set()
+    if args.used_photos.exists():
+        try:
+            used_urls = set(json.loads(args.used_photos.read_text(encoding="utf-8")))
+        except (ValueError, OSError):
+            used_urls = set()
+
     added = topup(
         queue, candidates, ranked_index,
         now=now, lookahead=args.lookahead, cadence_days=args.cadence_days,
-        assets_root=args.assets_root, skip_render=args.skip_render,
+        assets_root=args.assets_root, skip_render=args.skip_render, used_urls=used_urls,
         # --skip-render is an offline mode → don't hit the network for photos.
-        photo_preparer=_predict_photos if args.skip_render else prepare_listing_photos,
+        photo_selector=_predict_cover if args.skip_render else select_beautiful_cover,
     )
 
     args.queue.parent.mkdir(parents=True, exist_ok=True)
     args.queue.write_text(json.dumps(queue, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"[ig_autopilot] added {len(added)} item(s); queue now {len(queue['items'])} total → {args.queue}")
+
+    # Persist the ledger: prior + every cover chosen this run.
+    for it in added:
+        if it.get("cover_photo_url"):
+            used_urls.add(it["cover_photo_url"])
+    args.used_photos.parent.mkdir(parents=True, exist_ok=True)
+    args.used_photos.write_text(json.dumps(sorted(used_urls), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+    print(f"[ig_autopilot] added {len(added)} item(s); queue now {len(queue['items'])} total; "
+          f"ledger {len(used_urls)} photos → {args.queue}")
     return 0
 
 

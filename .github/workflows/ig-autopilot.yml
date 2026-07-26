@@ -84,7 +84,7 @@ jobs:
       - name: Commit queue + rendered posters
         if: github.event.inputs.dry_run != 'true'
         run: |
-          git add web/data/ig_queue.json web/data/ig_assets/autopilot
+          git add web/data/ig_queue.json web/data/ig_assets/autopilot web/data/ig_used_photos.json
           if git diff --cached --quiet; then
             echo "[ig-autopilot] queue already full — nothing to commit"
             exit 0

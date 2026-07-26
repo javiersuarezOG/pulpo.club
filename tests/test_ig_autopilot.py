@@ -16,12 +16,13 @@ sys.path.insert(0, str(REPO))
 
 from automation.ig_autopilot import (   # noqa: E402
     build_item,
-    prepare_listing_photos,
+    select_beautiful_cover,
     topup,
     _beauty,
     _future_approved_count,
     _next_slot,
     _next_day,
+    _ordered_fresh_urls,
     _pick_candidate,
 )
 from automation.ig_story_series import STORIES, story_for_index   # noqa: E402
@@ -46,15 +47,19 @@ def _fake_render(spec, color, out):
     return out  # no I/O
 
 
-def _fake_photos(listing, assets_dir, slug, want=2, **_):
-    return [f"web/data/ig_assets/autopilot/{slug}/photo_{i + 1}.jpg" for i in range(want)]
+def _fake_selector(listing, assets_dir, slug, *, used_urls=frozenset(), **_):
+    # a unique gorgeous cover per listing/day; honours the never-reuse ledger
+    url = f"http://x/{slug}.jpg"
+    if url in used_urls:
+        return None
+    return f"web/data/ig_assets/autopilot/{slug}/photo_1.jpg", url
 
 
-def _run(queue, lookahead=4, cadence=1, photo_preparer=_fake_photos):
+def _run(queue, lookahead=4, cadence=1, photo_selector=_fake_selector):
     return topup(
         queue, CANDS, RANKED_INDEX, now=NOW, lookahead=lookahead, cadence_days=cadence,
         assets_root=Path("/tmp/x"), skip_render=True,
-        slide_renderer=_fake_render, photo_preparer=photo_preparer,
+        slide_renderer=_fake_render, photo_selector=photo_selector,
     )
 
 
@@ -183,41 +188,57 @@ def test_next_slot_ignores_skipped_items():
     assert nxt.date().isoformat() == "2026-07-26"   # backfills, not Aug 1
 
 
-def test_build_item_returns_none_without_a_photo():
-    def _no_photos(listing, assets_dir, slug, want=2, **_):
-        return []
+def test_build_item_returns_none_when_no_gorgeous_photo():
+    def _no_cover(listing, assets_dir, slug, *, used_urls=frozenset(), **_):
+        return None
     item = build_item(
         day=101, story=STORIES[0], candidate=_cand("src__0"), listing={},
         scheduled_for="2026-07-07T01:00:00+00:00", assets_root=Path("/tmp/x"),
-        skip_render=True, slide_renderer=_fake_render, photo_preparer=_no_photos,
+        skip_render=True, slide_renderer=_fake_render, photo_selector=_no_cover,
     )
     assert item is None
 
 
-# ── BRAND-SAFE photo selection (the day-218 regression guard) ─────────
+def test_item_records_cover_url_and_never_repeats(tmp_path):
+    added = _run({"items": []}, lookahead=5)
+    urls = [it["cover_photo_url"] for it in added]
+    assert all(urls), "every item records the exact photo it used"
+    assert len(set(urls)) == len(urls), "no cover photo is reused"
 
-def test_prepare_photos_uses_gate_order_and_drops_rejected(tmp_path):
-    """The day-218 broker-phone cover came from raw photo_urls[0]. The fix
-    routes through the gate's order_photo_indices: hero first, and any frame
-    in photo_urls_rejected (broker flyers / logos) dropped entirely."""
+
+# ── BRAND-SAFE + BEAUTY cover selection (day-218 guard + gorgeous-or-skip)
+
+def test_ordered_fresh_urls_drops_rejected_and_used():
+    """Brand safety: the gate's order_photo_indices leads with the hero and
+    drops rejected broker frames; the ledger drops already-used photos."""
+    urls = ["http://x/flyer_broker.jpg", "http://x/hero.jpg", "http://x/nice.jpg"]
+    listing = {"photo_urls": urls, "photos_count": 3,
+               "selected_photo_url": "http://x/hero.jpg",
+               "photo_urls_rejected": ["http://x/flyer_broker.jpg"]}
+    fresh = _ordered_fresh_urls(listing, frozenset())
+    assert "http://x/flyer_broker.jpg" not in fresh   # broker flyer dropped
+    assert fresh[0] == "http://x/hero.jpg"             # hero leads
+    # already-used photo is excluded
+    fresh2 = _ordered_fresh_urls(listing, frozenset({"http://x/hero.jpg"}))
+    assert "http://x/hero.jpg" not in fresh2
+
+
+def test_select_beautiful_cover_picks_best_and_skips_dull(tmp_path):
+    """Scores each fresh photo and returns the most beautiful; returns None
+    when the best isn't gorgeous enough (skip the listing)."""
     from PIL import Image
-    urls = ["http://x/flyer_broker.jpg",   # idx 0 — a rejected broker graphic
-            "http://x/hero.jpg",           # idx 1 — the hero
-            "http://x/nice.jpg"]           # idx 2 — clean extra
-    listing = {
-        "photo_urls": urls, "photos_count": 3,
-        "selected_photo_url": "http://x/hero.jpg",          # hero = idx 1
-        "photo_urls_rejected": ["http://x/flyer_broker.jpg"],  # broker flyer dropped
+    imgs = {
+        "http://x/dull.jpg": Image.new("RGB", (1200, 1500), (150, 150, 150)),   # concrete
+        "http://x/ocean.jpg": Image.new("RGB", (1200, 1500), (85, 155, 230)),   # sky/ocean
     }
-    fetched: list[str] = []
+    listing = {"photo_urls": list(imgs), "photos_count": 2,
+               "selected_photo_url": "http://x/dull.jpg"}
+    sel = select_beautiful_cover(listing, tmp_path, "d1__el_mar",
+                                 fetcher=lambda u: imgs[u])
+    assert sel is not None
+    assert sel[1] == "http://x/ocean.jpg"              # the beautiful one wins
 
-    def _fetch(url):
-        fetched.append(url)
-        return Image.new("RGB", (1080, 1350), (30, 90, 140))
-
-    out = prepare_listing_photos(listing, tmp_path, "d999__el_mar", want=2, fetcher=_fetch)
-    # the broker flyer is never even fetched…
-    assert "http://x/flyer_broker.jpg" not in fetched
-    # …and the hero leads the order.
-    assert fetched[0] == "http://x/hero.jpg"
-    assert len(out) == 2
+    dull_only = {"photo_urls": ["http://x/dull.jpg"], "photos_count": 1,
+                 "selected_photo_url": "http://x/dull.jpg"}
+    assert select_beautiful_cover(dull_only, tmp_path, "d2__el_mar",
+                                  fetcher=lambda u: imgs["http://x/dull.jpg"]) is None
