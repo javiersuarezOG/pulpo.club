@@ -1,19 +1,19 @@
 {
-  "last_updated": "2026-07-25T06:23:29.115400+00:00",
-  "started_at": "2026-07-25T05:15:44.760041+00:00",
-  "duration_seconds": 4064.36,
-  "total_listings": 1895,
+  "last_updated": "2026-07-26T06:32:25.849083+00:00",
+  "started_at": "2026-07-26T05:33:11.340714+00:00",
+  "duration_seconds": 3554.51,
+  "total_listings": 1894,
   "dropped": 244,
   "per_source_raw": {
     "agentiz": 0,
-    "bienesraices": 578,
+    "bienesraices": 577,
     "century21": 15,
     "citymax": 33,
     "citymax_sc": 154,
     "csbr": 322,
     "elagente": 0,
-    "encuentra24": 26,
-    "essurf": 36,
+    "encuentra24": 28,
+    "essurf": 34,
     "goodlife": 65,
     "jamesedition": 0,
     "nexo": 8,
@@ -54,7 +54,7 @@
     },
     "bienesraices": {
       "supplier": null,
-      "pulled": 578,
+      "pulled": 577,
       "max_pages_hit": false
     },
     "century21": {
@@ -84,12 +84,12 @@
     },
     "encuentra24": {
       "supplier": null,
-      "pulled": 26,
+      "pulled": 28,
       "max_pages_hit": true
     },
     "essurf": {
       "supplier": null,
-      "pulled": 36,
+      "pulled": 34,
       "max_pages_hit": false
     },
     "goodlife": {
@@ -146,18 +146,18 @@
   "derived_field_population": {
     "source_type_off_market": 0.0,
     "source_type_on_market": 1.0,
-    "previous_price": 0.0364,
+    "previous_price": 0.0385,
     "beachfront_tier_on_beach": 0.0681,
     "beachfront_tier_walk_to_beach": 0.0074,
     "beachfront_tier_near_beach": 0.0201,
-    "land_type_commercial": 0.0528,
-    "land_type_tourist": 0.0749,
-    "land_type_residential": 0.8723,
-    "is_motivated": 0.0839
+    "land_type_commercial": 0.0523,
+    "land_type_tourist": 0.076,
+    "land_type_residential": 0.8717,
+    "is_motivated": 0.0845
   },
   "field_completeness": {
     "bienesraices": {
-      "n_listings": 424,
+      "n_listings": 423,
       "fields": {
         "price_usd": 0.97,
         "area_m2": 0.97,
@@ -282,21 +282,21 @@
       }
     },
     "encuentra24": {
-      "n_listings": 25,
+      "n_listings": 27,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 0.0,
-        "zone": 0.92,
-        "municipality": 0.92,
+        "zone": 0.93,
+        "municipality": 0.93,
         "department": 1.0,
         "location_text": 1.0,
         "lat": 1.0,
         "lng": 1.0,
-        "is_beachfront": 0.12,
-        "has_paved_access": 0.12,
-        "has_water": 0.36,
-        "has_power": 0.2,
-        "is_repriced": 0.16,
+        "is_beachfront": 0.11,
+        "has_paved_access": 0.15,
+        "has_water": 0.3,
+        "has_power": 0.22,
+        "is_repriced": 0.15,
         "days_listed": 1.0,
         "photos_count": 1.0,
         "broker_name": 1.0,
@@ -307,17 +307,17 @@
       }
     },
     "essurf": {
-      "n_listings": 35,
+      "n_listings": 33,
       "fields": {
         "price_usd": 1.0,
-        "area_m2": 0.89,
+        "area_m2": 0.88,
         "zone": 0.97,
         "municipality": 0.97,
         "department": 0.97,
         "location_text": 1.0,
         "lat": 1.0,
         "lng": 1.0,
-        "is_beachfront": 0.31,
+        "is_beachfront": 0.33,
         "has_paved_access": 0.0,
         "has_water": 0.0,
         "has_power": 0.0,
@@ -446,7 +446,7 @@
         "has_paved_access": 0.15,
         "has_water": 0.33,
         "has_power": 0.28,
-        "is_repriced": 0.09,
+        "is_repriced": 0.1,
         "days_listed": 1.0,
         "photos_count": 1.0,
         "broker_name": 0.0,
@@ -533,19 +533,19 @@
     }
   },
   "property_type_counts": {
-    "land": 1490,
-    "house": 329,
+    "land": 1488,
+    "house": 330,
     "condo": 76
   },
   "validation_by_type": {
     "land": {
-      "pass": 1546,
+      "pass": 1544,
       "flag": 128,
       "drop": 59
     },
     "house": {
       "pass": 247,
-      "flag": 82,
+      "flag": 83,
       "drop": 47
     },
     "condo": {
@@ -554,7 +554,7 @@
       "drop": 6
     }
   },
-  "v_fallback_no_price": 872,
+  "v_fallback_no_price": 874,
   "v_fallback_no_comps": 0,
   "sources": [
     "agentiz",
