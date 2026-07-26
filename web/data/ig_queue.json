@@ -1298,10 +1298,12 @@
       ],
       "primary_listing_id": "citymax__145280",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-26T16:49:20+00:00"
     },
     {
       "day": 230,
@@ -1329,10 +1331,12 @@
       ],
       "primary_listing_id": "bienesraices__1007",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-26T16:49:20+00:00"
     },
     {
       "day": 231,
@@ -1360,10 +1364,12 @@
       ],
       "primary_listing_id": "bienesraices__1783",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-26T16:49:20+00:00"
     },
     {
       "day": 232,
@@ -1391,10 +1397,12 @@
       ],
       "primary_listing_id": "bienesraices__2258",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-26T16:49:20+00:00"
     },
     {
       "day": 233,
@@ -1422,10 +1430,12 @@
       ],
       "primary_listing_id": "bienesraices__2029",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-26T16:49:20+00:00"
     },
     {
       "day": 234,
@@ -1453,10 +1463,12 @@
       ],
       "primary_listing_id": "bienesraices__1953",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-26T16:49:20+00:00"
     },
     {
       "day": 235,
@@ -1484,10 +1496,12 @@
       ],
       "primary_listing_id": "citymax__145401",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-26T16:49:20+00:00"
     }
   ]
 }
