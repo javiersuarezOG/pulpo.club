@@ -1271,6 +1271,223 @@
       "posted_media_id": null,
       "skipped": true,
       "skipped_at": "2026-07-25T19:29:16+00:00"
+    },
+    {
+      "day": 229,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "distancia",
+      "emotion": "regreso",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "distancia",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-07-27T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d229__distancia",
+      "poster_path": "web/data/ig_assets/autopilot/d229__distancia/slide_1.png",
+      "poster_overrides": {},
+      "caption": "La nostalgia no se cura con fotos. Se cura bajando del avión y sabiendo que hay un lugar que es tuyo.\n\n📍 La Libertad. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "La Libertad · 200 m² · $35,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #LaLibertad #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d229__distancia/slide_2.png"
+      ],
+      "listing_ids": [
+        "citymax__145280"
+      ],
+      "primary_listing_id": "citymax__145280",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 230,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "tiempo_tuyo",
+      "emotion": "tiempo",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "tiempo_tuyo",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-07-28T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d230__tiempo_tuyo",
+      "poster_path": "web/data/ig_assets/autopilot/d230__tiempo_tuyo/slide_1.png",
+      "poster_overrides": {},
+      "caption": "Comprar tiempo no se puede, dicen. Aquí casi. Un lugar donde las horas por fin te pertenecen.\n\n📍 Santa Tecla. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "Santa Tecla · 457 m² · $350,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #SantaTecla #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d230__tiempo_tuyo/slide_2.png"
+      ],
+      "listing_ids": [
+        "bienesraices__1007"
+      ],
+      "primary_listing_id": "bienesraices__1007",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 231,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "queda_paraiso",
+      "emotion": "escasez",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "queda_paraiso",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-07-29T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d231__queda_paraiso",
+      "poster_path": "web/data/ig_assets/autopilot/d231__queda_paraiso/slide_1.png",
+      "poster_overrides": {},
+      "caption": "La tierra frente al mar no se fabrica, y cada año queda menos. Todavía estás a tiempo de tener la tuya.\n\n📍 El Tunco. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "El Tunco · 1,412 m² · $230,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #ElTunco #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d231__queda_paraiso/slide_2.png"
+      ],
+      "listing_ids": [
+        "bienesraices__1783"
+      ],
+      "primary_listing_id": "bienesraices__1783",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 232,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "el_mar",
+      "emotion": "regreso",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "el_mar",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-07-30T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d232__el_mar",
+      "poster_path": "web/data/ig_assets/autopilot/d232__el_mar/slide_1.png",
+      "poster_overrides": {},
+      "caption": "Te fuiste, pero el mar sigue rompiendo igual que el día que te fuiste. La costa no se apura. Te espera.\n\n📍 La Libertad. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "La Libertad · 3,000 m² · $160,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #LaLibertad #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d232__el_mar/slide_2.png"
+      ],
+      "listing_ids": [
+        "bienesraices__2258"
+      ],
+      "primary_listing_id": "bienesraices__2258",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 233,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "lunes_domingo",
+      "emotion": "calma",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "lunes_domingo",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-07-31T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d233__lunes_domingo",
+      "poster_path": "web/data/ig_assets/autopilot/d233__lunes_domingo/slide_1.png",
+      "poster_overrides": {},
+      "caption": "Despertar sin alarma, café viendo el verde, y la sensación de que no hay prisa. Así se siente tener lo tuyo aquí.\n\n📍 El Tunco. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "El Tunco · 1,324 m² · $372,452.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #ElTunco #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d233__lunes_domingo/slide_2.png"
+      ],
+      "listing_ids": [
+        "bienesraices__2029"
+      ],
+      "primary_listing_id": "bienesraices__2029",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 234,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "raices",
+      "emotion": "legado",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "raices",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-08-01T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d234__raices",
+      "poster_path": "web/data/ig_assets/autopilot/d234__raices/slide_1.png",
+      "poster_overrides": {},
+      "caption": "Un árbol que plantás hoy da sombra a quien todavía no conocés. Eso es tener tierra: sembrar para los que vienen.\n\n📍 Jiquilisco. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "Jiquilisco · 19,000 m² · $250,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #Jiquilisco #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d234__raices/slide_2.png"
+      ],
+      "listing_ids": [
+        "bienesraices__1953"
+      ],
+      "primary_listing_id": "bienesraices__1953",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
+    },
+    {
+      "day": 235,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "ya_volvio",
+      "emotion": "orgullo",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "ya_volvio",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-08-02T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d235__ya_volvio",
+      "poster_path": "web/data/ig_assets/autopilot/d235__ya_volvio/slide_1.png",
+      "poster_overrides": {},
+      "caption": "El El Salvador que dejaste no es el que vas a encontrar. La costa está despierta, y todavía hay lugar para vos.\n\n📍 La Libertad. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "La Libertad · 200 m² · $100,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #LaLibertad #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d235__ya_volvio/slide_2.png"
+      ],
+      "listing_ids": [
+        "citymax__145401"
+      ],
+      "primary_listing_id": "citymax__145401",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
