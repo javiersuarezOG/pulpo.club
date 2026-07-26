@@ -2,13 +2,13 @@
   "source": "agentiz",
   "drift_state": "unreachable",
   "reason": "http_status=403",
-  "probed_at": "2026-07-26T14:02:17.816712+00:00",
+  "probed_at": "2026-07-26T19:39:07.992595+00:00",
   "last_probe": {
     "probed_url": "https://sv.agentiz.com/en",
     "status_code": 403,
     "final_url": "https://sv.agentiz.com/en",
     "response_size_bytes": null,
-    "duration_ms": 129,
+    "duration_ms": 218,
     "error": null
   },
   "baseline": null
