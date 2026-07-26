@@ -81,6 +81,10 @@ jobs:
         run: |
           python3 -m automation.ig_autopilot --lookahead "$LOOKAHEAD" --cadence-days 1
 
+      - name: Prune dead slide assets (keep repo under Vercel's size limit)
+        run: |
+          python3 -m automation.ig_prune_assets
+
       - name: Commit queue + rendered posters
         if: github.event.inputs.dry_run != 'true'
         run: |

@@ -73,7 +73,7 @@ def test_every_item_is_a_lintclean_approved_story():
         assert it["story_id"] and it["emotion"]
         assert it["approved"] is True and it["posted"] is False
         assert it["primary_listing_id"]
-        assert it["poster_path"].endswith(".png")
+        assert it["poster_path"].endswith(".jpg")   # JPEG (deploy-size fix)
         assert it["caption_status"] == "clean"
         assert lint_check(it["caption"]) == []
         assert lint_check(it["comment"]) == []

@@ -636,7 +636,15 @@ def _render_via_playwright(
             # this, headless screenshots sometimes capture the fallback
             # serif (Georgia) instead of Instrument Serif.
             page.evaluate("document.fonts.ready")
-            page.screenshot(path=str(output_path), full_page=False, omit_background=False)
+            shot = {"path": str(output_path), "full_page": False, "omit_background": False}
+            # Photographic slides as PNG are 2–3 MB each and bloated the repo
+            # past Vercel's deploy size limit (2026-07-26 incident). A .jpg
+            # output path renders JPEG ~10× smaller with no visible loss at
+            # 1080×1350; Instagram re-encodes on upload anyway.
+            if output_path.suffix.lower() in (".jpg", ".jpeg"):
+                shot["type"] = "jpeg"
+                shot["quality"] = 82
+            page.screenshot(**shot)
         finally:
             browser.close()
     return output_path

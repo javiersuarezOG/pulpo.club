@@ -345,9 +345,11 @@ def build_item(
     color = CATEGORY_COLORS.get(post["color_key"], INSPIRACION)
     rendered: list = []
     for i, spec in enumerate(post["slides"]):
-        rel = f"web/data/ig_assets/autopilot/{slug}/slide_{i + 1}.png"
+        # JPEG, not PNG: photographic slides as PNG are 2–3 MB and bloated
+        # the Vercel deploy past its size limit (2026-07-26 incident).
+        rel = f"web/data/ig_assets/autopilot/{slug}/slide_{i + 1}.jpg"
         if not skip_render:
-            slide_renderer(spec, color, assets_dir / f"slide_{i + 1}.png")
+            slide_renderer(spec, color, assets_dir / f"slide_{i + 1}.jpg")
         rendered.append(rel)
 
     caption = post["caption"]
