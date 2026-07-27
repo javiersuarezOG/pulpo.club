@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-26T06:26:39.197132+00:00",
+  "computed_at": "2026-07-27T06:48:26.861990+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -1799,10 +1799,10 @@
   "overlap_matrix": {},
   "per_source": {
     "bienesraices": {
-      "kept_as_unique": 505,
-      "raw": 506,
+      "kept_as_unique": 506,
+      "raw": 507,
       "shared_with_others": 0,
-      "unique_in_source": 505
+      "unique_in_source": 506
     },
     "century21": {
       "kept_as_unique": 14,
@@ -1829,10 +1829,10 @@
       "unique_in_source": 276
     },
     "encuentra24": {
-      "kept_as_unique": 27,
-      "raw": 27,
+      "kept_as_unique": 25,
+      "raw": 25,
       "shared_with_others": 0,
-      "unique_in_source": 27
+      "unique_in_source": 25
     },
     "essurf": {
       "kept_as_unique": 33,
@@ -1865,10 +1865,10 @@
       "unique_in_source": 288
     },
     "remax": {
-      "kept_as_unique": 331,
-      "raw": 350,
+      "kept_as_unique": 330,
+      "raw": 349,
       "shared_with_others": 0,
-      "unique_in_source": 331
+      "unique_in_source": 330
     },
     "santizo": {
       "kept_as_unique": 89,
@@ -1889,6 +1889,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2078,
-  "total_unique_fingerprints": 1997
+  "total_in_dataset": 2076,
+  "total_unique_fingerprints": 1995
 }

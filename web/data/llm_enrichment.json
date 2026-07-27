@@ -130380,5 +130380,662 @@
     "cost_usd": 0.00133621,
     "finish_reason": "stop",
     "latency_ms": 4424
+  },
+  "realestate_au_sv|canton-el-coro-y-el-morro-santiago-texacuangos-sobre-carretera-antigua-a-zacatecoluca-km-14-santiago-texacuangos-san-salvador-santiago-texacuangos-san-salvador-310109485896": {
+    "ts": "2026-07-27T06:48:31.627058+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Santiago Texacuangos, San Salvador",
+      "es": "Terreno en Venta en Santiago Texacuangos, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Cantón El Coro y El Morro, Santiago Texacuangos, on the old road to Zacatecoluca at km 14. Located in San Salvador department. Priced at $400,000.",
+      "es": "Terreno en Cantón El Coro y El Morro, Santiago Texacuangos, sobre carretera antigua a Zacatecoluca, km 14. Ubicado en el departamento de San Salvador. Precio de $400,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "On old road to Zacatecoluca, km 14",
+        "es": "Sobre carretera antigua a Zacatecoluca, km 14"
+      },
+      {
+        "en": "Located in Santiago Texacuangos, San Salvador",
+        "es": "Ubicado en Santiago Texacuangos, San Salvador"
+      },
+      {
+        "en": "Price: $400,000",
+        "es": "Precio: $400,000"
+      }
+    ],
+    "lat": 13.5,
+    "lng": -89.0,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santiago Texacuangos, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3106,
+    "tokens_out": 427,
+    "cost_usd": 0.00130832,
+    "finish_reason": "stop",
+    "latency_ms": 3846
+  },
+  "realestate_au_sv|canton-las-palmeras-chancuyo-ahuachapan-ahuachapan-ahuachapan-ahuachapan-ahuachapan-ahuachapan-310109485890": {
+    "ts": "2026-07-27T06:48:31.701859+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Canton Las Palmeras, Ahuachapán",
+      "es": "Terreno en Venta en Cantón Las Palmeras, Ahuachapán"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Canton Las Palmeras, Chancuyo, Ahuachapán. No built area, bedrooms, or bathrooms. Priced at $97,000.",
+      "es": "Terreno en Cantón Las Palmeras, Chancuyo, Ahuachapán. Sin área construida, dormitorios ni baños. Precio de $97,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Ahuachapán department",
+        "es": "Ubicado en el departamento de Ahuachapán"
+      },
+      {
+        "en": "Price: $97,000 USD",
+        "es": "Precio: $97,000 USD"
+      },
+      {
+        "en": "Land parcel for development",
+        "es": "Terreno para desarrollo"
+      }
+    ],
+    "lat": 13.925,
+    "lng": -89.85,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ahuachapán municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3105,
+    "tokens_out": 384,
+    "cost_usd": 0.00126075,
+    "finish_reason": "stop",
+    "latency_ms": 3921
+  },
+  "realestate_au_sv|canton-las-palmeras-chancuyo-ahuachapan-ahuachapan-ahuachapan-ahuachapan-ahuachapan-ahuachapan-310109485887": {
+    "ts": "2026-07-27T06:48:31.799185+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Canton Las Palmeras, Ahuachapán",
+      "es": "Terreno en Venta en Cantón Las Palmeras, Ahuachapán"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Canton Las Palmeras, Chancuyo, Ahuachapán. Located in Ahuachapán department. Priced at $125,000.",
+      "es": "Terreno en Cantón Las Palmeras, Chancuyo, Ahuachapán. Ubicado en el departamento de Ahuachapán. Precio de $125,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Priced at $125,000",
+        "es": "Precio de $125,000"
+      },
+      {
+        "en": "Located in Ahuachapán department",
+        "es": "Ubicado en el departamento de Ahuachapán"
+      },
+      {
+        "en": "Land in Canton Las Palmeras",
+        "es": "Terreno en Cantón Las Palmeras"
+      }
+    ],
+    "lat": 13.9167,
+    "lng": -89.85,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ahuachapán municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3105,
+    "tokens_out": 392,
+    "cost_usd": 0.00126955,
+    "finish_reason": "stop",
+    "latency_ms": 4019
+  },
+  "realestate_au_sv|canton-san-antonio-abad-ciudad-arce-la-libertad-centro-ciudad-arce-la-libertad-ciudad-arce-la-libertad-department-310119436580": {
+    "ts": "2026-07-27T06:48:31.957828+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Lot in Ciudad Arce, La Libertad",
+      "es": "Lote de 850 m² en Ciudad Arce, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Flat 850 m² residential lot in Cantón San Antonio Abad, Ciudad Arce, La Libertad. Located in a growing area near the city center. Priced at USD 155,000.",
+      "es": "Lote residencial plano de 850 m² en Cantón San Antonio Abad, Ciudad Arce, La Libertad. Ubicado en una zona en crecimiento cerca del centro de la ciudad. Precio de USD 155,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "850 m² flat lot in Ciudad Arce",
+        "es": "Lote plano de 850 m² en Ciudad Arce"
+      },
+      {
+        "en": "Residential zoning, ready to build",
+        "es": "Zonificación residencial, listo para construir"
+      },
+      {
+        "en": "Priced at USD 155,000",
+        "es": "Precio de USD 155,000"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -89.4333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ciudad Arce, La Libertad, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3089,
+    "tokens_out": 414,
+    "cost_usd": 0.00128943,
+    "finish_reason": "stop",
+    "latency_ms": 4178
+  },
+  "realestate_au_sv|lote-2-poligono-b-dos-lotificacion-las-americas-nejapa-san-salvador-nejapa-san-salvador-nejapa-san-salvador-310109485879": {
+    "ts": "2026-07-27T06:48:34.156804+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot #2, Las Americas, Nejapa, San Salvador",
+      "es": "Lote #2, Las Américas, Nejapa, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Lot #2 in Polígono B-Dos, Lotificación Las Américas, Nejapa, San Salvador. Land parcel for sale. Price: $265,000.",
+      "es": "Lote #2 en Polígono B-Dos, Lotificación Las Américas, Nejapa, San Salvador. Terreno en venta. Precio: $265,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Nejapa, San Salvador",
+        "es": "Ubicado en Nejapa, San Salvador"
+      },
+      {
+        "en": "Part of Las Américas lotification",
+        "es": "Parte de la lotificación Las Américas"
+      },
+      {
+        "en": "Price: $265,000 USD",
+        "es": "Precio: $265,000 USD"
+      }
+    ],
+    "lat": 13.8167,
+    "lng": -89.2333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nejapa, San Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 387,
+    "cost_usd": 0.00126216,
+    "finish_reason": "stop",
+    "latency_ms": 3164
+  },
+  "realestate_au_sv|portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485867": {
+    "ts": "2026-07-27T06:48:34.688069+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Lot in Santa Ana, El Salvador",
+      "es": "Terreno de 850 m² en Santa Ana, El Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Flat 850 m² residential lot in Portezuelo, behind MC El Brasil, Porvenir Jocotillo, Santa Ana. Located in a residential area with access to utilities. Priced at $35,000.",
+      "es": "Terreno residencial plano de 850 m² en Portezuelo, detrás de MC El Brasil, Porvenir Jocotillo, Santa Ana. Ubicado en zona residencial con acceso a servicios públicos. Precio de $35,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "850 m² flat lot",
+        "es": "Terreno plano de 850 m²"
+      },
+      {
+        "en": "Residential area with utilities",
+        "es": "Zona residencial con servicios"
+      },
+      {
+        "en": "Priced at $35,000",
+        "es": "Precio de $35,000"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3091,
+    "tokens_out": 395,
+    "cost_usd": 0.00126907,
+    "finish_reason": "stop",
+    "latency_ms": 3462
+  },
+  "realestate_au_sv|portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485860": {
+    "ts": "2026-07-27T06:48:34.867689+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Lot in Santa Ana",
+      "es": "Lote de 850 m² en Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Flat 850 m² residential lot in Portezuelo, behind MC El Brasil, Santa Ana. Located in a residential area with access to utilities. Priced at $35,000.",
+      "es": "Lote residencial plano de 850 m² en Portezuelo, detrás de MC El Brasil, Santa Ana. Ubicado en zona residencial con acceso a servicios públicos. Precio de $35,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "850 m² flat lot",
+        "es": "Lote plano de 850 m²"
+      },
+      {
+        "en": "Residential area with utilities",
+        "es": "Zona residencial con servicios"
+      },
+      {
+        "en": "Priced at $35,000",
+        "es": "Precio de $35,000"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3091,
+    "tokens_out": 375,
+    "cost_usd": 0.00124707,
+    "finish_reason": "stop",
+    "latency_ms": 3165
+  },
+  "realestate_au_sv|portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485866": {
+    "ts": "2026-07-27T06:48:34.871378+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Portezuelo, Santa Ana",
+      "es": "Terreno en Venta en Portezuelo, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Flat land lot in Portezuelo, behind MC El Brasil, Porvenir Jocotillo, Santa Ana. Priced at $35,000. Ideal for residential development.",
+      "es": "Terreno plano en Portezuelo, atrás de MC El Brasil, Porvenir Jocotillo, Santa Ana. Precio de $35,000. Ideal para desarrollo residencial."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located behind MC El Brasil",
+        "es": "Ubicado atrás de MC El Brasil"
+      },
+      {
+        "en": "Flat terrain, ready to build",
+        "es": "Terreno plano, listo para construir"
+      },
+      {
+        "en": "Affordable price at $35,000",
+        "es": "Precio accesible de $35,000"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3091,
+    "tokens_out": 381,
+    "cost_usd": 0.00125367,
+    "finish_reason": "stop",
+    "latency_ms": 3243
+  },
+  "realestate_au_sv|portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485859": {
+    "ts": "2026-07-27T06:48:35.256875+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Lot in Santa Ana, El Salvador",
+      "es": "Lote de 850 m² en Santa Ana, El Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Flat 850 m² residential lot in Portezuelo, behind MC El Brasil, Santa Ana. Located in a residential area with access to utilities. Priced at $35,000 USD.",
+      "es": "Lote residencial plano de 850 m² en Portezuelo, detrás de MC El Brasil, Santa Ana. Ubicado en zona residencial con acceso a servicios públicos. Precio de $35,000 USD."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "850 m² flat lot",
+        "es": "Lote plano de 850 m²"
+      },
+      {
+        "en": "Residential area, Santa Ana",
+        "es": "Zona residencial, Santa Ana"
+      },
+      {
+        "en": "Behind MC El Brasil",
+        "es": "Detrás de MC El Brasil"
+      },
+      {
+        "en": "Priced at $35,000 USD",
+        "es": "Precio de $35,000 USD"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5598,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3091,
+    "tokens_out": 413,
+    "cost_usd": 0.00128887,
+    "finish_reason": "stop",
+    "latency_ms": 3457
+  },
+  "realestate_au_sv|portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485858": {
+    "ts": "2026-07-27T06:48:35.453499+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Lot in Santa Ana",
+      "es": "Terreno de 850 m² en Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Flat 850 m² residential lot in Portezuelo, Santa Ana. Located behind MC El Brasil in Porvenir Jocotillo. Priced at $35,000.",
+      "es": "Terreno residencial plano de 850 m² en Portezuelo, Santa Ana. Ubicado detrás de MC El Brasil en Porvenir Jocotillo. Precio de $35,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "850 m² flat lot",
+        "es": "Terreno plano de 850 m²"
+      },
+      {
+        "en": "Located in Portezuelo, Santa Ana",
+        "es": "Ubicado en Portezuelo, Santa Ana"
+      },
+      {
+        "en": "Behind MC El Brasil",
+        "es": "Detrás de MC El Brasil"
+      },
+      {
+        "en": "Priced at $35,000",
+        "es": "Precio de $35,000"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3091,
+    "tokens_out": 405,
+    "cost_usd": 0.00128007,
+    "finish_reason": "stop",
+    "latency_ms": 3495
+  },
+  "remax|002283370024": {
+    "ts": "2026-07-27T06:48:35.696751+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "250 m² Lot on Ruta Militar, San Miguel",
+      "es": "Lote de 250 m² en Ruta Militar, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Flat 250 m² residential lot on Ruta Militar, San Miguel. 10 m frontage by 25 m depth, priced at $65,000. Five minutes from Gerardo Barrios Bypass, surrounded by hotels, restaurants, and shopping centers.",
+      "es": "Lote residencial plano de 250 m² en Ruta Militar, San Miguel. 10 m de frente por 25 m de fondo, precio de $65,000. A 5 minutos del Bypass Gerardo Barrios, rodeado de hoteles, restaurantes y centros comerciales."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "10 m frontage, 25 m depth",
+        "es": "10 m de frente, 25 m de fondo"
+      },
+      {
+        "en": "5 min from Gerardo Barrios Bypass",
+        "es": "5 min del Bypass Gerardo Barrios"
+      },
+      {
+        "en": "Growing area with nearby amenities",
+        "es": "Zona en crecimiento con servicios cercanos"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3323,
+    "tokens_out": 431,
+    "cost_usd": 0.00137131,
+    "finish_reason": "stop",
+    "latency_ms": 3524
+  },
+  "remax|002682423238": {
+    "ts": "2026-07-27T06:48:37.036353+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat 250 m² Lot in San Álvaro, Santa Ana",
+      "es": "Lote plano de 250 m² en San Álvaro, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Flat 250 m² residential lot in San Álvaro neighborhood, Santa Ana. Dimensions 10 m front by 25 m depth, with water and electricity hookups available. One block from the Santa Ana–Metapán highway, 3 minutes from UNICAES Bypass.",
+      "es": "Lote residencial plano de 250 m² en el barrio San Álvaro, Santa Ana. Dimensiones 10 m de frente por 25 m de fondo, con disponibilidad de conexiones de agua y electricidad. A una cuadra de la carretera Santa Ana–Metapán, a 3 minutos del Bypass UNICAES."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat 250 m² lot, 10×25 m",
+        "es": "Lote plano de 250 m², 10×25 m"
+      },
+      {
+        "en": "Water and electricity hookups available",
+        "es": "Conexiones de agua y electricidad disponibles"
+      },
+      {
+        "en": "1 block from Santa Ana–Metapán highway",
+        "es": "A 1 cuadra de carretera Santa Ana–Metapán"
+      },
+      {
+        "en": "3 minutes from UNICAES Bypass",
+        "es": "A 3 minutos del Bypass UNICAES"
+      },
+      {
+        "en": "5 minutes from Metrocentro Mall",
+        "es": "A 5 minutos del Metrocentro"
+      }
+    ],
+    "lat": 13.9947,
+    "lng": -89.5597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3289,
+    "tokens_out": 528,
+    "cost_usd": 0.00146883,
+    "finish_reason": "stop",
+    "latency_ms": 4314
+  },
+  "encuentra24|31268996": {
+    "ts": "2026-07-27T07:31:30.455919+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4BR House in Coronado Golf Club, 1250m² lot",
+      "es": "Casa 4 habs en Club de Golf Coronado, lote 1250m²"
+    },
+    "short_description_canonical": {
+      "en": "House in Coronado Golf Club on a 1250 m² lot, with option to buy adjacent 1250 m². 600 m² built area, 4 bedrooms each with private bath and walk-in closet, plus maid's room and bath. Renovated kitchen, pool with heater and jacuzzi, BBQ area, 6 parking spaces. 10-minute drive to beach, 5-minute walk to golf club.",
+      "es": "Casa en Club de Golf Coronado en lote de 1250 m², con opción a comprar lote colindante de 1250 m². 600 m² construidos, 4 recámaras cada una con baño privado y walk-in closet, más cuarto de empleada con baño. Cocina remodelada, piscina con calentador y jacuzzi, área BBQ, 6 estacionamientos. 10 minutos en auto a la playa, 5 minutos caminando al club de golf."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Adjacent 1250 m² lot available",
+        "es": "Lote colindante de 1250 m² disponible"
+      },
+      {
+        "en": "Renovated kitchen, pool with heater",
+        "es": "Cocina remodelada, piscina con calentador"
+      },
+      {
+        "en": "5-min walk to golf club",
+        "es": "5 min caminando al club de golf"
+      },
+      {
+        "en": "6 parking spaces, 4.5 bathrooms",
+        "es": "6 estacionamientos, 4.5 baños"
+      }
+    ],
+    "lat": 8.5167,
+    "lng": -79.8833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Coronado, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.5,
+      "built_area_m2": 600.0,
+      "parking_spaces": 6,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2633,
+    "tokens_out": 574,
+    "cost_usd": 0.00134231,
+    "finish_reason": "stop",
+    "latency_ms": 4937
   }
 }
