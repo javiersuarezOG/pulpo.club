@@ -55,23 +55,35 @@ def test_accent_is_a_substring_of_the_line():
             assert acc in s["line"], f"{s['id']}: accent {acc!r} not in line"
 
 
-def test_image_carries_no_price_but_comment_does():
+def test_cover_stays_price_free_but_property_card_and_comment_carry_it():
     post = S.build_post(S.STORIES[0], _cand(price_usd=225000.0), {}, ["hero.jpg"])
-    # the story cover slide has no price text anywhere
+    # the inspirational COVER carries no price (photo + line only)
     cover = post["slides"][0]
     blob = " ".join(str(v) for v in cover.values())
     assert "$" not in blob and "225" not in blob
-    # the price whispers in the first comment instead
+    # …but slide 2 is a real property card that DOES reference the price,
+    # and the first comment reinforces it.
+    assert post["slides"][1]["price"] == "$225,000"
     assert "$225,000" in post["comment"]
 
 
-def test_brand_safe_shape_cover_hero_plus_photofree_closer():
-    post = S.build_post(S.STORIES[3], _cand(), {}, ["hero.jpg", "second.jpg"])
+def test_brand_safe_shape_cover_hero_plus_property_card():
+    post = S.build_post(S.STORIES[3], _cand(zone="el-zonte", department="La Libertad",
+                                            property_type="land"), {}, ["hero.jpg", "second.jpg"])
     types = [s["t"] for s in post["slides"]]
-    assert types == ["story", "cta"], "cover(story) + photo-free closer(cta)"
-    # only the hero photo is referenced; the closer has no img
+    assert types == ["story", "detail"], "cover(story) + property card(detail)"
+    # only the hero photo is referenced; the property card has no img (no
+    # broker-watermark risk) but DOES reference the real property.
     assert post["slides"][0]["img"] == "hero.jpg"
-    assert "img" not in post["slides"][1]
+    card = post["slides"][1]
+    assert "img" not in card
+    assert "El Zonte" in card["loc"] and "La Libertad" in card["loc"]
+    assert "terreno" in card["facts"]
+
+
+def test_cover_eyebrow_names_the_location():
+    post = S.build_post(S.STORIES[0], _cand(zone="el-tunco"), {}, ["hero.jpg"])
+    assert "El Tunco" in post["slides"][0]["eye"]   # image references the place
 
 
 def test_build_post_none_without_photo():
