@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import fs from "node:fs";
 
 const base = process.argv[2];
@@ -54,12 +54,29 @@ function parseDomains(raw) {
 }
 
 function changedDiffContainsJustification(ref) {
-  try {
-    const diff = execFileSync("git", ["diff", `${ref}...HEAD`, "--", "."], { encoding: "utf8" });
-    return diff.split(/\r?\n/).some((line) => /^\+\s*# csp-drop:/.test(line));
-  } catch {
-    return false;
-  }
+  // Stream `git diff` through grep so the full diff is NEVER buffered in
+  // Node. A realistic "PR behind main by months" full-content diff is
+  // >100MB (measured), which overflows any fixed execFileSync maxBuffer
+  // (ENOBUFS) and — via the old catch-all — silently read as "no
+  // justification", false-failing a legitimate domain drop. Unlike the
+  // newsletter/home guards (which diff --name-only, always tiny), this
+  // guard needs full line content, so a fixed cap can't be made safe.
+  // grep -q short-circuits on the first match and emits no stdout, so
+  // memory stays O(1) regardless of diff size. Exit status: 0 = found,
+  // 1 = not found, >1 = git/grep error. `ref` is passed as a positional
+  // arg ($1), never string-interpolated into the shell. On any error we
+  // return false (fail-closed: an unjustified drop stays blocked).
+  const res = spawnSync(
+    "sh",
+    [
+      "-c",
+      'git diff "$1...HEAD" -- . | grep -qE "^\\+[[:space:]]*# csp-drop:"',
+      "sh",
+      ref,
+    ],
+    { encoding: "utf8" },
+  );
+  return res.status === 0;
 }
 
 const before = parseDomains(readBaseVercel(base));
