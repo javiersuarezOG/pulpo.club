@@ -1531,9 +1531,11 @@
       "cover_photo_url": "https://assets.easybroker.com/property_images/2496463/38934159/EB-IO6463.jpg?rasterize=true&version=1632824632",
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-07-27T03:58:06.164929+00:00",
+      "posted_media_id": "18170609203382744",
+      "comment_posted": true,
+      "comment_id": "17856562131696035"
     },
     {
       "day": 237,
