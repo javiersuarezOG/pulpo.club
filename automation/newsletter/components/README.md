@@ -46,7 +46,7 @@ Operator-driven polish + hard data-quality gate:
 | [`picks`](picks.py) | THE listing card + section intros | One `pick_card_html` for all 10 picks. Rank label unified: "Top deal · NN" (EN) / "Mejor oferta · NN" (ES) on all 10. Only background color (sage vs white) + pill chrome (forest-on-cream vs sand-on-grey) differ between top 3 and next 7. Title carries `text-wrap: balance` + post-escape `&nbsp;` widow guard to keep trailing short words glued to their preceding word. Section intros are big serif H2s |
 | [`editorial`](editorial.py) | Market context + Weekly News Spotlight | Market = 3 numbered editorial mini-blocks (01/02/03) · Spotlight = Pulpo icon + eyebrow + "Reported by …" + H2 + body |
 | [`personal`](personal.py) | "Pick up where you left off" | Up to 4 stacked cream action cards (saved / filter / browse / welcome) |
-| [`paywall`](paywall.py) | Pro upsell band | Free-cohort only · forest green band · "Go Pro — $9.99/month →" CTA |
+| [`paywall`](paywall.py) | Pro upsell band | Free-cohort only · forest green band · "Go Pro — $4.99/month →" CTA |
 
 ## Where the locked design lives
 

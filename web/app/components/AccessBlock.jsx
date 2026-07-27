@@ -8,13 +8,14 @@
 // Nothing here couples the options to each other, and nothing downstream
 // keys off which was used — only off the resulting state.
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { t } from "../i18n.jsx";
 import { track } from "../telemetry/hook";
 import { subscribeEmail, NL_EMAIL_RE } from "../lib/newsletter-signup";
 import { startCheckoutFromModal } from "../lib/stripe-modal-checkout";
 import { accessOptionsFor } from "../config/access";
 import { isPaid } from "../lib/gating";
+import { priceForCountry, fetchPriceForCurrentGeo } from "../lib/pricing";
 import { SubscribeConfirm } from "./SubscribeConfirm";
 
 /**
@@ -31,6 +32,16 @@ export function AccessBlock({ app, locale: lc, surface, cfg, onDone }) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("idle"); // idle | loading | invalid | error (free-email path)
   const [proStatus, setProStatus] = useState("idle"); // idle | loading | rate_limited | error (go_pro path)
+
+  // Geo-derived display price for the go_pro CTA ({price} placeholder).
+  // Mirrors the pattern in UspPopup / FreeMonthModal — USD fallback until the
+  // /api/geo resolve lands.
+  const [price, setPrice] = useState(() => priceForCountry(null));
+  useEffect(() => {
+    let cancelled = false;
+    fetchPriceForCurrentGeo().then((p) => { if (!cancelled) setPrice(p); });
+    return () => { cancelled = true; };
+  }, []);
 
   // ① Join free — email → Resend + Free membership (+ open the stashed top-3).
   const onJoinFree = async (e) => {
@@ -148,7 +159,9 @@ export function AccessBlock({ app, locale: lc, surface, cfg, onDone }) {
       rows.push(
         <div className="access-pro" key="pro">
           <button type="button" className="btn-pro lg block access-cta-pro" onClick={onGoPro} disabled={proStatus === "loading"}>
-            {t(proStatus === "loading" ? "access.go_pro.cta_loading" : "access.go_pro.cta", lc)}
+            {proStatus === "loading"
+              ? t("access.go_pro.cta_loading", lc)
+              : t("access.go_pro.cta", lc, { price: price.displayString })}
           </button>
           <div className="access-pro-sub">{t("access.go_pro.sub", lc)}</div>
           {(proStatus === "rate_limited" || proStatus === "error") && (

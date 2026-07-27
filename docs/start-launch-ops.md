@@ -15,8 +15,8 @@ El Salvador's legal tender). Every other geo falls back to USD.
 
 1. Stripe Dashboard → **Products → Pulpo Pro → Pulpo Pro Price**.
 2. Click "Add a price by currency". Add:
-   - `USD` — $9.99 (round marketing price — *do not* let Stripe pre-fill an FX-converted value like $11.83)
-3. `EUR` stays as the base — €9.99.
+   - `USD` — $4.99 (round marketing price — *do not* let Stripe pre-fill an FX-converted value like $5.91)
+3. `EUR` stays as the base — €4.99.
 4. **Do NOT** enable Adaptive Pricing. It conflicts with explicit
    `currency_options`. If Stripe surfaces an "Adaptive Pricing is on"
    banner, switch it off.

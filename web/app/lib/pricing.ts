@@ -36,10 +36,10 @@ export type Currency = "eur" | "usd";
 
 export type PriceDisplay = {
   currency: Currency;
-  // Amount in the major unit (e.g. 9.99 for €9.99).
+  // Amount in the major unit (e.g. 4.99 for €4.99).
   amount: number;
   // Pre-formatted display string with currency glyph + amount, e.g.
-  // "€9.99" / "$9.99". Used directly in CTA copy via the {price}
+  // "€4.99" / "$4.99". Used directly in CTA copy via the {price}
   // placeholder in UI_STRINGS — the glyph is carried by this string,
   // not hard-coded in the i18n template.
   displayString: string;
@@ -50,12 +50,26 @@ export type PriceDisplay = {
 // (see the rotation playbook above) ships a "marketing says X, Checkout
 // charges Y" trust break — the exact failure mode api/geo.js was built
 // to prevent.
-const PRICES: Record<Currency, PriceDisplay> = {
-  eur: { currency: "eur", amount: 9.99, displayString: "€9.99" },
-  usd: { currency: "usd", amount: 9.99, displayString: "$9.99" },
+export const PRICES: Record<Currency, PriceDisplay> = {
+  eur: { currency: "eur", amount: 4.99, displayString: "€4.99" },
+  usd: { currency: "usd", amount: 4.99, displayString: "$4.99" },
 };
 
 const DEFAULT_CURRENCY: Currency = "usd";
+
+// Locale-aware price string for surfaces that show BOTH currencies in one
+// sentence (legal copy) or otherwise can't use the geo-resolved {price}
+// placeholder. Applies the ES decimal-comma convention to EUR only — ES
+// legal copy writes "€4,99" but keeps "$4.99" for USD (matches how the
+// subscription policy was originally hand-written). Everything derives from
+// the `amount` in PRICES above, so a price change here is still one edit.
+export function priceDisplay(currency: Currency, locale: string = "en"): string {
+  const { amount } = PRICES[currency];
+  if (currency === "eur" && locale === "es") {
+    return `€${amount.toFixed(2).replace(".", ",")}`;
+  }
+  return PRICES[currency].displayString;
+}
 
 // Country → currency. Uppercase ISO 3166-1 alpha-2. Must mirror
 // api/stripe/_geo.js — see the header comment. Any country not in the
