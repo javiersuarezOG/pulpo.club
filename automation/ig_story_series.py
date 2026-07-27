@@ -25,6 +25,9 @@ from pulpo.countries import active as _active_country
 _COUNTRY = _active_country().name_en
 _C = _COUNTRY.replace(" ", "")
 
+# ES property-type noun for the property card on slide 2.
+_NOUN = {"land": "terreno", "house": "casa", "condo": "apartamento"}
+
 # ── the story library ─────────────────────────────────────────────────
 #
 # Each story: a stable id, the slide fields (eyebrow, poetic line with an
@@ -163,8 +166,16 @@ def build_post(story: dict, candidate: dict, listing: dict, photos: list[str]) -
     if not photos:
         return None
     zone = _zone_title(candidate.get("zone"))
+    department = candidate.get("department") or ""
+    loc = f"{zone}, {department}" if department and department != zone else zone
+    area = format_area_m2(candidate.get("area_m2"))
+    price = format_price_usd(candidate.get("price_usd"))
+    noun = _NOUN.get((candidate.get("property_type") or "").lower(), "propiedad")
 
-    cover = {"t": "story", "img": photos[0], "eye": story["eye"],
+    # Cover: the emotional line stays the hero, but the eyebrow now names the
+    # place so the beautiful image is tied to a real location, not a quote.
+    cover = {"t": "story", "img": photos[0],
+             "eye": f"{story['eye']} · {zone}",
              "line": story["line"], "accent": story.get("accent", "")}
     if story.get("sub"):
         cover["sub"] = story["sub"]
@@ -172,16 +183,17 @@ def build_post(story: dict, candidate: dict, listing: dict, photos: list[str]) -
         cover["small"] = True
     cover["pos"] = story.get("pos", "bottom")
     cover["scrim"] = story.get("scrim", "down")
-    # Photo-free closer (design card) — swipe-through to the brand, zero
-    # chance of a broker watermark on a second photo.
-    closer = {"t": "cta", "big": "Tu pedazo\nde paraíso", "sub": "pulpo.club · link en bio"}
+    # Slide 2 is now a real PROPERTY card (was a generic brand closer) — it
+    # references the actual listing on the image: location · size/type ·
+    # price · pulpo.club. Still photo-free (no broker-watermark risk).
+    facts = " · ".join(x for x in (area, noun) if x and x != "—")
+    closer = {"t": "detail", "eyebrow": "La propiedad", "price": price,
+              "facts": f"{facts} · en pulpo.club", "loc": loc}
     slides = [cover, closer]
 
     caption = f"{story['cap']}\n\n📍 {zone}. Mirá esta y las demás en pulpo.club — link en bio."
 
-    # The whisper: real listing details live here, not on the image.
-    area = format_area_m2(candidate.get("area_m2"))
-    price = format_price_usd(candidate.get("price_usd"))
+    # The first comment reinforces the details + carries discovery hashtags.
     spec = " · ".join(x for x in (zone, area, price) if x and x != "—")
     comment = (
         f"{spec}.\n\n"
