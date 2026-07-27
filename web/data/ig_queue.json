@@ -1564,10 +1564,12 @@
       "primary_listing_id": "bienesraices__1875",
       "cover_photo_url": "https://assets.easybroker.com/property_images/3750206/61404160/EB-NK0206.jpg?rasterize=true&version=1684361187",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-27T10:35:14+00:00"
     },
     {
       "day": 238,
@@ -1596,10 +1598,12 @@
       "primary_listing_id": "bienesraices__2296",
       "cover_photo_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvT080MFMxUjU5OS9mYVFoVkdGdEdvL1RlcnJlbm9fZGVfNC5qcGVnIiwgImVkaXRzIjogeyJyZXNpemUiOiB7IndpZHRoIjogMTI4MCwgImhlaWdodCI6IDk2MCwgImZpdCI6ICJpbnNpZGUifSwgInRvRm9ybWF0IjogImpwZWciLCAianBlZyI6IHsicXVhbGl0eSI6IDcwfX19",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-27T10:35:14+00:00"
     },
     {
       "day": 239,
@@ -1628,10 +1632,12 @@
       "primary_listing_id": "bienesraices__2030",
       "cover_photo_url": "https://assets.easybroker.com/property_images/712736/51603680/EB-BS2736.jpg?rasterize=true&version=1661884823",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-27T10:35:14+00:00"
     },
     {
       "day": 240,
@@ -1660,10 +1666,12 @@
       "primary_listing_id": "bienesraices__1690",
       "cover_photo_url": "https://assets.easybroker.com/property_images/4540000/76143075/EB-QL0000.jpg?rasterize=true&version=1718124036",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-27T10:35:14+00:00"
     },
     {
       "day": 241,
@@ -1692,10 +1700,12 @@
       "primary_listing_id": "bienesraices__1529",
       "cover_photo_url": "https://assets.easybroker.com/property_images/4922798/83879469/EB-RX2798.jpg?rasterize=true&version=1734712380",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-27T10:35:14+00:00"
     },
     {
       "day": 242,
@@ -1724,10 +1734,12 @@
       "primary_listing_id": "bienesraices__2200",
       "cover_photo_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/LD47F95U70/Reu7cMCjSs/Venta_de_Lotes_en_La_Uni%C3%B3n__200_m2__Listos_para_Construir_con_Matr%C3%ADcula_Propia.jpeg",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-07-27T10:35:14+00:00"
     }
   ]
 }
