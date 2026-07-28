@@ -1966,6 +1966,38 @@
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
+    },
+    {
+      "day": 250,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "hora_dorada",
+      "emotion": "lugar",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "hora_dorada",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-08-04T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d250__hora_dorada",
+      "poster_path": "web/data/ig_assets/autopilot/d250__hora_dorada/slide_1.jpg",
+      "poster_overrides": {},
+      "caption": "Esa media hora en que todo se pone dorado y el mundo baja la velocidad. Imaginá que pasa desde tu terraza.\n\n📍 El Zonte. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "El Zonte · 37,000 m² · $2.9M.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #ElZonte #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d250__hora_dorada/slide_2.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__1875"
+      ],
+      "primary_listing_id": "bienesraices__1875",
+      "cover_photo_url": "https://assets.easybroker.com/property_images/3750206/61404156/EB-NK0206.jpg?rasterize=true&version=1684361182",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
