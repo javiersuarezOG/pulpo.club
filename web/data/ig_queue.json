@@ -1769,9 +1769,11 @@
       "cover_photo_url": "https://assets.easybroker.com/property_images/5682376/99246354/EB-UV2376.jpeg?rasterize=true&version=1764871889",
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-07-28T03:30:02.851527+00:00",
+      "posted_media_id": "18119100931858272",
+      "comment_posted": true,
+      "comment_id": "18155512864494919"
     },
     {
       "day": 244,
