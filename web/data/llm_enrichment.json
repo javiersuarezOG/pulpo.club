@@ -131037,5 +131037,433 @@
     "cost_usd": 0.00134231,
     "finish_reason": "stop",
     "latency_ms": 4937
+  },
+  "realestate_au_sv|lotificacion-san-alvaro-santa-ana-santa-ana-santa-ana-santa-ana-310109534392": {
+    "ts": "2026-07-28T06:12:50.530659+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot in San Alvaro, Santa Ana",
+      "es": "Lote en San Alvaro, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Land lot in Lotificacion San Alvaro, Santa Ana. Flat terrain with road access. Priced at $42,000.",
+      "es": "Terreno en Lotificación San Álvaro, Santa Ana. Terreno plano con acceso vial. Precio de $42,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Santa Ana city",
+        "es": "Ubicado en la ciudad de Santa Ana"
+      },
+      {
+        "en": "Flat lot, ready to build",
+        "es": "Lote plano, listo para construir"
+      },
+      {
+        "en": "Priced at $42,000",
+        "es": "Precio de $42,000"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5567,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3080,
+    "tokens_out": 347,
+    "cost_usd": 0.0012133,
+    "finish_reason": "stop",
+    "latency_ms": 3460
+  },
+  "csbr|venta-lote-zaragoza": {
+    "ts": "2026-07-28T06:12:50.911054+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "210 m² Lot for Sale in Zaragoza, La Libertad",
+      "es": "Lote de 210 m² en Venta en Zaragoza, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Flat 210 m² residential lot in Zaragoza, La Libertad. Located in a residential area with access to utilities. Priced at $25,000, below zone median per m².",
+      "es": "Lote residencial plano de 210 m² en Zaragoza, La Libertad. Ubicado en zona residencial con acceso a servicios. Precio de $25,000, por debajo de la media de la zona por m²."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "210 m² flat lot",
+        "es": "Lote plano de 210 m²"
+      },
+      {
+        "en": "Below zone median price per m²",
+        "es": "Precio por m² por debajo de la media"
+      },
+      {
+        "en": "Residential area with utilities",
+        "es": "Zona residencial con servicios"
+      }
+    ],
+    "lat": 13.5833,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Zaragoza, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3071,
+    "tokens_out": 405,
+    "cost_usd": 0.00127467,
+    "finish_reason": "stop",
+    "latency_ms": 3841
+  },
+  "remax|003094388003": {
+    "ts": "2026-07-28T06:12:50.983136+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4200 m² Flat Lot, 8 min from Izalco",
+      "es": "Terreno Plano de 4200 m², 8 min de Izalco"
+    },
+    "short_description_canonical": {
+      "en": "Flat 4,200 m² lot with fruit trees, 8 minutes from Izalco Central Park. Access to basic utilities and convenient access from downtown Izalco and the Sonsonate Highway. Priced at $160,000.",
+      "es": "Terreno plano de 4,200 m² con árboles frutales, a 8 minutos del Parque Central de Izalco. Acceso a servicios básicos y acceso conveniente desde el centro de Izalco y la Carretera a Sonsonate. Precio: $160,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "8 minutes from Izalco Central Park",
+        "es": "8 minutos del Parque Central de Izalco"
+      },
+      {
+        "en": "Flat topography, ready to build",
+        "es": "Topografía plana, lista para construir"
+      },
+      {
+        "en": "Fruit trees on property",
+        "es": "Árboles frutales en la propiedad"
+      },
+      {
+        "en": "Access to basic utilities",
+        "es": "Acceso a servicios básicos"
+      }
+    ],
+    "lat": 13.745,
+    "lng": -89.673,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Izalco municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3145,
+    "tokens_out": 447,
+    "cost_usd": 0.00134085,
+    "finish_reason": "stop",
+    "latency_ms": 3912
+  },
+  "encuentra24|29592387": {
+    "ts": "2026-07-28T06:12:52.179294+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront 3BR House with Pool, La Libertad",
+      "es": "Casa frente al mar 3 habs con piscina, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Fully furnished 350 m² beachfront house on a 1,434.95 v² lot in Cangrejera, La Libertad. 3 bedrooms each with en-suite bath, plus social bath, infinity pool, terrace with ocean view, BBQ area, and 6 parking spaces. Currently generating high Airbnb returns, 20 minutes from the airport and Surf City.",
+      "es": "Casa totalmente amueblada de 350 m² frente al mar en lote de 1,434.95 v² en Cangrejera, La Libertad. 3 habitaciones cada una con baño completo, más baño social, piscina infinity, terraza con vista al mar, área de barbacoa y 6 espacios de estacionamiento. Actualmente genera alta rentabilidad en Airbnb, a 20 minutos del aeropuerto y Surf City."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront first row, 16.34 m frontage",
+        "es": "Primera fila frente al mar, 16.34 m de frente"
+      },
+      {
+        "en": "Fully furnished, turnkey Airbnb income",
+        "es": "Totalmente amueblado, ingreso Airbnb llave en mano"
+      },
+      {
+        "en": "Infinity pool with LED lighting",
+        "es": "Piscina infinity con iluminación LED"
+      },
+      {
+        "en": "20 minutes from airport and Surf City",
+        "es": "20 minutos del aeropuerto y Surf City"
+      },
+      {
+        "en": "6 parking spaces",
+        "es": "6 espacios de estacionamiento"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 350.0,
+      "parking_spaces": 6,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 3472,
+    "tokens_out": 575,
+    "cost_usd": 0.00156994,
+    "finish_reason": "stop",
+    "latency_ms": 5109
+  },
+  "remax|002283140053": {
+    "ts": "2026-07-28T06:12:54.400941+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Residencial Alicante, Comasagua – Fresh Climate",
+      "es": "Terreno en Residencial Alicante, Comasagua – Clima Fresco"
+    },
+    "short_description_canonical": {
+      "en": "Flat 1,252 m² lot in Residencial Alicante, Comasagua, surrounded by active coffee farm. Includes soil and topographic studies, utility feasibility, and biodigester system allowed. Only 13 neighbors in the entire colony.",
+      "es": "Lote plano de 1,252 m² en Residencial Alicante, Comasagua, rodeado de finca de café activa. Incluye estudios de suelo y topográficos, factibilidad de luz y agua, y sistema de biodigestor permitido. Solo 13 vecinos en toda la colonia."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Only 13 neighbors in the colony",
+        "es": "Solo 13 vecinos en la colonia"
+      },
+      {
+        "en": "1,100 m altitude – cool climate year-round",
+        "es": "1,100 m de altitud – clima fresco todo el año"
+      },
+      {
+        "en": "Soil and topographic studies included",
+        "es": "Estudios de suelo y topográficos incluidos"
+      },
+      {
+        "en": "1 min from Casa Campo Comasagua",
+        "es": "1 min de Casa Campo Comasagua"
+      },
+      {
+        "en": "45 min from El Tunco beach",
+        "es": "45 min de la playa El Tunco"
+      }
+    ],
+    "lat": 13.487,
+    "lng": -89.6133,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Tunco beach (45 min away)",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3480,
+    "tokens_out": 512,
+    "cost_usd": 0.0015028,
+    "finish_reason": "stop",
+    "latency_ms": 4320
+  },
+  "encuentra24|32756857": {
+    "ts": "2026-07-28T06:56:20.858426+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Remodeled Beach House, 2,600m² Land, Santa Clara",
+      "es": "Casa de Playa Remodelada, 2,600m² Terreno, Santa Clara"
+    },
+    "short_description_canonical": {
+      "en": "Recently remodeled beach house on 2,600m² lot with 600m² construction in Santa Clara. 4 bedrooms, 4 bathrooms, family den, living room, kitchen, bar/lounge, 200m² terrace, service quarters, laundry area, covered parking, pool, perimeter fence. Turnkey coastal property.",
+      "es": "Casa de playa recién remodelada en lote de 2,600m² con 600m² de construcción en Santa Clara. 4 habitaciones, 4 baños, sala familiar, sala, cocina, sala/bar, terraza de 200m², cuarto de servicio, área de lavandería, estacionamiento techado, piscina, cerca perimetral. Propiedad costera lista para habitar."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Recently remodeled throughout",
+        "es": "Recién remodelada por completo"
+      },
+      {
+        "en": "2,600m² lot with 600m² house",
+        "es": "Lote de 2,600m² con casa de 600m²"
+      },
+      {
+        "en": "4 bedrooms, 4 bathrooms",
+        "es": "4 habitaciones, 4 baños"
+      },
+      {
+        "en": "Pool, terrace, covered parking",
+        "es": "Piscina, terraza, estacionamiento techado"
+      }
+    ],
+    "lat": 8.3333,
+    "lng": -80.0,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Clara, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.0,
+      "built_area_m2": 600.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2355,
+    "tokens_out": 527,
+    "cost_usd": 0.00121555,
+    "finish_reason": "stop",
+    "latency_ms": 4707
+  },
+  "encuentra24|32375131": {
+    "ts": "2026-07-28T06:56:21.188193+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury 3BR Beachfront Apartment in Buenaventura",
+      "es": "Lujoso Apartamento 3H Frente al Mar en Buenaventura"
+    },
+    "short_description_canonical": {
+      "en": "Two-level apartment in Buenaventura, 315 m², 3 bedrooms, 3.5 bathrooms. Ground floor has two bedrooms with en-suite baths, guest bath, kitchen, living-dining with ocean-view balcony. Upper level features private pool, additional room with full bath, and storage. Beachfront community with 2 parking spaces.",
+      "es": "Apartamento de dos niveles en Buenaventura, 315 m², 3 habitaciones, 3.5 baños. Planta baja con dos recámaras con baño privado, baño de visitas, cocina, sala-comedor con balcón con vista al mar. Nivel superior con piscina privada, cuarto adicional con baño completo y depósito. Comunidad frente al mar con 2 estacionamientos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private pool on upper level",
+        "es": "Piscina privada en nivel superior"
+      },
+      {
+        "en": "315 m², two-level layout",
+        "es": "315 m², distribución de dos niveles"
+      },
+      {
+        "en": "Beachfront in exclusive Buenaventura",
+        "es": "Frente al mar en exclusivo Buenaventura"
+      },
+      {
+        "en": "3 bedrooms each with private bath",
+        "es": "3 recámaras cada una con baño privado"
+      },
+      {
+        "en": "2 parking spaces included",
+        "es": "2 estacionamientos incluidos"
+      }
+    ],
+    "lat": 8.0833,
+    "lng": -80.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Buenaventura beach area, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.5,
+      "built_area_m2": 315.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2488,
+    "tokens_out": 555,
+    "cost_usd": 0.00128226,
+    "finish_reason": "stop",
+    "latency_ms": 5035
+  },
+  "encuentra24|32689334": {
+    "ts": "2026-07-28T06:56:21.223059+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Elegant 4-Bed Home in Punta Barco Village",
+      "es": "Elegante Residencia de 4 Hab. en Punta Barco Village"
+    },
+    "short_description_canonical": {
+      "en": "House on 881.59 m² lot with 400 m² built area in Punta Barco Village, a private community near Coronado. Features 4 bedrooms (master suite on upper floor with private living area), 5.5 bathrooms, pool, terrace, and 2 covered parking spaces. Built in 2016, includes service quarters and water reserve tank.",
+      "es": "Casa en terreno de 881.59 m² con 400 m² construidos en Punta Barco Village, comunidad privada cerca de Coronado. Cuenta con 4 habitaciones (suite principal en planta alta con sala privada), 5.5 baños, piscina, terraza y 2 estacionamientos techados. Construida en 2016, incluye cuartos de servicio y tanque de reserva de agua."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private beach community Punta Barco",
+        "es": "Comunidad privada en playa Punta Barco"
+      },
+      {
+        "en": "881.59 m² lot, 400 m² built",
+        "es": "Terreno de 881.59 m², 400 m² construidos"
+      },
+      {
+        "en": "Master suite with private living area",
+        "es": "Suite principal con sala privada"
+      },
+      {
+        "en": "Pool, terrace, 2 covered parking",
+        "es": "Piscina, terraza, 2 estacionamientos techados"
+      }
+    ],
+    "lat": 8.5,
+    "lng": -79.9,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Punta Barco Beach, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": 2016,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 5.5,
+      "built_area_m2": 400.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2614,
+    "tokens_out": 544,
+    "cost_usd": 0.00130418,
+    "finish_reason": "stop",
+    "latency_ms": 5071
   }
 }
