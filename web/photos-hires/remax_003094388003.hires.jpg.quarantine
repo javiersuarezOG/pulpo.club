@@ -1,0 +1,8 @@
+{
+  "reason": "resdet_upscaled",
+  "detected_width": 945,
+  "detected_height": 1260,
+  "actual_width": 1080,
+  "actual_height": 1440,
+  "computed_at": "2026-07-28T06:21:04.185787+00:00"
+}

@@ -1,0 +1,17 @@
+{
+  "width": 1280,
+  "height": 960,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 669.2,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-07-28T06:18:23.497971+00:00",
+  "derivative_width": 1280,
+  "derivative_height": 960,
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": false,
+  "has_marketing_overlay": false,
+  "winning_url": "https://api.obriencrm.com/assets/images/fotos-inmuebles/d0ad8b621f46c33f3ea2388109114735.jpeg",
+  "candidate_count": 5
+}
