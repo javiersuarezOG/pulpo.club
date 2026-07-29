@@ -317,6 +317,18 @@ def _score_candidates_cheap(photo_urls, on_url_error=None):
             # blocks the VLM call on this run. Future runs will just
             # re-evaluate the floor.
             pass
+
+    # Within-listing dedup (PR-F): a broker gallery routinely repeats the
+    # same image (exact bytes, or re-encoded/resized near-dup). Stamp
+    # content_sha1 + dhash on every candidate and mark the redundant ones
+    # so the winner-pick skips them and the gallery drops them. Bytes are
+    # already in memory here, so this is nearly free. Non-fatal: a failure
+    # just leaves candidates un-deduped (today's behavior).
+    try:
+        from automation.image_hash import dedupe_within_listing as _dedupe
+        _dedupe(candidates)
+    except Exception as _dedup_err:  # noqa: BLE001 — never break the photo phase
+        print(f"[photos] within-listing dedup skipped: {_dedup_err!r}")
     return candidates
 
 
@@ -373,14 +385,18 @@ def _pick_winner_from_scored(
     if not scored_candidates:
         return (None, None, None, None, None)
 
-    # Filter cascade: drop picker_excluded → drop has_text_overlay=True →
-    # drop has_marketing_overlay=True. Each filter degrades gracefully:
-    # only drops the flag's matches when at least one clean alternative
-    # survives, so a listing with all-flagged photos still gets a hero
-    # (technical ranking decides among the dregs). None on any flag means
-    # "no signal," not "flagged" — missing signals don't disqualify.
-    non_excluded = [c for c in scored_candidates if not c.get("picker_excluded")]
-    base = non_excluded if non_excluded else list(scored_candidates)
+    # Filter cascade: drop within-listing duplicates → drop picker_excluded
+    # → drop has_text_overlay=True → drop has_marketing_overlay=True. Each
+    # filter degrades gracefully: only drops the flag's matches when at
+    # least one clean alternative survives, so a listing with all-flagged
+    # photos still gets a hero (technical ranking decides among the dregs).
+    # None on any flag means "no signal," not "flagged" — missing signals
+    # don't disqualify. Duplicates go first: a redundant copy should never
+    # win over the representative that carries the same picture.
+    non_dup = [c for c in scored_candidates if not c.get("is_duplicate")]
+    deduped = non_dup if non_dup else list(scored_candidates)
+    non_excluded = [c for c in deduped if not c.get("picker_excluded")]
+    base = non_excluded if non_excluded else deduped
     non_text = [c for c in base if c.get("has_text_overlay") is not True]
     after_text = non_text if non_text else base
     non_marketing = [c for c in after_text if c.get("has_marketing_overlay") is not True]
@@ -870,6 +886,20 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 hero_meta["has_marketing_overlay"] = winning_has_marketing
                 hero_meta["winning_url"] = winning_url
                 hero_meta["candidate_count"] = len(candidate_urls)
+                # PR-F — persist the winner's content identity + perceptual
+                # hash so a future run can recognise unchanged winning bytes
+                # (cross-run skip of derivative re-encoding) and PR-I can
+                # match the retained original to the served hero.
+                from automation.image_hash import content_sha1 as _c_sha1, dhash as _dhash
+                hero_meta["content_sha1"] = _c_sha1(winning_content)
+                _wd = _dhash(winning_content)
+                hero_meta["dhash"] = _wd
+                # How many of the scored candidates were dropped as
+                # within-listing duplicates — observability for the dedup
+                # rate without a separate log.
+                hero_meta["duplicates_dropped"] = sum(
+                    1 for c in scored if c.get("is_duplicate") is True
+                )
                 # P5 — a logo/icon/placeholder that wins the pick (structural
                 # gates can't tell a big logo from a real photo) must never be
                 # card/hero eligible. Override BEFORE the sidecar write so both
@@ -900,19 +930,21 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             li.selected_photo_url = winning_url
             # Per-photo verdicts: every SCORED candidate (the first `cap`
             # photo_urls) that the picker rejected — below the cheap-score
-            # floor (picker_excluded) or carrying a Tesseract text overlay.
-            # `scored` dicts don't carry has_marketing_overlay (that's only
-            # resolved for the winner in _pick_winner_from_scored), so the
-            # verdict set is limited to those two signals. URLs beyond the
-            # cap were never scored and stay out of the list (absence ≠
-            # rejected). The winner is never in this set by construction.
-            # Consumers: listings.ts::buildPhotos + ig_photo_gate.py::
-            # order_photo_indices.
+            # floor (picker_excluded), carrying a Tesseract text overlay,
+            # or a within-listing duplicate (PR-F: the same image repeated
+            # in the gallery). `scored` dicts don't carry
+            # has_marketing_overlay (that's only resolved for the winner in
+            # _pick_winner_from_scored), so the verdict set is limited to
+            # those signals. URLs beyond the cap were never scored and stay
+            # out of the list (absence ≠ rejected). The winner is never in
+            # this set by construction. Consumers: listings.ts::buildPhotos
+            # + ig_photo_gate.py::order_photo_indices.
             rejected = [
                 c["url"] for c in scored
                 if c.get("url") and c["url"] != winning_url
                 and (c.get("picker_excluded")
-                     or c.get("has_text_overlay") is True)
+                     or c.get("has_text_overlay") is True
+                     or c.get("is_duplicate") is True)
             ]
             li.photo_urls_rejected = rejected or None
             if li.card_eligible:
@@ -1391,10 +1423,30 @@ def main() -> int:
     # get it crawled on the next nightly without a workflow-YAML edit.
     # See pulpo/scrapers/__init__.py for the autodiscovery loop.
     _PULPO_SOURCES_RAW = (os.environ.get("PULPO_SOURCES") or "").strip()
+    paused_sources: list[str] = []
     if _PULPO_SOURCES_RAW:
         sources = [s for s in _PULPO_SOURCES_RAW.split(",") if s.strip()]
     else:
         sources = sorted(REGISTRY.keys())
+        # lifecycle="paused" sources (pulpo/scrapers/_metadata.py) are
+        # skipped on autodiscovered runs: known-dead scrapers burn crawl
+        # time and paint every health surface red for months. They still
+        # get an explicit status="paused" health row below so dashboards
+        # show intent, and an explicit PULPO_SOURCES=<slug> run (manual /
+        # autorepair) crawls them regardless — that's the un-pause
+        # escape hatch while a repair PR is in flight.
+        try:
+            from pulpo.scrapers._metadata import SCRAPER_METADATA as _SCRAPER_META
+            paused_sources = [
+                s for s in sources
+                if (_SCRAPER_META.get(s) or {}).get("lifecycle") == "paused"
+            ]
+        except Exception:
+            paused_sources = []
+        if paused_sources:
+            sources = [s for s in sources if s not in set(paused_sources)]
+            print(f"[scrape] skipping paused sources: {', '.join(paused_sources)} "
+                  f"(override with PULPO_SOURCES to crawl explicitly)")
 
     started = datetime.now(timezone.utc)
     # PostHog: tag every subsequent capture() in this process with a
@@ -1405,6 +1457,7 @@ def main() -> int:
     _ph_capture("pipeline_started", {
         "sources": sources,
         "sources_count": len(sources),
+        "sources_paused": paused_sources,
         "offline": offline,
         "limit": limit,
     })
@@ -1614,36 +1667,59 @@ def main() -> int:
     type_log_path.parent.mkdir(parents=True, exist_ok=True)
     try:
         from pulpo.scrapers._type_classifier import classify_property_type as _classify_t
-        with type_log_path.open("a", encoding="utf-8") as _tf:
-            for r in raw:
-                if "_type_signals" in r:
-                    pred_type, signals_payload = r["property_type"], r["_type_signals"]
-                    confidence, total = r["_type_confidence"], r["_type_total"]
-                    mode = "applied"
-                else:
-                    p, sigs, confidence, total = _classify_t({
-                        "url":         r.get("url") or "",
-                        "photo_urls":  r.get("photo_urls") or [],
-                        "title":       r.get("title") or "",
-                        "description": r.get("description") or "",
-                    }, fallback_type=r.get("property_type") or "land")
-                    pred_type = p
-                    signals_payload = [s.to_dict() for s in sigs]
-                    mode = "shadow"
-                _tf.write(json.dumps({
-                    "ts":           started.isoformat(),
-                    "source":       r.get("source"),
-                    "source_id":    r.get("source_id"),
-                    "scraper_type": r.get("property_type"),
-                    "predicted":    pred_type,
-                    "confidence":   confidence,
-                    "total_weight": round(total, 2),
-                    "mode":         mode,
-                    "signals":      signals_payload,
-                }, ensure_ascii=False) + "\n")
-                # Strip the piggyback fields before normalize sees the record.
-                for k in ("_type_signals", "_type_confidence", "_type_total"):
-                    r.pop(k, None)
+        from automation._jsonl import append_jsonl_idempotent as _append_jsonl
+        # Build the run's rows first, then write once (PR-H). This log was
+        # the worst unbounded-growth offender (~40 MB / ~100k rows,
+        # re-committed nightly) and a same-day rerun used to double every
+        # row. The idempotent writer keys on (date, source, source_id) so a
+        # rerun REPLACES rather than duplicates, and a 30-day retention
+        # window bounds the file. It's write-only telemetry (no consumer
+        # reads history beyond the current run), so trimming is safe.
+        type_rows = []
+        for r in raw:
+            if "_type_signals" in r:
+                pred_type, signals_payload = r["property_type"], r["_type_signals"]
+                confidence, total = r["_type_confidence"], r["_type_total"]
+                mode = "applied"
+            else:
+                p, sigs, confidence, total = _classify_t({
+                    "url":         r.get("url") or "",
+                    "photo_urls":  r.get("photo_urls") or [],
+                    "title":       r.get("title") or "",
+                    "description": r.get("description") or "",
+                }, fallback_type=r.get("property_type") or "land")
+                pred_type = p
+                signals_payload = [s.to_dict() for s in sigs]
+                mode = "shadow"
+            type_rows.append({
+                "ts":           started.isoformat(),
+                "source":       r.get("source"),
+                "source_id":    r.get("source_id"),
+                "scraper_type": r.get("property_type"),
+                "predicted":    pred_type,
+                "confidence":   confidence,
+                "total_weight": round(total, 2),
+                "mode":         mode,
+                "signals":      signals_payload,
+            })
+            # Strip the piggyback fields before normalize sees the record.
+            for k in ("_type_signals", "_type_confidence", "_type_total"):
+                r.pop(k, None)
+
+        def _type_key(row: dict):
+            sid = row.get("source_id")
+            if sid is None:
+                return None  # un-keyable → always keep, never dedupe
+            ts = row.get("ts") or ""
+            return (ts[:10], row.get("source"), sid)
+
+        _stats = _append_jsonl(
+            type_log_path, type_rows,
+            key_fn=_type_key, retention_days=30, now=started,
+        )
+        print(f"[type_classifier] log rows added={_stats['added']} "
+              f"replaced={_stats['replaced']} pruned={_stats['pruned']} "
+              f"total={_stats['total']}")
     except Exception as e:
         # Telemetry must never block a run.
         print(f"[type_classifier] shadow log skipped: {e}")
@@ -1681,6 +1757,24 @@ def main() -> int:
                 # ``web/data/scraper_failures/<source>_*_<failure_id>.json``,
                 # consumed by the watchdog + Phase-4 auto-repair agent.
                 "failure_id":   source_failure_id.get(src),
+            }, ensure_ascii=False) + "\n")
+        # Paused sources weren't crawled — write an explicit "paused"
+        # row (not "red") so dashboards show intent, the consecutive-red
+        # streak breaks, and check_source_health has a fresh latest-row
+        # that never pages. Removing the source from the file entirely
+        # would read as "source deleted" to the row-count sentinel.
+        for src in paused_sources:
+            _hf.write(json.dumps({
+                "ts":          health_ts,
+                "source":      src,
+                "status":      "paused",
+                "count":       0,
+                "duration_s":  0.0,
+                "error_class": None,
+                "error_msg":   "",
+                "max_pages_hit": False,
+                "limit_hit":     False,
+                "failure_id":   None,
             }, ensure_ascii=False) + "\n")
 
     # Normalize. seen_keys (plan 012): read-only ledger snapshot so the

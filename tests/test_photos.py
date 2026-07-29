@@ -390,6 +390,61 @@ def test_pick_best_photo_returns_none_when_all_fail(tmp_repo):
     assert result == (None, None, None, None, None)
 
 
+def test_score_candidates_marks_within_listing_duplicate(tmp_repo, monkeypatch):
+    """PR-F: a gallery that repeats the same image (exact bytes under two
+    URLs) marks the redundant copy is_duplicate=True with dup_of pointing
+    at the representative. Wires image_hash.dedupe_within_listing into the
+    real cheap-scoring path."""
+    pytest.importorskip("PIL")
+    monkeypatch.setenv("HERO_PICKER_MIN_CHEAP_SCORE", "0")
+    from automation.run import _score_candidates_cheap
+
+    # Two textured images so the dhash carries structure; one is repeated.
+    from PIL import Image
+    import math as _math
+
+    def _tex(w, h, phase=0.0):
+        img = Image.new("RGB", (w, h))
+        px = []
+        for y in range(h):
+            fy = y / max(1, h - 1)
+            for x in range(w):
+                fx = x / max(1, w - 1)
+                v = int(255 * (0.5 + 0.5 * _math.sin(6 * fx + phase) * _math.cos(6 * fy + phase)))
+                px.append((v, v, v))
+        img.putdata(px)
+        b = io.BytesIO()
+        img.save(b, format="JPEG", quality=90)
+        return b.getvalue()
+
+    same = _tex(1200, 900, phase=0.0)
+    other = _tex(1200, 900, phase=1.5)
+    responses = {
+        "https://ex.com/1.jpg": same,
+        "https://ex.com/2.jpg": same,     # exact repeat → duplicate
+        "https://ex.com/3.jpg": other,
+    }
+
+    def fake_get(url, *_a, **_k):
+        r = mock.MagicMock()
+        r.content = responses[url]
+        r.raise_for_status = mock.MagicMock()
+        return r
+
+    with mock.patch("httpx.get", side_effect=fake_get):
+        cands = _score_candidates_cheap(list(responses.keys()))
+
+    by_url = {c["url"]: c for c in cands}
+    dups = [c for c in cands if c.get("is_duplicate")]
+    assert len(dups) == 1
+    assert dups[0]["url"] == "https://ex.com/2.jpg"
+    assert dups[0]["dup_of"] == "https://ex.com/1.jpg"
+    assert dups[0]["dup_reason"] == "exact"
+    assert by_url["https://ex.com/3.jpg"]["is_duplicate"] is False
+    # Every candidate carries the persisted identity hashes.
+    assert all(c.get("content_sha1") for c in cands)
+
+
 def test_pick_best_photo_respects_candidates_cap(tmp_repo, monkeypatch):
     """Only the first N candidates are downloaded (PULPO_PHOTO_MAX_CANDIDATES)."""
     pytest.importorskip("PIL")
