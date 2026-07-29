@@ -17,6 +17,7 @@ import type { EventMap } from "./events";
 type PerfEventName =
   | "perf.data_fetch"
   | "perf.filter_recompute"
+  | "perf.histo_recompute"
   | "perf.detail_open"
   | "perf.lightbox_open"
   | "perf.route_transition";

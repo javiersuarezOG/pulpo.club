@@ -223,6 +223,37 @@ test.describe("New app boots cleanly on key routes", () => {
     expect(errors, "console errors during size histogram interaction").toEqual([]);
   });
 
+  // Faceting — a filter on one dimension narrows the OTHER histogram, but
+  // never its own (exclude-own-dimension invariant, post-2026-07-29).
+  test("@critical faceting narrows the price histogram but not its own bars", async ({ page }) => {
+    await page.goto("/browse", { waitUntil: "networkidle" });
+    await page.locator('[data-histo="price"] .histo-bar').first().waitFor({ state: "visible", timeout: 10_000 });
+
+    const sumCounts = () =>
+      page.evaluate(() =>
+        Array.from(document.querySelectorAll('[data-histo="price"] .histo-bar'))
+          .reduce((a, el) => a + Number(el.getAttribute("data-count") || 0), 0),
+      );
+
+    const before = await sumCounts();
+    expect(before).toBeGreaterThan(0);
+
+    // Cross-dimension facet (beachfront) via URL → the price base shrinks.
+    // Poll past the 300ms debounce, don't assert immediately.
+    await page.goto("/browse?features=beachfront", { waitUntil: "networkidle" });
+    await page.locator('[data-histo="price"] .histo-bar').first().waitFor({ state: "visible", timeout: 10_000 });
+    await expect.poll(sumCounts, { timeout: 5_000 }).toBeLessThan(before);
+
+    // Exclude-own-dimension: nudging the price MIN thumb must NOT move the
+    // price bar counts (price is skipped from its own facet base).
+    const afterFacet = await sumCounts();
+    await page.locator('[data-histo="price"] .histo-thumb-min').focus();
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+    await page.waitForTimeout(600); // let any (wrong) recompute land
+    expect(await sumCounts()).toBe(afterFacet);
+  });
+
   // PR-1 (WS4) — keyword relevance. When a search query is active,
   // results re-order by keyword relevance, so the sort dropdown is
   // swapped for a static "Best match" label. Asserts the swap both ways.
