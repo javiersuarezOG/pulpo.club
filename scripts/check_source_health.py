@@ -109,7 +109,8 @@ def fresh_red_rows(
         if ts < cutoff:
             continue
         if r.get("status") == "red":
-            if source_lifecycle(_src) == "experimental":
+            # experimental + paused sources are log-only, never page.
+            if source_lifecycle(_src) in {"experimental", "paused"}:
                 continue
             out.append(r)
     return out
@@ -160,7 +161,10 @@ def brownout_alert_lines(results: list[SourceBrownoutResult]) -> list[str]:
     for r in sorted(results, key=lambda x: x.source):
         if r.status in {"green", "skipped", "unknown"}:
             continue
-        if source_lifecycle(r.source) == "experimental":
+        # experimental + paused sources are log-only: they never page.
+        # A paused source yields count=0 every night, so the brownout
+        # walk would otherwise compute "red" and alert forever.
+        if source_lifecycle(r.source) in {"experimental", "paused"}:
             continue
         median_str = (
             f"{r.rolling_median_7:.0f}" if r.rolling_median_7 is not None else "?"
