@@ -14,7 +14,7 @@
 // actually wires it up — not the function in isolation.
 
 import { test, expect } from "@playwright/test";
-import { attachErrorRecorder, seedConsent, seedProUser } from "./_helpers";
+import { attachErrorRecorder, seedAgencyUser, seedConsent, seedProUser } from "./_helpers";
 
 const MODAL = ".pro-upsell-modal";
 
@@ -77,6 +77,16 @@ test.describe("Home page Pro upsell modal — trigger logic", () => {
 
   test("@critical Pro signed-in user → no modal even with utm", async ({ page }) => {
     await seedProUser(page);
+    await page.goto("/?utm_source=reddit", { waitUntil: "networkidle" });
+    await page.locator(".homepage-v2, .new-homepage, .new-hero").first().waitFor({ state: "visible", timeout: 10_000 });
+    await page.waitForTimeout(800);
+    await expect(page.locator(MODAL)).toHaveCount(0);
+  });
+
+  test("@critical Agency signed-in user → no modal even with utm", async ({ page }) => {
+    // Regression guard for the plan === "pro" literal that let agency
+    // users get the upsell modal (fixed via isPaid in NewHomePage.jsx).
+    await seedAgencyUser(page);
     await page.goto("/?utm_source=reddit", { waitUntil: "networkidle" });
     await page.locator(".homepage-v2, .new-homepage, .new-hero").first().waitFor({ state: "visible", timeout: 10_000 });
     await page.waitForTimeout(800);

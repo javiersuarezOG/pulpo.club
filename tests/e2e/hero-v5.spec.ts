@@ -20,7 +20,10 @@
 
 import { readFileSync } from "node:fs";
 import { test, expect, type Page } from "@playwright/test";
-import { attachErrorRecorder, TOLERATED, isTolerated } from "./_helpers";
+import {
+  attachErrorRecorder, TOLERATED, isTolerated,
+  seedAgencyUser, seedConsent, seedFreeMember, seedProUser,
+} from "./_helpers";
 
 const versions = JSON.parse(
   readFileSync(new URL("../../web/app/home/versions.json", import.meta.url), "utf8"),
@@ -73,8 +76,9 @@ test.describe("hero_v5 — flag on", () => {
     await expect(page.locator("#hp-hero-v5-h1")).toBeVisible();
     // 5 destination cards: All + Surf City I + Surf City II + Coatepeque + Ilopango
     await expect(page.locator(".hp-hero-v5-dest")).toHaveCount(5);
-    // Newsletter postcard preview
-    await expect(page.locator(".hp-hero-v5-postcard")).toBeVisible();
+    // The Top-N ranked card (pre-existing stale selector fixed: the old
+    // .hp-hero-v5-postcard class only ever existed in CSS, never in JSX).
+    await expect(page.locator(".hv6-card")).toBeVisible();
 
     const events = await getEvents(page);
     expect(events.find((e) => e.name === "hero_v5_viewed")?.props.version)
@@ -122,5 +126,122 @@ test.describe("hero_v5 — flag on", () => {
     await expect(page).toHaveURL(/\/browse/);
     // master_category=beach via buildFiltersForCategory("surf_city_1")
     await expect(page).toHaveURL(/cat=surf_city_1|master_category=beach/);
+  });
+});
+
+// ── Paid variant (post-2026-07-29) ─────────────────────────────────────
+// A paying Pro/Agency user must NEVER see an upsell on the home hero:
+// no lock overlay, no "Unlock" CTA, no "Go Pro — {price}" AccessBlock,
+// no "Free" tag. Instead: Pro tag, full Top 10 unlocked + clickable, and
+// a single "Browse all listings" CTA in the copy column.
+test.describe("hero_v5 — paid variant", () => {
+  test.beforeEach(async ({ page }) => {
+    await seedConsent(page);
+  });
+
+  test("@critical Pro user: no upsell surfaces, Pro tag, 10 unlocked rows", async ({ page }) => {
+    const errors = attachErrorRecorder(page);
+    await seedProUser(page);
+    await page.goto("/?posthog_capture=1&ff_hero_v5=1", { waitUntil: "networkidle" });
+    await expect(page.locator(".hp-hero-v5")).toBeVisible();
+
+    // No lock overlay, no unlock CTA anywhere.
+    await expect(page.locator(".hv6-lock")).toHaveCount(0);
+    await expect(page.locator(".hv6-lock-cta")).toHaveCount(0);
+    await expect(page.locator(".hv6-lock-over")).toHaveCount(0);
+
+    // Pro tag renders, "Free"/"Gratis" tag does not.
+    await expect(page.locator(".hv6-tag-pro")).toBeVisible();
+    await expect(page.locator(".hv6-tag-pro")).toHaveText("Pro");
+
+    // Full Top 10 unlocked and clickable.
+    await expect(page.locator(".hv6-card .hv6-r")).toHaveCount(10);
+    await expect(page.locator(".hv6-card button.hv6-r-link")).toHaveCount(10);
+
+    // No AccessBlock signup/upsell in the hero copy column.
+    await expect(page.locator(".access-cta-pro")).toHaveCount(0);
+    await expect(page.locator(".access-block form")).toHaveCount(0);
+    const hero = await page.locator(".hp-hero-v5").innerText();
+    expect(hero).not.toContain("Go Pro");
+    expect(hero).not.toContain("/month");
+
+    // ProHeroCta present; telemetry carries variant=pro + current version.
+    await expect(page.locator(".hv6-pro-cta")).toBeVisible();
+    const events = await getEvents(page);
+    const viewed = events.find((e) => e.name === "hero_v5_viewed");
+    expect(viewed?.props.variant).toBe("pro");
+    expect(viewed?.props.version).toBe(versions.blocks.hero_v5);
+
+    expect(errors.filter((e) => !isTolerated(e, TOLERATED))).toEqual([]);
+  });
+
+  test("@critical Pro user: 'Browse all listings' CTA navigates to /browse", async ({ page }) => {
+    await seedProUser(page);
+    await page.goto("/?posthog_capture=1&ff_hero_v5=1", { waitUntil: "networkidle" });
+    await page.locator(".hv6-pro-cta .hv6-pro-btn").click();
+    await expect(page).toHaveURL(/\/browse/);
+  });
+
+  test("Pro user: clicking a ranked row opens the listing detail", async ({ page }) => {
+    await seedProUser(page);
+    await page.goto("/?posthog_capture=1&ff_hero_v5=1", { waitUntil: "networkidle" });
+    await page.locator(".hv6-card button.hv6-r-link").first().click();
+    await expect(page).toHaveURL(/\/listing\//);
+    const events = await getEvents(page);
+    expect(events.find((e) => e.name === "hero_v5_pro_row_clicked")?.props.rank).toBe(1);
+  });
+
+  test("@critical Agency user: same no-upsell guarantees as Pro", async ({ page }) => {
+    await seedAgencyUser(page);
+    await page.goto("/?ff_hero_v5=1", { waitUntil: "networkidle" });
+    await expect(page.locator(".hp-hero-v5")).toBeVisible();
+    await expect(page.locator(".hv6-lock")).toHaveCount(0);
+    await expect(page.locator(".hv6-tag-pro")).toBeVisible();
+    const hero = await page.locator(".hp-hero-v5").innerText();
+    expect(hero).not.toContain("Go Pro");
+  });
+
+  for (const vp of VIEWPORTS) {
+    test(`Pro hero renders without horizontal overflow @ ${vp.name}`, async ({ page }) => {
+      await seedProUser(page);
+      await page.setViewportSize({ width: vp.width, height: vp.height });
+      await page.goto("/?ff_hero_v5=1", { waitUntil: "networkidle" });
+      await expect(page.locator(".hv6-tag-pro")).toBeVisible();
+      const overflow = await page.evaluate(() => ({
+        scrollWidth: document.documentElement.scrollWidth,
+        innerWidth: window.innerWidth,
+      }));
+      expect(
+        overflow.scrollWidth,
+        `Pro hero overflowed at ${vp.name}: scrollWidth ${overflow.scrollWidth} > innerWidth ${overflow.innerWidth}`,
+      ).toBeLessThanOrEqual(overflow.innerWidth + 1);
+    });
+  }
+
+  test("Pro ES locale: no English pro-CTA leak", async ({ page }) => {
+    await seedProUser(page);
+    await page.addInitScript(() => localStorage.setItem("pulpo-locale", "es"));
+    await page.goto("/?ff_hero_v5=1", { waitUntil: "networkidle" });
+    await expect(page.locator(".hv6-tag-pro")).toBeVisible();
+    const body = await page.locator("body").innerText();
+    expect(body).not.toContain("Browse all listings");
+    expect(body).not.toContain("Manage subscription");
+    expect(body).not.toContain("Go Pro");
+  });
+
+  test("@critical regression: anonymous still sees lock + access form", async ({ page }) => {
+    await page.goto("/?ff_hero_v5=1", { waitUntil: "networkidle" });
+    await expect(page.locator(".hv6-lock")).toBeVisible();
+    await expect(page.locator(".hv6-lock-cta")).toBeVisible();
+    await expect(page.locator(".hv6-tag-pro")).toHaveCount(0);
+    // Access surface (AccessBlock form or legacy EmailCapture) present.
+    await expect(page.locator(".access-block, .hv6-signup").first()).toBeVisible();
+  });
+
+  test("@critical regression: free email member is NOT paid — lock stays", async ({ page }) => {
+    await seedFreeMember(page);
+    await page.goto("/?ff_hero_v5=1", { waitUntil: "networkidle" });
+    await expect(page.locator(".hv6-lock")).toBeVisible();
+    await expect(page.locator(".hv6-tag-pro")).toHaveCount(0);
   });
 });

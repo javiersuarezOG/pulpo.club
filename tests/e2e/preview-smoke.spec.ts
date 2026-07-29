@@ -562,6 +562,12 @@ test.describe("New app boots cleanly on key routes", () => {
       // "Show missing details" opt-in chip. Both must localize.
       "Not shared",                                   // value.notshared.short
       "Show missing details",                         // filter.show_incomplete
+      // Paid-hero variant (post-2026-07-29) — BACKSTOP ONLY: this anon
+      // sweep can never render pro-only surfaces, so these entries only
+      // document the fix. Real ES coverage is hero-v5.spec.ts's
+      // "Pro ES locale: no English pro-CTA leak" (seeded pro user).
+      "Browse all listings",                          // home.hero.v5.pro_browse_cta
+      "Manage subscription",                          // access.already_pro_link
       // PriceContextBlock — "How this price compares" zone-context block
       // on the detail page. Renders whenever the backend cascade
       // (zone → macro → country) finds a qualifying comp pool. An anon
