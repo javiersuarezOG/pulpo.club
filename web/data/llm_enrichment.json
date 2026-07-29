@@ -131465,5 +131465,413 @@
     "cost_usd": 0.00130418,
     "finish_reason": "stop",
     "latency_ms": 5071
+  },
+  "citymax_sc|propiedad-de-inversion-frente-al-mar-en-surf-city-2": {
+    "ts": "2026-07-29T06:18:20.780007+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beach Houses for Sale in Surf City 2, Usulután",
+      "es": "Casas de playa en venta en Surf City 2, Usulután"
+    },
+    "short_description_canonical": {
+      "en": "Beach houses for sale in Surf City 2, Usulután department. Located in a coastal development area. Price: $1,200,000.",
+      "es": "Casas de playa en venta en Surf City 2, departamento de Usulután. Ubicadas en una zona de desarrollo costero. Precio: $1,200,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in Surf City 2",
+        "es": "Ubicación frente al mar en Surf City 2"
+      },
+      {
+        "en": "Coastal development area",
+        "es": "Zona de desarrollo costero"
+      },
+      {
+        "en": "Usulután department",
+        "es": "Departamento de Usulután"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol, Usulután",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3073,
+    "tokens_out": 389,
+    "cost_usd": 0.00125761,
+    "finish_reason": "stop",
+    "latency_ms": 3556
+  },
+  "csbr|costa-del-sol-rancho-en-venta-condominio-joyas-del-pacifico-en-privado-a-reparar": {
+    "ts": "2026-07-29T06:18:20.783710+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Condo for Sale, Costa del Sol, Joyas del Pacifico",
+      "es": "Condominio en Venta, Costa del Sol, Joyas del Pacífico"
+    },
+    "short_description_canonical": {
+      "en": "Condo in need of repair in Condominio Joyas del Pacifico, Costa del Sol, San Luis La Herradura. Located in a private gated community. Priced at $350,000.",
+      "es": "Condominio para reparar en Condominio Joyas del Pacífico, Costa del Sol, San Luis La Herradura. Ubicado en un privado con vigilancia. Precio de $350,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Costa del Sol beachfront location",
+        "es": "Ubicación frente a la playa Costa del Sol"
+      },
+      {
+        "en": "Private gated community",
+        "es": "Privado con vigilancia"
+      },
+      {
+        "en": "Fixer-upper with potential",
+        "es": "Para reparar con potencial"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3086,
+    "tokens_out": 394,
+    "cost_usd": 0.00126662,
+    "finish_reason": "stop",
+    "latency_ms": 3559
+  },
+  "csbr|venta-terreno-en-ateos-calle-panamericana-2": {
+    "ts": "2026-07-29T06:18:20.825356+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale on Pan-American Highway",
+      "es": "Terreno en Venta en Carretera Panamericana"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel for sale on the Pan-American Highway, El Salvador. No built area, bedrooms, or bathrooms. Priced at $2,264,258. High-visibility location along a major national route.",
+      "es": "Terreno en venta sobre la Carretera Panamericana, El Salvador. Sin área construida, habitaciones ni baños. Precio de $2,264,258. Ubicación de alta visibilidad sobre una ruta nacional principal."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Frontage on Pan-American Highway",
+        "es": "Frente sobre Carretera Panamericana"
+      },
+      {
+        "en": "High-traffic visibility",
+        "es": "Visibilidad de alto tráfico"
+      },
+      {
+        "en": "Listed at $2,264,258",
+        "es": "Listado en $2,264,258"
+      }
+    ],
+    "lat": 13.7942,
+    "lng": -89.0,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Pan-American Highway, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3053,
+    "tokens_out": 388,
+    "cost_usd": 0.00125111,
+    "finish_reason": "stop",
+    "latency_ms": 3601
+  },
+  "realestate_au_sv|a-pasos-de-pizza-hut-la-coquera-san-miguel-san-miguel-san-miguel-san-miguel-310109544462": {
+    "ts": "2026-07-29T06:18:20.873428+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land near Pizza Hut, San Miguel",
+      "es": "Terreno cerca de Pizza Hut, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Flat land lot near Pizza Hut La Coquera in San Miguel, San Miguel department. Located in an urban area with easy access to amenities. Priced at $65,000.",
+      "es": "Terreno plano cerca de Pizza Hut La Coquera en San Miguel, departamento de San Miguel. Ubicado en zona urbana con fácil acceso a servicios. Precio de $65,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Near Pizza Hut La Coquera",
+        "es": "Cerca de Pizza Hut La Coquera"
+      },
+      {
+        "en": "Urban location in San Miguel",
+        "es": "Ubicación urbana en San Miguel"
+      },
+      {
+        "en": "Priced at $65,000",
+        "es": "Precio de $65,000"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3076,
+    "tokens_out": 372,
+    "cost_usd": 0.00123972,
+    "finish_reason": "stop",
+    "latency_ms": 3648
+  },
+  "encuentra24|32713115": {
+    "ts": "2026-07-29T06:18:23.235820+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "New House with Pool, Panoramic Mountain Views",
+      "es": "Casa nueva con piscina, vista panorámica a montañas"
+    },
+    "short_description_canonical": {
+      "en": "Single-story new house in Residencial Las Luces, Zaragoza, La Libertad. Built area 275.59 m² on a 746.44 m² lot, with 3 bedrooms (all en-suite), 4.5 bathrooms, and parking for 6 vehicles. Features include pool, solar panels, smart lights, high ceilings, underground gas, and cistern; amenities include clubhouse, tennis and soccer courts, gym, and event hall.",
+      "es": "Casa nueva de un nivel en Residencial Las Luces, Zaragoza, La Libertad. Área construida de 275.59 m² en lote de 746.44 m², con 3 habitaciones (todas con baño), 4.5 baños y parqueo para 6 vehículos. Incluye piscina, paneles solares, luces inteligentes, techos altos, gas subterráneo y cisterna; amenidades: casa club, canchas de tenis y fútbol, gimnasio y salón de eventos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Brand new, never occupied",
+        "es": "A estrenar, nunca habitada"
+      },
+      {
+        "en": "Pool and panoramic mountain views",
+        "es": "Piscina y vista panorámica a montañas"
+      },
+      {
+        "en": "Solar panels and smart lighting",
+        "es": "Paneles solares y luces inteligentes"
+      },
+      {
+        "en": "10 minutes from Surf City",
+        "es": "10 minutos de Surf City"
+      },
+      {
+        "en": "Full amenities: clubhouse, sports courts, gym",
+        "es": "Amenidades completas: casa club, canchas, gimnasio"
+      }
+    ],
+    "lat": 13.5833,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Zaragoza, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 4.5,
+      "built_area_m2": 275.59,
+      "parking_spaces": 6,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3448,
+    "tokens_out": 607,
+    "cost_usd": 0.00159866,
+    "finish_reason": "stop",
+    "latency_ms": 6011
+  },
+  "remax|002522430093": {
+    "ts": "2026-07-29T06:18:24.479041+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "916 m² lot in Mejicanos, high-growth area",
+      "es": "Lote de 916 m² en Mejicanos, zona de alto crecimiento"
+    },
+    "short_description_canonical": {
+      "en": "Flat 916 m² residential lot in Mejicanos, San Salvador. Unpaved access road requires improvements; surrounded by nature yet close to city services. Located in a rapidly developing area with strong appreciation potential.",
+      "es": "Lote residencial plano de 916 m² en Mejicanos, San Salvador. Camino de acceso sin pavimentar que requiere mejoras; rodeado de naturaleza y cerca de servicios urbanos. Ubicado en una zona en rápido desarrollo con alto potencial de plusvalía."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "916 m² lot in growing area",
+        "es": "Lote de 916 m² en zona en crecimiento"
+      },
+      {
+        "en": "Close to city and services",
+        "es": "Cerca de la ciudad y servicios"
+      },
+      {
+        "en": "Strong appreciation potential",
+        "es": "Alto potencial de plusvalía"
+      },
+      {
+        "en": "Peaceful natural surroundings",
+        "es": "Entorno natural tranquilo"
+      }
+    ],
+    "lat": 13.6833,
+    "lng": -89.2167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Mejicanos, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3246,
+    "tokens_out": 435,
+    "cost_usd": 0.00135492,
+    "finish_reason": "stop",
+    "latency_ms": 3698
+  },
+  "remax|003093475014": {
+    "ts": "2026-07-29T06:18:24.871647+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3,799 m² Lot in Santo Tomás, Nature Setting",
+      "es": "Terreno de 3,799 m² en Santo Tomás, Entorno Natural"
+    },
+    "short_description_canonical": {
+      "en": "Flat to gently sloping 3,799 m² lot in Cantón El Carmen 1, Santo Tomás, part of an established subdivision. Features natural spring water, potable water connection, electricity, and mature fruit trees. Paved road access with pedestrian path; potential for direct vehicle access via neighbor agreement.",
+      "es": "Terreno plano a ligeramente inclinado de 3,799 m² en Cantón El Carmen 1, Santo Tomás, parte de una urbanización establecida. Cuenta con nacimiento de agua, conexión de agua potable, electricidad y árboles frutales maduros. Acceso por calle pavimentada con sendero peatonal; posibilidad de acceso vehicular directo mediante acuerdo vecinal."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Natural spring water on property",
+        "es": "Nacimiento de agua en la propiedad"
+      },
+      {
+        "en": "Mature avocado, mango, mamey trees",
+        "es": "Árboles maduros de aguacate, mango y mamey"
+      },
+      {
+        "en": "Paved road access in subdivision",
+        "es": "Acceso por calle pavimentada en urbanización"
+      },
+      {
+        "en": "Close to Plaza Santo Tomás amenities",
+        "es": "Cerca de servicios de Plaza Santo Tomás"
+      }
+    ],
+    "lat": 13.64,
+    "lng": -89.13,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santo Tomás, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3396,
+    "tokens_out": 507,
+    "cost_usd": 0.00147462,
+    "finish_reason": "stop",
+    "latency_ms": 4676
+  },
+  "encuentra24|30018880": {
+    "ts": "2026-07-29T07:02:44.851780+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3-Bedroom House on 3,565 m² Lot near El Valle",
+      "es": "Casa de 3 Habitaciones en Terreno de 3,565 m² cerca de El Valle"
+    },
+    "short_description_canonical": {
+      "en": "A 250 m² house on a 3,565 m² lot in La Laguna, near El Valle. The home has 3 bedrooms, 2 bathrooms, a study, and a generator. The land features fruit trees, vegetables, and a well with filtration system.",
+      "es": "Casa de 250 m² en terreno de 3,565 m² en La Laguna, cerca de El Valle. La vivienda tiene 3 habitaciones, 2 baños, un estudio y generador eléctrico. El terreno cuenta con árboles frutales, vegetales y pozo con sistema de filtración."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3,565 m² lot with fruit trees",
+        "es": "Terreno de 3,565 m² con árboles frutales"
+      },
+      {
+        "en": "Own well with filtration system",
+        "es": "Pozo propio con sistema de filtración"
+      },
+      {
+        "en": "20 minutes from El Valle",
+        "es": "20 minutos de El Valle"
+      }
+    ],
+    "lat": 8.6,
+    "lng": -80.0,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Laguna, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 3565.0,
+      "parking_spaces": 7,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2657,
+    "tokens_out": 452,
+    "cost_usd": 0.00121459,
+    "finish_reason": "stop",
+    "latency_ms": 4101
   }
 }

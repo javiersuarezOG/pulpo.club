@@ -1,7 +1,7 @@
 # PRD WS2 — Feasibility Probe
 
-_Generated: 2026-07-28T06:57:27.477043+00:00_  
-_Catalog size: **28 listings**_  
+_Generated: 2026-07-29T07:03:25.689793+00:00_  
+_Catalog size: **26 listings**_  
 _UI filter gate: ≥ 15% population (per PRD §OQ-1)_
 
 This report measures whether the PRD's proposed fields can actually be populated given today's scraper output. Green = ready to surface or meets PRD target. Amber = computed but below gate or PRD target. Red = needs deeper scraper extraction.
@@ -10,24 +10,24 @@ This report measures whether the PRD's proposed fields can actually be populated
 
 | Field | Count | % |
 |---|---:|---:|
-| `url` | 28 | 100.0% |
-| `title` | 28 | 100.0% |
-| `description>20` | 28 | 100.0% |
-| `price_usd` | 28 | 100.0% |
-| `first_seen_at` | 28 | 100.0% |
-| `scraped_at` | 28 | 100.0% |
-| `photo_urls>0` | 28 | 100.0% |
-| `photos_count>0` | 28 | 100.0% |
-| `broker_name` | 28 | 100.0% |
-| `property_type!=land` | 28 | 100.0% |
-| `days_listed` | 28 | 100.0% |
-| `lat` | 19 | 67.9% |
-| `lng` | 19 | 67.9% |
-| `is_in_development` | 10 | 35.7% |
-| `zone` | 7 | 25.0% |
-| `department` | 7 | 25.0% |
-| `is_beachfront` | 6 | 21.4% |
-| `is_repriced` | 2 | 7.1% |
+| `url` | 26 | 100.0% |
+| `title` | 26 | 100.0% |
+| `description>20` | 26 | 100.0% |
+| `price_usd` | 26 | 100.0% |
+| `first_seen_at` | 26 | 100.0% |
+| `scraped_at` | 26 | 100.0% |
+| `photo_urls>0` | 26 | 100.0% |
+| `photos_count>0` | 26 | 100.0% |
+| `broker_name` | 26 | 100.0% |
+| `property_type!=land` | 26 | 100.0% |
+| `days_listed` | 26 | 100.0% |
+| `lat` | 19 | 73.1% |
+| `lng` | 19 | 73.1% |
+| `zone` | 8 | 30.8% |
+| `department` | 8 | 30.8% |
+| `is_in_development` | 7 | 26.9% |
+| `is_beachfront` | 5 | 19.2% |
+| `is_repriced` | 2 | 7.7% |
 | `area_m2` | 0 | 0.0% |
 | `price_per_m2` | 0 | 0.0% |
 | `zone_specific` | 0 | 0.0% |
@@ -38,26 +38,26 @@ This report measures whether the PRD's proposed fields can actually be populated
 
 | Field | Hits | % | PRD Target | Verdict |
 |---|---:|---:|---:|---|
-| `has_mountain_view` | 1 | 3.6% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
-| `has_ocean_view` | 3 | 10.7% | ≥ 15% (gate) | 🟡 computed only, below UI gate |
-| `has_paved_access` | 1 | 3.6% | ≥ 40% | 🔴 below 5% — needs scraper depth |
-| `has_power` | 2 | 7.1% | ≥ 40% | 🟡 computed only, below UI gate |
-| `has_water` | 10 | 35.7% | ≥ 40% | 🟡 above 15% gate, below PRD target |
-| `has_water_body` | 13 | 46.4% | ≥ 15% (gate) | 🟢 surface-eligible |
-| `is_agricultural` | 4 | 14.3% | ≥ 15% (gate) | 🟡 computed only, below UI gate |
-| `is_beachfront` | 6 | 21.4% | ≥ 15% | 🟢 meets PRD target |
-| `is_commercial` | 2 | 7.1% | ≥ 15% (gate) | 🟡 computed only, below UI gate |
-| `is_flat` | 7 | 25.0% | ≥ 15% (gate) | 🟢 surface-eligible |
-| `is_motivated` | 5 | 17.9% | ≥ 15% (gate) | 🟢 surface-eligible |
-| `is_on_beach` | 6 | 21.4% | ≥ 15% (gate) | 🟢 surface-eligible |
-| `is_on_lake` | 1 | 3.6% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
-| `is_tourist` | 9 | 32.1% | ≥ 15% (gate) | 🟢 surface-eligible |
-| `is_walk_to_beach` | 1 | 3.6% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
+| `has_mountain_view` | 0 | 0.0% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
+| `has_ocean_view` | 3 | 11.5% | ≥ 15% (gate) | 🟡 computed only, below UI gate |
+| `has_paved_access` | 1 | 3.8% | ≥ 40% | 🔴 below 5% — needs scraper depth |
+| `has_power` | 2 | 7.7% | ≥ 40% | 🟡 computed only, below UI gate |
+| `has_water` | 9 | 34.6% | ≥ 40% | 🟡 above 15% gate, below PRD target |
+| `has_water_body` | 12 | 46.2% | ≥ 15% (gate) | 🟢 surface-eligible |
+| `is_agricultural` | 3 | 11.5% | ≥ 15% (gate) | 🟡 computed only, below UI gate |
+| `is_beachfront` | 5 | 19.2% | ≥ 15% | 🟢 meets PRD target |
+| `is_commercial` | 0 | 0.0% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
+| `is_flat` | 7 | 26.9% | ≥ 15% (gate) | 🟢 surface-eligible |
+| `is_motivated` | 5 | 19.2% | ≥ 15% (gate) | 🟢 surface-eligible |
+| `is_on_beach` | 5 | 19.2% | ≥ 15% (gate) | 🟢 surface-eligible |
+| `is_on_lake` | 1 | 3.8% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
+| `is_tourist` | 7 | 26.9% | ≥ 15% (gate) | 🟢 surface-eligible |
+| `is_walk_to_beach` | 1 | 3.8% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
 | `has_sewage` | 0 | 0.0% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
 | `is_repriced_text` | 0 | 0.0% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
-| `zoning_residential` | 6 | 21.4% | ≥ 15% (gate) | 🟢 surface-eligible |
+| `zoning_residential` | 4 | 15.4% | ≥ 15% (gate) | 🟢 surface-eligible |
 | `zoning_tourist` | 0 | 0.0% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
-| `land_commercial` | 4 | 14.3% | ≥ 15% (gate) | 🟡 computed only, below UI gate |
+| `land_commercial` | 1 | 3.8% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
 | `land_recreational` | 0 | 0.0% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
 
 ## 3. Description quality (gates NLP + AI feasibility downstream)
@@ -69,14 +69,14 @@ This report measures whether the PRD's proposed fields can actually be populated
 | empty | 0 | 0.0% |
 | <50 chars | 0 | 0.0% |
 | 50-200 | 0 | 0.0% |
-| 200-500 | 2 | 7.1% |
-| >=500 | 26 | 92.9% |
+| 200-500 | 4 | 15.4% |
+| >=500 | 22 | 84.6% |
 
 **Per-source quality (lower `pct_short_lt50` = better NLP/AI inputs):**
 
 | Source | n | Avg chars | % short (<50) |
 |---|---:|---:|---:|
-| `encuentra24` | 28 | 1122 | 0.0% |
+| `encuentra24` | 26 | 1127 | 0.0% |
 
 ## 4. US-01 flagship filter — "water + power + paved road"
 
@@ -84,7 +84,7 @@ This is the PRD's most-load-bearing user story. The cohort size determines wheth
 
 | Definition | Hits | % |
 |---|---:|---:|
-| ANY 1 of 3 utility signals (relaxed) | 11 | 39.3% |
+| ANY 1 of 3 utility signals (relaxed) | 10 | 38.5% |
 | ALL 3 of 3 utility signals (PRD spec) | 0 | 0.0% |
 
 ---

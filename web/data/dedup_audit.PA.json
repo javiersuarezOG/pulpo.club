@@ -1,44 +1,15 @@
 {
-  "computed_at": "2026-07-28T06:56:15.708957+00:00",
-  "duplicate_clusters": [
-    {
-      "count": 2,
-      "cross_source": false,
-      "fingerprint": "e2b59d008908fdabb97a7e29aa07dcb5196f8789",
-      "samples": [
-        {
-          "area_m2": null,
-          "price_usd": 1300000.0,
-          "source": "encuentra24",
-          "source_id": "31885858",
-          "title": "Casa equipada en Oceanlake Villas en Buenaventura Golf & beach resort",
-          "url": "https://www.encuentra24.com/panama-es/bienes-raices-venta-de-propiedades-casas/casa-equipada-en-oceanlake-villas-en-buenaventura-golf-amp-beach-resort/31885858",
-          "zone": null
-        },
-        {
-          "area_m2": null,
-          "price_usd": 1300000.0,
-          "source": "encuentra24",
-          "source_id": "31997601",
-          "title": "Casa equipada en Oceanlake Villas en Buenaventura Golf & beach resort",
-          "url": "https://www.encuentra24.com/panama-es/bienes-raices-venta-de-propiedades-casas/casa-equipada-en-oceanlake-villas-en-buenaventura-golf-amp-beach-resort/31997601",
-          "zone": null
-        }
-      ],
-      "sources": [
-        "encuentra24"
-      ]
-    }
-  ],
+  "computed_at": "2026-07-29T07:02:40.316034+00:00",
+  "duplicate_clusters": [],
   "overlap_matrix": {},
   "per_source": {
     "encuentra24": {
-      "kept_as_unique": 27,
-      "raw": 28,
+      "kept_as_unique": 26,
+      "raw": 26,
       "shared_with_others": 0,
-      "unique_in_source": 27
+      "unique_in_source": 26
     }
   },
-  "total_in_dataset": 28,
-  "total_unique_fingerprints": 27
+  "total_in_dataset": 26,
+  "total_unique_fingerprints": 26
 }
