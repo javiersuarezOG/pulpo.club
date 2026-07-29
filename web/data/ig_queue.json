@@ -2000,6 +2000,38 @@
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
+    },
+    {
+      "day": 251,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "aprendan_nadar",
+      "emotion": "familia",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "aprendan_nadar",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-08-05T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d251__aprendan_nadar",
+      "poster_path": "web/data/ig_assets/autopilot/d251__aprendan_nadar/slide_1.jpg",
+      "poster_overrides": {},
+      "caption": "No es un terreno: es tardes de sal en el pelo y risas que se oyen desde la casa. Es donde crecen.\n\n📍 El Zonte. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "El Zonte · 32,000 m² · $3.2M.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #ElZonte #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d251__aprendan_nadar/slide_2.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__2296"
+      ],
+      "primary_listing_id": "bienesraices__2296",
+      "cover_photo_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvQkcyRTFCNUZVSS9wSlB6QVI3Y0prL1RlcnJlbm9fZGVfNC5qcGVnIiwgImVkaXRzIjogeyJyZXNpemUiOiB7IndpZHRoIjogMTI4MCwgImhlaWdodCI6IDk2MCwgImZpdCI6ICJpbnNpZGUifSwgInRvRm9ybWF0IjogImpwZWciLCAianBlZyI6IHsicXVhbGl0eSI6IDcwfX19",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
