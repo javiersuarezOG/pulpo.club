@@ -1391,10 +1391,30 @@ def main() -> int:
     # get it crawled on the next nightly without a workflow-YAML edit.
     # See pulpo/scrapers/__init__.py for the autodiscovery loop.
     _PULPO_SOURCES_RAW = (os.environ.get("PULPO_SOURCES") or "").strip()
+    paused_sources: list[str] = []
     if _PULPO_SOURCES_RAW:
         sources = [s for s in _PULPO_SOURCES_RAW.split(",") if s.strip()]
     else:
         sources = sorted(REGISTRY.keys())
+        # lifecycle="paused" sources (pulpo/scrapers/_metadata.py) are
+        # skipped on autodiscovered runs: known-dead scrapers burn crawl
+        # time and paint every health surface red for months. They still
+        # get an explicit status="paused" health row below so dashboards
+        # show intent, and an explicit PULPO_SOURCES=<slug> run (manual /
+        # autorepair) crawls them regardless — that's the un-pause
+        # escape hatch while a repair PR is in flight.
+        try:
+            from pulpo.scrapers._metadata import SCRAPER_METADATA as _SCRAPER_META
+            paused_sources = [
+                s for s in sources
+                if (_SCRAPER_META.get(s) or {}).get("lifecycle") == "paused"
+            ]
+        except Exception:
+            paused_sources = []
+        if paused_sources:
+            sources = [s for s in sources if s not in set(paused_sources)]
+            print(f"[scrape] skipping paused sources: {', '.join(paused_sources)} "
+                  f"(override with PULPO_SOURCES to crawl explicitly)")
 
     started = datetime.now(timezone.utc)
     # PostHog: tag every subsequent capture() in this process with a
@@ -1405,6 +1425,7 @@ def main() -> int:
     _ph_capture("pipeline_started", {
         "sources": sources,
         "sources_count": len(sources),
+        "sources_paused": paused_sources,
         "offline": offline,
         "limit": limit,
     })
@@ -1681,6 +1702,24 @@ def main() -> int:
                 # ``web/data/scraper_failures/<source>_*_<failure_id>.json``,
                 # consumed by the watchdog + Phase-4 auto-repair agent.
                 "failure_id":   source_failure_id.get(src),
+            }, ensure_ascii=False) + "\n")
+        # Paused sources weren't crawled — write an explicit "paused"
+        # row (not "red") so dashboards show intent, the consecutive-red
+        # streak breaks, and check_source_health has a fresh latest-row
+        # that never pages. Removing the source from the file entirely
+        # would read as "source deleted" to the row-count sentinel.
+        for src in paused_sources:
+            _hf.write(json.dumps({
+                "ts":          health_ts,
+                "source":      src,
+                "status":      "paused",
+                "count":       0,
+                "duration_s":  0.0,
+                "error_class": None,
+                "error_msg":   "",
+                "max_pages_hit": False,
+                "limit_hit":     False,
+                "failure_id":   None,
             }, ensure_ascii=False) + "\n")
 
     # Normalize. seen_keys (plan 012): read-only ledger snapshot so the
