@@ -138,6 +138,32 @@ def test_fresh_red_rows_ignores_experimental_sources(monkeypatch):
     assert csh.fresh_red_rows(latest, now=NOW) == []
 
 
+def test_fresh_red_rows_ignores_paused_sources(monkeypatch):
+    """A paused source (image/nightly audit 2026-07-29) must never page.
+    Even if a stale red row survives from before it was paused, the
+    lifecycle gate suppresses it."""
+    monkeypatch.setattr(
+        csh,
+        "SCRAPER_METADATA",
+        {"agentiz": {"lifecycle": "paused"}},
+    )
+    latest = {
+        "agentiz": _row("agentiz", _ts(2), "red", scraped=0, error_class="HTTPError"),
+    }
+    assert csh.fresh_red_rows(latest, now=NOW) == []
+
+
+def test_paused_status_row_is_not_red(monkeypatch):
+    """The run.py paused writer emits status="paused" (not "red"), so a
+    paused source never trips the fresh-red-row alert even without the
+    lifecycle gate."""
+    monkeypatch.setattr(csh, "SCRAPER_METADATA", {})
+    latest = {
+        "agentiz": _row("agentiz", _ts(2), "paused", scraped=0),
+    }
+    assert csh.fresh_red_rows(latest, now=NOW) == []
+
+
 # ── build_message ─────────────────────────────────────────────────────
 
 def test_build_message_includes_each_red_source():
