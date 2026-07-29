@@ -94,6 +94,15 @@ export type EventMap = {
   };
   "browse.price_histogram.bar_clicked": { bucket_min: number; bucket_max: number };
   "browse.price_histogram.reset": Record<string, never>;
+  // Size histogram (post-2026-07-29) — same RangeHistogram, size dimension.
+  "browse.size_histogram.dragged": {
+    from_min: number;
+    from_max: number | null;
+    to_min: number;
+    to_max: number | null;
+  };
+  "browse.size_histogram.bar_clicked": { bucket_min: number; bucket_max: number };
+  "browse.size_histogram.reset": Record<string, never>;
   // Pagination control on Browse — fires when the user clicks
   // "Load N more". `from`/`to` are the visibleCount before/after the
   // click; `total` is the total filtered result count so we can tell

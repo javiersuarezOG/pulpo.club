@@ -78,6 +78,7 @@ export type DiscoverFilter = {
   price_min?: number;
   price_max?: number | null;
   size_min?: number;
+  size_max?: number | null;
   readiness?: number;
   rank_max?: number | null;
   master_category?: DiscoverMasterCategory | null;
@@ -152,6 +153,7 @@ export type DiscoverInMemoryFilter = {
   price_min?: number;
   price_max?: number | null;
   size_min?: number;
+  size_max?: number | null;
   readiness?: number;
   rank_max?: number | null;
   master_category?: DiscoverMasterCategory | null;
@@ -203,6 +205,9 @@ export function discoverToStorage(filter: DiscoverInMemoryFilter): DiscoverFilte
   if (typeof filter.size_min === "number" && filter.size_min > 0) {
     out.size_min = filter.size_min;
   }
+  if (filter.size_max != null) {
+    out.size_max = filter.size_max;
+  }
   if (typeof filter.readiness === "number" && filter.readiness > 0) {
     out.readiness = filter.readiness;
   }
@@ -242,6 +247,7 @@ export function storageToDiscover(stored: DiscoverFilter): DiscoverInMemoryFilte
     price_min:      typeof stored.price_min === "number" ? stored.price_min : 0,
     price_max:      stored.price_max == null ? null : Number(stored.price_max),
     size_min:       typeof stored.size_min === "number" ? stored.size_min : 0,
+    size_max:       stored.size_max == null ? null : Number(stored.size_max),
     readiness:      typeof stored.readiness === "number" ? stored.readiness : 0,
     rank_max:       stored.rank_max == null ? null : Number(stored.rank_max),
     master_category: stored.master_category === "beach" || stored.master_category === "lake"
