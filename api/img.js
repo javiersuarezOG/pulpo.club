@@ -56,6 +56,20 @@ async function fetchAsset(url) {
   }
 }
 
+// HEAD against the deployment CDN. Returns true when the asset exists,
+// false otherwise. Used to check for .quarantine sidecar markers without
+// pulling the (potentially large) parent .hires.jpg blob. Same helper as
+// api/social/image.js — the quarantine contract must hold on every path
+// that can emit hires bytes.
+async function assetExists(url) {
+  try {
+    const resp = await fetch(url, { method: "HEAD" });
+    return resp.ok;
+  } catch (_) {
+    return false;
+  }
+}
+
 function acceptsWebp(req) {
   const accept = (req.headers && req.headers.accept) || "";
   return /image\/webp/i.test(String(accept));
@@ -93,6 +107,18 @@ module.exports = async (req, res) => {
 
   const base = cdnBaseUrl();
   const url = `${base}/${root}/${src}`;
+  // Hires files carry a `.quarantine` sidecar when resdet flags the
+  // broker image as upscaled (hires QC in automation/run.py). The
+  // social endpoint honors the marker (api/social/image.js); without
+  // this check, ?root=photos-hires is a bypass that serves quarantined
+  // bytes. 404 (not 403) so the negative cache and any frontend
+  // fallback treat it exactly like a missing asset.
+  if (root === "photos-hires" && (await assetExists(`${url}.quarantine`))) {
+    return errJson(res, 404, {
+      error: "quarantined",
+      detail: `asset at ${root}/${src} is quarantined (resdet upscale)`,
+    });
+  }
   const buf = await fetchAsset(url);
   if (!buf) {
     return errJson(res, 404, { error: "not_found", detail: `no asset at ${root}/${src}` });

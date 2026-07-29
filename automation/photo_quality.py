@@ -479,6 +479,43 @@ def _detector_unavailable(reason: str) -> None:
         _TESSERACT_WARNED = True
 
 
+def text_overlay_detector_status() -> dict:
+    """Preflight for the text-overlay detector; never raises.
+
+    Returns ``{"available": bool, "reason": str | None, "langs": [str]}``.
+    ``available=True`` means pytesseract imports AND the tesseract binary
+    answers. ``langs`` lists installed language packs (empty when the
+    binary is missing or the pytesseract version predates
+    ``get_languages``); a missing "spa" with available=True means OCR
+    silently degrades to English-only stamps.
+
+    Callers (the nightly photo phase) stamp this into their summary +
+    telemetry so a disabled detector is visible in PostHog instead of
+    only as one stderr line. detect_text_overlay() itself keeps the
+    fail-soft None contract — this probe exists so the degradation is
+    LOUD, not to change filtering behavior.
+    """
+    try:
+        import pytesseract  # type: ignore
+    except ImportError:
+        return {"available": False, "reason": "pytesseract not installed", "langs": []}
+    try:
+        langs = sorted(pytesseract.get_languages(config=""))
+    except pytesseract.TesseractNotFoundError:
+        return {"available": False, "reason": "tesseract binary not on PATH", "langs": []}
+    except AttributeError:
+        # pytesseract < 0.3.8 has no get_languages; binary presence is
+        # still provable via get_tesseract_version().
+        try:
+            pytesseract.get_tesseract_version()
+            return {"available": True, "reason": None, "langs": []}
+        except Exception as e:
+            return {"available": False, "reason": f"tesseract probe failed: {e!r}", "langs": []}
+    except Exception as e:
+        return {"available": False, "reason": f"tesseract probe failed: {e!r}", "langs": []}
+    return {"available": True, "reason": None, "langs": langs}
+
+
 def detect_text_overlay(
     raw_bytes: bytes,
     *,
