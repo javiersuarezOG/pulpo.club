@@ -23,6 +23,7 @@ import { useListings } from "../data/use-listings";
 import { pickTopRanked } from "../lib/free-view";
 import { AccessBlock } from "../components/AccessBlock.jsx";
 import { SubscribeConfirm } from "../components/SubscribeConfirm";
+import { isPaid } from "../lib/gating";
 import versions from "./versions.json";
 
 const HERO_V5_VERSION = versions.blocks.hero_v5 || "unknown";
@@ -92,11 +93,11 @@ function valueGrade(score) {
   return "B";
 }
 
-function ListingRow({ listing, rank, locale }) {
+function ListingRow({ listing, rank, locale, onOpen }) {
   const grade = valueGrade(listing.rank_score);
   const size = listing.size_m2 != null ? formatSizeI18n(listing.size_m2, locale) : null;
-  return (
-    <div className="hv6-r">
+  const body = (
+    <>
       <span className="hv6-rank">{rank}</span>
       <span className="hv6-thumb">
         {/* card-image-allow: shelf ListingRow thumb, gated upstream by the shelf's isShelfEligible */}
@@ -110,8 +111,18 @@ function ListingRow({ listing, rank, locale }) {
         )}
       </span>
       <span className="hv6-price">{formatPriceI18n(listing.price, locale)}</span>
-    </div>
+    </>
   );
+  // Paid variant passes onOpen → rows are real buttons into the detail panel.
+  // Anon/free never pass it, keeping their DOM byte-identical to pre-Pro-variant.
+  if (onOpen) {
+    return (
+      <button type="button" className="hv6-r hv6-r-link" onClick={() => onOpen(listing, rank)}>
+        {body}
+      </button>
+    );
+  }
+  return <div className="hv6-r">{body}</div>;
 }
 
 function SkeletonRow({ rank }) {
@@ -128,9 +139,12 @@ function SkeletonRow({ rank }) {
 }
 
 // ── Pulpo Free card: real Top 3 shown, 4–10 frosted behind a Pro unlock.
+// Paid (pro/agency) variant: the full Top 10 unlocked — a paying user must
+// never see their own content blurred behind an upsell (post-2026-07-29).
 function FreeTopCard({ app, locale }) {
   const listings = useListings();
-  const picks = pickTop(listings, 7);
+  const paid = isPaid(app && app.user);
+  const picks = pickTop(listings, paid ? 10 : 7);
   const top3 = picks.slice(0, 3);
   const locked = picks.slice(3, 7);
   const haveData = top3.length === 3;
@@ -142,6 +156,12 @@ function FreeTopCard({ app, locale }) {
     else if (app && typeof app.openFreeMonthModal === "function") app.openFreeMonthModal({ trigger: "hero_pro_lock" });
   }, [app]);
 
+  // Paid rows open the listing detail — same API precedent as HeroV2/FeaturedDeal.
+  const onOpenRow = useCallback((listing, rank) => {
+    try { track("hero_v5_pro_row_clicked", { rank, version: HERO_V5_VERSION }); } catch { /* ignore */ }
+    if (app && typeof app.openListing === "function") app.openListing(listing.id);
+  }, [app]);
+
   return (
     <div className="hv6-stage">
       <div className="hv6-glow" aria-hidden="true" />
@@ -151,14 +171,16 @@ function FreeTopCard({ app, locale }) {
           <span className="hv6-brand">
             <span className="hv6-brand-mark"><PulpoMarkInline size={22} /></span>
             <span className="hv6-brand-wm">pulpo</span>
-            <span className="hv6-free-tag">{t("home.hero.v5.card_free_tag", locale)}</span>
+            <span className={paid ? "hv6-free-tag hv6-tag-pro" : "hv6-free-tag"}>
+              {t(paid ? "home.hero.v5.tier_pro_label" : "home.hero.v5.card_free_tag", locale)}
+            </span>
           </span>
           <span className="hv6-live"><i aria-hidden="true" />{t("home.hero.v5.card_live", locale)}</span>
         </div>
 
         <div className="hv6-card-title">
           {t("home.hero.v5.card_title_a", locale)}{" "}
-          <b>{t("home.hero.v5.card_title_b", locale)}</b>{" "}
+          <b>{t(paid ? "home.hero.v5.card_title_b_pro" : "home.hero.v5.card_title_b", locale)}</b>{" "}
           {t("home.hero.v5.card_title_c", locale)}
         </div>
         <p className="hv6-card-kick">{t("home.hero.v5.card_kick", locale)}</p>
@@ -174,33 +196,61 @@ function FreeTopCard({ app, locale }) {
           ))}
         </div>
 
-        {haveData
-          ? top3.map((l, i) => <ListingRow key={l.id} listing={l} rank={i + 1} locale={locale} />)
-          : [1, 2, 3].map((n) => <SkeletonRow key={n} rank={n} />)}
+        {paid ? (
+          // Paid: full Top 10, unlocked and clickable. Never skeleton stragglers
+          // next to real rows — after load, render exactly what exists.
+          haveData
+            ? picks.map((l, i) => <ListingRow key={l.id} listing={l} rank={i + 1} locale={locale} onOpen={onOpenRow} />)
+            : Array.from({ length: 10 }, (_, i) => <SkeletonRow key={i + 1} rank={i + 1} />)
+        ) : (
+          <>
+            {haveData
+              ? top3.map((l, i) => <ListingRow key={l.id} listing={l} rank={i + 1} locale={locale} />)
+              : [1, 2, 3].map((n) => <SkeletonRow key={n} rank={n} />)}
 
-        <div className="hv6-lock">
-          <div className="hv6-lock-rows">
-            {(locked.length ? locked : [0, 1, 2, 3]).map((l, i) =>
-              l && l.id
-                ? <ListingRow key={l.id} listing={l} rank={i + 4} locale={locale} />
-                : <SkeletonRow key={`s${i}`} rank={i + 4} />
-            )}
-          </div>
-          <div className="hv6-lock-over">
-            <span className="hv6-lock-badge" aria-hidden="true">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-button-text)" strokeWidth="2.2">
-                <rect x="4" y="11" width="16" height="10" rx="2.5" />
-                <path d="M8 11V8a4 4 0 0 1 8 0v3" />
-              </svg>
-            </span>
-            <div className="hv6-lock-ttl">{t("home.hero.v5.lock_more", locale, { n: 7 })}</div>
-            <div className="hv6-lock-sub">{t("home.hero.v5.lock_sub", locale)}</div>
-            <button type="button" className="hv6-lock-cta" onClick={onUnlock}>
-              {t("home.hero.v5.lock_cta", locale)} <span aria-hidden="true">→</span>
-            </button>
-          </div>
-        </div>
+            <div className="hv6-lock">
+              <div className="hv6-lock-rows">
+                {(locked.length ? locked : [0, 1, 2, 3]).map((l, i) =>
+                  l && l.id
+                    ? <ListingRow key={l.id} listing={l} rank={i + 4} locale={locale} />
+                    : <SkeletonRow key={`s${i}`} rank={i + 4} />
+                )}
+              </div>
+              <div className="hv6-lock-over">
+                <span className="hv6-lock-badge" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--color-button-text)" strokeWidth="2.2">
+                    <rect x="4" y="11" width="16" height="10" rx="2.5" />
+                    <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+                  </svg>
+                </span>
+                <div className="hv6-lock-ttl">{t("home.hero.v5.lock_more", locale, { n: 7 })}</div>
+                <div className="hv6-lock-sub">{t("home.hero.v5.lock_sub", locale)}</div>
+                <button type="button" className="hv6-lock-cta" onClick={onUnlock}>
+                  {t("home.hero.v5.lock_cta", locale)} <span aria-hidden="true">→</span>
+                </button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
+    </div>
+  );
+}
+
+// ── Paid (Pro/Agency) hero action: no signup form, no upsell — one browse CTA.
+// Replaces only the AccessBlock/EmailCapture slot; the rest of the copy column
+// (H1, lead, USP checklist) is tier-agnostic and stays as-is.
+function ProHeroCta({ app, locale }) {
+  const onBrowse = useCallback(() => {
+    try { track("hero_v5_pro_browse_clicked", { version: HERO_V5_VERSION }); } catch { /* ignore */ }
+    if (app && typeof app.goBrowse === "function") app.goBrowse({});
+  }, [app]);
+  return (
+    <div className="hv6-pro-cta">
+      <p className="hv6-pro-note">{t("home.hero.v5.pro_note", locale)}</p>
+      <button type="button" className="hv6-signup-btn hv6-pro-btn" onClick={onBrowse}>
+        {t("home.hero.v5.pro_browse_cta", locale)} <span aria-hidden="true">→</span>
+      </button>
     </div>
   );
 }
@@ -293,9 +343,14 @@ function EmailCapture({ app, locale }) {
 export function HeroV5({ app, locale }) {
   React.useEffect(() => {
     try {
-      track("hero_v5_viewed", { version: HERO_V5_VERSION });
+      // `variant` is the paid-hero verification signal: paid persons emitting
+      // variant="free" measures the fresh-device Clerk hydration flash.
+      track("hero_v5_viewed", { version: HERO_V5_VERSION, variant: isPaid(app && app.user) ? "pro" : "free" });
       track("homepage.section_viewed", { section: "hero_v5" });
     } catch { /* ignore */ }
+    // Mount-only by design — a mid-session hydration flip is intentionally
+    // NOT re-tracked; paid_home_rendered.user_state is the source of truth.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onNavigate = useCallback(
@@ -324,9 +379,11 @@ export function HeroV5({ app, locale }) {
               <li>{t("home.hero.v5.usp_2", locale)}</li>
               <li>{t("home.hero.v5.usp_3", locale)}</li>
             </ul>
-            {app && app.accessV2
-              ? <AccessBlock app={app} locale={locale} surface="hero" />
-              : <EmailCapture app={app} locale={locale} />}
+            {isPaid(app && app.user)
+              ? <ProHeroCta app={app} locale={locale} />
+              : app && app.accessV2
+                ? <AccessBlock app={app} locale={locale} surface="hero" />
+                : <EmailCapture app={app} locale={locale} />}
           </div>
           <div className="hv6-viz">
             <FreeTopCard app={app} locale={locale} />
