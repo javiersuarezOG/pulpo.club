@@ -36,6 +36,7 @@ import {
 import { track, optIn, optOut } from "./telemetry/hook";
 import { readConsent, writeConsent, CONSENT_POLICY_VERSION } from "./lib/consent";
 import { useDebouncedValue } from "./lib/use-debounced-value.ts";
+import { computeBucketCounts } from "./lib/histo-buckets.ts";
 import { safeLocalGet, safeLocalSet } from "./lib/safe-storage";
 import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
 import { markUpsellDismissed, decideShouldShowUpsell } from "./lib/upsell-config";
@@ -121,6 +122,7 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
     + (f.land_types?.size || 0) + (f.features?.size || 0)
     + (f.infra?.size || 0) + (f.status?.size || 0)
     + (f.price_max != null || f.price_min > 0 ? 1 : 0)
+    + (f.size_max != null || f.size_min > 0 ? 1 : 0)
     + (f.master_category ? 1 : 0)
     + (f.subcategory ? 1 : 0)
     + (f.discovery_tags?.size || 0)
@@ -298,11 +300,7 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
       </FilterGroup>
 
       <FilterGroup title={t("filter.size", lc)}>
-        <div className="range-row">
-          <label>{t("filter.size_min", lc, { n: (filters.size_min/10000).toFixed(1) })}</label>
-          <input type="range" min="0" max="200000" step="500"
-            value={filters.size_min} onChange={(e) => update({ size_min: +e.target.value })}/>
-        </div>
+        <SizeHistogram filters={filters} setFilters={update} />
       </FilterGroup>
 
       <FilterGroup title={t("filter.zone", lc)}>
@@ -524,7 +522,7 @@ function FilterGroup({ title, children, collapsible = false, defaultOpen = true 
   );
 }
 
-// PR-4f — Interactive price histogram (range-slider-over-histogram).
+// PR-4f — Interactive range histogram (range-slider-over-histogram).
 // Industry-canonical pattern (Airbnb / Zillow / Redfin / Booking):
 //   - Two draggable thumbs sit ABOVE the bars (min on left, max on right).
 //   - Histogram bars are visual context; each bar is also a click target.
@@ -535,25 +533,52 @@ function FilterGroup({ title, children, collapsible = false, defaultOpen = true 
 //   - Drag a thumb → set that side of the range.
 //   - Reset link / Escape → clear range.
 //   - Min/max number inputs stay below — keyboard a11y + power users.
+//
+// Generalized post-2026-07-29: this component is dimension-agnostic
+// (price OR size). Everything price-specific is injected via props —
+// the field names, visual scale, formatter, i18n strings, telemetry
+// event names, and the counted population. PriceHistogram / SizeHistogram
+// below are thin config wrappers.
 const HISTO_BUCKETS = 24;
-const HISTO_VISUAL_MAX = 1_000_000;            // visual scale of the bars
-const HISTO_BAR_WIDTH_USD = HISTO_VISUAL_MAX / HISTO_BUCKETS;  // ~$41,667
+const PRICE_HISTO_MAX = 1_000_000;             // visual scale of the price bars ($)
+// Size scale: 20,000 m² (2 ha). Data-driven — of 1,047 sized SV listings
+// p50=1,264 m², p90=34,111, max=6.85M. At 20k the histogram has 22/24
+// populated buckets and a meaningful "2 ha+" right cluster; at the old
+// 200k slider max it collapsed to one mega-bar (80% in bucket 0). The
+// min/max number inputs accept any value, so large-lot buyers aren't
+// capped — the visual scale is just a legibility choice.
+const SIZE_HISTO_MAX = 20_000;
 
-function bucketToPrice(bucket) {
-  return Math.round(bucket * HISTO_BAR_WIDTH_USD);
-}
-
-function priceToBucket(price) {
-  if (price == null || price <= 0) return 0;
-  return Math.min(HISTO_BUCKETS, Math.max(0, Math.round(price / HISTO_BAR_WIDTH_USD)));
-}
-
-function PriceHistogram({ filters, setFilters }) {
-  const LISTINGS = useListings();
+function RangeHistogram({
+  filters, setFilters,
+  fieldMin, fieldMax,
+  visualMax,
+  bucketCount = HISTO_BUCKETS,
+  population,
+  getValue,
+  formatValue,
+  noCapLabel, maxPlaceholder,
+  ariaMinLabel, ariaMaxLabel,
+  inputMinLabel, inputMaxLabel,
+  resetLabel,
+  unitHint,
+  emptyLabel,
+  dim,
+  events,
+}) {
+  const allListings = useListings();
+  const base = population ?? allListings;
   const lc = currentLocale();
   const trackRef = pUseRef(null);
+  const curMin = filters[fieldMin];
+  const curMax = filters[fieldMax];
+  const barWidth = visualMax / bucketCount;
+  const bucketToValue = (bucket) => Math.round(bucket * barWidth);
+  const valueToBucket = (value) => {
+    if (value == null || value <= 0) return 0;
+    return Math.min(bucketCount, Math.max(0, Math.round(value / barWidth)));
+  };
   // dragging: null | "min" | "max" | "brush"
-  // brushFrom / brushTo: bucket indices during a brush gesture (live)
   const [dragging, setDragging] = pUseState(null);
   const [brushFrom, setBrushFrom] = pUseState(null);
   const [brushTo, setBrushTo] = pUseState(null);
@@ -562,42 +587,38 @@ function PriceHistogram({ filters, setFilters }) {
   const [liveMin, setLiveMin] = pUseState(null);
   const [liveMax, setLiveMax] = pUseState(null);
 
-  const counts = pUseMemo(() => {
-    const arr = new Array(HISTO_BUCKETS).fill(0);
-    LISTINGS.forEach(l => {
-      if (typeof l.price !== "number" || l.price <= 0) return;
-      const b = Math.min(HISTO_BUCKETS - 1, Math.floor(l.price / HISTO_VISUAL_MAX * HISTO_BUCKETS));
-      arr[b] += 1;
-    });
-    return arr;
-  }, [LISTINGS]);
+  const counts = pUseMemo(
+    () => computeBucketCounts(base, getValue, visualMax, bucketCount),
+    [base, getValue, visualMax, bucketCount],
+  );
   const peak = Math.max(...counts, 1);
+  const totalInBase = pUseMemo(() => counts.reduce((a, c) => a + c, 0), [counts]);
 
   // Visual position math — committed filter values, overridden by live
   // drag values when the user is mid-gesture.
-  const visualMinPrice = liveMin != null ? liveMin : filters.price_min;
-  const visualMaxPrice =
+  const visualMin = liveMin != null ? liveMin : curMin;
+  const visualMaxVal =
     liveMax != null ? liveMax :
-    (filters.price_max != null ? filters.price_max : HISTO_VISUAL_MAX);
-  const minPct = Math.min(100, Math.max(0, (visualMinPrice / HISTO_VISUAL_MAX) * 100));
-  const maxPct = Math.min(100, Math.max(0, (visualMaxPrice / HISTO_VISUAL_MAX) * 100));
+    (curMax != null ? curMax : visualMax);
+  const minPct = Math.min(100, Math.max(0, (visualMin / visualMax) * 100));
+  const maxPct = Math.min(100, Math.max(0, (visualMaxVal / visualMax) * 100));
 
   // Brush overlay (during a brush drag, before commit).
   const brushActive = dragging === "brush" && brushFrom != null && brushTo != null;
   const brushLow = brushActive ? Math.min(brushFrom, brushTo) : null;
   const brushHigh = brushActive ? Math.max(brushFrom, brushTo) + 1 : null;
 
-  // Convert pointer X to bucket index (0..HISTO_BUCKETS-1, clamped).
+  // Convert pointer X to bucket index (0..bucketCount-1, clamped).
   const pointerToBucket = (clientX) => {
     const el = trackRef.current;
     if (!el) return 0;
     const r = el.getBoundingClientRect();
     if (r.width <= 0) return 0;
     const x = clientX - r.left;
-    return Math.min(HISTO_BUCKETS - 1, Math.max(0, Math.floor(x / r.width * HISTO_BUCKETS)));
+    return Math.min(bucketCount - 1, Math.max(0, Math.floor(x / r.width * bucketCount)));
   };
 
-  const hasRange = filters.price_min > 0 || filters.price_max != null;
+  const hasRange = curMin > 0 || curMax != null;
 
   // ── Thumb drag ────────────────────────────────────────────────
   const startThumbDrag = (which, e) => {
@@ -609,30 +630,30 @@ function PriceHistogram({ filters, setFilters }) {
   const onThumbMove = (e) => {
     if (dragging !== "min" && dragging !== "max") return;
     const bucket = pointerToBucket(e.clientX);
-    const price = bucketToPrice(bucket);
+    const value = bucketToValue(bucket);
     if (dragging === "min") {
       // Don't let min cross max.
-      const cap = filters.price_max != null ? filters.price_max : HISTO_VISUAL_MAX;
-      setLiveMin(Math.min(price, cap));
+      const cap = curMax != null ? curMax : visualMax;
+      setLiveMin(Math.min(value, cap));
     } else {
-      const floor = filters.price_min;
-      setLiveMax(Math.max(price, floor));
+      const floor = curMin;
+      setLiveMax(Math.max(value, floor));
     }
   };
   const onThumbUp = () => {
     if (dragging !== "min" && dragging !== "max") return;
     if (dragging === "min" && liveMin != null) {
-      setFilters({ price_min: liveMin });
-      track("browse.price_histogram.dragged", {
-        from_min: filters.price_min, from_max: filters.price_max,
-        to_min: liveMin, to_max: filters.price_max,
+      setFilters({ [fieldMin]: liveMin });
+      track(events.dragged, {
+        from_min: curMin, from_max: curMax,
+        to_min: liveMin, to_max: curMax,
       });
     } else if (dragging === "max" && liveMax != null) {
-      const newMax = liveMax >= HISTO_VISUAL_MAX ? null : liveMax;
-      setFilters({ price_max: newMax });
-      track("browse.price_histogram.dragged", {
-        from_min: filters.price_min, from_max: filters.price_max,
-        to_min: filters.price_min, to_max: newMax,
+      const newMax = liveMax >= visualMax ? null : liveMax;
+      setFilters({ [fieldMax]: newMax });
+      track(events.dragged, {
+        from_min: curMin, from_max: curMax,
+        to_min: curMin, to_max: newMax,
       });
     }
     setDragging(null);
@@ -641,11 +662,7 @@ function PriceHistogram({ filters, setFilters }) {
   };
 
   // ── Bar click + brush ─────────────────────────────────────────
-  // Pointer-down on the track (not on a thumb) starts a brush.
-  // We track from the bucket under the pointer, and on pointer-up
-  // either commit (single-bar click → that bucket; brush → range).
   const onTrackPointerDown = (e) => {
-    // Ignore clicks that originated on a thumb (they handle their own).
     if (e.target.closest && e.target.closest(".histo-thumb")) return;
     if (e.button !== undefined && e.button !== 0) return; // left-click only on mouse
     e.preventDefault();
@@ -668,20 +685,17 @@ function PriceHistogram({ filters, setFilters }) {
     const lo = Math.min(brushFrom, brushTo);
     const hi = Math.max(brushFrom, brushTo);
     const isSingleClick = lo === hi;
-    const newMin = bucketToPrice(lo);
-    // Inclusive of the last bucket: max = right edge of bucket hi.
-    // If hi is the rightmost bucket, treat as "no upper cap" (keeps
-    // listings >$1M in scope).
-    const hiPrice = bucketToPrice(hi + 1);
-    const newMax = hi === HISTO_BUCKETS - 1 ? null : hiPrice;
-    setFilters({ price_min: newMin, price_max: newMax });
+    const newMin = bucketToValue(lo);
+    // Inclusive of the last bucket. If hi is the rightmost bucket, treat
+    // as "no upper cap" (keeps listings past visualMax in scope).
+    const hiValue = bucketToValue(hi + 1);
+    const newMax = hi === bucketCount - 1 ? null : hiValue;
+    setFilters({ [fieldMin]: newMin, [fieldMax]: newMax });
     if (isSingleClick) {
-      track("browse.price_histogram.bar_clicked", {
-        bucket_min: newMin, bucket_max: hiPrice,
-      });
+      track(events.barClicked, { bucket_min: newMin, bucket_max: hiValue });
     } else {
-      track("browse.price_histogram.dragged", {
-        from_min: filters.price_min, from_max: filters.price_max,
+      track(events.dragged, {
+        from_min: curMin, from_max: curMax,
         to_min: newMin, to_max: newMax,
       });
     }
@@ -692,8 +706,8 @@ function PriceHistogram({ filters, setFilters }) {
 
   // ── Reset ─────────────────────────────────────────────────────
   const onReset = () => {
-    setFilters({ price_min: 0, price_max: null });
-    track("browse.price_histogram.reset", {});
+    setFilters({ [fieldMin]: 0, [fieldMax]: null });
+    track(events.reset, {});
   };
   const onKeyDown = (e) => {
     if (e.key === "Escape" && hasRange) {
@@ -710,10 +724,10 @@ function PriceHistogram({ filters, setFilters }) {
     if (e.shiftKey) delta *= 5;
     if (delta === 0) return;
     e.preventDefault();
-    const cur = priceToBucket(filters.price_min);
-    const cap = priceToBucket(filters.price_max != null ? filters.price_max : HISTO_VISUAL_MAX);
+    const cur = valueToBucket(curMin);
+    const cap = valueToBucket(curMax != null ? curMax : visualMax);
     const next = Math.min(cap, Math.max(0, cur + delta));
-    setFilters({ price_min: bucketToPrice(next) });
+    setFilters({ [fieldMin]: bucketToValue(next) });
   };
   const onMaxKey = (e) => {
     let delta = 0;
@@ -722,15 +736,15 @@ function PriceHistogram({ filters, setFilters }) {
     if (e.shiftKey) delta *= 5;
     if (delta === 0) return;
     e.preventDefault();
-    const curIdx = filters.price_max != null ? priceToBucket(filters.price_max) : HISTO_BUCKETS;
-    const floor = priceToBucket(filters.price_min);
-    const nextIdx = Math.min(HISTO_BUCKETS, Math.max(floor, curIdx + delta));
-    const newPrice = nextIdx >= HISTO_BUCKETS ? null : bucketToPrice(nextIdx);
-    setFilters({ price_max: newPrice });
+    const curIdx = curMax != null ? valueToBucket(curMax) : bucketCount;
+    const floor = valueToBucket(curMin);
+    const nextIdx = Math.min(bucketCount, Math.max(floor, curIdx + delta));
+    const newValue = nextIdx >= bucketCount ? null : bucketToValue(nextIdx);
+    setFilters({ [fieldMax]: newValue });
   };
 
   return (
-    <div className="histo" onKeyDown={onKeyDown}>
+    <div className="histo" data-histo={dim} onKeyDown={onKeyDown}>
       <div
         className={`histo-track ${dragging ? "is-dragging" : ""}`}
         ref={trackRef}
@@ -741,13 +755,14 @@ function PriceHistogram({ filters, setFilters }) {
       >
         <div className="histo-bars" aria-hidden="true">
           {counts.map((c, i) => {
-            const left = i * (100 / HISTO_BUCKETS);
-            const right = (i + 1) * (100 / HISTO_BUCKETS);
+            const left = i * (100 / bucketCount);
+            const right = (i + 1) * (100 / bucketCount);
             const inRange = left >= minPct && right <= maxPct + 0.01;
             const inBrush = brushActive && i >= brushLow && i < brushHigh;
             return (
               <div
                 key={i}
+                data-count={c}
                 className={`histo-bar ${inRange ? "active" : ""} ${inBrush ? "is-brushed" : ""}`}
                 style={{ height: `${(c/peak)*100}%` }}
               />
@@ -765,8 +780,8 @@ function PriceHistogram({ filters, setFilters }) {
           <div
             className="histo-brush-overlay"
             style={{
-              left: `${brushLow * (100 / HISTO_BUCKETS)}%`,
-              width: `${(brushHigh - brushLow) * (100 / HISTO_BUCKETS)}%`,
+              left: `${brushLow * (100 / bucketCount)}%`,
+              width: `${(brushHigh - brushLow) * (100 / bucketCount)}%`,
             }}
             aria-hidden="true"
           />
@@ -776,11 +791,11 @@ function PriceHistogram({ filters, setFilters }) {
           role="slider"
           className={`histo-thumb histo-thumb-min ${dragging === "min" ? "is-dragging" : ""}`}
           style={{ left: `${minPct}%` }}
-          aria-label={lc === "es" ? "Precio mínimo" : "Minimum price"}
+          aria-label={ariaMinLabel}
           aria-valuemin={0}
-          aria-valuemax={HISTO_VISUAL_MAX}
-          aria-valuenow={visualMinPrice}
-          aria-valuetext={formatPrice(visualMinPrice)}
+          aria-valuemax={visualMax}
+          aria-valuenow={visualMin}
+          aria-valuetext={formatValue(visualMin)}
           onPointerDown={(e) => startThumbDrag("min", e)}
           onPointerMove={onThumbMove}
           onPointerUp={onThumbUp}
@@ -788,7 +803,7 @@ function PriceHistogram({ filters, setFilters }) {
           onKeyDown={onMinKey}
         >
           {dragging === "min" && (
-            <span className="histo-thumb-label" aria-hidden="true">{formatPrice(visualMinPrice)}</span>
+            <span className="histo-thumb-label" aria-hidden="true">{formatValue(visualMin)}</span>
           )}
         </button>
         <button
@@ -796,11 +811,11 @@ function PriceHistogram({ filters, setFilters }) {
           role="slider"
           className={`histo-thumb histo-thumb-max ${dragging === "max" ? "is-dragging" : ""}`}
           style={{ left: `${maxPct}%` }}
-          aria-label={lc === "es" ? "Precio máximo" : "Maximum price"}
+          aria-label={ariaMaxLabel}
           aria-valuemin={0}
-          aria-valuemax={HISTO_VISUAL_MAX}
-          aria-valuenow={visualMaxPrice}
-          aria-valuetext={liveMax != null ? formatPrice(liveMax) : (filters.price_max != null ? formatPrice(filters.price_max) : t("filter.price.no_cap", lc))}
+          aria-valuemax={visualMax}
+          aria-valuenow={visualMaxVal}
+          aria-valuetext={liveMax != null ? formatValue(liveMax) : (curMax != null ? formatValue(curMax) : noCapLabel)}
           onPointerDown={(e) => startThumbDrag("max", e)}
           onPointerMove={onThumbMove}
           onPointerUp={onThumbUp}
@@ -809,42 +824,115 @@ function PriceHistogram({ filters, setFilters }) {
         >
           {dragging === "max" && (
             <span className="histo-thumb-label" aria-hidden="true">
-              {liveMax != null && liveMax >= HISTO_VISUAL_MAX
-                ? t("filter.price.no_cap", lc)
-                : formatPrice(visualMaxPrice)}
+              {liveMax != null && liveMax >= visualMax
+                ? noCapLabel
+                : formatValue(visualMaxVal)}
             </span>
           )}
         </button>
       </div>
+      {/* Empty facet base (PR 3: other filters left 0 matches; PR 2: a
+          dimension with no data at all, e.g. size before enrichment). */}
+      {emptyLabel && totalInBase === 0 && (
+        <div className="histo-empty" aria-live="polite">{emptyLabel}</div>
+      )}
       {hasRange && (
         <div className="histo-meta" aria-live="polite">
           <span className="histo-current-range">
-            {formatPrice(filters.price_min)}–{filters.price_max != null ? formatPrice(filters.price_max) : t("filter.price.no_cap", lc)}
+            {formatValue(curMin)}–{curMax != null ? formatValue(curMax) : noCapLabel}
           </span>
           <button type="button" className="link-btn histo-reset" onClick={onReset}>
-            {lc === "es" ? "Restablecer" : "Reset"}
+            {resetLabel}
           </button>
         </div>
       )}
       <div className="price-inputs">
         <div className="price-input">
-          <label>{lc === "es" ? "Mín" : "Min"}</label>
-          <input type="number" value={filters.price_min} onChange={(e) => setFilters({ price_min: +e.target.value })} />
+          <label>{inputMinLabel}</label>
+          <input type="number" value={curMin} onChange={(e) => setFilters({ [fieldMin]: +e.target.value })} />
         </div>
         <div className="price-input">
-          <label>{lc === "es" ? "Máx" : "Max"}</label>
+          <label>{inputMaxLabel}</label>
           <input
             type="number"
-            value={filters.price_max ?? ""}
-            placeholder={filters.price_max == null ? t("filter.price.max_placeholder", lc) : ""}
+            value={curMax ?? ""}
+            placeholder={curMax == null ? maxPlaceholder : ""}
             onChange={(e) => {
               const v = e.target.value;
-              setFilters({ price_max: v === "" ? null : +v });
+              setFilters({ [fieldMax]: v === "" ? null : +v });
             }}
           />
         </div>
       </div>
+      {unitHint && <div className="histo-unit-hint">{unitHint}</div>}
     </div>
+  );
+}
+
+// Value extractors are module-level constants so their identity is stable
+// across renders — otherwise the counts memo (dep: getValue) would recompute
+// every render.
+const getPrice = (l) => l.price;
+const getSize = (l) => l.size_m2;
+
+function PriceHistogram({ filters, setFilters, population }) {
+  const lc = currentLocale();
+  return (
+    <RangeHistogram
+      filters={filters}
+      setFilters={setFilters}
+      population={population}
+      fieldMin="price_min"
+      fieldMax="price_max"
+      visualMax={PRICE_HISTO_MAX}
+      getValue={getPrice}
+      formatValue={formatPrice}
+      dim="price"
+      noCapLabel={t("filter.price.no_cap", lc)}
+      maxPlaceholder={t("filter.price.max_placeholder", lc)}
+      ariaMinLabel={t("filter.price.aria_min", lc)}
+      ariaMaxLabel={t("filter.price.aria_max", lc)}
+      inputMinLabel={t("filter.price.input_min", lc)}
+      inputMaxLabel={t("filter.price.input_max", lc)}
+      resetLabel={t("filter.histo.reset", lc)}
+      emptyLabel={t("filter.histo.no_matches", lc)}
+      events={{
+        dragged: "browse.price_histogram.dragged",
+        barClicked: "browse.price_histogram.bar_clicked",
+        reset: "browse.price_histogram.reset",
+      }}
+    />
+  );
+}
+
+function SizeHistogram({ filters, setFilters, population }) {
+  const lc = currentLocale();
+  return (
+    <RangeHistogram
+      filters={filters}
+      setFilters={setFilters}
+      population={population}
+      fieldMin="size_min"
+      fieldMax="size_max"
+      visualMax={SIZE_HISTO_MAX}
+      getValue={getSize}
+      formatValue={formatSize}
+      dim="size"
+      noCapLabel={t("filter.size.no_cap", lc)}
+      maxPlaceholder={t("filter.size.max_placeholder", lc)}
+      ariaMinLabel={t("filter.size.aria_min", lc)}
+      ariaMaxLabel={t("filter.size.aria_max", lc)}
+      inputMinLabel={t("filter.size.input_min", lc)}
+      inputMaxLabel={t("filter.size.input_max", lc)}
+      resetLabel={t("filter.histo.reset", lc)}
+      unitHint={t("filter.size.unit_hint", lc)}
+      emptyLabel={t("filter.size.no_data", lc)}
+      events={{
+        dragged: "browse.size_histogram.dragged",
+        barClicked: "browse.size_histogram.bar_clicked",
+        reset: "browse.size_histogram.reset",
+      }}
+    />
   );
 }
 
@@ -864,6 +952,9 @@ function makeDefaultFilters() {
     // counted ~700 while LiveStats correctly reported 873. Bug fix.
     price_max: null,
     size_min: 0,
+    // null = no upper cap, mirroring price_max. Number inputs accept any
+    // value; the 20k m² visual scale is only a legibility choice.
+    size_max: null,
     readiness: 0,
     // PR-4b — feature parity with legacy:
     score_min: 0,                             // 0–100 score floor
@@ -938,6 +1029,10 @@ function applyFilters(listings, f) {
     if (l.price < f.price_min) return false;
     if (f.price_max != null && l.price > f.price_max) return false;
     if (l.size_m2 < f.size_min) return false;
+    // null size passes a max-only cap (null > n is false) — identical to
+    // the price-null semantics above. Unknown-size listings are still
+    // excluded by size_min > 0 (existing behavior; don't "fix").
+    if (f.size_max != null && l.size_m2 > f.size_max) return false;
     if (f.features.has("beachfront") && !l.beachfront_tier) return false;
     if (f.features.has("ocean_view") && !l.has_ocean_view) return false;
     if (f.features.has("mountain_view") && !l.has_mountain_view) return false;
@@ -1354,6 +1449,7 @@ function BrowsePage({ app }) {
         debouncedFilters.features.size + debouncedFilters.infra.size +
         debouncedFilters.status.size +
         (debouncedFilters.price_max != null || debouncedFilters.price_min > 0 ? 1 : 0) +
+        (debouncedFilters.size_max != null || debouncedFilters.size_min > 0 ? 1 : 0) +
         (debouncedFilters.readiness > 0 ? 1 : 0);
       track("perf.filter_recompute", {
         ms,
@@ -1364,7 +1460,7 @@ function BrowsePage({ app }) {
     return sorted;
   }, [debouncedFilters, sort, LISTINGS]);
 
-  const activeFilterCount = filters.zones.size + filters.land_types.size + filters.features.size + filters.infra.size + filters.status.size + (filters.price_max != null || filters.price_min > 0 ? 1 : 0) + (filters.readiness > 0 ? 1 : 0);
+  const activeFilterCount = filters.zones.size + filters.land_types.size + filters.features.size + filters.infra.size + filters.status.size + (filters.price_max != null || filters.price_min > 0 ? 1 : 0) + (filters.size_max != null || filters.size_min > 0 ? 1 : 0) + (filters.readiness > 0 ? 1 : 0);
 
   // When a search query is active, results are ordered by keyword
   // relevance (see the results memo) so the sort dropdown no longer
@@ -1763,6 +1859,7 @@ function BrowsePage({ app }) {
               {[...filters.infra].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.infra); s.delete(f); setFiltersWithPinClear({...filters, infra: s});}}>{t(`filter.infra.${f}`, app.locale)} <Icon name="close" size={12}/></span>)}
               {[...filters.status].map(f => <span key={f} className="active-chip" onClick={() => { const s = new Set(filters.status); s.delete(f); setFiltersWithPinClear({...filters, status: s});}}>{statusChipLabel(f, app.locale)} <Icon name="close" size={12}/></span>)}
               {(filters.price_min > 0 || filters.price_max != null) && <span className="active-chip" onClick={() => setFiltersWithPinClear({...filters, price_min: 0, price_max: null})}>{formatPrice(filters.price_min)}–{filters.price_max != null ? formatPrice(filters.price_max) : t("filter.price.no_cap", app.locale)} <Icon name="close" size={12}/></span>}
+              {(filters.size_min > 0 || filters.size_max != null) && <span className="active-chip" onClick={() => setFiltersWithPinClear({...filters, size_min: 0, size_max: null})}>{formatSize(filters.size_min)}–{filters.size_max != null ? formatSize(filters.size_max) : t("filter.size.no_cap", app.locale)} <Icon name="close" size={12}/></span>}
             </div>
           )}
 
@@ -3725,6 +3822,7 @@ function EmptyResults({ onClear, filters, listings, setFilters }) {
         price_min: filters.price_min,
         price_max: filters.price_max,
         size_min: filters.size_min,
+        size_max: filters.size_max,
         readiness: filters.readiness,
       };
       mutator(next);
@@ -3744,6 +3842,12 @@ function EmptyResults({ onClear, filters, listings, setFilters }) {
       tryWithout("any budget", "cualquier presupuesto", (n) => {
         n.price_min = 0;
         n.price_max = null;
+      });
+    }
+    if (filters.size_min > 0 || filters.size_max != null) {
+      tryWithout("any size", "cualquier tamaño", (n) => {
+        n.size_min = 0;
+        n.size_max = null;
       });
     }
     if (filters.features.size > 0) {

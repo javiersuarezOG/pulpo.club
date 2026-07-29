@@ -23,6 +23,7 @@ function baseFilters(): FilterShape {
     price_min: 0,
     price_max: null,
     size_min: 0,
+    size_max: null,
     readiness: 0,
     rank_max: null,
     master_category: null,
@@ -106,6 +107,33 @@ describe("URL param coexistence (cat + sort + q + filters + view)", () => {
     const search = "?q=beachfront";
     expect(readFilterFromURL(search, baseFilters()).query).toBe("beachfront");
     expect(readViewFromURL(search, "cards")).toBe("cards");
+  });
+});
+
+describe("size range params (smin / smax)", () => {
+  it("smax is a filter key", () => {
+    expect(FILTER_URL_KEYS).toContain("smax");
+    expect(hasFilterParamsInURL("?smax=20000")).toBe(true);
+  });
+
+  it("reads smin + smax", () => {
+    const f = readFilterFromURL("?smin=5000&smax=20000", baseFilters());
+    expect(f.size_min).toBe(5000);
+    expect(f.size_max).toBe(20000);
+  });
+
+  it("absent smax → null (no cap)", () => {
+    expect(readFilterFromURL("?smin=5000", baseFilters()).size_max).toBeNull();
+  });
+
+  it("garbage smax → null, NOT 0 (a malformed shared link must not empty the results)", () => {
+    expect(readFilterFromURL("?smax=abc", baseFilters()).size_max).toBeNull();
+    // same hardening applied to pmax (was parseInt0(..., 0) → 0).
+    expect(readFilterFromURL("?pmax=xyz", baseFilters()).price_max).toBeNull();
+  });
+
+  it("smax=0 round-trips as 0 (explicit, not treated as absent)", () => {
+    expect(readFilterFromURL("?smax=0", baseFilters()).size_max).toBe(0);
   });
 });
 

@@ -631,6 +631,32 @@ export const UI_STRINGS = {
   // Max-price input placeholder (empty field). EN reads "any" here (not
   // "no max"); ES shares "sin tope".
   "filter.price.max_placeholder": { en: "any",            es: "sin tope" },
+  // Range-histogram strings shared by price + size (post-2026-07-29
+  // RangeHistogram generalization). Migrated out of inline EN/ES
+  // ternaries so the shared component carries zero raw locale switches.
+  "filter.histo.reset":          { en: "Reset",           es: "Restablecer" },
+  // Faceted zero-state (PR 3): other filters left this dimension with no
+  // matches. Only renders once faceting is wired; harmless before then.
+  "filter.histo.no_matches":     { en: "No listings match your other filters",
+                                   es: "Ninguna propiedad coincide con tus otros filtros" },
+  "filter.price.aria_min":       { en: "Minimum price",    es: "Precio mínimo" },
+  "filter.price.aria_max":       { en: "Maximum price",    es: "Precio máximo" },
+  "filter.price.input_min":      { en: "Min",              es: "Mín" },
+  "filter.price.input_max":      { en: "Max",              es: "Máx" },
+  // Size range (mirrors the price keys). no_cap/max_placeholder share
+  // "sin tope" with price; size keeps its own so future copy can diverge.
+  "filter.size.no_cap":          { en: "no max",           es: "sin tope" },
+  "filter.size.max_placeholder": { en: "any",              es: "sin tope" },
+  "filter.size.aria_min":        { en: "Minimum size",     es: "Tamaño mínimo" },
+  "filter.size.aria_max":        { en: "Maximum size",     es: "Tamaño máximo" },
+  // Inputs are canonical m² (like price inputs are raw USD); the unit is
+  // stated in the label + the hint below so the m²/vrs² toggle mismatch
+  // with the ha thumb labels is never ambiguous.
+  "filter.size.input_min":       { en: "Min (m²)",         es: "Mín (m²)" },
+  "filter.size.input_max":       { en: "Max (m²)",         es: "Máx (m²)" },
+  "filter.size.unit_hint":       { en: "1 ha = 10,000 m²", es: "1 ha = 10 000 m²" },
+  "filter.size.no_data":         { en: "Size data unavailable for these listings",
+                                   es: "Sin datos de tamaño para estas propiedades" },
   // JSON-LD breadcrumb labels (Browse + Detail). Own keys rather than
   // reusing nav.* so the SEO breadcrumb text ("Browse"/"Explorar") stays
   // independent of the nav tab label ("Discover"/"Descubrir").
@@ -1289,7 +1315,8 @@ export const UI_STRINGS = {
 
   // Filter chip labels (PR-6)
   "filter.photos":           { en: "Photos",                        es: "Fotos" },
-  "filter.size_min":         { en: "Min: {n} ha",                   es: "Mín: {n} ha" },
+  // filter.size_min removed post-2026-07-29 — the min-only slider label
+  // was replaced by the SizeHistogram (filter.size.* keys above).
   "filter.show_count":       { en: "Show {n} listings",             es: "Ver {n} propiedades" },
   "filter.feature.beachfront":   { en: "Beachfront",     es: "Frente a la playa" },
   "filter.feature.ocean_view":   { en: "Ocean View",     es: "Vista al mar" },

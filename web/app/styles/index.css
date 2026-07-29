@@ -2233,6 +2233,20 @@ h1,h2,h3,h4,h5 { margin: 0; }
   border: 1px solid var(--line); border-radius: 8px;
   background: var(--paper); font-size: 13px;
 }
+/* Unit hint under the size inputs (m² canonical, ha in thumb labels). */
+.histo-unit-hint {
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+/* Faceted / no-data zero-state caption (PR 3 no-matches, PR 2 size no-data). */
+.histo-empty {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-3);
+  padding: 2px 0;
+}
 
 .filter-apply {
   position: sticky; bottom: 0;

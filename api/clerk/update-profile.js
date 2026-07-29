@@ -85,7 +85,7 @@ function isNewsletterPreference(v) {
 // devices AND drives the weekly newsletter pipeline (replaces the
 // older `newsletter` blob in a follow-up PR).
 //
-// Persisted axes (13) — what the user wants to FIND. Excluded
+// Persisted axes (14) — what the user wants to FIND. Excluded
 // (weights, score_min, photos, include_incomplete) are tuning knobs
 // for how the user reads the catalogue and stay client-state.
 //
@@ -112,6 +112,10 @@ function isDiscoverFilter(v) {
     return false;
   }
   if ("size_min"  in v && (typeof v.size_min  !== "number" || v.size_min  < 0 || v.size_min  > 1e9)) return false;
+  if ("size_max"  in v && v.size_max !== null
+      && (typeof v.size_max !== "number" || v.size_max < 0 || v.size_max > 1e9)) {
+    return false;
+  }
   if ("readiness" in v && (typeof v.readiness !== "number" || v.readiness < 0 || v.readiness > 4))   return false;
   if ("rank_max"  in v && v.rank_max !== null
       && (typeof v.rank_max !== "number" || v.rank_max < 1 || v.rank_max > 100)) {

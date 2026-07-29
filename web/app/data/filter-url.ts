@@ -39,6 +39,7 @@ export type FilterShape = {
   price_min: number;
   price_max: number | null;   // null = no upper cap (default; was 1,000,000 — hid ~20% of catalog)
   size_min: number;
+  size_max: number | null;    // null = no upper cap (mirrors price_max)
   readiness: number;
   score_min?: number;
   weights?: { value: number; location: number; momentum: number };
@@ -79,6 +80,16 @@ function parseInt0(value: string | null, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
+// Nullable upper-cap parser for pmax/smax. Absent OR malformed → null
+// ("no cap"). Using parseInt0(x, 0) here would turn a garbage shared
+// link (?smax=abc) into "max 0" and silently empty the results — the
+// wrong failure mode for a cap.
+function parseCapOrNull(value: string | null): number | null {
+  if (value == null) return null;
+  const n = parseInt(value, 10);
+  return Number.isFinite(n) ? n : null;
+}
+
 function parseMaster(value: string | null): MasterCategory | null {
   if (!value) return null;
   return VALID_MASTER.has(value as MasterCategory) ? (value as MasterCategory) : null;
@@ -114,6 +125,7 @@ export const FILTER_URL_KEYS: readonly string[] = [
   "pmin",
   "pmax",
   "smin",
+  "smax",
   "ready",
   "master",
   "sub",
@@ -143,8 +155,9 @@ export function readFilterFromURL(search: string, baseDefaults: FilterShape): Fi
     infra: parseSet(p.get("infra")),
     status: parseSet(p.get("status")),
     price_min: parseInt0(p.get("pmin"), 0),
-    price_max: p.get("pmax") != null ? parseInt0(p.get("pmax"), 0) : null,
+    price_max: parseCapOrNull(p.get("pmax")),
     size_min: parseInt0(p.get("smin"), 0),
+    size_max: parseCapOrNull(p.get("smax")),
     readiness: parseInt0(p.get("ready"), 0),
     master_category: masterFromUrl ?? baseDefaults.master_category,
     subcategory:     subFromUrl    ?? baseDefaults.subcategory,
@@ -237,6 +250,7 @@ export function writeFilterToURL(
   setOrRemove("pmin", filters.price_min > 0 ? String(filters.price_min) : "");
   setOrRemove("pmax", filters.price_max != null ? String(filters.price_max) : "");
   setOrRemove("smin", filters.size_min > 0 ? String(filters.size_min) : "");
+  setOrRemove("smax", filters.size_max != null ? String(filters.size_max) : "");
   setOrRemove("ready", filters.readiness > 0 ? String(filters.readiness) : "");
   setOrRemove(
     "score_min",
