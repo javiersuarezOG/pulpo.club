@@ -109,6 +109,42 @@ def _classify_error(exc: BaseException) -> str:
     return "Unknown"
 
 
+def _fetch_photo_with_retry(url, *, timeout, retries=1, backoff_s=1.5):
+    """GET a photo URL, retrying TRANSIENT failures once. Returns the
+    httpx.Response (raise_for_status already applied).
+
+    Transient = timeout / connection / transport errors and HTTP 5xx.
+    Non-transient (4xx like a dead broker URL, anything else) raises
+    immediately — retrying a 404 just burns budget. Bounded by design:
+    worst case per URL ≈ (retries+1) × read-timeout + backoff, and both
+    callers (hero cheap-scoring, hires fetch) already run under phase
+    wall budgets with explicit per-request httpx.Timeout objects, so
+    the 2026-06-13 dribbling-bytes freeze class stays impossible.
+    """
+    import httpx
+    last_exc: BaseException | None = None
+    for attempt in range(retries + 1):
+        try:
+            r = httpx.get(url, timeout=timeout, follow_redirects=True)
+            r.raise_for_status()
+            return r
+        except httpx.HTTPStatusError as e:
+            code = e.response.status_code if e.response is not None else 0
+            if code < 500 or attempt >= retries:
+                raise
+            last_exc = e
+        except httpx.TransportError as e:
+            # Covers TimeoutException, ConnectError, ReadError, etc.
+            if attempt >= retries:
+                raise
+            last_exc = e
+        _time.sleep(backoff_s)
+    # Defensive — the loop always returns or raises above.
+    if last_exc is not None:
+        raise last_exc
+    raise RuntimeError(f"unreachable retry exit for {url}")
+
+
 def _hero_file_path(thumbnail_path: Path) -> Path:
     """`<file>.jpg` → `<file>.hero.jpg` (dual-derivative photo storage)."""
     stem = thumbnail_path.name[:-len(".jpg")] if thumbnail_path.name.endswith(".jpg") else thumbnail_path.stem
@@ -205,12 +241,13 @@ def _score_candidates_cheap(photo_urls, on_url_error=None):
             # budget, so one un-bounded GET wedges the whole phase indefinitely —
             # the hang that survived the validate_via_head fix (froze nightly
             # 2026-06-13). An explicit read timeout bounds each download.
-            r = httpx.get(
+            # One bounded retry on transient failures (timeout / 5xx) — a
+            # single flaky CDN response used to cost the candidate for the
+            # whole nightly.
+            r = _fetch_photo_with_retry(
                 url,
                 timeout=httpx.Timeout(5.0, connect=5.0, read=5.0, write=5.0, pool=5.0),
-                follow_redirects=True,
             )
-            r.raise_for_status()
         except Exception as e:
             if on_url_error is not None:
                 try:
@@ -1076,12 +1113,11 @@ def _download_hires_photos(listings, repo: Path) -> dict:
             # past a float read-timeout; froze the nightly 2026-06-13) are
             # fetched here. An explicit read timeout bounds a dribbling body
             # so one slow derivative can't eat the whole hires wall budget.
-            r = httpx.get(
+            # One bounded retry on transient failures (timeout / 5xx).
+            r = _fetch_photo_with_retry(
                 url,
                 timeout=httpx.Timeout(8.0, connect=8.0, read=8.0, write=8.0, pool=8.0),
-                follow_redirects=True,
             )
-            r.raise_for_status()
             raw = r.content
         except Exception as e:
             errored += 1
