@@ -88,7 +88,11 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "elagente": {
         "layer": "extraction",
-        "lifecycle": "active",
+        # Paused 2026-07-29 (image/nightly audit): red 6/6 runs in the
+        # trailing week, zero yield. Un-pause by flipping back to
+        # "active" once a repair PR lands; PULPO_SOURCES=elagente still
+        # crawls it explicitly (autorepair / manual runs).
+        "lifecycle": "paused",
         "fetch_kind": "curl_cffi",
         "discovery_kind": "html_pagination",
         "extraction_kind": "html_cards via GCP scrape-shim",
@@ -178,7 +182,10 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "realtyelsalvador": {
         "layer": "extraction",
-        "lifecycle": "active",
+        # Paused 2026-07-29 (image/nightly audit): red since 2026-05-20,
+        # zero yield. Un-pause by flipping back to "active" once a
+        # repair PR lands; PULPO_SOURCES still crawls it explicitly.
+        "lifecycle": "paused",
         "fetch_kind": "curl_cffi",
         "discovery_kind": "html_pagination",
         "extraction_kind": "html_cards via GCP scrape-shim",
@@ -208,7 +215,11 @@ SCRAPER_METADATA: dict[str, dict] = {
     # calibration pass replaces placeholder selectors with real ones.
     "agentiz": {
         "layer": "extraction",
-        "lifecycle": "experimental",
+        # Paused 2026-07-29 (image/nightly audit): red 6/6 runs in the
+        # trailing week, zero yield. Un-pause by flipping back to
+        # "active"/"experimental" once a repair PR lands; PULPO_SOURCES
+        # still crawls it explicitly.
+        "lifecycle": "paused",
         "fetch_kind": "static_http",
         "discovery_kind": "static_urls",
         "extraction_kind": "5 hardcoded type-slot URLs → per-detail JSON-LD RealEstateListing",
@@ -311,7 +322,12 @@ SCRAPER_METADATA: dict[str, dict] = {
     },
     "jamesedition": {
         "layer": "extraction",
-        "lifecycle": "experimental",
+        # Paused 2026-07-29 (image/nightly audit): Cloudflare challenge
+        # has blocked every fetch transport since 2026-06-05; red 6/6
+        # runs, zero yield. Un-pause once the challenge relaxes or a
+        # Playwright transport lands; PULPO_SOURCES still crawls it
+        # explicitly.
+        "lifecycle": "paused",
         "fetch_kind": "curl_cffi",
         "discovery_kind": "html_pagination",
         "extraction_kind": "jsonld_listing (case-insensitive @type) — Coatepeque luxury",
