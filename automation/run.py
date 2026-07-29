@@ -280,6 +280,18 @@ def _score_candidates_cheap(photo_urls, on_url_error=None):
             # blocks the VLM call on this run. Future runs will just
             # re-evaluate the floor.
             pass
+
+    # Within-listing dedup (PR-F): a broker gallery routinely repeats the
+    # same image (exact bytes, or re-encoded/resized near-dup). Stamp
+    # content_sha1 + dhash on every candidate and mark the redundant ones
+    # so the winner-pick skips them and the gallery drops them. Bytes are
+    # already in memory here, so this is nearly free. Non-fatal: a failure
+    # just leaves candidates un-deduped (today's behavior).
+    try:
+        from automation.image_hash import dedupe_within_listing as _dedupe
+        _dedupe(candidates)
+    except Exception as _dedup_err:  # noqa: BLE001 — never break the photo phase
+        print(f"[photos] within-listing dedup skipped: {_dedup_err!r}")
     return candidates
 
 
@@ -336,14 +348,18 @@ def _pick_winner_from_scored(
     if not scored_candidates:
         return (None, None, None, None, None)
 
-    # Filter cascade: drop picker_excluded → drop has_text_overlay=True →
-    # drop has_marketing_overlay=True. Each filter degrades gracefully:
-    # only drops the flag's matches when at least one clean alternative
-    # survives, so a listing with all-flagged photos still gets a hero
-    # (technical ranking decides among the dregs). None on any flag means
-    # "no signal," not "flagged" — missing signals don't disqualify.
-    non_excluded = [c for c in scored_candidates if not c.get("picker_excluded")]
-    base = non_excluded if non_excluded else list(scored_candidates)
+    # Filter cascade: drop within-listing duplicates → drop picker_excluded
+    # → drop has_text_overlay=True → drop has_marketing_overlay=True. Each
+    # filter degrades gracefully: only drops the flag's matches when at
+    # least one clean alternative survives, so a listing with all-flagged
+    # photos still gets a hero (technical ranking decides among the dregs).
+    # None on any flag means "no signal," not "flagged" — missing signals
+    # don't disqualify. Duplicates go first: a redundant copy should never
+    # win over the representative that carries the same picture.
+    non_dup = [c for c in scored_candidates if not c.get("is_duplicate")]
+    deduped = non_dup if non_dup else list(scored_candidates)
+    non_excluded = [c for c in deduped if not c.get("picker_excluded")]
+    base = non_excluded if non_excluded else deduped
     non_text = [c for c in base if c.get("has_text_overlay") is not True]
     after_text = non_text if non_text else base
     non_marketing = [c for c in after_text if c.get("has_marketing_overlay") is not True]
@@ -817,6 +833,20 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 hero_meta["has_marketing_overlay"] = winning_has_marketing
                 hero_meta["winning_url"] = winning_url
                 hero_meta["candidate_count"] = len(candidate_urls)
+                # PR-F — persist the winner's content identity + perceptual
+                # hash so a future run can recognise unchanged winning bytes
+                # (cross-run skip of derivative re-encoding) and PR-I can
+                # match the retained original to the served hero.
+                from automation.image_hash import content_sha1 as _c_sha1, dhash as _dhash
+                hero_meta["content_sha1"] = _c_sha1(winning_content)
+                _wd = _dhash(winning_content)
+                hero_meta["dhash"] = _wd
+                # How many of the scored candidates were dropped as
+                # within-listing duplicates — observability for the dedup
+                # rate without a separate log.
+                hero_meta["duplicates_dropped"] = sum(
+                    1 for c in scored if c.get("is_duplicate") is True
+                )
                 # P5 — a logo/icon/placeholder that wins the pick (structural
                 # gates can't tell a big logo from a real photo) must never be
                 # card/hero eligible. Override BEFORE the sidecar write so both
@@ -847,19 +877,21 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             li.selected_photo_url = winning_url
             # Per-photo verdicts: every SCORED candidate (the first `cap`
             # photo_urls) that the picker rejected — below the cheap-score
-            # floor (picker_excluded) or carrying a Tesseract text overlay.
-            # `scored` dicts don't carry has_marketing_overlay (that's only
-            # resolved for the winner in _pick_winner_from_scored), so the
-            # verdict set is limited to those two signals. URLs beyond the
-            # cap were never scored and stay out of the list (absence ≠
-            # rejected). The winner is never in this set by construction.
-            # Consumers: listings.ts::buildPhotos + ig_photo_gate.py::
-            # order_photo_indices.
+            # floor (picker_excluded), carrying a Tesseract text overlay,
+            # or a within-listing duplicate (PR-F: the same image repeated
+            # in the gallery). `scored` dicts don't carry
+            # has_marketing_overlay (that's only resolved for the winner in
+            # _pick_winner_from_scored), so the verdict set is limited to
+            # those signals. URLs beyond the cap were never scored and stay
+            # out of the list (absence ≠ rejected). The winner is never in
+            # this set by construction. Consumers: listings.ts::buildPhotos
+            # + ig_photo_gate.py::order_photo_indices.
             rejected = [
                 c["url"] for c in scored
                 if c.get("url") and c["url"] != winning_url
                 and (c.get("picker_excluded")
-                     or c.get("has_text_overlay") is True)
+                     or c.get("has_text_overlay") is True
+                     or c.get("is_duplicate") is True)
             ]
             li.photo_urls_rejected = rejected or None
             if li.card_eligible:
