@@ -569,7 +569,23 @@ def _download_hero_photos(listings, repo: Path) -> dict:
     except ImportError:
         print("[photos] Pillow not installed — skipping hero download")
         return {"attempted": 0, "ok": 0, "skipped": 0, "failed": 0, "elapsed_s": 0.0,
-                "hero_eligible": 0, "card_eligible": 0}
+                "hero_eligible": 0, "card_eligible": 0,
+                "text_overlay_detector_available": None}
+
+    # One-shot preflight: a missing tesseract binary/langpack silently
+    # turns detect_text_overlay into a no-op (None = "do not exclude"),
+    # which shipped brochure heroes unnoticed before. Stamp availability
+    # into the summary (→ pipeline_completed PostHog event) so the
+    # degraded state is observable even when the workflow-level install
+    # assert is bypassed (local runs, repick scripts).
+    from automation.photo_quality import text_overlay_detector_status
+    _tess = text_overlay_detector_status()
+    if not _tess["available"]:
+        print(f"[photos] WARNING: text-overlay detector unavailable "
+              f"({_tess['reason']}) — brochure/banner filtering is OFF this run")
+    elif _tess["langs"] and "spa" not in _tess["langs"]:
+        print("[photos] WARNING: tesseract spa language pack missing — "
+              "text-overlay OCR degraded to English-only stamps")
 
     # Pillow 10+ moved the resampling enum to Image.Resampling.* and
     # removed the top-level Image.LANCZOS alias. Detect at module load
@@ -926,7 +942,8 @@ def _download_hero_photos(listings, repo: Path) -> dict:
 
     return {"attempted": attempted, "ok": ok, "skipped": skipped, "failed": failed,
             "elapsed_s": elapsed, "budget_hit": budget_hit,
-            "hero_eligible": hero_eligible_count, "card_eligible": card_eligible_count}
+            "hero_eligible": hero_eligible_count, "card_eligible": card_eligible_count,
+            "text_overlay_detector_available": _tess["available"]}
 
 
 def _hires_file_path(photos_hires_dir: Path, source: str, source_id: str) -> Path:
@@ -2844,6 +2861,10 @@ def main() -> int:
         "scrape_slowest_s":        round(_slowest_s, 1),
         "offline":                 offline,
         "fixture_fallback_active": fixture_fallback_active,
+        # False = OCR brochure filtering was OFF this run (missing
+        # tesseract/pytesseract). Alert-worthy in PostHog: filtering
+        # silently disabled is how brochure heroes ship unnoticed.
+        "text_overlay_detector_available": photo_results.get("text_overlay_detector_available"),
     })
     print(f"[pipeline] scrape_total={_scrape_total_s}s slowest={_slowest_src}({round(_slowest_s,1)}s) "
           f"wall={round((finished - started).total_seconds(),1)}s")
