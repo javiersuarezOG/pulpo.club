@@ -113,7 +113,7 @@ const SHOW_AGENCY_PLAN = false;
 // (WHERE, RANKING, FILTERS) mapped directly to the new Primary
 // tier + the existing Refine "Discovery tags" group. See
 // `filter-primary` styling in styles/index.css.
-function FilterPanel({ filters, setFilters, count, onClose, app }) {
+function FilterPanel({ filters, setFilters, count, onClose, app, priceFacetBase, sizeFacetBase }) {
   // Helper to count active filters from a CANDIDATE filter shape — used
   // by the telemetry below to compute active_count POST-toggle without
   // double-rendering. Mirrors the logic of `activeCount` below.
@@ -296,11 +296,11 @@ function FilterPanel({ filters, setFilters, count, onClose, app }) {
       </FilterGroup>
 
       <FilterGroup title={t("filter.price", lc)}>
-        <PriceHistogram filters={filters} setFilters={update} />
+        <PriceHistogram filters={filters} setFilters={update} population={priceFacetBase} />
       </FilterGroup>
 
       <FilterGroup title={t("filter.size", lc)}>
-        <SizeHistogram filters={filters} setFilters={update} />
+        <SizeHistogram filters={filters} setFilters={update} population={sizeFacetBase} />
       </FilterGroup>
 
       <FilterGroup title={t("filter.zone", lc)}>
@@ -563,6 +563,7 @@ function RangeHistogram({
   resetLabel,
   unitHint,
   emptyLabel,
+  noDataLabel,
   dim,
   events,
 }) {
@@ -593,6 +594,17 @@ function RangeHistogram({
   );
   const peak = Math.max(...counts, 1);
   const totalInBase = pUseMemo(() => counts.reduce((a, c) => a + c, 0), [counts]);
+  // Distinguish "other filters left 0 matches" (emptyLabel / no_matches)
+  // from "this dimension has no data in the catalog at all" (noDataLabel /
+  // size no_data). Global count is memoized on the full catalog only, so
+  // it computes once and never per filter change.
+  const globalTotal = pUseMemo(
+    () => computeBucketCounts(allListings, getValue, visualMax, bucketCount).reduce((a, c) => a + c, 0),
+    [allListings, getValue, visualMax, bucketCount],
+  );
+  const emptyText = totalInBase === 0
+    ? (globalTotal === 0 && noDataLabel ? noDataLabel : emptyLabel)
+    : null;
 
   // Visual position math — committed filter values, overridden by live
   // drag values when the user is mid-gesture.
@@ -831,10 +843,11 @@ function RangeHistogram({
           )}
         </button>
       </div>
-      {/* Empty facet base (PR 3: other filters left 0 matches; PR 2: a
-          dimension with no data at all, e.g. size before enrichment). */}
-      {emptyLabel && totalInBase === 0 && (
-        <div className="histo-empty" aria-live="polite">{emptyLabel}</div>
+      {/* Empty base: faceting left 0 matches (no_matches) OR the dimension
+          has no data at all (size no_data). Thumbs stay operable so
+          clearing the other filters restores the bars live. */}
+      {emptyText && (
+        <div className="histo-empty" aria-live="polite">{emptyText}</div>
       )}
       {hasRange && (
         <div className="histo-meta" aria-live="polite">
@@ -926,7 +939,8 @@ function SizeHistogram({ filters, setFilters, population }) {
       inputMaxLabel={t("filter.size.input_max", lc)}
       resetLabel={t("filter.histo.reset", lc)}
       unitHint={t("filter.size.unit_hint", lc)}
-      emptyLabel={t("filter.size.no_data", lc)}
+      emptyLabel={t("filter.histo.no_matches", lc)}
+      noDataLabel={t("filter.size.no_data", lc)}
       events={{
         dragged: "browse.size_histogram.dragged",
         barClicked: "browse.size_histogram.bar_clicked",
@@ -1014,7 +1028,13 @@ function buildTopRankMap(listings, n = 10) {
   return out;
 }
 
-function applyFilters(listings, f) {
+// opts.skip ("price" | "size" | undefined) drops that dimension's own
+// predicate — used to compute faceted histogram populations that reflect
+// every OTHER filter (Airbnb/Amazon convention: a facet excludes its own
+// dimension, so interacting with a control can never move its own bars).
+// Backward compatible: 2-arg callers (account.jsx) pass no opts.
+function applyFilters(listings, f, opts) {
+  const skip = opts && opts.skip;
   // Tokenize once for the whole filter pass — matchesQuery is a hot
   // path (runs per-listing per-render) and re-splitting + re-folding
   // the same query string per row is wasteful.
@@ -1026,13 +1046,17 @@ function applyFilters(listings, f) {
     if (l.is_incomplete && !f.include_incomplete) return false;
     if (f.zones.size && !f.zones.has(l.zone_name)) return false;
     if (f.land_types.size && !f.land_types.has(l.land_type)) return false;
-    if (l.price < f.price_min) return false;
-    if (f.price_max != null && l.price > f.price_max) return false;
-    if (l.size_m2 < f.size_min) return false;
-    // null size passes a max-only cap (null > n is false) — identical to
-    // the price-null semantics above. Unknown-size listings are still
-    // excluded by size_min > 0 (existing behavior; don't "fix").
-    if (f.size_max != null && l.size_m2 > f.size_max) return false;
+    if (skip !== "price") {
+      if (l.price < f.price_min) return false;
+      if (f.price_max != null && l.price > f.price_max) return false;
+    }
+    if (skip !== "size") {
+      if (l.size_m2 < f.size_min) return false;
+      // null size passes a max-only cap (null > n is false) — identical to
+      // the price-null semantics above. Unknown-size listings are still
+      // excluded by size_min > 0 (existing behavior; don't "fix").
+      if (f.size_max != null && l.size_m2 > f.size_max) return false;
+    }
     if (f.features.has("beachfront") && !l.beachfront_tier) return false;
     if (f.features.has("ocean_view") && !l.has_ocean_view) return false;
     if (f.features.has("mountain_view") && !l.has_mountain_view) return false;
@@ -1387,6 +1411,30 @@ function BrowsePage({ app }) {
   const debouncedFilters = useDebouncedValue(filters, 300);
 
   const topRankMap = pUseMemo(() => buildTopRankMap(LISTINGS), [LISTINGS]);
+
+  // Faceted histogram populations. Each excludes its OWN dimension so the
+  // price bars reflect every filter except price (and vice-versa) — a
+  // control can never move its own bars (no jumpiness), while a size
+  // filter DOES narrow the price distribution (the useful signal). Keyed
+  // on debouncedFilters so it rides the same 300ms debounce as `results`
+  // and isn't recomputed per keystroke. rank_max is intentionally NOT in
+  // applyFilters (it caps AFTER, see applyRankCap), so a "Top 10" chip
+  // does not shrink the histogram to 10 bars — a 10-bar histogram is
+  // useless; the bars stay the full filtered distribution.
+  const priceFacetBase = pUseMemo(() => {
+    const t0 = (typeof performance !== "undefined" && performance.now) ? performance.now() : 0;
+    const base = applyFilters(LISTINGS, debouncedFilters, { skip: "price" });
+    if (t0) { try { track("perf.histo_recompute", { ms: performance.now() - t0, dim: "price", base_count: base.length }); } catch { /* ignore */ } }
+    return base;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [LISTINGS, debouncedFilters]);
+  const sizeFacetBase = pUseMemo(() => {
+    const t0 = (typeof performance !== "undefined" && performance.now) ? performance.now() : 0;
+    const base = applyFilters(LISTINGS, debouncedFilters, { skip: "size" });
+    if (t0) { try { track("perf.histo_recompute", { ms: performance.now() - t0, dim: "size", base_count: base.length }); } catch { /* ignore */ } }
+    return base;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [LISTINGS, debouncedFilters]);
 
   const results = pUseMemo(() => {
     // PR-photo-nav-perf — filter+sort cost is the most expensive
@@ -1744,7 +1792,7 @@ function BrowsePage({ app }) {
       <BreadcrumbListJsonLd items={browseBreadcrumb} />
       <div className="browse-layout">
         <div className="filter-desktop">
-          <FilterPanel filters={filters} setFilters={setFiltersWithPinClear} count={displayCount} app={app} />
+          <FilterPanel filters={filters} setFilters={setFiltersWithPinClear} count={displayCount} app={app} priceFacetBase={priceFacetBase} sizeFacetBase={sizeFacetBase} />
         </div>
         <div className="results-col">
           <BrowseSearchBar
@@ -2036,7 +2084,7 @@ function BrowsePage({ app }) {
         <div className="filter-drawer-backdrop" onClick={() => setFilterDrawerOpen(false)}>
           <div className="filter-drawer" onClick={(e) => e.stopPropagation()}>
             <div className="drawer-handle" />
-            <FilterPanel filters={filters} setFilters={setFiltersWithPinClear} count={results.length} onClose={() => setFilterDrawerOpen(false)} app={app} />
+            <FilterPanel filters={filters} setFilters={setFiltersWithPinClear} count={results.length} onClose={() => setFilterDrawerOpen(false)} app={app} priceFacetBase={priceFacetBase} sizeFacetBase={sizeFacetBase} />
           </div>
         </div>
       )}

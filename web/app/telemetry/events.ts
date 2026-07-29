@@ -1094,6 +1094,15 @@ export type EventMap = {
     result_count: number;
     active_filters: number;
   };
+  /** Faceted histogram base recompute (post-2026-07-29). One per
+      dimension per committed filter change; base_count is the size of the
+      exclude-own-dimension population. Watch P95 to justify the extra
+      O(n) passes as the catalog grows. */
+  "perf.histo_recompute": {
+    ms: number;
+    dim: "price" | "size";
+    base_count: number;
+  };
   /** Card click → detail-panel rendered. */
   "perf.detail_open": { listing_id: string; ms: number };
   /** Lightbox open: gallery click → lightbox visible (image not yet loaded). */
