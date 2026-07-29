@@ -141,6 +141,18 @@ jobs:
       - name: Install Tesseract OCR
         run: sudo apt-get update && sudo apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-spa
 
+      # A missing binary or language pack silently disables text-overlay
+      # filtering (detect_text_overlay returns None = "do not exclude").
+      # That's the right library contract at runtime, but a broken
+      # INSTALL is an environment failure and should fail loudly here,
+      # exactly like a broken pip install would. eng + spa are both
+      # required — spa-pack loss silently degrades OCR to English-only.
+      - name: Verify Tesseract install (eng + spa)
+        run: |
+          tesseract --version
+          tesseract --list-langs | grep -qx eng
+          tesseract --list-langs | grep -qx spa
+
       - name: Install dependencies
         run: pip install -r requirements.txt
 
