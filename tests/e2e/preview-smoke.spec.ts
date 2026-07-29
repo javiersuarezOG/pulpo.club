@@ -184,7 +184,10 @@ test.describe("New app boots cleanly on key routes", () => {
   });
 
   // Size histogram — mirror of the price test (min+max parity, post-2026-07-29).
-  test("@critical size histogram bar-click filters listings and updates URL", async ({ page }) => {
+  // NOT @critical: like the price-histogram test, it needs browse listing
+  // data, which the CI built preview doesn't serve (publicDir:false). Runs
+  // in the dev-server e2e:smoke suite.
+  test("size histogram bar-click filters listings and updates URL", async ({ page }) => {
     const errors: string[] = [];
     page.on("console", (msg) => {
       if (msg.type() === "error" && !isTolerated(msg)) errors.push(msg.text());
