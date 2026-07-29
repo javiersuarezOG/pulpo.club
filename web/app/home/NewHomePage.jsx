@@ -53,7 +53,7 @@ import {
 } from "./HomeShelf.jsx";
 import { visibleBlocksFor } from "./blockRegistry";
 import { readFeatureFlag } from "../lib/feature-flag";
-import { tierFor } from "../lib/gating";
+import { tierFor, isPaid } from "../lib/gating";
 import { track } from "../telemetry/hook";
 import { UspPopup } from "../components/UspPopup.jsx";
 import { decideArm, armPassiveTriggers } from "../lib/usp-popup-trigger";
@@ -170,7 +170,9 @@ export function NewHomePage({ app }) {
     try { urls = new URLSearchParams(window.location.search); } catch { return; }
     const decision = decideShouldShowUpsell({
       searchParams: urls,
-      isProUser: !!(app.user && app.user.plan === "pro"),
+      // isPaid covers agency too — the bare plan === "pro" check let agency
+      // users get the upsell modal via ?utm_*/?code= deep links.
+      isProUser: isPaid(app.user),
     });
     if (!decision.show) return;
     const utms = {};

@@ -1066,7 +1066,9 @@ function App() {
   }, []);
 
   const toggleSave = useCallback((id) => {
-    const authState = !user ? "anonymous" : (user.plan === "pro" ? "pro" : "free");
+    // isPaid (pro OR agency) — the bare `plan === "pro"` literal classified
+    // agency users as "free" in the save-funnel dashboards.
+    const authState = !user ? "anonymous" : (isPaid(user) ? "pro" : "free");
 
     // Two-state model (2026-06-08): saving is a Pro-only capability. A
     // non-paid user — anonymous, or a canceled/ever-paid user off an
