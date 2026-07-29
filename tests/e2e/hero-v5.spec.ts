@@ -139,7 +139,16 @@ test.describe("hero_v5 — paid variant", () => {
     await seedConsent(page);
   });
 
-  test("@critical Pro user: no upsell surfaces, Pro tag, 10 unlocked rows", async ({ page }) => {
+  // The @critical assertions here are all DATA-FREE on purpose: CI's
+  // `e2e critical` runs against the built vite preview, which does NOT
+  // serve /data/* (publicDir:false, no vercel rewrites), so listings
+  // never load and the card renders 10 SkeletonRows. The paid variant's
+  // upsell-absence (the actual bug fix) is provable from the tag + the
+  // lock's absence + the ProHeroCta + telemetry — none of which need
+  // data. The "10 real clickable rows" richness check needs listings, so
+  // it lives in the data-bearing dev-smoke test below (non-@critical),
+  // same precedent as the price-histogram test.
+  test("@critical Pro user: no upsell surface (no lock, Pro tag, Browse CTA, variant=pro)", async ({ page }) => {
     const errors = attachErrorRecorder(page);
     await seedProUser(page);
     await page.goto("/?posthog_capture=1&ff_hero_v5=1", { waitUntil: "networkidle" });
@@ -154,9 +163,9 @@ test.describe("hero_v5 — paid variant", () => {
     await expect(page.locator(".hv6-tag-pro")).toBeVisible();
     await expect(page.locator(".hv6-tag-pro")).toHaveText("Pro");
 
-    // Full Top 10 unlocked and clickable.
+    // Paid branch rendered its full Top-10 slot (10 rows, real or
+    // skeleton) — proves it's the pro variant, not the 7-row free card.
     await expect(page.locator(".hv6-card .hv6-r")).toHaveCount(10);
-    await expect(page.locator(".hv6-card button.hv6-r-link")).toHaveCount(10);
 
     // No AccessBlock signup/upsell in the hero copy column.
     await expect(page.locator(".access-cta-pro")).toHaveCount(0);
@@ -182,13 +191,17 @@ test.describe("hero_v5 — paid variant", () => {
     await expect(page).toHaveURL(/\/browse/);
   });
 
-  test("Pro user: clicking a ranked row opens the listing detail", async ({ page }) => {
+  // Data-dependent (needs listings loaded) → dev-smoke only, NOT @critical.
+  test("Pro user: 10 unlocked rows, clicking one opens the listing detail", async ({ page }) => {
     await seedProUser(page);
     // The card floats on an infinite hv6Float animation — Playwright's
     // pre-click stability wait would time out. The CSS already honors
     // prefers-reduced-motion (animation: none), so emulate it.
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/?posthog_capture=1&ff_hero_v5=1", { waitUntil: "networkidle" });
+    // Wait for real ranked rows to load, then assert all 10 are clickable.
+    await expect(page.locator(".hv6-card button.hv6-r-link").first()).toBeVisible({ timeout: 15_000 });
+    await expect(page.locator(".hv6-card button.hv6-r-link")).toHaveCount(10);
     await page.locator(".hv6-card button.hv6-r-link").first().click();
     await expect(page).toHaveURL(/\/listing\//);
     const events = await getEvents(page);
