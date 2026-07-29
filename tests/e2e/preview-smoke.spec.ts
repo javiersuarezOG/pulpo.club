@@ -225,7 +225,9 @@ test.describe("New app boots cleanly on key routes", () => {
 
   // Faceting — a filter on one dimension narrows the OTHER histogram, but
   // never its own (exclude-own-dimension invariant, post-2026-07-29).
-  test("@critical faceting narrows the price histogram but not its own bars", async ({ page }) => {
+  // NOT @critical: needs browse listing data (the histogram bars), which
+  // the CI built preview doesn't serve. Runs in the dev-server e2e:smoke.
+  test("faceting narrows the price histogram but not its own bars", async ({ page }) => {
     await page.goto("/browse", { waitUntil: "networkidle" });
     await page.locator('[data-histo="price"] .histo-bar').first().waitFor({ state: "visible", timeout: 10_000 });
 
