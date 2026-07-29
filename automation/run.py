@@ -1635,36 +1635,59 @@ def main() -> int:
     type_log_path.parent.mkdir(parents=True, exist_ok=True)
     try:
         from pulpo.scrapers._type_classifier import classify_property_type as _classify_t
-        with type_log_path.open("a", encoding="utf-8") as _tf:
-            for r in raw:
-                if "_type_signals" in r:
-                    pred_type, signals_payload = r["property_type"], r["_type_signals"]
-                    confidence, total = r["_type_confidence"], r["_type_total"]
-                    mode = "applied"
-                else:
-                    p, sigs, confidence, total = _classify_t({
-                        "url":         r.get("url") or "",
-                        "photo_urls":  r.get("photo_urls") or [],
-                        "title":       r.get("title") or "",
-                        "description": r.get("description") or "",
-                    }, fallback_type=r.get("property_type") or "land")
-                    pred_type = p
-                    signals_payload = [s.to_dict() for s in sigs]
-                    mode = "shadow"
-                _tf.write(json.dumps({
-                    "ts":           started.isoformat(),
-                    "source":       r.get("source"),
-                    "source_id":    r.get("source_id"),
-                    "scraper_type": r.get("property_type"),
-                    "predicted":    pred_type,
-                    "confidence":   confidence,
-                    "total_weight": round(total, 2),
-                    "mode":         mode,
-                    "signals":      signals_payload,
-                }, ensure_ascii=False) + "\n")
-                # Strip the piggyback fields before normalize sees the record.
-                for k in ("_type_signals", "_type_confidence", "_type_total"):
-                    r.pop(k, None)
+        from automation._jsonl import append_jsonl_idempotent as _append_jsonl
+        # Build the run's rows first, then write once (PR-H). This log was
+        # the worst unbounded-growth offender (~40 MB / ~100k rows,
+        # re-committed nightly) and a same-day rerun used to double every
+        # row. The idempotent writer keys on (date, source, source_id) so a
+        # rerun REPLACES rather than duplicates, and a 30-day retention
+        # window bounds the file. It's write-only telemetry (no consumer
+        # reads history beyond the current run), so trimming is safe.
+        type_rows = []
+        for r in raw:
+            if "_type_signals" in r:
+                pred_type, signals_payload = r["property_type"], r["_type_signals"]
+                confidence, total = r["_type_confidence"], r["_type_total"]
+                mode = "applied"
+            else:
+                p, sigs, confidence, total = _classify_t({
+                    "url":         r.get("url") or "",
+                    "photo_urls":  r.get("photo_urls") or [],
+                    "title":       r.get("title") or "",
+                    "description": r.get("description") or "",
+                }, fallback_type=r.get("property_type") or "land")
+                pred_type = p
+                signals_payload = [s.to_dict() for s in sigs]
+                mode = "shadow"
+            type_rows.append({
+                "ts":           started.isoformat(),
+                "source":       r.get("source"),
+                "source_id":    r.get("source_id"),
+                "scraper_type": r.get("property_type"),
+                "predicted":    pred_type,
+                "confidence":   confidence,
+                "total_weight": round(total, 2),
+                "mode":         mode,
+                "signals":      signals_payload,
+            })
+            # Strip the piggyback fields before normalize sees the record.
+            for k in ("_type_signals", "_type_confidence", "_type_total"):
+                r.pop(k, None)
+
+        def _type_key(row: dict):
+            sid = row.get("source_id")
+            if sid is None:
+                return None  # un-keyable → always keep, never dedupe
+            ts = row.get("ts") or ""
+            return (ts[:10], row.get("source"), sid)
+
+        _stats = _append_jsonl(
+            type_log_path, type_rows,
+            key_fn=_type_key, retention_days=30, now=started,
+        )
+        print(f"[type_classifier] log rows added={_stats['added']} "
+              f"replaced={_stats['replaced']} pruned={_stats['pruned']} "
+              f"total={_stats['total']}")
     except Exception as e:
         # Telemetry must never block a run.
         print(f"[type_classifier] shadow log skipped: {e}")
