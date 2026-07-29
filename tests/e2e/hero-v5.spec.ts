@@ -184,6 +184,10 @@ test.describe("hero_v5 — paid variant", () => {
 
   test("Pro user: clicking a ranked row opens the listing detail", async ({ page }) => {
     await seedProUser(page);
+    // The card floats on an infinite hv6Float animation — Playwright's
+    // pre-click stability wait would time out. The CSS already honors
+    // prefers-reduced-motion (animation: none), so emulate it.
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/?posthog_capture=1&ff_hero_v5=1", { waitUntil: "networkidle" });
     await page.locator(".hv6-card button.hv6-r-link").first().click();
     await expect(page).toHaveURL(/\/listing\//);
