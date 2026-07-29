@@ -109,6 +109,42 @@ def _classify_error(exc: BaseException) -> str:
     return "Unknown"
 
 
+def _fetch_photo_with_retry(url, *, timeout, retries=1, backoff_s=1.5):
+    """GET a photo URL, retrying TRANSIENT failures once. Returns the
+    httpx.Response (raise_for_status already applied).
+
+    Transient = timeout / connection / transport errors and HTTP 5xx.
+    Non-transient (4xx like a dead broker URL, anything else) raises
+    immediately — retrying a 404 just burns budget. Bounded by design:
+    worst case per URL ≈ (retries+1) × read-timeout + backoff, and both
+    callers (hero cheap-scoring, hires fetch) already run under phase
+    wall budgets with explicit per-request httpx.Timeout objects, so
+    the 2026-06-13 dribbling-bytes freeze class stays impossible.
+    """
+    import httpx
+    last_exc: BaseException | None = None
+    for attempt in range(retries + 1):
+        try:
+            r = httpx.get(url, timeout=timeout, follow_redirects=True)
+            r.raise_for_status()
+            return r
+        except httpx.HTTPStatusError as e:
+            code = e.response.status_code if e.response is not None else 0
+            if code < 500 or attempt >= retries:
+                raise
+            last_exc = e
+        except httpx.TransportError as e:
+            # Covers TimeoutException, ConnectError, ReadError, etc.
+            if attempt >= retries:
+                raise
+            last_exc = e
+        _time.sleep(backoff_s)
+    # Defensive — the loop always returns or raises above.
+    if last_exc is not None:
+        raise last_exc
+    raise RuntimeError(f"unreachable retry exit for {url}")
+
+
 def _hero_file_path(thumbnail_path: Path) -> Path:
     """`<file>.jpg` → `<file>.hero.jpg` (dual-derivative photo storage)."""
     stem = thumbnail_path.name[:-len(".jpg")] if thumbnail_path.name.endswith(".jpg") else thumbnail_path.stem
@@ -205,12 +241,13 @@ def _score_candidates_cheap(photo_urls, on_url_error=None):
             # budget, so one un-bounded GET wedges the whole phase indefinitely —
             # the hang that survived the validate_via_head fix (froze nightly
             # 2026-06-13). An explicit read timeout bounds each download.
-            r = httpx.get(
+            # One bounded retry on transient failures (timeout / 5xx) — a
+            # single flaky CDN response used to cost the candidate for the
+            # whole nightly.
+            r = _fetch_photo_with_retry(
                 url,
                 timeout=httpx.Timeout(5.0, connect=5.0, read=5.0, write=5.0, pool=5.0),
-                follow_redirects=True,
             )
-            r.raise_for_status()
         except Exception as e:
             if on_url_error is not None:
                 try:
@@ -280,6 +317,18 @@ def _score_candidates_cheap(photo_urls, on_url_error=None):
             # blocks the VLM call on this run. Future runs will just
             # re-evaluate the floor.
             pass
+
+    # Within-listing dedup (PR-F): a broker gallery routinely repeats the
+    # same image (exact bytes, or re-encoded/resized near-dup). Stamp
+    # content_sha1 + dhash on every candidate and mark the redundant ones
+    # so the winner-pick skips them and the gallery drops them. Bytes are
+    # already in memory here, so this is nearly free. Non-fatal: a failure
+    # just leaves candidates un-deduped (today's behavior).
+    try:
+        from automation.image_hash import dedupe_within_listing as _dedupe
+        _dedupe(candidates)
+    except Exception as _dedup_err:  # noqa: BLE001 — never break the photo phase
+        print(f"[photos] within-listing dedup skipped: {_dedup_err!r}")
     return candidates
 
 
@@ -336,14 +385,18 @@ def _pick_winner_from_scored(
     if not scored_candidates:
         return (None, None, None, None, None)
 
-    # Filter cascade: drop picker_excluded → drop has_text_overlay=True →
-    # drop has_marketing_overlay=True. Each filter degrades gracefully:
-    # only drops the flag's matches when at least one clean alternative
-    # survives, so a listing with all-flagged photos still gets a hero
-    # (technical ranking decides among the dregs). None on any flag means
-    # "no signal," not "flagged" — missing signals don't disqualify.
-    non_excluded = [c for c in scored_candidates if not c.get("picker_excluded")]
-    base = non_excluded if non_excluded else list(scored_candidates)
+    # Filter cascade: drop within-listing duplicates → drop picker_excluded
+    # → drop has_text_overlay=True → drop has_marketing_overlay=True. Each
+    # filter degrades gracefully: only drops the flag's matches when at
+    # least one clean alternative survives, so a listing with all-flagged
+    # photos still gets a hero (technical ranking decides among the dregs).
+    # None on any flag means "no signal," not "flagged" — missing signals
+    # don't disqualify. Duplicates go first: a redundant copy should never
+    # win over the representative that carries the same picture.
+    non_dup = [c for c in scored_candidates if not c.get("is_duplicate")]
+    deduped = non_dup if non_dup else list(scored_candidates)
+    non_excluded = [c for c in deduped if not c.get("picker_excluded")]
+    base = non_excluded if non_excluded else deduped
     non_text = [c for c in base if c.get("has_text_overlay") is not True]
     after_text = non_text if non_text else base
     non_marketing = [c for c in after_text if c.get("has_marketing_overlay") is not True]
@@ -532,7 +585,23 @@ def _download_hero_photos(listings, repo: Path) -> dict:
     except ImportError:
         print("[photos] Pillow not installed — skipping hero download")
         return {"attempted": 0, "ok": 0, "skipped": 0, "failed": 0, "elapsed_s": 0.0,
-                "hero_eligible": 0, "card_eligible": 0}
+                "hero_eligible": 0, "card_eligible": 0,
+                "text_overlay_detector_available": None}
+
+    # One-shot preflight: a missing tesseract binary/langpack silently
+    # turns detect_text_overlay into a no-op (None = "do not exclude"),
+    # which shipped brochure heroes unnoticed before. Stamp availability
+    # into the summary (→ pipeline_completed PostHog event) so the
+    # degraded state is observable even when the workflow-level install
+    # assert is bypassed (local runs, repick scripts).
+    from automation.photo_quality import text_overlay_detector_status
+    _tess = text_overlay_detector_status()
+    if not _tess["available"]:
+        print(f"[photos] WARNING: text-overlay detector unavailable "
+              f"({_tess['reason']}) — brochure/banner filtering is OFF this run")
+    elif _tess["langs"] and "spa" not in _tess["langs"]:
+        print("[photos] WARNING: tesseract spa language pack missing — "
+              "text-overlay OCR degraded to English-only stamps")
 
     # Pillow 10+ moved the resampling enum to Image.Resampling.* and
     # removed the top-level Image.LANCZOS alias. Detect at module load
@@ -817,6 +886,20 @@ def _download_hero_photos(listings, repo: Path) -> dict:
                 hero_meta["has_marketing_overlay"] = winning_has_marketing
                 hero_meta["winning_url"] = winning_url
                 hero_meta["candidate_count"] = len(candidate_urls)
+                # PR-F — persist the winner's content identity + perceptual
+                # hash so a future run can recognise unchanged winning bytes
+                # (cross-run skip of derivative re-encoding) and PR-I can
+                # match the retained original to the served hero.
+                from automation.image_hash import content_sha1 as _c_sha1, dhash as _dhash
+                hero_meta["content_sha1"] = _c_sha1(winning_content)
+                _wd = _dhash(winning_content)
+                hero_meta["dhash"] = _wd
+                # How many of the scored candidates were dropped as
+                # within-listing duplicates — observability for the dedup
+                # rate without a separate log.
+                hero_meta["duplicates_dropped"] = sum(
+                    1 for c in scored if c.get("is_duplicate") is True
+                )
                 # P5 — a logo/icon/placeholder that wins the pick (structural
                 # gates can't tell a big logo from a real photo) must never be
                 # card/hero eligible. Override BEFORE the sidecar write so both
@@ -847,19 +930,21 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             li.selected_photo_url = winning_url
             # Per-photo verdicts: every SCORED candidate (the first `cap`
             # photo_urls) that the picker rejected — below the cheap-score
-            # floor (picker_excluded) or carrying a Tesseract text overlay.
-            # `scored` dicts don't carry has_marketing_overlay (that's only
-            # resolved for the winner in _pick_winner_from_scored), so the
-            # verdict set is limited to those two signals. URLs beyond the
-            # cap were never scored and stay out of the list (absence ≠
-            # rejected). The winner is never in this set by construction.
-            # Consumers: listings.ts::buildPhotos + ig_photo_gate.py::
-            # order_photo_indices.
+            # floor (picker_excluded), carrying a Tesseract text overlay,
+            # or a within-listing duplicate (PR-F: the same image repeated
+            # in the gallery). `scored` dicts don't carry
+            # has_marketing_overlay (that's only resolved for the winner in
+            # _pick_winner_from_scored), so the verdict set is limited to
+            # those signals. URLs beyond the cap were never scored and stay
+            # out of the list (absence ≠ rejected). The winner is never in
+            # this set by construction. Consumers: listings.ts::buildPhotos
+            # + ig_photo_gate.py::order_photo_indices.
             rejected = [
                 c["url"] for c in scored
                 if c.get("url") and c["url"] != winning_url
                 and (c.get("picker_excluded")
-                     or c.get("has_text_overlay") is True)
+                     or c.get("has_text_overlay") is True
+                     or c.get("is_duplicate") is True)
             ]
             li.photo_urls_rejected = rejected or None
             if li.card_eligible:
@@ -889,7 +974,8 @@ def _download_hero_photos(listings, repo: Path) -> dict:
 
     return {"attempted": attempted, "ok": ok, "skipped": skipped, "failed": failed,
             "elapsed_s": elapsed, "budget_hit": budget_hit,
-            "hero_eligible": hero_eligible_count, "card_eligible": card_eligible_count}
+            "hero_eligible": hero_eligible_count, "card_eligible": card_eligible_count,
+            "text_overlay_detector_available": _tess["available"]}
 
 
 def _hires_file_path(photos_hires_dir: Path, source: str, source_id: str) -> Path:
@@ -1076,12 +1162,11 @@ def _download_hires_photos(listings, repo: Path) -> dict:
             # past a float read-timeout; froze the nightly 2026-06-13) are
             # fetched here. An explicit read timeout bounds a dribbling body
             # so one slow derivative can't eat the whole hires wall budget.
-            r = httpx.get(
+            # One bounded retry on transient failures (timeout / 5xx).
+            r = _fetch_photo_with_retry(
                 url,
                 timeout=httpx.Timeout(8.0, connect=8.0, read=8.0, write=8.0, pool=8.0),
-                follow_redirects=True,
             )
-            r.raise_for_status()
             raw = r.content
         except Exception as e:
             errored += 1
@@ -1338,10 +1423,30 @@ def main() -> int:
     # get it crawled on the next nightly without a workflow-YAML edit.
     # See pulpo/scrapers/__init__.py for the autodiscovery loop.
     _PULPO_SOURCES_RAW = (os.environ.get("PULPO_SOURCES") or "").strip()
+    paused_sources: list[str] = []
     if _PULPO_SOURCES_RAW:
         sources = [s for s in _PULPO_SOURCES_RAW.split(",") if s.strip()]
     else:
         sources = sorted(REGISTRY.keys())
+        # lifecycle="paused" sources (pulpo/scrapers/_metadata.py) are
+        # skipped on autodiscovered runs: known-dead scrapers burn crawl
+        # time and paint every health surface red for months. They still
+        # get an explicit status="paused" health row below so dashboards
+        # show intent, and an explicit PULPO_SOURCES=<slug> run (manual /
+        # autorepair) crawls them regardless — that's the un-pause
+        # escape hatch while a repair PR is in flight.
+        try:
+            from pulpo.scrapers._metadata import SCRAPER_METADATA as _SCRAPER_META
+            paused_sources = [
+                s for s in sources
+                if (_SCRAPER_META.get(s) or {}).get("lifecycle") == "paused"
+            ]
+        except Exception:
+            paused_sources = []
+        if paused_sources:
+            sources = [s for s in sources if s not in set(paused_sources)]
+            print(f"[scrape] skipping paused sources: {', '.join(paused_sources)} "
+                  f"(override with PULPO_SOURCES to crawl explicitly)")
 
     started = datetime.now(timezone.utc)
     # PostHog: tag every subsequent capture() in this process with a
@@ -1352,6 +1457,7 @@ def main() -> int:
     _ph_capture("pipeline_started", {
         "sources": sources,
         "sources_count": len(sources),
+        "sources_paused": paused_sources,
         "offline": offline,
         "limit": limit,
     })
@@ -1561,36 +1667,59 @@ def main() -> int:
     type_log_path.parent.mkdir(parents=True, exist_ok=True)
     try:
         from pulpo.scrapers._type_classifier import classify_property_type as _classify_t
-        with type_log_path.open("a", encoding="utf-8") as _tf:
-            for r in raw:
-                if "_type_signals" in r:
-                    pred_type, signals_payload = r["property_type"], r["_type_signals"]
-                    confidence, total = r["_type_confidence"], r["_type_total"]
-                    mode = "applied"
-                else:
-                    p, sigs, confidence, total = _classify_t({
-                        "url":         r.get("url") or "",
-                        "photo_urls":  r.get("photo_urls") or [],
-                        "title":       r.get("title") or "",
-                        "description": r.get("description") or "",
-                    }, fallback_type=r.get("property_type") or "land")
-                    pred_type = p
-                    signals_payload = [s.to_dict() for s in sigs]
-                    mode = "shadow"
-                _tf.write(json.dumps({
-                    "ts":           started.isoformat(),
-                    "source":       r.get("source"),
-                    "source_id":    r.get("source_id"),
-                    "scraper_type": r.get("property_type"),
-                    "predicted":    pred_type,
-                    "confidence":   confidence,
-                    "total_weight": round(total, 2),
-                    "mode":         mode,
-                    "signals":      signals_payload,
-                }, ensure_ascii=False) + "\n")
-                # Strip the piggyback fields before normalize sees the record.
-                for k in ("_type_signals", "_type_confidence", "_type_total"):
-                    r.pop(k, None)
+        from automation._jsonl import append_jsonl_idempotent as _append_jsonl
+        # Build the run's rows first, then write once (PR-H). This log was
+        # the worst unbounded-growth offender (~40 MB / ~100k rows,
+        # re-committed nightly) and a same-day rerun used to double every
+        # row. The idempotent writer keys on (date, source, source_id) so a
+        # rerun REPLACES rather than duplicates, and a 30-day retention
+        # window bounds the file. It's write-only telemetry (no consumer
+        # reads history beyond the current run), so trimming is safe.
+        type_rows = []
+        for r in raw:
+            if "_type_signals" in r:
+                pred_type, signals_payload = r["property_type"], r["_type_signals"]
+                confidence, total = r["_type_confidence"], r["_type_total"]
+                mode = "applied"
+            else:
+                p, sigs, confidence, total = _classify_t({
+                    "url":         r.get("url") or "",
+                    "photo_urls":  r.get("photo_urls") or [],
+                    "title":       r.get("title") or "",
+                    "description": r.get("description") or "",
+                }, fallback_type=r.get("property_type") or "land")
+                pred_type = p
+                signals_payload = [s.to_dict() for s in sigs]
+                mode = "shadow"
+            type_rows.append({
+                "ts":           started.isoformat(),
+                "source":       r.get("source"),
+                "source_id":    r.get("source_id"),
+                "scraper_type": r.get("property_type"),
+                "predicted":    pred_type,
+                "confidence":   confidence,
+                "total_weight": round(total, 2),
+                "mode":         mode,
+                "signals":      signals_payload,
+            })
+            # Strip the piggyback fields before normalize sees the record.
+            for k in ("_type_signals", "_type_confidence", "_type_total"):
+                r.pop(k, None)
+
+        def _type_key(row: dict):
+            sid = row.get("source_id")
+            if sid is None:
+                return None  # un-keyable → always keep, never dedupe
+            ts = row.get("ts") or ""
+            return (ts[:10], row.get("source"), sid)
+
+        _stats = _append_jsonl(
+            type_log_path, type_rows,
+            key_fn=_type_key, retention_days=30, now=started,
+        )
+        print(f"[type_classifier] log rows added={_stats['added']} "
+              f"replaced={_stats['replaced']} pruned={_stats['pruned']} "
+              f"total={_stats['total']}")
     except Exception as e:
         # Telemetry must never block a run.
         print(f"[type_classifier] shadow log skipped: {e}")
@@ -1628,6 +1757,24 @@ def main() -> int:
                 # ``web/data/scraper_failures/<source>_*_<failure_id>.json``,
                 # consumed by the watchdog + Phase-4 auto-repair agent.
                 "failure_id":   source_failure_id.get(src),
+            }, ensure_ascii=False) + "\n")
+        # Paused sources weren't crawled — write an explicit "paused"
+        # row (not "red") so dashboards show intent, the consecutive-red
+        # streak breaks, and check_source_health has a fresh latest-row
+        # that never pages. Removing the source from the file entirely
+        # would read as "source deleted" to the row-count sentinel.
+        for src in paused_sources:
+            _hf.write(json.dumps({
+                "ts":          health_ts,
+                "source":      src,
+                "status":      "paused",
+                "count":       0,
+                "duration_s":  0.0,
+                "error_class": None,
+                "error_msg":   "",
+                "max_pages_hit": False,
+                "limit_hit":     False,
+                "failure_id":   None,
             }, ensure_ascii=False) + "\n")
 
     # Normalize. seen_keys (plan 012): read-only ledger snapshot so the
@@ -2808,6 +2955,10 @@ def main() -> int:
         "scrape_slowest_s":        round(_slowest_s, 1),
         "offline":                 offline,
         "fixture_fallback_active": fixture_fallback_active,
+        # False = OCR brochure filtering was OFF this run (missing
+        # tesseract/pytesseract). Alert-worthy in PostHog: filtering
+        # silently disabled is how brochure heroes ship unnoticed.
+        "text_overlay_detector_available": photo_results.get("text_overlay_detector_available"),
     })
     print(f"[pipeline] scrape_total={_scrape_total_s}s slowest={_slowest_src}({round(_slowest_s,1)}s) "
           f"wall={round((finished - started).total_seconds(),1)}s")

@@ -209,6 +209,31 @@ def test_detect_text_overlay_no_pytesseract_returns_none(monkeypatch):
     assert detect_text_overlay(raw) is None
 
 
+def test_detector_status_shape():
+    """Preflight never raises and always returns the full shape; the
+    nightly stamps `available` into pipeline_completed telemetry."""
+    from automation.photo_quality import text_overlay_detector_status
+    status = text_overlay_detector_status()
+    assert set(status) == {"available", "reason", "langs"}
+    assert isinstance(status["available"], bool)
+    assert isinstance(status["langs"], list)
+    if status["available"]:
+        assert status["reason"] is None
+    else:
+        assert isinstance(status["reason"], str) and status["reason"]
+
+
+def test_detector_status_unavailable_when_no_pytesseract(monkeypatch):
+    """Missing pytesseract → available=False with a named reason, so the
+    photo phase can log the loud WARNING instead of silently no-opping."""
+    import sys
+    monkeypatch.setitem(sys.modules, "pytesseract", None)
+    from automation.photo_quality import text_overlay_detector_status
+    status = text_overlay_detector_status()
+    assert status["available"] is False
+    assert "pytesseract" in status["reason"]
+
+
 # Tesseract-dependent tests — skip when the binary isn't available.
 
 import pytest  # noqa: E402

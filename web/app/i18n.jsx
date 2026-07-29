@@ -379,11 +379,16 @@ export const UI_STRINGS = {
   "home.hero.v5.usp_3":          { en: "Delivers your top picks to your inbox, every Sunday",
                                    es: "Te envía tus mejores opciones al correo, cada domingo" },
   "home.hero.v5.email_cta":      { en: "Get going — it's free",                 es: "Empieza — es gratis" },
+  // Paid (Pro/Agency) hero action — replaces the signup/upsell slot.
+  "home.hero.v5.pro_note":       { en: "You're on Pulpo Pro — every listing and your Sunday top 10, unlocked.",
+                                   es: "Tienes Pulpo Pro — todas las propiedades y tu top 10 del domingo, desbloqueados." },
+  "home.hero.v5.pro_browse_cta": { en: "Browse all listings",                    es: "Ver todas las propiedades" },
   // Pulpo Free Top-3 card
   "home.hero.v5.card_free_tag":  { en: "Free",                                  es: "Gratis" },
   "home.hero.v5.card_live":      { en: "Live · 6:00 AM",                        es: "En vivo · 6:00 AM" },
   "home.hero.v5.card_title_a":   { en: "Your",                                  es: "Tu" },
   "home.hero.v5.card_title_b":   { en: "Top 3",                                 es: "Top 3" },
+  "home.hero.v5.card_title_b_pro": { en: "Top 10",                              es: "Top 10" },
   "home.hero.v5.card_title_c":   { en: "this week",                             es: "esta semana" },
   "home.hero.v5.card_kick":      { en: "Ranked by value · filtered to your preferences",
                                    es: "Ordenado por valor · filtrado a tus preferencias" },
@@ -1816,6 +1821,10 @@ export const UI_STRINGS = {
   "access.go_pro.sub":                 { en: "Every listing + all 10 of our weekly picks. First month's on us.", es: "Todas las propiedades + las 10 selecciones de la semana. El primer mes va por nuestra cuenta." },
   "access.signin.prefix":              { en: "Already one of us?",            es: "¿Ya eres de los nuestros?" },
   "access.signin.link":                { en: "Sign in",                       es: "Inicia sesión" },
+  // Already-Pro compact row — rendered instead of signup/upsell CTAs when
+  // a paid user reaches any AccessBlock surface (defense-in-depth).
+  "access.already_pro":                { en: "You're on Pulpo Pro.",          es: "Ya tienes Pulpo Pro." },
+  "access.already_pro_link":           { en: "Manage subscription",           es: "Gestionar suscripción" },
   "access.error.invalid":              { en: "Enter a valid email address.",  es: "Ingresa un correo válido." },
   "access.error.generic":              { en: "Something went wrong. Try again.", es: "Algo salió mal. Inténtalo de nuevo." },
   "access.error.rate_limited":         { en: "Too many attempts just now. Wait a moment and try again.", es: "Demasiados intentos por ahora. Espera un momento e inténtalo de nuevo." },

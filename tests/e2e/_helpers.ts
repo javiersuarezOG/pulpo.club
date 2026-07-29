@@ -38,14 +38,14 @@ export function attachErrorRecorder(page: Page): string[] {
 // (account.subscription, account.notifications, paywalls).
 export async function seedUser(
   page: Page,
-  plan: "pro" | "free",
+  plan: "pro" | "free" | "agency",
 ): Promise<void> {
   await page.addInitScript((p) => {
     localStorage.setItem(
       "pulpo-user",
       JSON.stringify({
-        email: p === "pro" ? "pro-tester@pulpo.club" : "free-tester@pulpo.club",
-        name: p === "pro" ? "Pro Tester" : "Free Tester",
+        email: `${p}-tester@pulpo.club`,
+        name: `${p[0].toUpperCase()}${p.slice(1)} Tester`,
         plan: p,
         joined: Date.now(),
         provider: "email",
@@ -57,6 +57,12 @@ export async function seedUser(
 // Convenience for the existing Pro-user smoke test path.
 export async function seedProUser(page: Page): Promise<void> {
   await seedUser(page, "pro");
+}
+
+// Agency tier — paid like Pro (isPaid covers both) but a distinct plan
+// literal, so it catches any `plan === "pro"` check that forgot agency.
+export async function seedAgencyUser(page: Page): Promise<void> {
+  await seedUser(page, "agency");
 }
 
 // Email-only Free MEMBER (no Clerk account) — the state app.becomeFreeMember

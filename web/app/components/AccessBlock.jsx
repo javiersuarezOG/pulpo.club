@@ -29,19 +29,28 @@ import { SubscribeConfirm } from "./SubscribeConfirm";
 export function AccessBlock({ app, locale: lc, surface, cfg, onDone }) {
   const options = accessOptionsFor(surface);
   const reason = (cfg && cfg.reason) || surface;
+  const paid = isPaid(app && app.user);
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("idle"); // idle | loading | invalid | error (free-email path)
   const [proStatus, setProStatus] = useState("idle"); // idle | loading | rate_limited | error (go_pro path)
 
   // Geo-derived display price for the go_pro CTA ({price} placeholder).
   // Mirrors the pattern in UspPopup / FreeMonthModal — USD fallback until the
-  // /api/geo resolve lands.
+  // /api/geo resolve lands. Paid renders never show a price CTA → skip the fetch.
   const [price, setPrice] = useState(() => priceForCountry(null));
   useEffect(() => {
+    if (paid) return undefined;
     let cancelled = false;
     fetchPriceForCurrentGeo().then((p) => { if (!cancelled) setPrice(p); });
     return () => { cancelled = true; };
-  }, []);
+  }, [paid]);
+
+  // Defense-in-depth observability: a paid user reaching ANY AccessBlock
+  // surface gets the compact already-Pro row (below) instead of upsell CTAs.
+  useEffect(() => {
+    if (!paid) return;
+    try { track("access.already_pro_rendered", { surface, reason }); } catch { /* ignore */ }
+  }, [paid, surface, reason]);
 
   // ① Join free — email → Resend + Free membership (+ open the stashed top-3).
   const onJoinFree = async (e) => {
@@ -118,6 +127,26 @@ export function AccessBlock({ app, locale: lc, surface, cfg, onDone }) {
     if (app.clerkActions && typeof app.clerkActions.openSignIn === "function") app.clerkActions.openSignIn({});
     else if (typeof app.openSignup === "function") app.openSignup({ mode: "login" });
   };
+
+  // Already Pro → never render signup/upsell CTAs. Right users, right prompts:
+  // this makes the guarantee a property of the component, not of each caller
+  // (the onGoPro click guard above stays as the hydration-race backstop).
+  if (paid) {
+    return (
+      <div className="access-block access-paid" role="status">
+        <div className="access-signin">
+          {t("access.already_pro", lc)}{" "}
+          <button
+            type="button"
+            className="access-signin-link"
+            onClick={() => window.location.assign("/account/subscription")}
+          >
+            {t("access.already_pro_link", lc)}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Render each enabled option in its configured order. `first` controls the
   // "or" dividers so they only appear between options, regardless of subset.
