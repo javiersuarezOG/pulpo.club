@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-29T07:03:25.650654+00:00",
+  "computed_at": "2026-07-30T06:34:42.754900+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 1,
@@ -9,7 +9,7 @@
         "renders_on_homepage": false
       },
       "beach_homes": {
-        "count": 2,
+        "count": 1,
         "renders_on_homepage": false
       },
       "beach_land": {
@@ -33,7 +33,7 @@
       "agentiz": {
         "coverage_pct_vs_discovered": null,
         "kept": 0,
-        "status": "skipped",
+        "status": "paused",
         "target_discovered": null,
         "target_prd": null
       },
@@ -75,13 +75,13 @@
       "elagente": {
         "coverage_pct_vs_discovered": null,
         "kept": 0,
-        "status": "skipped",
+        "status": "paused",
         "target_discovered": null,
         "target_prd": null
       },
       "encuentra24": {
-        "coverage_pct_vs_discovered": 0.9,
-        "kept": 26,
+        "coverage_pct_vs_discovered": 1.1,
+        "kept": 31,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -103,7 +103,7 @@
       "jamesedition": {
         "coverage_pct_vs_discovered": 0.0,
         "kept": 0,
-        "status": "skipped",
+        "status": "paused",
         "target_discovered": null,
         "target_prd": 50
       },
@@ -131,7 +131,7 @@
       "realtyelsalvador": {
         "coverage_pct_vs_discovered": null,
         "kept": 0,
-        "status": "skipped",
+        "status": "paused",
         "target_discovered": null,
         "target_prd": null
       },
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 0,
     "shelves_total": 6,
-    "total_in_dataset": 26,
-    "total_visible_listings": 6
+    "total_in_dataset": 31,
+    "total_visible_listings": 5
   },
   "min_real_listings": 4
 }
