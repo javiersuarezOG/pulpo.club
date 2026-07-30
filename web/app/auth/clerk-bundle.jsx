@@ -25,6 +25,7 @@ import { ClerkProvider, useUser, useClerk } from "@clerk/react";
 import { esMX, enUS } from "@clerk/localizations";
 import { applyFounderPlan } from "../lib/founder-emails";
 import { deriveSubscriptionState } from "../lib/subscription";
+import { planFromMetadata } from "./plan-from-metadata";
 import { track } from "../telemetry/hook";
 
 // PR-perf-5c — time the click → modal-paint gap for Clerk hosted
@@ -63,14 +64,8 @@ function timedClerkOpen(intent, fn) {
   }
 }
 
-function planFromMetadata(metadata) {
-  // Clerk Dashboard test users carry plan in publicMetadata.plan.
-  // Default to "free" — pro is opt-in per user. The founder-email
-  // allowlist is applied downstream in applyFounderPlan so the
-  // override travels with the hydrated user object.
-  const v = metadata && metadata.plan;
-  return v === "pro" ? "pro" : "free";
-}
+// planFromMetadata lives in ./plan-from-metadata (pure, Clerk-free) so it's
+// unit-testable — the Clerk-ON path it maps is invisible to CI.
 
 // Subscription lifecycle fields written by api/stripe/webhook.js
 // (see api/_plan.js for the canonical schema + grace logic). Surfaced
