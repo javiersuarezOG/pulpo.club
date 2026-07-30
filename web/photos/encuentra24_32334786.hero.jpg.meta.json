@@ -6,12 +6,15 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-07-29T07:03:25.076148+00:00",
+  "computed_at": "2026-07-30T06:34:41.937822+00:00",
   "derivative_width": 979,
   "derivative_height": 734,
   "hero_photo_quality_score": 30,
   "has_text_overlay": null,
   "has_marketing_overlay": null,
   "winning_url": "https://photos.encuentra24.com/t_or_fh_l/f_auto/v1/pa/32/33/47/86/32334786_691635",
-  "candidate_count": 5
+  "candidate_count": 5,
+  "content_sha1": "9b967a81aab084dd",
+  "dhash": 4997644506592131863,
+  "duplicates_dropped": 1
 }

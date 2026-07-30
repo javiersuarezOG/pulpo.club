@@ -1,0 +1,20 @@
+{
+  "width": 1200,
+  "height": 900,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 427.7,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-07-30T05:56:43.821446+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 900,
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://image.vivolatam.com/eyJidWNrZXQiOiJ2bC1jZG4iLCJrZXkiOiJtZWRpYS9wcm9wZXJ0eS9saXN0aW5ncy81ZTM4N2NmNC9pbWFnZXMvMDAwXzY2NmJlYzZhLTc2NDEtNGQ1NS05ZGVkLTBhNzY2MzgzNWQ1OS5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6OTAwLCJmaXQiOiJmaWxsIn19fQ==",
+  "candidate_count": 5,
+  "content_sha1": "be0725d0b556b4f0",
+  "dhash": 17454976666933760068,
+  "duplicates_dropped": 0
+}
