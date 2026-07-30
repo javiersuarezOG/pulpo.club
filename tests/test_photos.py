@@ -390,6 +390,23 @@ def test_pick_best_photo_returns_none_when_all_fail(tmp_repo):
     assert result == (None, None, None, None, None)
 
 
+def test_photo_url_hash_is_order_insensitive():
+    """PR-G: reordering a gallery's URLs must NOT change the cache key —
+    the same set resolves to the same winner, so a reorder shouldn't force
+    a full re-download. The legacy key stays order-sensitive so committed
+    .hash files still match on the transition run."""
+    from automation.run import _photo_url_hash, _photo_url_hash_legacy
+
+    a = ["https://x/1.jpg", "https://x/2.jpg", "https://x/3.jpg"]
+    b = ["https://x/3.jpg", "https://x/1.jpg", "https://x/2.jpg"]  # reordered
+    c = ["https://x/1.jpg", "https://x/2.jpg"]                     # different set
+
+    assert _photo_url_hash(a) == _photo_url_hash(b)   # order-insensitive
+    assert _photo_url_hash(a) != _photo_url_hash(c)   # set change invalidates
+    # Legacy is order-sensitive (that's the whole reason PR-G exists).
+    assert _photo_url_hash_legacy(a) != _photo_url_hash_legacy(b)
+
+
 def test_score_candidates_marks_within_listing_duplicate(tmp_repo, monkeypatch):
     """PR-F: a gallery that repeats the same image (exact bytes under two
     URLs) marks the redundant copy is_duplicate=True with dup_of pointing

@@ -145,6 +145,23 @@ def _fetch_photo_with_retry(url, *, timeout, retries=1, backoff_s=1.5):
     raise RuntimeError(f"unreachable retry exit for {url}")
 
 
+def _photo_url_hash(candidate_urls) -> str:
+    """Order-INSENSITIVE cache key over a listing's candidate URL set
+    (PR-G, 2026-07-29). Sorting before hashing means a scraper that merely
+    re-orders its gallery no longer invalidates the cache — the same SET
+    of candidates always resolves to the same winner, so re-downloading +
+    re-picking is pure churn. A genuine add/remove still changes the set,
+    hence the hash, and correctly invalidates."""
+    return hashlib.sha1("|".join(sorted(candidate_urls)).encode()).hexdigest()[:12]
+
+
+def _photo_url_hash_legacy(candidate_urls) -> str:
+    """The pre-PR-G order-SENSITIVE key. Committed .hash files still carry
+    it; the skip path accepts it so the transition invalidates nothing.
+    Only the new sorted hash is ever written back."""
+    return hashlib.sha1("|".join(candidate_urls).encode()).hexdigest()[:12]
+
+
 def _hero_file_path(thumbnail_path: Path) -> Path:
     """`<file>.jpg` → `<file>.hero.jpg` (dual-derivative photo storage)."""
     stem = thumbnail_path.name[:-len(".jpg")] if thumbnail_path.name.endswith(".jpg") else thumbnail_path.stem
@@ -641,13 +658,19 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             break
         if not li.photo_urls:
             continue
-        # U1 (2026-05-18) — cache key hashes the WHOLE candidate set
-        # in submission order so a scraper re-ordering retriggers
-        # selection. The hero file name still keys off the listing id.
+        # Cache key over the WHOLE candidate set. PR-G (2026-07-29) makes
+        # it order-INSENSITIVE (sorted before hashing): a scraper merely
+        # re-ordering its gallery used to invalidate the cache and force a
+        # full re-download + re-pick of every listing, which is pure
+        # churn — the same SET of candidates yields the same winner. The
+        # set is still the cache identity, so a genuine URL add/remove
+        # still invalidates correctly.
         candidate_urls = li.photo_urls[:cap]
-        url_hash = hashlib.sha1(
-            "|".join(candidate_urls).encode()
-        ).hexdigest()[:12]
+        url_hash = _photo_url_hash(candidate_urls)
+        # Transition: the committed .hash files still carry the legacy
+        # ORDER-sensitive hash. Accept either so this change invalidates
+        # nothing on first run; only the new sorted hash is ever written.
+        legacy_url_hash = _photo_url_hash_legacy(candidate_urls)
 
         fname = f"{li.source}_{li.source_id}.jpg"
         fpath = photos_dir / fname
@@ -661,7 +684,7 @@ def _download_hero_photos(listings, repo: Path) -> dict:
             and hero_fpath.exists()
             and thumb_meta_path.exists() and hero_meta_path.exists()
         )
-        if all_files_present and hash_path.read_text().strip() == url_hash:
+        if all_files_present and hash_path.read_text().strip() in (url_hash, legacy_url_hash):
             li.hero_photo_path = f"/photos/{fname}"
             hero_meta = _read_sidecar(hero_fpath)
             if hero_meta:
