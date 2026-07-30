@@ -1145,7 +1145,13 @@ def _download_hires_photos(listings, repo: Path) -> dict:
             budget_hit = True
             break
 
-        original_url = li.photo_urls[0]
+        # PR-I (2026-07-29): fetch the hi-res of the picker's WINNING photo,
+        # not blindly photo_urls[0]. The hero phase already chose a winner
+        # (li.selected_photo_url, repopulated from the sidecar even on the
+        # hero cache-skip path); using photo_urls[0] here meant the retained
+        # native-res original could be a DIFFERENT image than the served
+        # hero. Fall back to photo_urls[0] when no winner was recorded.
+        original_url = li.selected_photo_url or li.photo_urls[0]
         url = transform_hires_url(li.source, original_url)
         url_hash = hashlib.sha1(url.encode()).hexdigest()[:12]
 
