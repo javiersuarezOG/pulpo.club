@@ -207,6 +207,21 @@ def _repick_one_listing(
             hero_meta["candidate_count"] = len(candidates)
             hero_meta["picker_excluded_count"] = n_excluded
             hero_meta["repicked_at"] = datetime.now(timezone.utc).isoformat()
+            # PR-F parity (audit C1) — persist the winner's content
+            # identity + perceptual hash exactly like run.py's Phase C,
+            # so cross-run identity (nightly skip logic, hires matching)
+            # survives a repick. NOTE the deliberate asymmetry with
+            # run.py: repick does NOT write the `.jpg.hash` URL-hash
+            # file — leaving it untouched means the next nightly's skip
+            # path still matches (same URL set) and PRESERVES these
+            # repicked outputs instead of re-downloading. That is the
+            # intended interplay, not an omission.
+            from automation.image_hash import content_sha1 as _c_sha1, dhash as _dhash
+            hero_meta["content_sha1"] = _c_sha1(winning_content)
+            hero_meta["dhash"] = _dhash(winning_content)
+            hero_meta["duplicates_dropped"] = sum(
+                1 for c in candidates if c.get("is_duplicate") is True
+            )
             # P5 — reject logo/placeholder winners (mirrors run.py). Override
             # before the write so both the sidecar and the listing dict
             # (read from hero_meta below) reflect card/hero ineligibility.
@@ -244,17 +259,20 @@ def _repick_one_listing(
     # detail gallery to match the card. Consumer: listings.ts::buildPhotos.
     listing["selected_photo_url"] = winning_url
     # Per-photo verdicts: every scored candidate the picker rejected —
-    # below the cheap-score floor (picker_excluded) or carrying a
-    # Tesseract text overlay. `candidates` dicts don't carry
+    # below the cheap-score floor (picker_excluded), carrying a Tesseract
+    # text overlay, or a within-listing duplicate (PR-F parity, audit C1:
+    # omitting is_duplicate here made a repick RE-ADMIT gallery dupes the
+    # nightly had rejected). `candidates` dicts don't carry
     # has_marketing_overlay (resolved only for the winner), so the verdict
-    # set is limited to those two signals. Winner never appears here.
+    # set is limited to those signals. Winner never appears here.
     # Consumers: listings.ts::buildPhotos + ig_photo_gate.py::
     # order_photo_indices. None = nothing rejected.
     rejected = [
         c["url"] for c in candidates
         if c.get("url") and c["url"] != winning_url
         and (c.get("picker_excluded")
-             or c.get("has_text_overlay") is True)
+             or c.get("has_text_overlay") is True
+             or c.get("is_duplicate") is True)
     ]
     listing["photo_urls_rejected"] = rejected or None
     listing["hero_photo_quality_score"] = winning_score

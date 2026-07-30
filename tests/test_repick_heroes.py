@@ -336,3 +336,42 @@ def test_repick_no_photos_leaves_field_unset(tmp_path: Path, monkeypatch):
     assert result["action"] == "no_photo_urls"
     # No candidates scored → no verdict written.
     assert "photo_urls_rejected" not in listing
+
+
+def test_repick_matches_run_py_contract_for_duplicates(tmp_path: Path, monkeypatch):
+    """Drift guard (audit C1, 2026-07-30): repick must mirror run.py's
+    Phase-C contract for within-listing duplicates —
+    1. a duplicate candidate lands in photo_urls_rejected (omitting it
+       made a repick RE-ADMIT gallery dupes the nightly had rejected);
+    2. the hero sidecar carries content_sha1 / dhash / duplicates_dropped
+       so cross-run identity survives a repick."""
+    photos_dir = tmp_path / "web" / "photos"
+    photos_dir.mkdir(parents=True, exist_ok=True)
+    dup_bytes = _png_bytes(1920, 1080)
+    cands = [
+        _scored("https://x/a.jpg", content=dup_bytes),   # winner
+        _scored("https://x/b.jpg", content=dup_bytes),   # duplicate of winner
+        _scored("https://x/c.jpg"),                      # clean second photo
+    ]
+    # Stamp the dedup verdict the shared _score_candidates_cheap would
+    # produce (it's patched out in this harness).
+    cands[1]["is_duplicate"] = True
+    cands[1]["dup_of"] = "https://x/a.jpg"
+    cands[1]["dup_reason"] = "exact"
+    _patch_pick(monkeypatch, cands, "https://x/a.jpg")
+    listing = _stub_listing("remax", "dup001",
+                            ["https://x/a.jpg", "https://x/b.jpg", "https://x/c.jpg"])
+    from automation.repick_heroes import _repick_one_listing
+    _repick_one_listing(listing, photos_dir=photos_dir, booster_only_cached=False)
+
+    # 1. Duplicate rejected, clean kept, winner never rejected.
+    assert listing["photo_urls_rejected"] == ["https://x/b.jpg"]
+
+    # 2. Sidecar parity with run.py's Phase C.
+    sidecar = json.loads(
+        (photos_dir / "remax_dup001.hero.jpg.meta.json").read_text()
+    )
+    from automation.image_hash import content_sha1
+    assert sidecar["content_sha1"] == content_sha1(dup_bytes)
+    assert sidecar["dhash"] is not None
+    assert sidecar["duplicates_dropped"] == 1
