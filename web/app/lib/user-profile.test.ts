@@ -51,6 +51,7 @@ describe("discoverToStorage", () => {
       price_min: 50000,
       price_max: 500000,
       size_min: 1000,
+      size_max: 20000,
       readiness: 2,
       rank_max: 10,
     };
@@ -58,9 +59,18 @@ describe("discoverToStorage", () => {
       price_min: 50000,
       price_max: 500000,
       size_min: 1000,
+      size_max: 20000,
       readiness: 2,
       rank_max: 10,
     });
+  });
+
+  it("size_max round-trips (serialize + deserialize)", () => {
+    const stored = discoverToStorage({ size_min: 5000, size_max: 20000 });
+    expect(stored).toEqual({ size_min: 5000, size_max: 20000 });
+    expect(storageToDiscover(stored).size_max).toBe(20000);
+    // Absent size_max deserializes to null (no cap).
+    expect(storageToDiscover({ size_min: 5000 }).size_max).toBeNull();
   });
 
   it("preserves enum axes only when explicitly set", () => {

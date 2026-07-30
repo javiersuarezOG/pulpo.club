@@ -131873,5 +131873,857 @@
     "cost_usd": 0.00121459,
     "finish_reason": "stop",
     "latency_ms": 4101
+  },
+  "realestate_au_sv|canton-huiscoyolate-izalco-este-izalco-sonsonate-izalco-sonsonate-310109561571": {
+    "ts": "2026-07-30T05:51:47.494930+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "850 m² Land in Izalco, Sonsonate",
+      "es": "Terreno de 850 m² en Izalco, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Flat 850 m² residential lot in Cantón Huiscoyolate, Izalco Este, Izalco, Sonsonate. Located in a growing area with access to local amenities. Priced at $160,000.",
+      "es": "Lote residencial plano de 850 m² en Cantón Huiscoyolate, Izalco Este, Izalco, Sonsonate. Ubicado en una zona en crecimiento con acceso a servicios locales. Precio de $160,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "850 m² flat lot",
+        "es": "Lote plano de 850 m²"
+      },
+      {
+        "en": "Located in Izalco, Sonsonate",
+        "es": "Ubicado en Izalco, Sonsonate"
+      },
+      {
+        "en": "Priced at $160,000",
+        "es": "Precio de $160,000"
+      }
+    ],
+    "lat": 13.744,
+    "lng": -89.673,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Izalco, Sonsonate",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3083,
+    "tokens_out": 402,
+    "cost_usd": 0.00127461,
+    "finish_reason": "stop",
+    "latency_ms": 3493
+  },
+  "remax|002522430094": {
+    "ts": "2026-07-30T05:51:47.612887+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "1,675 m² Lot in Los Girasoles, Armenia",
+      "es": "Lote de 1,675 m² en Los Girasoles, Armenia"
+    },
+    "short_description_canonical": {
+      "en": "Rustic lot of 1,675.44 m² in Los Girasoles subdivision, Armenia, Sonsonate. Suitable for vacation home, residential development, cabins, or agricultural use. Quiet natural surroundings with access to main roads connecting to Sonsonate and nearby tourist destinations.",
+      "es": "Lote rústico de 1,675.44 m² en la colonia Los Girasoles, Armenia, Sonsonate. Adecuado para casa de vacaciones, desarrollo residencial, cabañas o uso agrícola. Entorno natural tranquilo con acceso a carreteras principales que conectan con Sonsonate y destinos turísticos cercanos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1,675.44 m² versatile lot",
+        "es": "Lote versátil de 1,675.44 m²"
+      },
+      {
+        "en": "Quiet natural surroundings",
+        "es": "Entorno natural tranquilo"
+      },
+      {
+        "en": "Area with strong growth potential",
+        "es": "Zona con alto potencial de crecimiento"
+      },
+      {
+        "en": "Access to main roads",
+        "es": "Acceso a carreteras principales"
+      }
+    ],
+    "lat": 13.6833,
+    "lng": -89.5,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Armenia, Sonsonate",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3256,
+    "tokens_out": 465,
+    "cost_usd": 0.00139062,
+    "finish_reason": "stop",
+    "latency_ms": 3610
+  },
+  "remax|001462660115": {
+    "ts": "2026-07-30T05:51:47.712555+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "24.16-Mz Land Plot in Apopa/Nejapa Logistics Corridor",
+      "es": "Terreno de 24.16 Mz en Corredor Logístico Apopa/Nejapa"
+    },
+    "short_description_canonical": {
+      "en": "24.16-manzana (168,853 m²) land plot near Integración Roundabout, Apopa/Nejapa. Subdivided: 7.8 Mz for industrial use, 16.36 Mz additional. Direct connectivity to San Salvador metropolitan area and east-west routes.",
+      "es": "Terreno de 24.16 manzanas (168,853 m²) cerca del Redondel Integración, Apopa/Nejapa. Subdividido: 7.8 Mz para uso industrial, 16.36 Mz adicionales. Conectividad directa al área metropolitana de San Salvador y rutas este-oeste."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "24.16 Mz (168,853 m²) total area",
+        "es": "24.16 Mz (168,853 m²) de área total"
+      },
+      {
+        "en": "7.8 Mz subdivided for industrial use",
+        "es": "7.8 Mz subdivididas para uso industrial"
+      },
+      {
+        "en": "Prime logistics corridor location",
+        "es": "Ubicación privilegiada en corredor logístico"
+      },
+      {
+        "en": "Direct connectivity to San Salvador",
+        "es": "Conectividad directa a San Salvador"
+      }
+    ],
+    "lat": 13.8167,
+    "lng": -89.2333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nejapa municipality centroid",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3186,
+    "tokens_out": 502,
+    "cost_usd": 0.00141242,
+    "finish_reason": "stop",
+    "latency_ms": 3710
+  },
+  "nexo|P-VE-TER-16-000-2A3B3EDD": {
+    "ts": "2026-07-30T05:51:47.987125+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Commercial Lot 5,000 v² on Panoramic Route",
+      "es": "Lote comercial 5,000 v² en Ruta Panorámica"
+    },
+    "short_description_canonical": {
+      "en": "Commercial lot of 5,000 v² (approx. 3,494 m²) on the Ruta Panorámica in Santiago Texacuangos, with lake views. Sloped terrain ideal for tourism projects, with water and electricity access. Priced at $145,000.",
+      "es": "Lote comercial de 5,000 v² (aprox. 3,494 m²) en la Ruta Panorámica, Santiago Texacuangos, con vista al lago. Terreno inclinado ideal para proyectos turísticos, con acceso a agua y electricidad. Precio: $145,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "5,000 v² commercial lot on paved road",
+        "es": "Lote comercial de 5,000 v² sobre calle pavimentada"
+      },
+      {
+        "en": "Panoramic lake view towards Ilopango",
+        "es": "Vista panorámica al lago de Ilopango"
+      },
+      {
+        "en": "Water and electricity on site",
+        "es": "Agua y electricidad en el terreno"
+      },
+      {
+        "en": "Ideal slope for restaurant or hotel",
+        "es": "Pendiente ideal para restaurante u hotel"
+      },
+      {
+        "en": "Priced at $145,000",
+        "es": "Precio de $145,000"
+      }
+    ],
+    "lat": 13.6667,
+    "lng": -89.0833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santiago Texacuangos, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3158,
+    "tokens_out": 514,
+    "cost_usd": 0.00141806,
+    "finish_reason": "stop",
+    "latency_ms": 3986
+  },
+  "vivolatam|5e387cf4": {
+    "ts": "2026-07-30T05:51:50.890265+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "28,377 m² Land in San Marcos, San Salvador",
+      "es": "Terreno de 28,377 m² en San Marcos, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Flat 28,377 m² (2.84 ha) lot in San Marcos, San Salvador. No built area, bedrooms, or bathrooms. Suitable for residential, commercial, or recreational development. Priced at $4,060,257.",
+      "es": "Lote plano de 28,377 m² (2.84 ha) en San Marcos, San Salvador. Sin área construida, dormitorios ni baños. Apto para desarrollo residencial, comercial o recreativo. Precio: $4,060,257."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "28,377 m² flat lot in San Marcos",
+        "es": "Lote plano de 28,377 m² en San Marcos"
+      },
+      {
+        "en": "2.84 hectares for development",
+        "es": "2.84 hectáreas para desarrollo"
+      },
+      {
+        "en": "Price: $4,060,257",
+        "es": "Precio: $4,060,257"
+      }
+    ],
+    "lat": 13.66,
+    "lng": -89.18,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Marcos, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3140,
+    "tokens_out": 423,
+    "cost_usd": 0.0013131,
+    "finish_reason": "stop",
+    "latency_ms": 3276
+  },
+  "encuentra24|29164763": {
+    "ts": "2026-07-30T06:33:33.389587+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Luxury Villa in Playa Venao, Panama",
+      "es": "Villa de lujo frente al mar en Playa Venao, Panamá"
+    },
+    "short_description_canonical": {
+      "en": "Luxury beachfront house of 500 m² in Playa Venao, Panama. It has 6 bedrooms, 5.5 bathrooms, and parking for 5 cars. Direct ocean access and sunset views.",
+      "es": "Casa de lujo frente al mar de 500 m² en Playa Venao, Panamá. Cuenta con 6 habitaciones, 5.5 baños y estacionamiento para 5 autos. Acceso directo al océano y vistas al atardecer."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront first row on Playa Venao",
+        "es": "Primera fila frente al mar en Playa Venao"
+      },
+      {
+        "en": "500 m² built, 6 bedrooms, 5.5 baths",
+        "es": "500 m² construidos, 6 habitaciones, 5.5 baños"
+      },
+      {
+        "en": "Parking for 5 cars",
+        "es": "Estacionamiento para 5 autos"
+      }
+    ],
+    "lat": 7.4167,
+    "lng": -80.2167,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Venao, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 6,
+      "bathrooms": 5.5,
+      "built_area_m2": 500.0,
+      "parking_spaces": 5,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2464,
+    "tokens_out": 453,
+    "cost_usd": 0.00116358,
+    "finish_reason": "stop",
+    "latency_ms": 3507
+  },
+  "encuentra24|29232572": {
+    "ts": "2026-07-30T06:33:33.458674+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury 2-Story House in Coronado Near Beach with Pool",
+      "es": "Casa de lujo de 2 pisos en Coronado cerca de la playa con piscina"
+    },
+    "short_description_canonical": {
+      "en": "Luxury 2-story house in Coronado, steps from the beach. 1,200 m² built, 6 bedrooms, 5.5 bathrooms, 4 parking spaces. Private pool, high-end finishes, open layout with abundant natural light.",
+      "es": "Casa de lujo de 2 pisos en Coronado, a pasos de la playa. 1,200 m² construidos, 6 habitaciones, 5.5 baños, 4 estacionamientos. Piscina privada, acabados de primera, diseño abierto con abundante luz natural."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Steps from the beach",
+        "es": "A pasos de la playa"
+      },
+      {
+        "en": "Private pool and outdoor spaces",
+        "es": "Piscina privada y espacios al aire libre"
+      },
+      {
+        "en": "1,200 m² built, 6 bedrooms",
+        "es": "1,200 m² construidos, 6 habitaciones"
+      }
+    ],
+    "lat": 8.5167,
+    "lng": -79.8833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Coronado, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 6,
+      "bathrooms": 5.5,
+      "built_area_m2": 1200.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2435,
+    "tokens_out": 450,
+    "cost_usd": 0.00115245,
+    "finish_reason": "stop",
+    "latency_ms": 3575
+  },
+  "encuentra24|32764370": {
+    "ts": "2026-07-30T06:33:33.872876+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Luxury Villa in Pedasí, Panama",
+      "es": "Villa de lujo frente al mar en Pedasí, Panamá"
+    },
+    "short_description_canonical": {
+      "en": "Exclusive beachfront villa on a private point in Playa Rincón, minutes from Pedasí. 4 bedrooms, 4 bathrooms, 1,162 m² built on 7,700 m² titled land. Infinity pool, fully furnished, private boat house, solar backup, diesel generator, and water reserve system.",
+      "es": "Exclusiva villa frente al mar en una punta privada de Playa Rincón, a minutos de Pedasí. 4 recámaras, 4 baños, 1,162 m² construidos en 7,700 m² de terreno titulado. Piscina infinita, totalmente amueblada, casa de botes privada, respaldo solar, generador diésel y sistema de reserva de agua."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront on private point",
+        "es": "Frente al mar en punta privada"
+      },
+      {
+        "en": "1,162 m² built, 7,700 m² land",
+        "es": "1,162 m² construidos, 7,700 m² de terreno"
+      },
+      {
+        "en": "Infinity pool and private boat house",
+        "es": "Piscina infinita y casa de botes privada"
+      },
+      {
+        "en": "Fully furnished, turnkey ready",
+        "es": "Totalmente amueblada, lista para ocupar"
+      },
+      {
+        "en": "No HOA fees, self-sufficient infrastructure",
+        "es": "Sin cuota de mantenimiento, infraestructura autosuficiente"
+      }
+    ],
+    "lat": 7.4667,
+    "lng": -80.0333,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Rincón, Pedasí, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.0,
+      "built_area_m2": 1162.0,
+      "parking_spaces": 2,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2631,
+    "tokens_out": 574,
+    "cost_usd": 0.00134177,
+    "finish_reason": "stop",
+    "latency_ms": 3992
+  },
+  "encuentra24|31965053": {
+    "ts": "2026-07-30T06:33:33.882090+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Casa de la Huerta – Turnkey Home Near Playa Venao",
+      "es": "Casa de la Huerta – Vivienda lista para entrar cerca de Playa Venao"
+    },
+    "short_description_canonical": {
+      "en": "Turnkey 127 m² house on 1.1 hectares near Playa Venao, 12 min from world-class surf. 2 bedrooms, 2 bathrooms, open-plan living, private pool. Built by a renowned Portland builder, with reforested grounds including tropical fruit trees.",
+      "es": "Casa de 127 m² lista para entrar en 1.1 hectáreas cerca de Playa Venao, a 12 min del surf de clase mundial. 2 dormitorios, 2 baños, sala y cocina abiertas, piscina privada. Construida por una reconocida constructora de Portland, con terrenos reforestados que incluyen árboles frutales tropicales."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "12 min from Playa Venao surf",
+        "es": "12 min del surf de Playa Venao"
+      },
+      {
+        "en": "127 m² house on 1.1 ha lot",
+        "es": "Casa de 127 m² en lote de 1.1 ha"
+      },
+      {
+        "en": "Private pool and reforested grounds",
+        "es": "Piscina privada y terrenos reforestados"
+      },
+      {
+        "en": "Built by renowned Portland builder",
+        "es": "Construida por reconocida constructora de Portland"
+      },
+      {
+        "en": "Expansion potential for additional units",
+        "es": "Potencial de expansión para unidades adicionales"
+      }
+    ],
+    "lat": 7.485,
+    "lng": -80.255,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Venao, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 2,
+      "bathrooms": 2.0,
+      "built_area_m2": 127.0,
+      "parking_spaces": 3,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2617,
+    "tokens_out": 556,
+    "cost_usd": 0.00131819,
+    "finish_reason": "stop",
+    "latency_ms": 4000
+  },
+  "encuentra24|32748220": {
+    "ts": "2026-07-30T06:33:34.010759+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Modern Villa with Ocean Views in Cañas, Azuero",
+      "es": "Villa Moderna con Vistas al Mar en Cañas, Azuero"
+    },
+    "short_description_canonical": {
+      "en": "Single-level modern villa of 220 m² built on 2,844 m² lot in Cañas, Azuero Peninsula. 3 bedrooms, 3 bathrooms, equipped kitchen with quartz countertops, covered terrace, and ocean/mountain views. Gated community, 5 km from the beach and near Playa Venao.",
+      "es": "Villa moderna de un solo nivel de 220 m² construidos en 2,844 m² de terreno en Cañas, Península de Azuero. 3 recámaras, 3 baños, cocina equipada con sobres de cuarzo, terraza cubierta y vistas al mar y montañas. Comunidad cerrada, a 5 km de la playa y cerca de Playa Venao."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Ocean and mountain views",
+        "es": "Vistas al mar y montañas"
+      },
+      {
+        "en": "5 km from the beach",
+        "es": "A 5 km de la playa"
+      },
+      {
+        "en": "Gated community, low density",
+        "es": "Comunidad cerrada, baja densidad"
+      },
+      {
+        "en": "Equipped kitchen, quartz counters",
+        "es": "Cocina equipada, sobres de cuarzo"
+      },
+      {
+        "en": "Financing and crypto accepted",
+        "es": "Financiamiento y cripto aceptados"
+      }
+    ],
+    "lat": 7.45,
+    "lng": -80.35,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Cañas, Tonosí, Azuero Peninsula",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": 220.0,
+      "parking_spaces": 1,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2557,
+    "tokens_out": 542,
+    "cost_usd": 0.00128659,
+    "finish_reason": "stop",
+    "latency_ms": 4129
+  },
+  "encuentra24|26003581": {
+    "ts": "2026-07-30T06:33:34.016804+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "New Beachfront Villa in Costa Pedasí, 492 m²",
+      "es": "Nueva Villa Frente al Mar en Costa Pedasí, 492 m²"
+    },
+    "short_description_canonical": {
+      "en": "New 492 m² beachfront villa in Costa Pedasí gated community. 3 bedrooms, 4 bathrooms, high-end appliances, imported Thai furniture, pool, jacuzzi, office, garage for 3 cars. Located in Pedasí, Los Santos, on the Azuero Peninsula.",
+      "es": "Nueva villa frente al mar de 492 m² en comunidad cerrada Costa Pedasí. 3 habitaciones, 4 baños, electrodomésticos de alta gama, muebles importados de Tailandia, piscina, jacuzzi, oficina, garaje para 3 autos. Ubicada en Pedasí, Los Santos, Península de Azuero."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront in gated community",
+        "es": "Frente al mar en comunidad cerrada"
+      },
+      {
+        "en": "New construction, never lived in",
+        "es": "Construcción nueva, nunca habitada"
+      },
+      {
+        "en": "492 m² with high-end finishes",
+        "es": "492 m² con acabados de alta gama"
+      },
+      {
+        "en": "Pool, jacuzzi, and office included",
+        "es": "Piscina, jacuzzi y oficina incluidos"
+      },
+      {
+        "en": "Garage for 3 cars with storage",
+        "es": "Garaje para 3 autos con almacenamiento"
+      }
+    ],
+    "lat": 7.5333,
+    "lng": -80.0333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Pedasí, Los Santos, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 4.0,
+      "built_area_m2": 492.0,
+      "parking_spaces": 3,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2616,
+    "tokens_out": 545,
+    "cost_usd": 0.00130582,
+    "finish_reason": "stop",
+    "latency_ms": 4134
+  },
+  "encuentra24|32768409": {
+    "ts": "2026-07-30T06:33:34.365920+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury Beachfront Villa in Ocean Reef Islands",
+      "es": "Villa de lujo frente al mar en Ocean Reef Islands"
+    },
+    "short_description_canonical": {
+      "en": "A 640 m² luxury beachfront villa in Ocean Reef Islands, Punta Pacífica, Panama City. Features 3 bedrooms (convertible to 4), 4.5 bathrooms, open-concept remodeled kitchen with Miele appliances, private pool, BBQ area, and 4 parking spaces. Includes full furniture and high-end finishes.",
+      "es": "Villa de lujo frente al mar de 640 m² en Ocean Reef Islands, Punta Pacífica, Ciudad de Panamá. Cuenta con 3 recámaras (convertibles a 4), 4.5 baños, cocina remodelada de concepto abierto con electrodomésticos Miele, piscina privada, área de BBQ y 4 estacionamientos. Incluye mobiliario y acabados de alta gama."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront villa in private marina community",
+        "es": "Villa frente al mar en comunidad de marina privada"
+      },
+      {
+        "en": "640 m² with private pool and BBQ",
+        "es": "640 m² con piscina privada y BBQ"
+      },
+      {
+        "en": "Remodeled kitchen with Miele appliances",
+        "es": "Cocina remodelada con electrodomésticos Miele"
+      },
+      {
+        "en": "4 parking spaces, fully furnished",
+        "es": "4 estacionamientos, totalmente amueblada"
+      },
+      {
+        "en": "Convertible 3rd bedroom to 4th easily",
+        "es": "3ra recámara convertible a 4ta fácilmente"
+      }
+    ],
+    "lat": 8.9767,
+    "lng": -79.5167,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ocean Reef Islands, Punta Pacífica, Panama City",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 4.5,
+      "built_area_m2": 640.0,
+      "parking_spaces": 4,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2615,
+    "tokens_out": 568,
+    "cost_usd": 0.00133085,
+    "finish_reason": "stop",
+    "latency_ms": 4484
+  },
+  "encuentra24|29124887": {
+    "ts": "2026-07-30T06:33:36.420102+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beach House with Private Pool in Playa Venao",
+      "es": "Casa de Playa con Piscina Privada en Playa Venao"
+    },
+    "short_description_canonical": {
+      "en": "House of 643 m² with 3 bedrooms and 2.5 bathrooms in Playa Venao, Panama. Features private pool, 2 parking spaces, and modern design with ocean views. Steps from the beach, ideal for family getaways or vacation rental investment.",
+      "es": "Casa de 643 m² con 3 habitaciones y 2.5 baños en Playa Venao, Panamá. Cuenta con piscina privada, 2 estacionamientos y diseño moderno con vistas al mar. A pasos de la playa, ideal para escapadas familiares o inversión en alquiler vacacional."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private pool and ocean views",
+        "es": "Piscina privada y vistas al mar"
+      },
+      {
+        "en": "Steps from the beach",
+        "es": "A pasos de la playa"
+      },
+      {
+        "en": "Modern design, 643 m² built",
+        "es": "Diseño moderno, 643 m² construidos"
+      }
+    ],
+    "lat": 7.5083,
+    "lng": -80.2333,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Venao, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.5,
+      "built_area_m2": 643.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2427,
+    "tokens_out": 451,
+    "cost_usd": 0.00115139,
+    "finish_reason": "stop",
+    "latency_ms": 3030
+  },
+  "encuentra24|25680754": {
+    "ts": "2026-07-30T06:33:36.645713+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3 Luxury Villas, 1.4 Ha, Near Playa Venao",
+      "es": "3 Villas de Lujo, 1.4 Ha, Cerca de Playa Venao"
+    },
+    "short_description_canonical": {
+      "en": "Three villas totaling 406 m² built on 1.4 hectares in Cañas, near Playa Venao. The property includes 6 bedrooms, 8 bathrooms, fully equipped kitchens, and parking for 3 cars. Located minutes from Playa Venao with jungle and ocean views.",
+      "es": "Tres villas con 406 m² construidos en 1.4 hectáreas en Cañas, cerca de Playa Venao. La propiedad incluye 6 habitaciones, 8 baños, cocinas totalmente equipadas y estacionamiento para 3 autos. Ubicada a minutos de Playa Venao con vistas a la jungla y al mar."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1.4 Ha lot with 3 villas",
+        "es": "Lote de 1.4 Ha con 3 villas"
+      },
+      {
+        "en": "Minutes from Playa Venao",
+        "es": "Minutos de Playa Venao"
+      },
+      {
+        "en": "6 bedrooms, 8 bathrooms total",
+        "es": "6 habitaciones, 8 baños en total"
+      }
+    ],
+    "lat": 7.4997,
+    "lng": -80.2554,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Venao, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 6,
+      "bathrooms": 8.0,
+      "built_area_m2": 406.0,
+      "parking_spaces": 3,
+      "furnished": true,
+      "has_pool": null
+    },
+    "tokens_in": 2653,
+    "tokens_out": 480,
+    "cost_usd": 0.00124431,
+    "finish_reason": "stop",
+    "latency_ms": 3186
+  },
+  "encuentra24|25693329": {
+    "ts": "2026-07-30T06:33:37.077236+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Villa in Playa Destiladeros, Pedasí",
+      "es": "Villa frente al mar en Playa Destiladeros, Pedasí"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront villa on 1,105 m² lot with 500 m² built area in Playa Destiladeros, Pedasí. Features 4 bedrooms, 3.5 bathrooms, pool, barbecue area, and parking. Located in an exclusive area near Playa Venao.",
+      "es": "Villa frente al mar en lote de 1,105 m² con 500 m² construidos en Playa Destiladeros, Pedasí. Cuenta con 4 habitaciones, 3.5 baños, piscina, zona de barbacoa y estacionamiento. Ubicada en zona exclusiva cerca de Playa Venao."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront first row",
+        "es": "Primera fila frente al mar"
+      },
+      {
+        "en": "500 m² built, 4 bedrooms",
+        "es": "500 m² construidos, 4 habitaciones"
+      },
+      {
+        "en": "Pool and barbecue area",
+        "es": "Piscina y zona de barbacoa"
+      },
+      {
+        "en": "Near Playa Venao hotspot",
+        "es": "Cerca del punto turístico Playa Venao"
+      }
+    ],
+    "lat": 7.3333,
+    "lng": -80.0833,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Destiladeros, Pedasí",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 3.5,
+      "built_area_m2": 500.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2584,
+    "tokens_out": 495,
+    "cost_usd": 0.00124218,
+    "finish_reason": "stop",
+    "latency_ms": 3204
+  },
+  "encuentra24|25932771": {
+    "ts": "2026-07-30T06:33:37.560825+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury Ocean-View Villa near Playa Venao, Panama",
+      "es": "Villa de lujo con vista al mar cerca de Playa Venao, Panamá"
+    },
+    "short_description_canonical": {
+      "en": "Luxury villa with ocean views between Playa Venao and Cañas, Panama. Main house has 2 en-suite bedrooms plus two fully equipped guest casitas with private baths and kitchens, totaling 4 bedrooms and 4.5 baths. Built area 365 m², 3 parking spaces, solar panels, and rental income potential.",
+      "es": "Villa de lujo con vista al mar entre Playa Venao y Cañas, Panamá. Casa principal con 2 dormitorios en suite más dos casitas para invitados completamente equipadas con baños y cocinas privados, totalizando 4 dormitorios y 4.5 baños. Área construida 365 m², 3 estacionamientos, paneles solares y potencial de ingresos por alquiler."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Ocean views near Playa Venao surf",
+        "es": "Vistas al mar cerca del surf de Playa Venao"
+      },
+      {
+        "en": "4 bedrooms, 4.5 baths, 365 m²",
+        "es": "4 dormitorios, 4.5 baños, 365 m²"
+      },
+      {
+        "en": "Two income-generating guest casitas",
+        "es": "Dos casitas para invitados que generan ingresos"
+      },
+      {
+        "en": "Solar panels for sustainable living",
+        "es": "Paneles solares para vida sostenible"
+      },
+      {
+        "en": "3 parking spaces included",
+        "es": "3 espacios de estacionamiento incluidos"
+      }
+    ],
+    "lat": 7.4833,
+    "lng": -80.2667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Venao, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.5,
+      "built_area_m2": 365.0,
+      "parking_spaces": 3,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2605,
+    "tokens_out": 574,
+    "cost_usd": 0.00133475,
+    "finish_reason": "stop",
+    "latency_ms": 3678
   }
 }

@@ -144,7 +144,8 @@ test.describe("New app boots cleanly on key routes", () => {
     // /browse via topnav-links from / isn't possible. Cold-load
     // /browse directly — the test's intent is the histogram itself.
     await page.goto("/browse", { waitUntil: "networkidle" });
-    const histo = page.locator(".histo-track");
+    // Two histograms now (price + size) — scope to price.
+    const histo = page.locator('[data-histo="price"] .histo-track');
     await histo.waitFor({ state: "visible", timeout: 10_000 });
     // Scroll the histogram into view before clicking — Playwright's
     // `mouse.click(x, y)` uses absolute viewport coords without
@@ -180,6 +181,79 @@ test.describe("New app boots cleanly on key routes", () => {
     );
 
     expect(errors, "console errors during histogram interaction").toEqual([]);
+  });
+
+  // Size histogram — mirror of the price test (min+max parity, post-2026-07-29).
+  // NOT @critical: like the price-histogram test, it needs browse listing
+  // data, which the CI built preview doesn't serve (publicDir:false). Runs
+  // in the dev-server e2e:smoke suite.
+  test("size histogram bar-click filters listings and updates URL", async ({ page }) => {
+    const errors: string[] = [];
+    page.on("console", (msg) => {
+      if (msg.type() === "error" && !isTolerated(msg)) errors.push(msg.text());
+    });
+    page.on("pageerror", (err) => errors.push(err.message));
+
+    await page.goto("/browse", { waitUntil: "networkidle" });
+    const histo = page.locator('[data-histo="size"] .histo-track');
+    await histo.waitFor({ state: "visible", timeout: 10_000 });
+    await histo.scrollIntoViewIfNeeded();
+
+    const box = await histo.boundingBox();
+    if (!box) throw new Error("size histo-track has no box");
+    // Bar ~5 of 24 — where sized listings cluster (small lots).
+    const targetX = box.x + box.width * (5 / 24) + 4;
+    const targetY = box.y + box.height / 2;
+    await page.mouse.click(targetX, targetY);
+
+    await page.waitForFunction(
+      () => /[?&](smin|smax)=/.test(window.location.search),
+      { timeout: 3_000 },
+    );
+
+    const reset = page.locator('[data-histo="size"] .histo-reset').first();
+    await reset.waitFor({ state: "visible", timeout: 3_000 });
+    await reset.click();
+
+    await page.waitForFunction(
+      () => !/[?&]smin=|[?&]smax=/.test(window.location.search),
+      { timeout: 3_000 },
+    );
+
+    expect(errors, "console errors during size histogram interaction").toEqual([]);
+  });
+
+  // Faceting — a filter on one dimension narrows the OTHER histogram, but
+  // never its own (exclude-own-dimension invariant, post-2026-07-29).
+  // NOT @critical: needs browse listing data (the histogram bars), which
+  // the CI built preview doesn't serve. Runs in the dev-server e2e:smoke.
+  test("faceting narrows the price histogram but not its own bars", async ({ page }) => {
+    await page.goto("/browse", { waitUntil: "networkidle" });
+    await page.locator('[data-histo="price"] .histo-bar').first().waitFor({ state: "visible", timeout: 10_000 });
+
+    const sumCounts = () =>
+      page.evaluate(() =>
+        Array.from(document.querySelectorAll('[data-histo="price"] .histo-bar'))
+          .reduce((a, el) => a + Number(el.getAttribute("data-count") || 0), 0),
+      );
+
+    const before = await sumCounts();
+    expect(before).toBeGreaterThan(0);
+
+    // Cross-dimension facet (beachfront) via URL → the price base shrinks.
+    // Poll past the 300ms debounce, don't assert immediately.
+    await page.goto("/browse?features=beachfront", { waitUntil: "networkidle" });
+    await page.locator('[data-histo="price"] .histo-bar').first().waitFor({ state: "visible", timeout: 10_000 });
+    await expect.poll(sumCounts, { timeout: 5_000 }).toBeLessThan(before);
+
+    // Exclude-own-dimension: nudging the price MIN thumb must NOT move the
+    // price bar counts (price is skipped from its own facet base).
+    const afterFacet = await sumCounts();
+    await page.locator('[data-histo="price"] .histo-thumb-min').focus();
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+    await page.waitForTimeout(600); // let any (wrong) recompute land
+    expect(await sumCounts()).toBe(afterFacet);
   });
 
   // PR-1 (WS4) — keyword relevance. When a search query is active,
@@ -562,6 +636,12 @@ test.describe("New app boots cleanly on key routes", () => {
       // "Show missing details" opt-in chip. Both must localize.
       "Not shared",                                   // value.notshared.short
       "Show missing details",                         // filter.show_incomplete
+      // Paid-hero variant (post-2026-07-29) — BACKSTOP ONLY: this anon
+      // sweep can never render pro-only surfaces, so these entries only
+      // document the fix. Real ES coverage is hero-v5.spec.ts's
+      // "Pro ES locale: no English pro-CTA leak" (seeded pro user).
+      "Browse all listings",                          // home.hero.v5.pro_browse_cta
+      "Manage subscription",                          // access.already_pro_link
       // PriceContextBlock — "How this price compares" zone-context block
       // on the detail page. Renders whenever the backend cascade
       // (zone → macro → country) finds a qualifying comp pool. An anon
@@ -716,7 +796,9 @@ test.describe("New app boots cleanly on key routes", () => {
     // whole canary set against them, so the next leak in these views is caught
     // too — not just the chip/header words. (Locale persists from above.)
     await page.setViewportSize({ width: 1280, height: 800 }); // desktop → real <table> headers
-    await page.goto("/browse?view=table&features=ocean_view&status=price_drop", {
+    // smin+smax added post-2026-07-29 so the size active-chip ("sin tope")
+    // + unit hint render under ES and get scanned by the canary sweep.
+    await page.goto("/browse?view=table&features=ocean_view&status=price_drop&smin=5000&smax=20000", {
       waitUntil: "networkidle",
     });
     await page.locator(".results-table thead, .active-filter-row").first().waitFor({

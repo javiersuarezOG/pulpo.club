@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-29T06:27:31.410589+00:00",
+  "computed_at": "2026-07-30T06:00:56.836639+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 15,
@@ -9,11 +9,11 @@
         "renders_on_homepage": true
       },
       "beach_homes": {
-        "count": 152,
+        "count": 150,
         "renders_on_homepage": true
       },
       "beach_land": {
-        "count": 490,
+        "count": 487,
         "renders_on_homepage": true
       },
       "lake_condos": {
@@ -25,7 +25,7 @@
         "renders_on_homepage": true
       },
       "lake_land": {
-        "count": 18,
+        "count": 19,
         "renders_on_homepage": true
       }
     },
@@ -33,13 +33,13 @@
       "agentiz": {
         "coverage_pct_vs_discovered": null,
         "kept": 0,
-        "status": "skipped",
+        "status": "paused",
         "target_discovered": null,
         "target_prd": null
       },
       "bienesraices": {
         "coverage_pct_vs_discovered": null,
-        "kept": 424,
+        "kept": 423,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -59,8 +59,8 @@
         "target_prd": null
       },
       "citymax_sc": {
-        "coverage_pct_vs_discovered": 48.0,
-        "kept": 144,
+        "coverage_pct_vs_discovered": 47.7,
+        "kept": 143,
         "status": "green",
         "target_discovered": null,
         "target_prd": 300
@@ -75,13 +75,13 @@
       "elagente": {
         "coverage_pct_vs_discovered": null,
         "kept": 0,
-        "status": "skipped",
+        "status": "paused",
         "target_discovered": null,
         "target_prd": null
       },
       "encuentra24": {
-        "coverage_pct_vs_discovered": 1.1,
-        "kept": 31,
+        "coverage_pct_vs_discovered": 1.0,
+        "kept": 28,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -103,13 +103,13 @@
       "jamesedition": {
         "coverage_pct_vs_discovered": 0.0,
         "kept": 0,
-        "status": "skipped",
+        "status": "paused",
         "target_discovered": null,
         "target_prd": 50
       },
       "nexo": {
         "coverage_pct_vs_discovered": null,
-        "kept": 8,
+        "kept": 9,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -131,13 +131,13 @@
       "realtyelsalvador": {
         "coverage_pct_vs_discovered": null,
         "kept": 0,
-        "status": "skipped",
+        "status": "paused",
         "target_discovered": null,
         "target_prd": null
       },
       "remax": {
         "coverage_pct_vs_discovered": null,
-        "kept": 291,
+        "kept": 290,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -150,8 +150,8 @@
         "target_prd": 150
       },
       "vivolatam": {
-        "coverage_pct_vs_discovered": 38.0,
-        "kept": 152,
+        "coverage_pct_vs_discovered": 38.2,
+        "kept": 153,
         "status": "green",
         "target_discovered": null,
         "target_prd": 400
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 5,
     "shelves_total": 6,
-    "total_in_dataset": 1896,
-    "total_visible_listings": 1685
+    "total_in_dataset": 1892,
+    "total_visible_listings": 1682
   },
   "min_real_listings": 4
 }

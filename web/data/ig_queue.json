@@ -1837,9 +1837,11 @@
       "cover_photo_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/9OMPQEKPTJ/sgstFn5tDH/76453.jpeg",
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-07-30T03:20:08.373822+00:00",
+      "posted_media_id": "18138504664570272",
+      "comment_posted": true,
+      "comment_id": "18015967352865397"
     },
     {
       "day": 246,

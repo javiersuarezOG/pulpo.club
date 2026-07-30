@@ -2233,6 +2233,20 @@ h1,h2,h3,h4,h5 { margin: 0; }
   border: 1px solid var(--line); border-radius: 8px;
   background: var(--paper); font-size: 13px;
 }
+/* Unit hint under the size inputs (m² canonical, ha in thumb labels). */
+.histo-unit-hint {
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-3);
+}
+/* Faceted / no-data zero-state caption (PR 3 no-matches, PR 2 size no-data). */
+.histo-empty {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-3);
+  padding: 2px 0;
+}
 
 .filter-apply {
   position: sticky; bottom: 0;
@@ -8222,6 +8236,35 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   cursor: pointer; box-shadow: 0 10px 22px rgb(31, 61, 49, 0.18);
 }
 .homepage-v2 .hv6-lock-cta:hover { filter: brightness(1.05); }
+
+/* ── Paid (Pro/Agency) hero variant ────────────────────────────────── */
+/* Card tag: same box recipe as .hv6-free-tag, gold Pro identity. The
+   gradient reuses the .hv6-lock-badge recipe; --color-button-text on
+   --pro-ink's band clears 4.5:1 (same pairing as .hv6-lock-cta). */
+.homepage-v2 .hv6-tag-pro {
+  background: linear-gradient(180deg, var(--gold), var(--pro-ink));
+  color: var(--color-button-text);
+}
+/* Unlocked Top-10 rows are real buttons into the listing detail. Reset
+   button chrome so the row reads identically to the static free rows. */
+.homepage-v2 button.hv6-r-link {
+  width: 100%; text-align: inherit; background: none; border: none;
+  font: inherit; color: inherit; cursor: pointer;
+  border-top: 1px solid var(--color-line-faint);
+}
+.homepage-v2 button.hv6-r-link:first-of-type { border-top: none; }
+.homepage-v2 button.hv6-r-link:hover { background: var(--color-bg-pebble); }
+.homepage-v2 button.hv6-r-link:focus-visible {
+  outline: 2px solid var(--color-forest-deep); outline-offset: -2px; border-radius: 9px;
+}
+/* Copy-column paid action: note + browse CTA (reuses .hv6-signup-btn). */
+.homepage-v2 .hv6-pro-cta { display: flex; flex-direction: column; gap: 10px; max-width: 460px; align-items: flex-start; }
+.homepage-v2 .hv6-pro-note {
+  font-family: var(--font-sans); font-size: 14px; line-height: 1.5;
+  color: var(--color-ink-secondary); max-width: 40ch; margin: 0 0 2px;
+}
+.homepage-v2 .hv6-pro-btn { width: 100%; }
+@media (min-width: 520px) { .homepage-v2 .hv6-pro-btn { width: auto; } }
 
 /* ──────────────────────────────────────────────────────────────────────
    HeroV5 → Shelves transition (Wave-6 polish)

@@ -73,6 +73,7 @@ describe("api/clerk/update-profile ALLOWED_PROFILE_KEYS", () => {
       "price_min",
       "price_max",
       "size_min",
+      "size_max",
       "readiness",
       "rank_max",
       "master_category",
@@ -80,6 +81,16 @@ describe("api/clerk/update-profile ALLOWED_PROFILE_KEYS", () => {
     ]) {
       expect(body, `axis ${axis} validated`).toContain(`"${axis}"`);
     }
+  });
+
+  it("size_max is validated as a nullable numeric cap (mirrors price_max)", () => {
+    // Contract per CLAUDE.md: a new persisted axis needs its validator in
+    // the same PR. size_max is nullable (null = no cap) with the same
+    // 0..1e9 bounds as size_min, and rejects garbage / negatives.
+    const fnMatch = src.match(/function isDiscoverFilter\(v\)\s*\{[\s\S]*?\n\}/);
+    const body = fnMatch[0];
+    expect(body).toMatch(/"size_max"[\s\S]*?v\.size_max !== null/);
+    expect(body).toMatch(/"size_max"[\s\S]*?typeof v\.size_max !== "number"/);
   });
 
   it("isDiscoverFilter excludes tuning knobs (weights / score_min / photos / include_incomplete)", () => {

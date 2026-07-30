@@ -94,6 +94,15 @@ export type EventMap = {
   };
   "browse.price_histogram.bar_clicked": { bucket_min: number; bucket_max: number };
   "browse.price_histogram.reset": Record<string, never>;
+  // Size histogram (post-2026-07-29) — same RangeHistogram, size dimension.
+  "browse.size_histogram.dragged": {
+    from_min: number;
+    from_max: number | null;
+    to_min: number;
+    to_max: number | null;
+  };
+  "browse.size_histogram.bar_clicked": { bucket_min: number; bucket_max: number };
+  "browse.size_histogram.reset": Record<string, never>;
   // Pagination control on Browse — fires when the user clicks
   // "Load N more". `from`/`to` are the visibleCount before/after the
   // click; `total` is the total filtered result count so we can tell
@@ -461,8 +470,44 @@ export type EventMap = {
   // cohorts can split funnels by visual revision (v5 vs v5.1 vs
   // future) without changing the event name. Bumped via the CI
   // version-bump guard whenever HeroV5's rendered output changes.
+  // `variant` (post-2026-07-29 pro-hero fix): "pro" when the paid Top-10
+  // card rendered, "free" otherwise. Paid persons emitting variant="free"
+  // measure the fresh-device Clerk hydration flash — join against
+  // paid_home_rendered.user_state (the source of truth) to verify the fix.
   "hero_v5_viewed": {
     version: string;
+    variant: "free" | "pro";
+  };
+
+  // Legacy name (the card was briefly "v6") — fires on the free/anon lock
+  // overlay's Unlock CTA. Declared here post-2026-07-29: paid users no
+  // longer see the lock, so volume from paid persons dropping to ~0 is
+  // the pro-hero fix working, not a telemetry regression.
+  "hero_v6_pro_unlock_clicked": {
+    version: string;
+  };
+
+  // Paid hero (post-2026-07-29): the ProHeroCta "Browse all listings"
+  // button in the copy column. Kept separate from
+  // hero_v5_destination_clicked so the destination-card funnel stays pure.
+  "hero_v5_pro_browse_clicked": {
+    version: string;
+  };
+
+  // Paid hero: click on one of the 10 unlocked ranked rows → opens the
+  // listing detail. `rank` is 1-based position in the card.
+  "hero_v5_pro_row_clicked": {
+    rank: number;
+    version: string;
+  };
+
+  // Defense-in-depth: a paid user reached an AccessBlock surface and got
+  // the compact "You're on Pulpo Pro / Manage subscription" row instead of
+  // signup/upsell CTAs. Non-trivial volume on a NEW surface value means a
+  // caller is routing paid users into an access gate — investigate.
+  "access.already_pro_rendered": {
+    surface: string;
+    reason: string;
   };
 
   // Wave 6 — fires when the user clicks one of the 5 destination
@@ -1048,6 +1093,15 @@ export type EventMap = {
     ms: number;
     result_count: number;
     active_filters: number;
+  };
+  /** Faceted histogram base recompute (post-2026-07-29). One per
+      dimension per committed filter change; base_count is the size of the
+      exclude-own-dimension population. Watch P95 to justify the extra
+      O(n) passes as the catalog grows. */
+  "perf.histo_recompute": {
+    ms: number;
+    dim: "price" | "size";
+    base_count: number;
   };
   /** Card click → detail-panel rendered. */
   "perf.detail_open": { listing_id: string; ms: number };

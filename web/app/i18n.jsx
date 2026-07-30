@@ -379,11 +379,16 @@ export const UI_STRINGS = {
   "home.hero.v5.usp_3":          { en: "Delivers your top picks to your inbox, every Sunday",
                                    es: "Te envía tus mejores opciones al correo, cada domingo" },
   "home.hero.v5.email_cta":      { en: "Get going — it's free",                 es: "Empieza — es gratis" },
+  // Paid (Pro/Agency) hero action — replaces the signup/upsell slot.
+  "home.hero.v5.pro_note":       { en: "You're on Pulpo Pro — every listing and your Sunday top 10, unlocked.",
+                                   es: "Tienes Pulpo Pro — todas las propiedades y tu top 10 del domingo, desbloqueados." },
+  "home.hero.v5.pro_browse_cta": { en: "Browse all listings",                    es: "Ver todas las propiedades" },
   // Pulpo Free Top-3 card
   "home.hero.v5.card_free_tag":  { en: "Free",                                  es: "Gratis" },
   "home.hero.v5.card_live":      { en: "Live · 6:00 AM",                        es: "En vivo · 6:00 AM" },
   "home.hero.v5.card_title_a":   { en: "Your",                                  es: "Tu" },
   "home.hero.v5.card_title_b":   { en: "Top 3",                                 es: "Top 3" },
+  "home.hero.v5.card_title_b_pro": { en: "Top 10",                              es: "Top 10" },
   "home.hero.v5.card_title_c":   { en: "this week",                             es: "esta semana" },
   "home.hero.v5.card_kick":      { en: "Ranked by value · filtered to your preferences",
                                    es: "Ordenado por valor · filtrado a tus preferencias" },
@@ -631,6 +636,32 @@ export const UI_STRINGS = {
   // Max-price input placeholder (empty field). EN reads "any" here (not
   // "no max"); ES shares "sin tope".
   "filter.price.max_placeholder": { en: "any",            es: "sin tope" },
+  // Range-histogram strings shared by price + size (post-2026-07-29
+  // RangeHistogram generalization). Migrated out of inline EN/ES
+  // ternaries so the shared component carries zero raw locale switches.
+  "filter.histo.reset":          { en: "Reset",           es: "Restablecer" },
+  // Faceted zero-state (PR 3): other filters left this dimension with no
+  // matches. Only renders once faceting is wired; harmless before then.
+  "filter.histo.no_matches":     { en: "No listings match your other filters",
+                                   es: "Ninguna propiedad coincide con tus otros filtros" },
+  "filter.price.aria_min":       { en: "Minimum price",    es: "Precio mínimo" },
+  "filter.price.aria_max":       { en: "Maximum price",    es: "Precio máximo" },
+  "filter.price.input_min":      { en: "Min",              es: "Mín" },
+  "filter.price.input_max":      { en: "Max",              es: "Máx" },
+  // Size range (mirrors the price keys). no_cap/max_placeholder share
+  // "sin tope" with price; size keeps its own so future copy can diverge.
+  "filter.size.no_cap":          { en: "no max",           es: "sin tope" },
+  "filter.size.max_placeholder": { en: "any",              es: "sin tope" },
+  "filter.size.aria_min":        { en: "Minimum size",     es: "Tamaño mínimo" },
+  "filter.size.aria_max":        { en: "Maximum size",     es: "Tamaño máximo" },
+  // Inputs are canonical m² (like price inputs are raw USD); the unit is
+  // stated in the label + the hint below so the m²/vrs² toggle mismatch
+  // with the ha thumb labels is never ambiguous.
+  "filter.size.input_min":       { en: "Min (m²)",         es: "Mín (m²)" },
+  "filter.size.input_max":       { en: "Max (m²)",         es: "Máx (m²)" },
+  "filter.size.unit_hint":       { en: "1 ha = 10,000 m²", es: "1 ha = 10 000 m²" },
+  "filter.size.no_data":         { en: "Size data unavailable for these listings",
+                                   es: "Sin datos de tamaño para estas propiedades" },
   // JSON-LD breadcrumb labels (Browse + Detail). Own keys rather than
   // reusing nav.* so the SEO breadcrumb text ("Browse"/"Explorar") stays
   // independent of the nav tab label ("Discover"/"Descubrir").
@@ -1289,7 +1320,8 @@ export const UI_STRINGS = {
 
   // Filter chip labels (PR-6)
   "filter.photos":           { en: "Photos",                        es: "Fotos" },
-  "filter.size_min":         { en: "Min: {n} ha",                   es: "Mín: {n} ha" },
+  // filter.size_min removed post-2026-07-29 — the min-only slider label
+  // was replaced by the SizeHistogram (filter.size.* keys above).
   "filter.show_count":       { en: "Show {n} listings",             es: "Ver {n} propiedades" },
   "filter.feature.beachfront":   { en: "Beachfront",     es: "Frente a la playa" },
   "filter.feature.ocean_view":   { en: "Ocean View",     es: "Vista al mar" },
@@ -1789,6 +1821,10 @@ export const UI_STRINGS = {
   "access.go_pro.sub":                 { en: "Every listing + all 10 of our weekly picks. First month's on us.", es: "Todas las propiedades + las 10 selecciones de la semana. El primer mes va por nuestra cuenta." },
   "access.signin.prefix":              { en: "Already one of us?",            es: "¿Ya eres de los nuestros?" },
   "access.signin.link":                { en: "Sign in",                       es: "Inicia sesión" },
+  // Already-Pro compact row — rendered instead of signup/upsell CTAs when
+  // a paid user reaches any AccessBlock surface (defense-in-depth).
+  "access.already_pro":                { en: "You're on Pulpo Pro.",          es: "Ya tienes Pulpo Pro." },
+  "access.already_pro_link":           { en: "Manage subscription",           es: "Gestionar suscripción" },
   "access.error.invalid":              { en: "Enter a valid email address.",  es: "Ingresa un correo válido." },
   "access.error.generic":              { en: "Something went wrong. Try again.", es: "Algo salió mal. Inténtalo de nuevo." },
   "access.error.rate_limited":         { en: "Too many attempts just now. Wait a moment and try again.", es: "Demasiados intentos por ahora. Espera un momento e inténtalo de nuevo." },

@@ -18,8 +18,8 @@
       "pick_count": 3
     }
   },
-  "picked_at": "2026-07-29T06:27:42.990706+00:00",
-  "expires_at": "2026-07-30T00:00:00+00:00",
+  "picked_at": "2026-07-30T06:01:07.639084+00:00",
+  "expires_at": "2026-07-31T00:00:00+00:00",
   "tier": "elite",
   "listing_id": "citymax|156276",
   "rank_score": 80.06,
@@ -40,7 +40,7 @@
     },
     {
       "listing_id": "bienesraices|1875",
-      "rank_score": 77.27,
+      "rank_score": 76.94,
       "hero_photo_quality_score": 100,
       "photos_count": 30
     },
@@ -75,7 +75,7 @@
     },
     {
       "listing_id": "citymax|152836",
-      "rank_score": 83.38,
+      "rank_score": 83.34,
       "master_category": null,
       "subcategory": "land",
       "star_rating": 4.5,
