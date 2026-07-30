@@ -234,6 +234,30 @@ def test_detector_status_unavailable_when_no_pytesseract(monkeypatch):
     assert "pytesseract" in status["reason"]
 
 
+def test_detector_status_smoke_failure_flips_available(monkeypatch):
+    """Audit C2: a binary that answers --list-langs but fails at actual
+    OCR (the 2026-07-30 nightly's TypeError) must report available=False
+    with an 'ocr smoke' reason — that's what makes the runtime failure
+    visible in pipeline_completed telemetry."""
+    import sys
+    import types
+
+    def _raise_typeerror(*_a, **_k):
+        raise TypeError("Unsupported image format/type")
+
+    fake = types.SimpleNamespace(
+        get_languages=lambda config="": ["eng", "spa"],
+        image_to_string=_raise_typeerror,
+    )
+    monkeypatch.setitem(sys.modules, "pytesseract", fake)
+    from automation.photo_quality import text_overlay_detector_status
+    status = text_overlay_detector_status()
+    assert status["available"] is False
+    assert "ocr smoke" in status["reason"]
+    # Langs were still probed successfully before the smoke failed.
+    assert status["langs"] == ["eng", "spa"]
+
+
 # Tesseract-dependent tests — skip when the binary isn't available.
 
 import pytest  # noqa: E402
@@ -244,6 +268,31 @@ def test_detect_text_overlay_clean_image_returns_false():
     """Random-pixel image (no readable text) → not flagged."""
     raw = _make_image(900, 700)
     assert detect_text_overlay(raw) is False
+
+
+@pytest.mark.skipif(not _tesseract_available(), reason="tesseract binary not installed")
+def test_detect_text_overlay_handles_palette_mode():
+    """Audit C2: palette-mode ('P') images used to make pytesseract throw
+    TypeError and silently skip text filtering. After the RGB convert,
+    every decodable image gets a real bool verdict, never None."""
+    from PIL import Image
+    img = Image.new("RGB", (900, 700), (120, 130, 140)).convert(
+        "P", palette=Image.Palette.ADAPTIVE
+    )
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    assert detect_text_overlay(buf.getvalue()) in (True, False)
+
+
+@pytest.mark.skipif(not _tesseract_available(), reason="tesseract binary not installed")
+def test_detect_text_overlay_handles_cmyk_mode():
+    """Audit C2: CMYK JPEGs (print-oriented broker uploads) must OCR
+    after the RGB convert instead of returning the no-signal None."""
+    from PIL import Image
+    img = Image.new("CMYK", (900, 700), (20, 40, 60, 10))
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG")
+    assert detect_text_overlay(buf.getvalue()) in (True, False)
 
 
 @pytest.mark.skipif(not _tesseract_available(), reason="tesseract binary not installed")

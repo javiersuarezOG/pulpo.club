@@ -508,11 +508,24 @@ def text_overlay_detector_status() -> dict:
         # still provable via get_tesseract_version().
         try:
             pytesseract.get_tesseract_version()
-            return {"available": True, "reason": None, "langs": []}
+            langs = []
         except Exception as e:
             return {"available": False, "reason": f"tesseract probe failed: {e!r}", "langs": []}
     except Exception as e:
         return {"available": False, "reason": f"tesseract probe failed: {e!r}", "langs": []}
+    # Real-OCR smoke (audit C2): the binary answering `--list-langs` does
+    # NOT prove image_to_* works — the 2026-07-30 nightly hit a runtime
+    # TypeError inside OCR while the binary was perfectly installed. A
+    # tiny in-memory image exercises the same call path detect_text_overlay
+    # uses, so a systematic runtime failure flips available=False in the
+    # pipeline_completed telemetry instead of hiding in one stderr line.
+    try:
+        from PIL import Image
+        pytesseract.image_to_string(Image.new("RGB", (32, 32), "white"))
+    except ImportError:
+        return {"available": False, "reason": "Pillow not installed", "langs": langs}
+    except Exception as e:
+        return {"available": False, "reason": f"ocr smoke failed: {e!r}", "langs": langs}
     return {"available": True, "reason": None, "langs": langs}
 
 
@@ -557,6 +570,15 @@ def detect_text_overlay(
         img = Image.open(io.BytesIO(raw_bytes))
         img.load()
         width, height = img.size
+        # Normalize to RGB before OCR (audit C2). Broker CDNs serve
+        # palette / CMYK / 16-bit images; pytesseract throws
+        # TypeError('Unsupported image format/type') on exotic modes and
+        # those photos silently skipped text filtering (caught live in
+        # the 2026-07-30 nightly log). Every decodable image OCRs after
+        # this convert; OCR quality on the converted copy is identical
+        # for the stamp text we care about.
+        if img.mode != "RGB":
+            img = img.convert("RGB")
     except Exception:
         return None
 
