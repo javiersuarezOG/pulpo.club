@@ -132725,5 +132725,910 @@
     "cost_usd": 0.00133475,
     "finish_reason": "stop",
     "latency_ms": 3678
+  },
+  "realestate_au_sv|canton-el-carmen-a-200-m-del-centro-escolar-santo-tomas-san-salvador-santo-tomas-san-salvador-310109567647": {
+    "ts": "2026-07-31T06:30:43.710154+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Santo Tomas, San Salvador",
+      "es": "Terreno en Santo Tomás, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Land in Cantón El Carmen, Santo Tomas, San Salvador. Located 200 m from the Centro Escolar. Offered at $40,000.",
+      "es": "Terreno en Cantón El Carmen, Santo Tomás, San Salvador. Ubicado a 200 m del Centro Escolar. Ofrecido en $40,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "200 m from Centro Escolar",
+        "es": "A 200 m del Centro Escolar"
+      },
+      {
+        "en": "Price $40,000",
+        "es": "Precio $40,000"
+      },
+      {
+        "en": "In Santo Tomas, San Salvador",
+        "es": "En Santo Tomás, San Salvador"
+      }
+    ],
+    "lat": 13.6404,
+    "lng": -89.1333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santo Tomas, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3082,
+    "tokens_out": 356,
+    "cost_usd": 0.00122374,
+    "finish_reason": "stop",
+    "latency_ms": 3268
+  },
+  "realestate_au_sv|residencial-alicante-comasagua-la-libertad-comasagua-la-libertad-department-310109561583": {
+    "ts": "2026-07-31T06:30:43.753651+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Residencial Alicante, Comasagua",
+      "es": "Terreno en Venta en Residencial Alicante, Comasagua"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Residencial Alicante, Comasagua, La Libertad. The property is offered for sale at USD 113,000. No further details on size or features are provided.",
+      "es": "Terreno en Residencial Alicante, Comasagua, La Libertad. La propiedad se ofrece en venta por USD 113,000. No se proporcionan más detalles sobre tamaño o características."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Residencial Alicante, Comasagua",
+        "es": "Ubicado en Residencial Alicante, Comasagua"
+      },
+      {
+        "en": "Listed by RE/MAX Capital",
+        "es": "Listado por RE/MAX Capital"
+      },
+      {
+        "en": "Asking price USD 113,000",
+        "es": "Precio de venta USD 113,000"
+      }
+    ],
+    "lat": 13.6349,
+    "lng": -89.3833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Comasagua, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3080,
+    "tokens_out": 410,
+    "cost_usd": 0.0012826,
+    "finish_reason": "stop",
+    "latency_ms": 3311
+  },
+  "realestate_au_sv|autopista-san-salvador-apopa-y-calle-changala-numero-lote-17-parcelacion-lomalinda-mejicanos-san-salvador-centro-san-salvador-mejicanos-san-salvador-mejicanos-san-salvador-310109567638": {
+    "ts": "2026-07-31T06:30:44.173701+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Mejicanos, San Salvador",
+      "es": "Terreno en Venta en Mejicanos, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Land lot 17 in Parcelación Lomalinda, near Autopista San Salvador-Apopa and Calle Changala, Mejicanos, San Salvador. Offered at $35,000. No further details provided.",
+      "es": "Lote 17 en Parcelación Lomalinda, cerca de Autopista San Salvador-Apopa y Calle Changala, Mejicanos, San Salvador. Precio de $35,000. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located near Autopista San Salvador-Apopa",
+        "es": "Ubicado cerca de Autopista San Salvador-Apopa"
+      },
+      {
+        "en": "Lot 17 in Parcelación Lomalinda",
+        "es": "Lote 17 en Parcelación Lomalinda"
+      },
+      {
+        "en": "Price: $35,000",
+        "es": "Precio: $35,000"
+      }
+    ],
+    "lat": 13.7167,
+    "lng": -89.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Apopa, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3126,
+    "tokens_out": 415,
+    "cost_usd": 0.00130052,
+    "finish_reason": "stop",
+    "latency_ms": 3732
+  },
+  "csbr|finca-cafetalera-y-proyecto-turistico-en-venta-en-los-naranjos-juayua-sonsonate-s2726rc": {
+    "ts": "2026-07-31T06:30:44.491767+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Coffee Farm and Tourist Project in Los Naranjos, Juayúa",
+      "es": "Finca Cafetalera y Proyecto Turístico en Los Naranjos, Juayúa"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 3,468 m² in Los Naranjos, Juayúa, Sonsonate, offered as a coffee farm and tourist project. The property is listed for sale at USD 3,200,000. It is presented as a development opportunity in a coffee-growing region.",
+      "es": "Terreno de 3,468 m² en Los Naranjos, Juayúa, Sonsonate, ofrecido como finca cafetalera y proyecto turístico. La propiedad está a la venta por USD 3,200,000. Se presenta como una oportunidad de desarrollo en una región cafetalera."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3,468 m² land parcel",
+        "es": "Terreno de 3,468 m²"
+      },
+      {
+        "en": "Coffee farm potential",
+        "es": "Potencial cafetalero"
+      },
+      {
+        "en": "Tourist project opportunity",
+        "es": "Oportunidad de proyecto turístico"
+      },
+      {
+        "en": "Located in Juayúa, Sonsonate",
+        "es": "Ubicado en Juayúa, Sonsonate"
+      }
+    ],
+    "lat": 13.8433,
+    "lng": -89.7453,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Juayúa, Sonsonate",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3103,
+    "tokens_out": 466,
+    "cost_usd": 0.00135041,
+    "finish_reason": "stop",
+    "latency_ms": 4050
+  },
+  "bienesraices|2438": {
+    "ts": "2026-07-31T06:30:45.424447+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "66,037 m² Land on Main Road, Quezaltepeque",
+      "es": "Terreno de 66,037 m² frente a calle principal, Quezaltepeque"
+    },
+    "short_description_canonical": {
+      "en": "Flat 66,037 m² land parcel in Cantón Valle del Señor, Quezaltepeque, La Libertad, with over 70 meters of frontage on the main road. Located 120 meters from the new Shell gas station on the route to the San Salvador Volcano, with direct access to the Santa Ana highway and Monseñor Romero Boulevard. Priced at $59.00/m², total $3,896,193.00.",
+      "es": "Terreno plano de 66,037 m² en Cantón Valle del Señor, Quezaltepeque, La Libertad, con más de 70 metros de frente a calle principal. Ubicado a 120 metros de la nueva gasolinera Shell sobre la ruta al Volcán de San Salvador, con acceso directo a la carretera a Santa Ana y al Bulevar Monseñor Romero. Precio de $59.00/m², total $3,896,193.00."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Over 70 m frontage on main road",
+        "es": "Más de 70 m de frente a calle principal"
+      },
+      {
+        "en": "120 m from new Shell station",
+        "es": "A 120 m de la nueva gasolinera Shell"
+      },
+      {
+        "en": "Flat topography, official survey",
+        "es": "Topografía plana, levantamiento oficial"
+      },
+      {
+        "en": "Direct access to Santa Ana highway",
+        "es": "Acceso directo a carretera a Santa Ana"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -89.2667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Quezaltepeque, La Libertad, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3525,
+    "tokens_out": 564,
+    "cost_usd": 0.00157215,
+    "finish_reason": "stop",
+    "latency_ms": 4984
+  },
+  "realestate_au_sv|la-esperanza-canton-ashapuco-jurisdiccion-de-ahuachapan-centro-ahuachapan-ashapuco-ahuachapan-ashapuco-ahuachapan-310108329891": {
+    "ts": "2026-07-31T06:30:46.819499+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Ahuachapán, El Salvador",
+      "es": "Terreno en Venta en Ahuachapán, El Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in La Esperanza, Canton Ashapuco, Ahuachapán Centro, Ahuachapán. Offered at $3,900,000. No further details provided.",
+      "es": "Terreno en La Esperanza, Cantón Ashapuco, Ahuachapán Centro, Ahuachapán. Precio de $3,900,000. Sin más detalles disponibles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Ahuachapán department",
+        "es": "Ubicado en el departamento de Ahuachapán"
+      },
+      {
+        "en": "Listed by RE/MAX EXPANSION",
+        "es": "Publicado por RE/MAX EXPANSION"
+      },
+      {
+        "en": "Price: $3,900,000",
+        "es": "Precio: $3,900,000"
+      }
+    ],
+    "lat": 13.925,
+    "lng": -89.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ahuachapán municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3105,
+    "tokens_out": 397,
+    "cost_usd": 0.00127505,
+    "finish_reason": "stop",
+    "latency_ms": 3200
+  },
+  "remax|001461165137": {
+    "ts": "2026-07-31T06:30:47.694761+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "11,063 m² Land in Vista Hermosa, Mixed-Use",
+      "es": "Terreno de 11,063 m² en Vista Hermosa, Uso Mixto"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 11,062.88 m² in Colonia Vista Hermosa, with central location and access from the main street for heavy and light vehicles. Suitable for offices, universities, schools, or residential and commercial complexes. Area hosts established companies like Industrias Topaz and Capri, with a mix of residential, commercial, and business uses.",
+      "es": "Terreno de 11,062.88 m² en Colonia Vista Hermosa, con ubicación céntrica y acceso desde calle principal para vehículos pesados y livianos. Apto para oficinas, universidades, colegios o complejos residenciales y comerciales. La zona alberga empresas establecidas como Industrias Topaz y Capri, con uso mixto residencial, comercial y empresarial."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Central location, mixed-use zone",
+        "es": "Ubicación céntrica, zona de uso mixto"
+      },
+      {
+        "en": "Main street access for heavy vehicles",
+        "es": "Acceso por calle principal para vehículos pesados"
+      },
+      {
+        "en": "Near Industrias Topaz and Capri",
+        "es": "Cerca de Industrias Topaz y Capri"
+      },
+      {
+        "en": "Ideal for offices or educational campuses",
+        "es": "Ideal para oficinas o campus educativos"
+      }
+    ],
+    "lat": 13.69294,
+    "lng": -89.21819,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Salvador, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3147,
+    "tokens_out": 518,
+    "cost_usd": 0.00141949,
+    "finish_reason": "stop",
+    "latency_ms": 3940
+  },
+  "remax|002684004018": {
+    "ts": "2026-07-31T06:30:48.091202+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Two Adjacent Residential Lots in Santa Ana",
+      "es": "Dos lotes residenciales contiguos en Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Two adjacent residential lots, Lots 16 and 25, Block 4, in Santa Adela, Ayuta, Santa Ana, totaling 665 m² (375 m² + 290 m²). Intended for residential use or asset investment. The lots offer utility service feasibility and design flexibility. Price: $108,000 negotiable.",
+      "es": "Dos lotes residenciales contiguos, Lotes 16 y 25, Manzana 4, en Santa Adela, Ayuta, Santa Ana, con un total de 665 m² (375 m² + 290 m²). Uso previsto: residencial o inversión patrimonial. Los lotes ofrecen viabilidad de servicios públicos y flexibilidad de diseño. Precio: $108,000 negociable."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Two adjacent lots, 665 m² total",
+        "es": "Dos lotes contiguos, 665 m² en total"
+      },
+      {
+        "en": "Residential use or asset investment",
+        "es": "Uso residencial o inversión patrimonial"
+      },
+      {
+        "en": "Utility service feasibility",
+        "es": "Viabilidad de servicios públicos"
+      },
+      {
+        "en": "Design flexibility for construction",
+        "es": "Flexibilidad de diseño para construcción"
+      },
+      {
+        "en": "Price negotiable at $108,000",
+        "es": "Precio negociable en $108,000"
+      }
+    ],
+    "lat": 13.9943,
+    "lng": -89.5598,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3215,
+    "tokens_out": 524,
+    "cost_usd": 0.00144445,
+    "finish_reason": "stop",
+    "latency_ms": 3917
+  },
+  "remax|001463160072": {
+    "ts": "2026-07-31T06:30:48.167338+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Premium Land in Surf City, La Libertad",
+      "es": "Terreno Premium en Surf City, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 6,983.72 m² in Cantón San Rafael, La Libertad, on the Periférico Camino a Surf City. Semi-sloped with elevated terraces offering panoramic ocean views, divided into East and West portions by the highway right-of-way. Direct access to the bypass and secondary access via Calle Vieja, suitable for residential, logistics, or mixed-use development.",
+      "es": "Parcela de 6,983.72 m² en Cantón San Rafael, La Libertad, sobre el Periférico Camino a Surf City. Topografía semi-inclinada con terrazas elevadas que ofrecen vistas panorámicas al océano, dividida en porciones Este y Oeste por el derecho de vía de la carretera. Acceso directo al bypass y acceso secundario por Calle Vieja, apta para desarrollo residencial, logístico o de uso mixto."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct frontage on Surf City Bypass",
+        "es": "Frente directo al Periférico Surf City"
+      },
+      {
+        "en": "Panoramic Pacific Ocean views",
+        "es": "Vistas panorámicas al Océano Pacífico"
+      },
+      {
+        "en": "6,983.72 m² with dual access",
+        "es": "6,983.72 m² con doble acceso"
+      },
+      {
+        "en": "High-growth tourism-commercial hub",
+        "es": "Polo de alto crecimiento turístico-comercial"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3364,
+    "tokens_out": 540,
+    "cost_usd": 0.00150228,
+    "finish_reason": "stop",
+    "latency_ms": 4456
+  },
+  "remax|002684004017": {
+    "ts": "2026-07-31T06:30:49.108800+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Two Adjacent Lots, Santa Adela, Santa Ana",
+      "es": "Dos lotes contiguos, Santa Adela, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Two adjoining lots in Santa Adela, Ayuta, Santa Ana, totaling 717.67 m². Lot 16 is 341 m² (16 x 25 m) and Lot 31 is 375.97 m², with street access on both sides. Located 200 m from the main road and 15 minutes from Las Ramblas, Ayuta, and the Candelaria de la Frontera highway. Price: $118,000, negotiable.",
+      "es": "Dos lotes contiguos en Santa Adela, Ayuta, Santa Ana, con un total de 717.67 m². El lote 16 mide 341 m² (16 x 25 m) y el lote 31 mide 375.97 m², con acceso a calle por ambos lados. Ubicados a 200 m de la carretera principal y a 15 minutos de Las Ramblas, Ayuta y la carretera a Candelaria de la Frontera. Precio: $118,000, negociable."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Two lots, 717.67 m² total",
+        "es": "Dos lotes, 717.67 m² en total"
+      },
+      {
+        "en": "Street access on both sides",
+        "es": "Acceso a calle por ambos lados"
+      },
+      {
+        "en": "200 m from main road",
+        "es": "A 200 m de la carretera principal"
+      },
+      {
+        "en": "15 min to Las Ramblas, Ayuta",
+        "es": "15 min a Las Ramblas, Ayuta"
+      },
+      {
+        "en": "Price $118,000, negotiable",
+        "es": "Precio $118,000, negociable"
+      }
+    ],
+    "lat": 14.1461,
+    "lng": -89.5136,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3285,
+    "tokens_out": 599,
+    "cost_usd": 0.00154585,
+    "finish_reason": "stop",
+    "latency_ms": 4616
+  },
+  "remax|002283370025": {
+    "ts": "2026-07-31T06:30:49.206391+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Osicala, Morazán",
+      "es": "Terreno en Venta en Osicala, Morazán"
+    },
+    "short_description_canonical": {
+      "en": "Land for sale in Osicala, Morazán, with an area of 2,685.56 m². It has access to drinking water and electricity, and is 3 minutes from the Longitudinal del Norte Highway and 12 minutes from the Ruta de Paz. The property includes timber trees and is close to waterfalls and tourist centers.",
+      "es": "Terreno en venta en Osicala, Morazán, con un área de 2,685.56 m². Cuenta con acceso a agua potable y electricidad, y está a 3 minutos de la Carretera Longitudinal del Norte y a 12 minutos de la Ruta de Paz. La propiedad incluye árboles maderables y está cerca de cascadas y centros turísticos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3 minutes from Longitudinal del Norte Highway",
+        "es": "A 3 minutos de la Carretera Longitudinal del Norte"
+      },
+      {
+        "en": "12 minutes from Ruta de Paz",
+        "es": "A 12 minutos de la Ruta de Paz"
+      },
+      {
+        "en": "Access to drinking water and electricity",
+        "es": "Acceso a agua potable y electricidad"
+      },
+      {
+        "en": "Includes timber trees on property",
+        "es": "Incluye árboles maderables en la propiedad"
+      },
+      {
+        "en": "Close to waterfalls and tourist centers",
+        "es": "Cerca de cascadas y centros turísticos"
+      }
+    ],
+    "lat": 13.6667,
+    "lng": -88.1333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Osicala, Morazán",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3387,
+    "tokens_out": 531,
+    "cost_usd": 0.00149859,
+    "finish_reason": "stop",
+    "latency_ms": 3781
+  },
+  "remax|002874391005": {
+    "ts": "2026-07-31T06:30:49.389507+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Mixed-Use Land with Building in Acajutla",
+      "es": "Terreno Mixto con Construcción en Acajutla"
+    },
+    "short_description_canonical": {
+      "en": "998.64 m² mixed-use lot with a 68.80 m² concrete-block building in Cantón Morro Grande, Hacienda San Carlos, Acajutla, Sonsonate. The building includes finished bathrooms, doors, and windows, ready for immediate use as a restaurant or pupusería. Additional space allows for expansion, storage, parking, or residential development.",
+      "es": "Terreno de uso mixto de 998.64 m² con construcción de 68.80 m² en bloque de concreto en Cantón Morro Grande, Hacienda San Carlos, Acajutla, Sonsonate. La construcción incluye baños, puertas y ventanas terminados, lista para uso inmediato como comedor o pupusería. El espacio adicional permite ampliaciones, almacenamiento, estacionamiento o desarrollo habitacional."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "998.64 m² mixed-use lot",
+        "es": "Terreno mixto de 998.64 m²"
+      },
+      {
+        "en": "68.80 m² building ready to use",
+        "es": "Construcción de 68.80 m² lista para usar"
+      },
+      {
+        "en": "Ideal for restaurant or pupusería",
+        "es": "Ideal para comedor o pupusería"
+      },
+      {
+        "en": "Space for expansion or parking",
+        "es": "Espacio para ampliaciones o estacionamiento"
+      }
+    ],
+    "lat": 13.5928,
+    "lng": -89.8275,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Acajutla",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": 68.8,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3259,
+    "tokens_out": 525,
+    "cost_usd": 0.00145743,
+    "finish_reason": "stop",
+    "latency_ms": 4150
+  },
+  "santizo|9574838": {
+    "ts": "2026-07-31T06:30:51.581943+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Premium Lot in Mérida's Country Zone",
+      "es": "Lote Premium en Zona Country de Mérida"
+    },
+    "short_description_canonical": {
+      "en": "Residential lot in the Country zone, a growing area of Mérida, Yucatán. The project offers 37 lots from 200 to 800 m², with a wide tree-lined avenue, security at two entrances, eight parks, and a clubhouse. This 800 m² lot is priced at $54,232.",
+      "es": "Lote residencial en la zona Country, área en crecimiento de Mérida, Yucatán. El proyecto ofrece 37 lotes de 200 a 800 m², con amplia avenida arbolada, seguridad en dos accesos, ocho parques y casa club. Este lote de 800 m² tiene un precio de $54,232."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "800 m² lot in premium community",
+        "es": "Lote de 800 m² en comunidad premium"
+      },
+      {
+        "en": "37 lots, 200–800 m² available",
+        "es": "37 lotes, de 200 a 800 m² disponibles"
+      },
+      {
+        "en": "Security at two entrances",
+        "es": "Seguridad en dos accesos"
+      },
+      {
+        "en": "Eight parks and clubhouse",
+        "es": "Ocho parques y casa club"
+      }
+    ],
+    "lat": 13.7942,
+    "lng": -88.8965,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Salvador centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3184,
+    "tokens_out": 478,
+    "cost_usd": 0.00138548,
+    "finish_reason": "stop",
+    "latency_ms": 3886
+  },
+  "encuentra24|32613005": {
+    "ts": "2026-07-31T07:16:34.700454+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lake-view house, 603 m², 4 bedrooms, Santa María",
+      "es": "Casa con vista al lago, 603 m², 4 recámaras, Santa María"
+    },
+    "short_description_canonical": {
+      "en": "Single-family house with lake view in Santa María, on a 603 m² lot with 520 m² of construction. It has 4 bedrooms, 4.5 bathrooms, a maid's room with bath, marble floors, Italian kitchen, family room, and study/den with terrace view. Ready to move in, immediate delivery, price $2,400,000 negotiable.",
+      "es": "Casa unifamiliar con vista al lago en Santa María, en un terreno de 603 m² y 520 m² de construcción. Cuenta con 4 recámaras, 4.5 baños, cuarto y baño de empleada, pisos de mármol, cocina italiana, family room y estudio o den con vista a la terraza. Lista para estrenar, entrega inmediata, precio $2,400,000 negociable."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Lake view from privileged location",
+        "es": "Vista al lago desde ubicación privilegiada"
+      },
+      {
+        "en": "Marble floors and Italian kitchen",
+        "es": "Pisos de mármol y cocina italiana"
+      },
+      {
+        "en": "Maid's room with bath included",
+        "es": "Cuarto y baño de empleada incluidos"
+      },
+      {
+        "en": "Immediate delivery, ready to move",
+        "es": "Entrega inmediata, lista para estrenar"
+      }
+    ],
+    "lat": 8.9833,
+    "lng": -79.5167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa María, Costa del Este, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.5,
+      "built_area_m2": 603.0,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2347,
+    "tokens_out": 542,
+    "cost_usd": 0.00122989,
+    "finish_reason": "stop",
+    "latency_ms": 4521
+  },
+  "encuentra24|32749788": {
+    "ts": "2026-07-31T07:16:34.724283+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Spacious 2-Story House in San Carlos, Punta Caelo",
+      "es": "Amplia casa de 2 niveles en San Carlos, Punta Caelo"
+    },
+    "short_description_canonical": {
+      "en": "Spacious 2-story house in Punta Caelo, San Carlos, with 180 m² built area, 3 bedrooms, 3 bathrooms, and 1 parking space. Includes living room, dining room, kitchen, den, and balcony. Amenities: beach club with rental area, game room, pool, ping pong, restaurant, direct beach access, soccer field, skateboard park, and 2 padel courts. Price: $310,000; maintenance fee: $250.",
+      "es": "Amplia casa de 2 niveles en Punta Caelo, San Carlos, con 180 m² construidos, 3 habitaciones, 3 baños y 1 estacionamiento. Incluye sala, comedor, cocina, den y balcón. Amenidades: club de playa con área de alquiler, sala de juegos, piscina, ping pong, restaurante, acceso directo a la playa, cancha de fútbol, skatepark y 2 canchas de pádel. Precio: $310,000; cuota de mantenimiento: $250."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct beach access",
+        "es": "Acceso directo a la playa"
+      },
+      {
+        "en": "Beach club with pool and restaurant",
+        "es": "Club de playa con piscina y restaurante"
+      },
+      {
+        "en": "Includes soccer field and 2 padel courts",
+        "es": "Incluye cancha de fútbol y 2 canchas de pádel"
+      },
+      {
+        "en": "3 bedrooms, 3 bathrooms, 180 m²",
+        "es": "3 habitaciones, 3 baños, 180 m²"
+      }
+    ],
+    "lat": 8.4833,
+    "lng": -79.95,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Carlos, Panamá",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": 180.0,
+      "parking_spaces": 1,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2413,
+    "tokens_out": 605,
+    "cost_usd": 0.00131701,
+    "finish_reason": "stop",
+    "latency_ms": 4544
+  },
+  "encuentra24|32674290": {
+    "ts": "2026-07-31T07:16:35.716059+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Turnkey 8-Bedroom Estate with Pool in Las Lajas",
+      "es": "Propiedad llave en mano con 8 recámaras y piscina en Las Lajas"
+    },
+    "short_description_canonical": {
+      "en": "This turnkey property in Las Lajas, San Félix, includes a two-level main house and six duplex studios on a 4,147 m² lot with 445 m² of construction. It offers 8 bedrooms and 8.5 baths, plus a pool, jacuzzi, and tropical gardens. Ideal for private residence, rental income, or boutique lodging near a renowned Chiriquí beach.",
+      "es": "Esta propiedad llave en mano en Las Lajas, San Félix, incluye una casa principal de dos niveles y seis estudios dúplex en un terreno de 4,147 m² con 445 m² de construcción. Ofrece 8 recámaras y 8.5 baños, además de piscina, jacuzzi y jardines tropicales. Ideal para residencia privada, ingresos por alquiler u hospedaje boutique cerca de una playa reconocida de Chiriquí."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Turnkey with 6 income-ready studios",
+        "es": "Llave en mano con 6 estudios listos para rentar"
+      },
+      {
+        "en": "8 bedrooms, 8.5 baths total",
+        "es": "8 recámaras, 8.5 baños en total"
+      },
+      {
+        "en": "Pool and outdoor jacuzzi included",
+        "es": "Incluye piscina y jacuzzi exterior"
+      },
+      {
+        "en": "445 m² built on 4,147 m² lot",
+        "es": "445 m² construidos en terreno de 4,147 m²"
+      },
+      {
+        "en": "Near renowned Las Lajas beach",
+        "es": "Cerca de la reconocida playa Las Lajas"
+      }
+    ],
+    "lat": 8.1833,
+    "lng": -82.0167,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa las Lajas, Chiriquí, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 8,
+      "bathrooms": 8.5,
+      "built_area_m2": 445.82,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2576,
+    "tokens_out": 611,
+    "cost_usd": 0.00136762,
+    "finish_reason": "stop",
+    "latency_ms": 5536
+  },
+  "encuentra24|32368015": {
+    "ts": "2026-07-31T07:16:35.822030+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Spacious 3-Bed Condo with Sea View in Costa del Este",
+      "es": "Amplio apartamento de 3 recámaras con vista al mar en Costa del Este"
+    },
+    "short_description_canonical": {
+      "en": "Spacious 325 m² condo in PH Paramount, Costa del Este, with panoramic sea and city skyline views. Features 3 bedrooms each with private bath and walk-in closet, plus option for a 4th, guest bath, service quarters, large balcony, and 3 parking spaces. Building amenities include pools, sports courts, gym, event rooms, and BBQ areas. Rental potential around $4,500/month.",
+      "es": "Amplio apartamento de 325 m² en PH Paramount, Costa del Este, con vista panorámica al mar y al skyline de la ciudad. Cuenta con 3 recámaras cada una con baño privado y walk-in closet, opción para una 4ta, baño de visitas, cuarto de servicio, balcón grande y 3 estacionamientos. Amenidades del edificio incluyen piscinas, canchas, gimnasio, salones de eventos y áreas de BBQ. Potencial de alquiler alrededor de $4,500 mensuales."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "325 m² with panoramic sea view",
+        "es": "325 m² con vista panorámica al mar"
+      },
+      {
+        "en": "3 bedrooms, each with private bath",
+        "es": "3 recámaras, cada una con baño privado"
+      },
+      {
+        "en": "3 parking spaces included",
+        "es": "3 estacionamientos incluidos"
+      },
+      {
+        "en": "Rental potential ~$4,500/month",
+        "es": "Potencial de alquiler ~$4,500/mes"
+      },
+      {
+        "en": "Full amenities: pools, gym, sports courts",
+        "es": "Amenidades completas: piscinas, gimnasio, canchas"
+      }
+    ],
+    "lat": 8.9789,
+    "lng": -79.5167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Este, Panama City",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": 325.0,
+      "parking_spaces": 3,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2610,
+    "tokens_out": 619,
+    "cost_usd": 0.0013856,
+    "finish_reason": "stop",
+    "latency_ms": 5643
   }
 }
