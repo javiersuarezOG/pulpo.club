@@ -2068,6 +2068,38 @@
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
+    },
+    {
+      "day": 253,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "algun_dia",
+      "emotion": "empuje",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "algun_dia",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-08-07T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d253__algun_dia",
+      "poster_path": "web/data/ig_assets/autopilot/d253__algun_dia/slide_1.jpg",
+      "poster_overrides": {},
+      "caption": "Siempre es 'algún día'. Algún día el mar, algún día la casa, algún día volver. Ese día no llega solo.\n\n📍 Santa Tecla. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "Santa Tecla · 597 m² · $85,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #SantaTecla #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d253__algun_dia/slide_2.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__1690"
+      ],
+      "primary_listing_id": "bienesraices__1690",
+      "cover_photo_url": "https://assets.easybroker.com/property_images/4540000/76143072/EB-QL0000.jpg?rasterize=true&version=1718124035",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
