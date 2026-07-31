@@ -1871,9 +1871,11 @@
       "cover_photo_url": "https://assets.easybroker.com/property_images/2172022/33402685/EB-HI2022.jpg?rasterize=true&version=1618973463",
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-07-31T04:34:07.436102+00:00",
+      "posted_media_id": "17868938172635654",
+      "comment_posted": true,
+      "comment_id": "18114957892924579"
     },
     {
       "day": 247,
