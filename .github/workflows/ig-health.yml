@@ -1,0 +1,33 @@
+# Social Brain health canary — watches the IG loop and Slack-pages on
+# trouble (freshness / insights-flow / token / queue-supply). Read-only:
+# never commits, never blocks (scripts/check_ig_health.py always exits 0).
+# IG_PAUSED-aware, so a deliberately paused feed does not false-page.
+name: pulpo-ig-health
+
+on:
+  schedule:
+    - cron: '35 */6 * * *'   # every 6h at :35 (off the publisher :05 + insights :20)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ig-health
+  cancel-in-progress: false
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SLACK_WEBHOOK_URL:      ${{ secrets.SLACK_WEBHOOK_URL }}
+      POSTHOG_PROJECT_TOKEN:  ${{ secrets.POSTHOG_PROJECT_TOKEN }}
+      IG_PAUSED:              ${{ secrets.IG_PAUSED }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: main, fetch-depth: 1 }
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - name: IG health canary
+        run: python3 scripts/check_ig_health.py
