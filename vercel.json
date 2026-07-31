@@ -70,6 +70,7 @@
     { "source": "/admin/:widget",           "destination": "/web/dist/index.html" },
     { "source": "/listing/:id",             "destination": "/web/dist/index.html" },
     { "source": "/l/:token",                "destination": "/api/l/:token" },
+    { "source": "/go/:code",                "destination": "/api/go/:code" },
     { "source": "/start",                   "destination": "/web/dist/index.html" },
     { "source": "/newsletter-v3-preview",   "destination": "/web/newsletter-v3-live-preview.html" },
     { "source": "/newsletter-v31-preview",  "destination": "/web/newsletter-v31-live-preview.html" },
