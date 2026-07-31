@@ -51,9 +51,19 @@ def _emit(event: str, props: dict) -> None:
 
 # ── listing helpers (source-language-safe, no invented data) ───────────
 
+def _active_country_name() -> str:
+    """Fallback zone label = the active country's name, from the manifest —
+    never a hardcoded country literal (check_country_hardcodes guard)."""
+    try:
+        from pulpo.countries import active
+        return active().name_en
+    except Exception:
+        return ""
+
+
 def _zone_label(listing: dict) -> str:
     z = (listing.get("zone") or "").replace("-", " ").strip()
-    return z.title() if z else (listing.get("department") or "El Salvador")
+    return z.title() if z else (listing.get("department") or _active_country_name())
 
 
 def _price(listing: dict) -> Optional[str]:
