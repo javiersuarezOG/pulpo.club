@@ -1,0 +1,28 @@
+{
+  "width": 4000,
+  "height": 2250,
+  "aspect_ratio": 1.778,
+  "file_size_kb": 1803.7,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-07-31T06:38:13.337063+00:00",
+  "source_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002283370025/v3/HDPhotos/WhatsApp%20Image%202026-07-28%20at%205.28.42%20PM.jpeg",
+  "original_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002283370025/v3/HDPhotos/WhatsApp%20Image%202026-07-28%20at%205.28.42%20PM.jpeg",
+  "transform_used": "none",
+  "fetched_at": "2026-07-31T06:38:14.329676+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": 3500,
+  "resdet_detected_height": 1969,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 4.7,
+    "issues": [
+      "uninteresting"
+    ],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.033 color_entropy=0.447"
+  }
+}

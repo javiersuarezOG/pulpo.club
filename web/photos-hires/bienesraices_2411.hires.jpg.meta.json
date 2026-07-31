@@ -1,0 +1,26 @@
+{
+  "width": 1200,
+  "height": 1600,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 255.2,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-07-31T06:38:26.109450+00:00",
+  "source_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/PH7307BDA6/LN4hRxxG8H/Terreno_Comercial_en_Alquiler_en_Nuevo_Cuscatl%C3%A1n__13500_v%C2%B2_Cerca_de_Salamanca.jpeg",
+  "original_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/PH7307BDA6/LN4hRxxG8H/Terreno_Comercial_en_Alquiler_en_Nuevo_Cuscatl%C3%A1n__13500_v%C2%B2_Cerca_de_Salamanca.jpeg",
+  "transform_used": "none",
+  "fetched_at": "2026-07-31T06:38:26.323841+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": 1050,
+  "resdet_detected_height": 1400,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 7.7,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.484 color_entropy=0.494"
+  }
+}
