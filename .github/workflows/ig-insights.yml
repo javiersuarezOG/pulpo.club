@@ -1,0 +1,76 @@
+# Per-post Instagram insights poller — the Sense half of the loop.
+#
+# Runs every 6h and pulls reach/saves/shares/likes/comments/views for each
+# post that has matured (+24h, +72h) into web/data/ig_insights.jsonl, so the
+# Growth Hacker can later join engagement with the /go router's attributed
+# signups. See automation/ig_insights.py.
+#
+# Deliberately NOT gated by IG_PAUSED: this is read-only measurement of posts
+# already published. It must keep running even while the publisher is paused
+# (e.g. during a rebuild) so we don't lose the +24h/+72h reads on live posts.
+# Idempotent per (media_id, maturity), so extra runs are free.
+name: pulpo-ig-insights
+
+on:
+  schedule:
+    # Every 6 hours at :20 (offset off the publisher's :05).
+    - cron: '20 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ig-insights
+  cancel-in-progress: false
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+      IG_USER_ID:      ${{ secrets.IG_USER_ID }}
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          # bot PAT so the artifact commit pushes back past branch protection
+          token: ${{ secrets.PULPO_BOT_TOKEN }}
+          fetch-depth: 1
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Configure git identity
+        run: |
+          git config user.name  "pulpo-bot"
+          git config user.email "pulpo-bot@users.noreply.github.com"
+
+      - name: Poll matured posts
+        run: python3 -m automation.ig_insights
+
+      - name: Commit insights artifact
+        run: |
+          git add web/data/ig_insights.jsonl
+          if git diff --cached --quiet; then
+            echo "[ig-insights] no new rows — nothing to commit"
+            exit 0
+          fi
+          git commit -m "chore(ig): insights poll (per-post metrics)"
+          # main can move under us between checkout and push; rebase our
+          # single artifact commit on top, matching the nightly invariant.
+          git fetch origin main
+          git rebase --autostash origin/main || {
+            echo "::warning::rebase failed; aborting and pushing as-is"
+            git rebase --abort || true
+          }
+          git push origin main
