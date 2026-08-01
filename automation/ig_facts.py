@@ -26,28 +26,12 @@ import re
 
 # id → fact. `levers` lists which content categories may cite it. `number`
 # is the bare figure (for the stat-trace guard); `caveat` is required framing.
+# HARD RULE (Javi, 2026-08-01): NEVER cite crime / homicide / "safest country"
+# framing. It is off-brand and legally/reputationally fraught. There is no
+# crime fact in this ledger by design, and `mentions_banned_topic()` below
+# guarantees one can never re-enter a caption. Lead with beauty, lifestyle,
+# investment logic, remittances, tourism, dollarization — never safety-by-numbers.
 FACTS: dict[str, dict] = {
-    "homicide_rate_2024": {
-        "number": 1.9,
-        "value_es": "1.9 homicidios por cada 100 mil habitantes",
-        "value_en": "1.9 homicides per 100,000",
-        "statement_es": (
-            "El Salvador cerró 2024 con una tasa oficial de 1.9 homicidios por cada "
-            "100 mil habitantes — de las más bajas del hemisferio."
-        ),
-        "statement_en": (
-            "El Salvador closed 2024 with an official homicide rate of 1.9 per 100,000 "
-            "— among the lowest in the hemisphere."
-        ),
-        "source": "Gobierno de El Salvador, vía InSight Crime 2024 Homicide Round-Up",
-        "source_url": "https://insightcrime.org/news/insight-crime-2024-homicide-round-up/",
-        "as_of": "2024-12-31",
-        "caveat": (
-            "Cifra OFICIAL del gobierno; no sigue el Protocolo de Bogotá (excluye "
-            "ciertas muertes). Siempre citar como 'cifra oficial' — nunca como dato neutral."
-        ),
-        "levers": ["authority", "social_proof", "transformation"],
-    },
     "remesas_2024": {
         "number": 8.479,
         "value_es": "$8,479 millones en remesas",
@@ -82,7 +66,7 @@ FACTS: dict[str, dict] = {
         "source_url": "https://www.visitelsalvador.ai/blog/record-tourisme-el-salvador-2024-4-millions",
         "as_of": "2024-12-31",
         "caveat": "",
-        "levers": ["social_proof", "transformation", "aspiration"],
+        "levers": ["social_proof", "transformation", "aspiration", "authority"],
     },
     "dollarized_since_2001": {
         "number": 2001,
@@ -100,7 +84,7 @@ FACTS: dict[str, dict] = {
         "source_url": "https://www.bcr.gob.sv/",
         "as_of": "2001-01-01",
         "caveat": "",
-        "levers": ["investment", "transformation"],
+        "levers": ["investment", "transformation", "authority"],
     },
 }
 
@@ -190,3 +174,36 @@ def stat_violations(caption: str) -> list[str]:
             continue
         bad.append(frag.strip())
     return bad
+
+
+# ── the banned-topic guard (crime / safety-by-numbers) ─────────────────
+# HARD RULE: no caption may ever reference crime, homicide, gangs, or the
+# "safest country" framing. This is a brand + reputational line we never
+# cross. mentions_banned_topic() runs in the Copywriter's validator, so a
+# banned phrase — deterministic OR LLM-polished — fails validation and the
+# post is rejected before it can reach a review board, let alone the wire.
+_BANNED_TOPIC_RE = re.compile(
+    r"""(
+        homicid              |  # homicidio / homicide
+        \bcrim(?:e|en|inal)  |  # crime / crimen / criminal
+        \bgang(?:s|as)?\b    |  # gang(s)
+        pandill              |  # pandilla / pandillas
+        maras?\b             |  # mara / maras
+        violenc              |  # violencia / violence
+        \bmurder             |  # murder(s)
+        homicide[\s-]*rate   |
+        tasa\s+de\s+homicid  |
+        por\s+cada\s+[\d.,]+\s*mil\s+habitantes  |  # "por cada 100 mil habitantes"
+        (?:pa[ií]s|country)[^.]{0,40}(?:m[aá]s\s+seguro|safest)  |  # "país más seguro" / "safest country"
+        (?:safest|m[aá]s\s+seguro)[^.]{0,20}(?:hemisf|hemisphere|regi[oó]n|region|mundo|world)
+    )""",
+    re.IGNORECASE | re.VERBOSE,
+)
+
+
+def mentions_banned_topic(text: str) -> list[str]:
+    """Banned crime/safety-framing phrases in `text`. Empty list = clean.
+    Any non-empty result MUST fail caption validation — no exceptions."""
+    if not text:
+        return []
+    return [m.group(0).strip() for m in _BANNED_TOPIC_RE.finditer(text)]

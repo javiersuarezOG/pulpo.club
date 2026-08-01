@@ -32,23 +32,41 @@ def test_fact_levers_reference_real_registry_slugs():
             assert lever in cats.CATEGORIES, f"{fid} tags unknown lever {lever!r}"
 
 
-def test_contested_figures_carry_a_caveat():
-    # The homicide figure is the government's (excludes some deaths); it MUST
-    # carry framing so the Copywriter never states it as neutral fact.
-    assert facts.get("homicide_rate_2024")["caveat"]
-    assert "oficial" in facts.get("homicide_rate_2024")["caveat"].lower()
+def test_no_crime_fact_exists():
+    # HARD RULE (2026-08-01): the ledger carries NO crime/homicide fact, and
+    # no fact statement may reference crime/safety-by-numbers framing.
+    assert facts.get("homicide_rate_2024") is None
+    for fid, f in facts.FACTS.items():
+        for field in ("statement_es", "statement_en", "value_es", "value_en"):
+            assert facts.mentions_banned_topic(f[field]) == [], f"{fid} {field} names a banned topic"
+
+
+def test_banned_topic_guard_catches_crime_framing():
+    for phrase in (
+        "El país más seguro del hemisferio es un dato.",
+        "The safest country in the hemisphere.",
+        "una tasa de 1.9 homicidios por cada 100 mil habitantes",
+        "libre de pandillas y maras",
+        "gang violence is down",
+    ):
+        assert facts.mentions_banned_topic(phrase), f"missed: {phrase!r}"
+    # a clean lifestyle/investment line trips nothing
+    assert facts.mentions_banned_topic("Domingo, 7am, el Pacífico a 30 metros.") == []
 
 
 def test_for_lever_and_get():
     inv = {f["id"] for f in facts.for_lever("investment")}
     assert "remesas_2024" in inv and "dollarized_since_2001" in inv
+    # authority now cites tourism / dollarization — NOT crime
+    auth = {f["id"] for f in facts.for_lever("authority")}
+    assert auth and "homicide_rate_2024" not in auth
     assert facts.get("tourism_2024")["number"] == 3.9
     assert facts.get("nope") is None
 
 
 def test_stat_guard_passes_sourced_numbers():
-    # A caption citing ledger figures is clean.
-    clean = "En 2024 se enviaron $8,479 millones en remesas. La tasa fue 1.9 por cada 100 mil."
+    # A caption citing ledger figures is clean (remesas + tourism, both in-ledger).
+    clean = "En 2024 se enviaron $8,479 millones en remesas y llegaron 3.9 millones de visitantes."
     assert facts.stat_violations(clean) == []
 
 
