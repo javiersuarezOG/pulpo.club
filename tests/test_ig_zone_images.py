@@ -6,18 +6,33 @@ from __future__ import annotations
 from automation import ig_zone_images as zi
 
 
-def test_registry_starts_empty_so_openers_fall_back_safely():
-    # No image ships until a human vets it — get() returns None → poster fallback.
-    assert zi.get("el-tunco") is None
-    assert zi.has("el-tunco") is False
+def test_seeded_zones_are_served_uncovered_fall_back():
+    # The 5 verified zones resolve; an uncovered zone / None falls back to poster.
+    for z in ("el-tunco", "el-zonte", "lago-coatepeque", "el-cuco", "lago-ilopango"):
+        assert zi.has(z), f"{z} should be served"
+    assert zi.get("nowhere-zone") is None
     assert zi.get(None) is None
 
 
-def test_shot_list_is_non_empty_and_everything_is_missing_today():
-    assert len(zi.TARGET_ZONES) >= 10
-    missing = dict(zi.missing_shots())
-    for zone, _note in zi.TARGET_ZONES:
-        assert zone in missing        # nothing sourced yet
+def test_license_families_normalize():
+    assert zi._license_family("CC BY-SA 4.0") == "cc-by-sa"
+    assert zi._license_family("CC BY 4.0") == "cc-by"
+    assert zi._license_family("CC0") == "cc0"
+    assert zi._license_family("Public domain") == "public_domain"
+    assert zi._license_family("pulpo_owned") == "pulpo_owned"
+    assert zi._license_family("All rights reserved") is None   # rejected
+
+
+def test_share_alike_is_flagged():
+    # El Tunco/El Zonte are CC BY-SA; Coatepeque (CC BY) is not.
+    assert zi.is_share_alike("el-tunco") is True
+    assert zi.is_share_alike("lago-coatepeque") is False
+
+
+def test_seeded_entries_require_attribution_only_for_cc_by():
+    assert zi._requires_attribution("CC BY 4.0") is True
+    assert zi._requires_attribution("CC BY-SA 3.0") is True
+    assert zi._requires_attribution("CC0") is False
 
 
 def test_a_valid_owned_entry_is_served(monkeypatch):

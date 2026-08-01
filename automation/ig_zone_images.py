@@ -27,14 +27,41 @@ and add one entry below. `missing_shots()` prints the shot-list still to source.
 """
 from __future__ import annotations
 
-# Licenses we accept for an establishing image. Anything else is rejected by
-# _valid() — no broker photos, no unlicensed stock.
+# License FAMILIES we accept for an establishing image, matched against the
+# entry's license string (normalized). Anything else is rejected by _valid() —
+# no broker photos, no unlicensed stock. CC BY-SA is accepted but share-alike:
+# _is_share_alike() flags it so a reviewer can prefer non-SA where it matters.
 APPROVED_LICENSES = frozenset({
     "pulpo_owned",     # shot by / for Pulpo
     "commissioned",    # paid, rights assigned to Pulpo
     "cc0",             # Creative Commons Zero (public-domain dedication)
     "public_domain",
+    "cc-by",           # attribution required (emitted in the first comment)
+    "cc-by-sa",        # attribution + share-alike
 })
+
+
+def _license_family(lic: str) -> str | None:
+    """Normalize a license string ('CC BY-SA 4.0', 'CC0', 'pulpo_owned') to a
+    family key in APPROVED_LICENSES, or None if unrecognised (→ rejected)."""
+    s = (lic or "").lower().replace("_", " ").strip()
+    if "share" in s or "by-sa" in s or "by sa" in s:
+        return "cc-by-sa"
+    if "cc0" in s or "zero" in s:
+        return "cc0"
+    if "public domain" in s or s == "pd":
+        return "public_domain"
+    if "by" in s and "cc" in s:
+        return "cc-by"
+    if "pulpo" in s or "owned" in s:
+        return "pulpo_owned"
+    if "commission" in s:
+        return "commissioned"
+    return None
+
+
+def _requires_attribution(lic: str) -> bool:
+    return _license_family(lic) in {"cc-by", "cc-by-sa"}
 
 ZONE_DIR = "web/data/ig_assets/zones"
 
@@ -46,7 +73,36 @@ ZONE_DIR = "web/data/ig_assets/zones"
 #       "license": "pulpo_owned",             # must be in APPROVED_LICENSES
 #       "license_url": "",                    # required for cc0 / public_domain
 #   }
-ZONE_IMAGES: dict[str, dict] = {}
+ZONE_IMAGES: dict[str, dict] = {
+    # Sourced from Wikimedia Commons + VISUALLY VERIFIED (each image was opened
+    # and confirmed to show the actual location and be beautiful). Attribution
+    # for CC-BY/BY-SA is emitted in the post's first comment (ig_render).
+    "el-tunco": {
+        "image": f"{ZONE_DIR}/el-tunco.jpg", "credit": "Rebevon11",
+        "license": "CC BY-SA 4.0",
+        "license_url": "https://commons.wikimedia.org/wiki/File:El_tunco.png",
+    },
+    "el-zonte": {
+        "image": f"{ZONE_DIR}/el-zonte.jpg", "credit": "Wikimedia Commons",
+        "license": "CC BY-SA 3.0",
+        "license_url": "https://commons.wikimedia.org/wiki/File:El_Zonte_(11-2011)_-_Playa_-_panoramio.jpg",
+    },
+    "lago-coatepeque": {
+        "image": f"{ZONE_DIR}/lago-coatepeque.jpg", "credit": "JMRAFFi",
+        "license": "CC BY 4.0",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Coatepeque_Vista1.jpg",
+    },
+    "el-cuco": {
+        "image": f"{ZONE_DIR}/el-cuco.jpg", "credit": "Ll1324",
+        "license": "CC0",
+        "license_url": "https://commons.wikimedia.org/wiki/File:El_Cuco_San_Miguel_El_Salvador_Playa_2011.jpg",
+    },
+    "lago-ilopango": {
+        "image": f"{ZONE_DIR}/lago-ilopango.jpg", "credit": "Ll1324",
+        "license": "CC0",
+        "license_url": "https://commons.wikimedia.org/wiki/File:Lago_Ilopango_desde_Cojutepeque_2011.jpg",
+    },
+}
 
 # The shot-list: the scenic zones worth a curated establishing shot, most-
 # featured first. Sourcing these unlocks real-location openers for the bulk of
@@ -70,14 +126,22 @@ TARGET_ZONES: tuple[tuple[str, str], ...] = (
 
 
 def _valid(entry: dict) -> bool:
-    return (
-        isinstance(entry, dict)
-        and bool(entry.get("image"))
-        and entry.get("license") in APPROVED_LICENSES
-        and bool(entry.get("credit"))
-        # cc0 / public_domain must cite where it came from
-        and (entry["license"] not in {"cc0", "public_domain"} or bool(entry.get("license_url")))
-    )
+    if not (isinstance(entry, dict) and entry.get("image") and entry.get("credit")):
+        return False
+    fam = _license_family(entry.get("license"))
+    if fam not in APPROVED_LICENSES:
+        return False
+    # anything sourced from the commons (not our own) must cite where it's from
+    if fam in {"cc0", "public_domain", "cc-by", "cc-by-sa"} and not entry.get("license_url"):
+        return False
+    return True
+
+
+def is_share_alike(zone: str | None) -> bool:
+    """True if the zone's image is CC BY-SA (share-alike) — a reviewer may
+    prefer to swap these for a non-SA image where licensing hygiene matters."""
+    entry = get(zone)
+    return bool(entry) and _license_family(entry.get("license")) == "cc-by-sa"
 
 
 def get(zone: str | None) -> dict | None:
