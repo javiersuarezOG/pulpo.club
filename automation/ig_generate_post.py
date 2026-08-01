@@ -27,6 +27,7 @@ from automation import ig_code_stamp
 from automation import ig_content_categories as cats
 from automation import ig_copywriter
 from automation import ig_photo_gate
+from automation import ig_story
 
 
 # ── Listing Scout ──────────────────────────────────────────────────────
@@ -119,6 +120,7 @@ def generate_batch(
         post = ig_copywriter.generate_post(li, lever, llm_polish=llm_polish)
         day = start_day + i
         code = ig_code_stamp.make_code(day, lever, post["tier"])
+        slides = ig_story.build_storyboard(li, lever)
         out.append({
             "day": day,
             "lever": lever,
@@ -135,5 +137,7 @@ def generate_batch(
             "zone": li.get("zone"),
             "price_usd": li.get("price_usd"),
             "hero_photo_path": li.get("hero_photo_path"),
+            "slides": slides,
+            "slide_count": len(slides),
         })
     return out
