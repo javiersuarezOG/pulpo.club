@@ -12,7 +12,9 @@ from automation import ig_story
 
 def _listing(**over):
     li = {
-        "zone": "el-tunco", "department": "La Libertad", "dist_beach_km": 0.2,
+        # an UNCOVERED zone by default, so the opener exercises the poster
+        # fallback; the curated-image test overrides to a registered zone.
+        "zone": "test-cove", "department": "La Libertad", "dist_beach_km": 0.2,
         "photo_urls": [f"https://cdn/pic{i}.jpg" for i in range(9)],
         "photos_count": 9,
         "reasons_to_buy": [
@@ -51,13 +53,13 @@ def test_opener_and_cta_are_designed_middle_is_real_photos():
 
 
 def test_curated_zone_image_becomes_the_opener(monkeypatch):
-    monkeypatch.setitem(ig_story.ig_zone_images.ZONE_IMAGES, "el-tunco", {
-        "image": "web/data/ig_assets/zones/el-tunco.jpg",
+    monkeypatch.setitem(ig_story.ig_zone_images.ZONE_IMAGES, "test-cove", {
+        "image": "web/data/ig_assets/zones/test-cove.jpg",
         "credit": "Pulpo", "license": "pulpo_owned",
     })
     sb = ig_story.build_storyboard(_listing(), "aspiration")
     assert sb[0]["kind"] == "zone_photo"
-    assert sb[0]["image"].endswith("el-tunco.jpg")
+    assert sb[0]["image"].endswith("test-cove.jpg")
     assert sb[0]["needs_review"] is False   # curated + licensed = trusted
 
 
