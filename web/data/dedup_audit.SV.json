@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-07-31T06:30:39.435781+00:00",
+  "computed_at": "2026-08-01T06:23:13.137994+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -1406,6 +1406,34 @@
     {
       "count": 2,
       "cross_source": false,
+      "fingerprint": "920bde86150de4ff504b5970c56ef1454bae2bd8",
+      "samples": [
+        {
+          "area_m2": null,
+          "price_usd": 1600000.0,
+          "source": "csbr",
+          "source_id": "venta-casa-con-piscina-frente-al-lago-de-coatepeque-ideal-inversion-2",
+          "title": "CASA ORILLA LAGO DE COATEPEQUE",
+          "url": "https://www.camarabienesraices.com.sv/propiedad/venta-casa-con-piscina-frente-al-lago-de-coatepeque-ideal-inversion-2/",
+          "zone": "lago-coatepeque"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 1600000.0,
+          "source": "csbr",
+          "source_id": "venta-casa-con-piscina-frente-al-lago-de-coatepeque-ideal-inversion",
+          "title": "CASA ORILLA LAGO DE COATEPEQUE",
+          "url": "https://www.camarabienesraices.com.sv/propiedad/venta-casa-con-piscina-frente-al-lago-de-coatepeque-ideal-inversion/",
+          "zone": "lago-coatepeque"
+        }
+      ],
+      "sources": [
+        "csbr"
+      ]
+    },
+    {
+      "count": 2,
+      "cross_source": false,
       "fingerprint": "936015b904b5fc9bae3bea5189ad25bbeb06f623",
       "samples": [
         {
@@ -1513,6 +1541,34 @@
       ],
       "sources": [
         "realestate_au_sv"
+      ]
+    },
+    {
+      "count": 2,
+      "cross_source": false,
+      "fingerprint": "bd93293dcefd94a6f862800e8cfa9f8ca0b58437",
+      "samples": [
+        {
+          "area_m2": null,
+          "price_usd": 2906809.0,
+          "source": "csbr",
+          "source_id": "venta-terreno-industrial-lourdes-colon-2",
+          "title": "VENTA TERRENO ZONA INDUSTRIAL LOURDES COLON",
+          "url": "https://www.camarabienesraices.com.sv/propiedad/venta-terreno-industrial-lourdes-colon-2/",
+          "zone": "colon"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 2906809.0,
+          "source": "csbr",
+          "source_id": "venta-terreno-industrial-lourdes-colon",
+          "title": "VENTA TERRENO ZONA INDUSTRIAL LOURDES COLON",
+          "url": "https://www.camarabienesraices.com.sv/propiedad/venta-terreno-industrial-lourdes-colon/",
+          "zone": "colon"
+        }
+      ],
+      "sources": [
+        "csbr"
       ]
     },
     {
@@ -1799,10 +1855,10 @@
   "overlap_matrix": {},
   "per_source": {
     "bienesraices": {
-      "kept_as_unique": 506,
-      "raw": 507,
+      "kept_as_unique": 507,
+      "raw": 508,
       "shared_with_others": 0,
-      "unique_in_source": 506
+      "unique_in_source": 507
     },
     "century21": {
       "kept_as_unique": 13,
@@ -1823,16 +1879,16 @@
       "unique_in_source": 149
     },
     "csbr": {
-      "kept_as_unique": 277,
-      "raw": 282,
+      "kept_as_unique": 278,
+      "raw": 285,
       "shared_with_others": 0,
-      "unique_in_source": 277
+      "unique_in_source": 278
     },
     "encuentra24": {
-      "kept_as_unique": 28,
-      "raw": 28,
+      "kept_as_unique": 30,
+      "raw": 30,
       "shared_with_others": 0,
-      "unique_in_source": 28
+      "unique_in_source": 30
     },
     "essurf": {
       "kept_as_unique": 33,
@@ -1865,10 +1921,10 @@
       "unique_in_source": 285
     },
     "remax": {
-      "kept_as_unique": 328,
-      "raw": 347,
+      "kept_as_unique": 330,
+      "raw": 349,
       "shared_with_others": 0,
-      "unique_in_source": 328
+      "unique_in_source": 330
     },
     "santizo": {
       "kept_as_unique": 88,
@@ -1889,6 +1945,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2076,
-  "total_unique_fingerprints": 1995
+  "total_in_dataset": 2084,
+  "total_unique_fingerprints": 2001
 }

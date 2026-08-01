@@ -133630,5 +133630,816 @@
     "cost_usd": 0.0013856,
     "finish_reason": "stop",
     "latency_ms": 5643
+  },
+  "csbr|venta-casa-con-piscina-frente-al-lago-de-coatepeque-ideal-inversion-2": {
+    "ts": "2026-08-01T06:23:18.003777+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lake Coatepeque House for Sale",
+      "es": "Casa en Venta a Orillas del Lago de Coatepeque"
+    },
+    "short_description_canonical": {
+      "en": "House on the shore of Lake Coatepeque in El Congo, Santa Ana. Listed at $1,600,000. Property type: house. No further details provided.",
+      "es": "Casa a orillas del Lago de Coatepeque en El Congo, Santa Ana. Precio de lista: $1,600,000. Tipo de propiedad: casa. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Lakefront location on Lake Coatepeque",
+        "es": "Ubicación frente al Lago de Coatepeque"
+      },
+      {
+        "en": "Listed at $1,600,000",
+        "es": "Precio de lista: $1,600,000"
+      },
+      {
+        "en": "In El Congo, Santa Ana",
+        "es": "En El Congo, Santa Ana"
+      }
+    ],
+    "lat": 13.8667,
+    "lng": -89.55,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Congo, Santa Ana",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3065,
+    "tokens_out": 392,
+    "cost_usd": 0.00125875,
+    "finish_reason": "stop",
+    "latency_ms": 3849
+  },
+  "csbr|venta-terreno-industrial-lourdes-colon-2": {
+    "ts": "2026-08-01T06:23:18.305866+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Industrial Land for Sale in Lourdes Colón",
+      "es": "Terreno Industrial en Venta en Lourdes Colón"
+    },
+    "short_description_canonical": {
+      "en": "Industrial land for sale in the Lourdes Colón industrial zone, La Libertad. The property is listed at $2,906,809 USD. Specific details on size, access, and utilities are not provided in the listing.",
+      "es": "Terreno industrial en venta en la zona industrial de Lourdes Colón, La Libertad. La propiedad está listada en $2,906,809 USD. No se proporcionan detalles específicos sobre tamaño, acceso y servicios en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Industrial zone location in Lourdes Colón",
+        "es": "Ubicación en zona industrial de Lourdes Colón"
+      },
+      {
+        "en": "Listed at $2,906,809 USD",
+        "es": "Listado en $2,906,809 USD"
+      },
+      {
+        "en": "Available through CASALCO",
+        "es": "Disponible a través de CASALCO"
+      }
+    ],
+    "lat": 13.7167,
+    "lng": -89.3667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Colón, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3070,
+    "tokens_out": 412,
+    "cost_usd": 0.0012821,
+    "finish_reason": "stop",
+    "latency_ms": 4151
+  },
+  "bienesraices|2439": {
+    "ts": "2026-08-01T06:23:18.629860+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Large Land in El Estero de Jaltepeque, Costa del Sol",
+      "es": "Gran Terreno en El Estero de Jaltepeque, Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Land of 20,925.31 v² (approx. 14,625 m² / 2.09 manzanas) in El Estero de Jaltepeque, Costa del Sol, La Paz. It has a 41.64 m frontage and depth of 357.37 m (east) and 351.96 m (west). Surrounded by tropical vegetation and mangroves, it is ideal for tourism projects, a marina, or private residential development. Price: $1,674,024.80 USD.",
+      "es": "Terreno de 20,925.31 v² (aprox. 14,625 m² / 2.09 manzanas) en El Estero de Jaltepeque, Costa del Sol, La Paz. Cuenta con 41.64 m de frente y fondo de 357.37 m (lado oriente) y 351.96 m (lado poniente). Rodeado de vegetación tropical y manglares, es ideal para proyectos turísticos, marina o desarrollo residencial privado. Precio: $1,674,024.80 USD."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct access to estero canals",
+        "es": "Acceso directo a canales del estero"
+      },
+      {
+        "en": "Over 350 m depth",
+        "es": "Más de 350 m de fondo"
+      },
+      {
+        "en": "Near international airport (AEP)",
+        "es": "Cerca del aeropuerto internacional (AEP)"
+      },
+      {
+        "en": "Ideal for marina or resort",
+        "es": "Ideal para marina o resort"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3514,
+    "tokens_out": 573,
+    "cost_usd": 0.00157908,
+    "finish_reason": "stop",
+    "latency_ms": 4477
+  },
+  "bienesraices|2440": {
+    "ts": "2026-08-01T06:23:18.793056+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Strategic Double-Front Land, Costa del Sol",
+      "es": "Macro-Terreno Estratégico Doble Frente, Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Strategic land parcel of 47,483.29 v² (approx. 33,184 m² / 4.7 manzanas) in Costa del Sol, La Paz, El Salvador. It features a double frontage: 34,388.14 v² facing the Pacific Ocean and 13,095.15 v² facing the Estero de Jaltepeque. Approved development permits are included, priced at $150.00 USD/v², total $7,122,493.50 USD.",
+      "es": "Macro-terreno estratégico de 47,483.29 v² (aprox. 33,184 m² / 4.7 manzanas) en Costa del Sol, La Paz, El Salvador. Cuenta con doble frente: 34,388.14 v² frente al océano Pacífico y 13,095.15 v² frente al Estero de Jaltepeque. Incluye permisos de desarrollo aprobados, a $150.00 USD/v², total $7,122,493.50 USD."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Double frontage: ocean and estuary",
+        "es": "Doble frente: océano y estero"
+      },
+      {
+        "en": "Approved development permits included",
+        "es": "Permisos de desarrollo aprobados incluidos"
+      },
+      {
+        "en": "Ideal for resort or marina",
+        "es": "Ideal para resort o marina"
+      },
+      {
+        "en": "4.7 manzanas total land area",
+        "es": "4.7 manzanas de área total"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3519,
+    "tokens_out": 561,
+    "cost_usd": 0.00156723,
+    "finish_reason": "stop",
+    "latency_ms": 4640
+  },
+  "encuentra24|32187431": {
+    "ts": "2026-08-01T06:23:21.826110+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront House in El Palmarcito, La Libertad",
+      "es": "Casa frente al mar en El Palmarcito, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "House with 450 m² built area on a 1,125 m² lot in El Palmarcito, La Libertad, minutes from El Zonte. It features 4 bedrooms, 3 bathrooms, private pool, and parking for 10 vehicles. Includes water, well, septic systems, and electricity. Located in a high-appreciation area.",
+      "es": "Casa con 450 m² de construcción en un terreno de 1,125 m² en El Palmarcito, La Libertad, a minutos de El Zonte. Cuenta con 4 habitaciones, 3 baños, piscina privada y parqueo para 10 vehículos. Incluye agua potable, pozo, fosas sépticas y electricidad. Ubicada en una zona de alta plusvalía."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront with ocean views",
+        "es": "Frente al mar con vistas al océano"
+      },
+      {
+        "en": "450 m² built, 1,125 m² lot",
+        "es": "450 m² construidos, 1,125 m² de terreno"
+      },
+      {
+        "en": "Private pool and 3 ranchos",
+        "es": "Piscina privada y 3 ranchos"
+      },
+      {
+        "en": "Parking for 10 vehicles",
+        "es": "Parqueo para 10 vehículos"
+      },
+      {
+        "en": "Minutes from El Zonte surf",
+        "es": "Minutos del surf en El Zonte"
+      }
+    ],
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Palmarcito beach, near El Zonte",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 3.0,
+      "built_area_m2": 450.0,
+      "parking_spaces": 10,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3507,
+    "tokens_out": 562,
+    "cost_usd": 0.00156509,
+    "finish_reason": "stop",
+    "latency_ms": 4145
+  },
+  "encuentra24|29454125": {
+    "ts": "2026-08-01T06:23:22.168353+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "12,996 m² Corner Lot, La Unión, Near Pacific Airport",
+      "es": "Terreno de esquina 12,996 m² en La Unión, cerca del Aeropuerto del Pacífico"
+    },
+    "short_description_canonical": {
+      "en": "Flat 12,996 m² corner lot in La Unión, fronting the Pan-American Highway and a local road. Located near the ETESAL substation, the new Pacific Airport, and the Bypass. Utilities available: water and electricity. Ideal for industrial, logistics, commercial, or residential projects. Price $650,860 ($35 per square vara).",
+      "es": "Terreno plano de 12,996 m² en esquina en La Unión, con frente a la Carretera Panamericana y a un camino vecinal. Ubicado cerca de la Subestación ETESAL, el nuevo Aeropuerto del Pacífico y el Bypass. Factibilidad de agua potable y energía eléctrica. Ideal para proyectos industriales, logísticos, comerciales o habitacionales. Precio $650,860 ($35 por vara²)."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Corner lot, 100% flat",
+        "es": "Terreno de esquina, 100% plano"
+      },
+      {
+        "en": "Frontage on two roads",
+        "es": "Frente sobre dos vías"
+      },
+      {
+        "en": "Water and electricity feasibility",
+        "es": "Factibilidad de agua y electricidad"
+      },
+      {
+        "en": "Near new Pacific Airport",
+        "es": "Cerca del nuevo Aeropuerto del Pacífico"
+      },
+      {
+        "en": "156 m frontage on Pan-American Hwy",
+        "es": "156 m de frente sobre Carretera Panamericana"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Unión bay",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3323,
+    "tokens_out": 559,
+    "cost_usd": 0.00151211,
+    "finish_reason": "stop",
+    "latency_ms": 4572
+  },
+  "encuentra24|32664328": {
+    "ts": "2026-08-01T06:23:22.350353+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Villas de Salinitas: 5-Bed Home with Pool, Parking",
+      "es": "Villas de Salinitas: Casa 5 habs con piscina y parqueo"
+    },
+    "short_description_canonical": {
+      "en": "House in Villas de Salinitas, Acajutla, Sonsonate, on a 2,204 m² lot (3,154 varas²). It has 5 bedrooms, 4 bathrooms, parking for 10 vehicles, and a pool with rancho hamaquero. Includes guest room, barbecue area, and some furniture; beach access via Residencial Salinitas. Price $700,000.",
+      "es": "Casa en Villas de Salinitas, Acajutla, Sonsonate, en lote de 2,204 m² (3,154 varas²). Tiene 5 habitaciones, 4 baños, parqueo para 10 vehículos y piscina con rancho hamaquero. Incluye cuarto de huéspedes, área de barbacoa y algunos muebles; acceso a playa por Residencial Salinitas. Precio $700,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "2,204 m² lot, 30m frontage",
+        "es": "Lote de 2,204 m², frente de 30m"
+      },
+      {
+        "en": "Parking for 10 vehicles",
+        "es": "Parqueo para 10 vehículos"
+      },
+      {
+        "en": "Pool with rancho hamaquero",
+        "es": "Piscina con rancho hamaquero"
+      },
+      {
+        "en": "Beach access via Residencial Salinitas",
+        "es": "Acceso a playa por Residencial Salinitas"
+      },
+      {
+        "en": "Includes furniture and appliances",
+        "es": "Incluye muebles y línea blanca"
+      }
+    ],
+    "lat": 13.5928,
+    "lng": -89.8275,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Acajutla",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 5,
+      "bathrooms": 4.0,
+      "built_area_m2": null,
+      "parking_spaces": 10,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 3284,
+    "tokens_out": 600,
+    "cost_usd": 0.00154668,
+    "finish_reason": "stop",
+    "latency_ms": 4346
+  },
+  "realestate_au_sv|lotificacion-los-girasoles-poligono-j-lote-28-armenia-sonsonate-este-sonsonate-armenia-sonsonate-armenia-sonsonate-310119458960": {
+    "ts": "2026-08-01T06:23:22.455318+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land Lot 28, Los Girasoles, Armenia, Sonsonate",
+      "es": "Lote 28, Los Girasoles, Armenia, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Land lot 28 in Polígono J, Los Girasoles, Armenia, Sonsonate, El Salvador. This residential lot is offered for sale at USD 65,000. No further details on terrain, utilities, or zoning are provided in the listing.",
+      "es": "Lote de terreno 28 en Polígono J, Los Girasoles, Armenia, Sonsonate, El Salvador. Este lote residencial se ofrece en venta por USD 65,000. No se proporcionan más detalles sobre el terreno, servicios públicos o zonificación en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Armenia, Sonsonate",
+        "es": "Ubicado en Armenia, Sonsonate"
+      },
+      {
+        "en": "Part of Los Girasoles development",
+        "es": "Parte del desarrollo Los Girasoles"
+      },
+      {
+        "en": "Asking price USD 65,000",
+        "es": "Precio de venta USD 65,000"
+      }
+    ],
+    "lat": 13.7167,
+    "lng": -89.5,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Armenia, Sonsonate, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 427,
+    "cost_usd": 0.00130616,
+    "finish_reason": "stop",
+    "latency_ms": 3662
+  },
+  "encuentra24|32576721": {
+    "ts": "2026-08-01T06:23:22.637188+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "350 m² Lot in Costa del Sol Gated Community",
+      "es": "Terreno de 350 m² en Residencial Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "350 m² (500 varas²) residential lot in the private Golden Lake community, Costa del Sol, La Paz. The complex offers tennis court, artificial fishing lagoon, boat dock, clubhouse, and 24/7 security. Five-minute walk to the beach, 30 minutes from Comalapa airport, 1 hour from San Salvador. Price $98,000.",
+      "es": "Terreno residencial de 350 m² (500 varas²) en la residencial privada Golden Lake, Costa del Sol, La Paz. El complejo cuenta con cancha de tenis, laguna artificial de pesca, desembarcadero de lanchas, casa club y seguridad 24/7. A 5 minutos caminando de la playa, 30 minutos del aeropuerto de Comalapa, 1 hora de San Salvador. Precio $98,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Residencial privada con seguridad 24/7"
+      },
+      {
+        "en": "5-minute walk to the beach",
+        "es": "A 5 minutos caminando de la playa"
+      },
+      {
+        "en": "30 minutes from Comalapa airport",
+        "es": "A 30 minutos del aeropuerto de Comalapa"
+      },
+      {
+        "en": "Amenities: tennis, fishing lagoon, boat dock",
+        "es": "Comodidades: tenis, laguna de pesca, desembarcadero"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3300,
+    "tokens_out": 541,
+    "cost_usd": 0.0014861,
+    "finish_reason": "stop",
+    "latency_ms": 4006
+  },
+  "encuentra24|32664356": {
+    "ts": "2026-08-01T06:23:22.680524+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "25.26 Manzanas Development Land, Tecoluca, San Vicente",
+      "es": "25.26 Manzanas Terreno para Desarrollo, Tecoluca, San Vicente"
+    },
+    "short_description_canonical": {
+      "en": "Flat 25.26 manzanas (176,553 m²) development land in Tecoluca, San Vicente, with road interconnection to surrounding areas. Currently accessed via dirt road to El Playón, 2 minutes from Litoral Highway, bordering the Grifal River. Includes water well, electricity accessible, and potential for urban or industrial development. Total sale price USD $2,700,000 negotiable.",
+      "es": "Terreno plano de 25.26 manzanas (176,553 m²) para desarrollo en Tecoluca, San Vicente, con interconexión vial a zonas aledañas. Acceso actual por calle de tierra al Playón, a 2 minutos de la Carretera Litoral, colindante con el río Grifal. Incluye pozo de agua, accesible a energía eléctrica y potencial para urbanizar o industrializar. Precio total de venta USD $2,700,000 negociable."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat 25.26 manzanas (176,553 m²)",
+        "es": "Plano 25.26 manzanas (176,553 m²)"
+      },
+      {
+        "en": "2 minutes from Litoral Highway",
+        "es": "A 2 minutos de la Carretera Litoral"
+      },
+      {
+        "en": "Borders Grifal River",
+        "es": "Colinda con río Grifal"
+      },
+      {
+        "en": "Water well on site",
+        "es": "Pozo de agua en el terreno"
+      },
+      {
+        "en": "Potential for urban or industrial",
+        "es": "Potencial para urbanizar o industrializar"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3225,
+    "tokens_out": 587,
+    "cost_usd": 0.00151645,
+    "finish_reason": "stop",
+    "latency_ms": 4374
+  },
+  "encuentra24|32484739": {
+    "ts": "2026-08-01T06:23:22.723447+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Ranch in La Libertad, 1,400 m²",
+      "es": "Rancho frente al mar en La Libertad, 1,400 m²"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront ranch in La Libertad, Surf City, on a 1,400 m² lot (2,000 varas²). It has 5 bedrooms with A/C, 6 bathrooms, living room, dining room, kitchen, laundry area, ocean-view lookout, family pool, full apartment, and parking for 10 vehicles. Located 5 minutes from Puerto de La Libertad, 10 minutes from El Tunco, 40 minutes from San Salvador and the airport.",
+      "es": "Rancho frente al mar en La Libertad, Surf City, en un terreno de 1,400 m² (2,000 varas²). Cuenta con 5 habitaciones con A/C, 6 baños, sala, comedor, cocina, área de lavandería, mirador frente al mar, piscina familiar, apartamento completo y parqueo para 10 vehículos. Ubicado a 5 minutos del Puerto de La Libertad, 10 minutos de El Tunco, 40 minutos de San Salvador y del aeropuerto."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront with ocean-view lookout",
+        "es": "Frente al mar con mirador"
+      },
+      {
+        "en": "5 bedrooms with A/C, 6 baths",
+        "es": "5 habitaciones con A/C, 6 baños"
+      },
+      {
+        "en": "Family pool and full apartment",
+        "es": "Piscina familiar y apartamento completo"
+      },
+      {
+        "en": "Parking for 10 vehicles",
+        "es": "Parqueo para 10 vehículos"
+      },
+      {
+        "en": "5 min to Puerto de La Libertad",
+        "es": "5 min al Puerto de La Libertad"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 5,
+      "bathrooms": 6.0,
+      "built_area_m2": null,
+      "parking_spaces": 10,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3356,
+    "tokens_out": 601,
+    "cost_usd": 0.00156722,
+    "finish_reason": "stop",
+    "latency_ms": 4037
+  },
+  "remax|001461165138": {
+    "ts": "2026-08-01T06:23:25.469499+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Gated Community Lot Near La Libertad Beaches",
+      "es": "Lote en comunidad cerrada cerca de playas de La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Flat 5,128 m² lot in the private gated community of El Cortijo, on the road to Surfcity, La Libertad. The community has basic services, mountain scenery, and valid building and environmental permits. Close to both the city and La Libertad beaches.",
+      "es": "Lote plano de 5,128 m² en la comunidad cerrada El Cortijo, sobre la carretera a Surfcity, La Libertad. La comunidad cuenta con servicios básicos, paisaje montañoso y permisos de construcción y ambientales vigentes. Cerca de la ciudad y de las playas de La Libertad."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Gated community with basic services",
+        "es": "Comunidad cerrada con servicios básicos"
+      },
+      {
+        "en": "Valid building and environmental permits",
+        "es": "Permisos de construcción y ambientales vigentes"
+      },
+      {
+        "en": "Close to city and La Libertad beaches",
+        "es": "Cerca de la ciudad y playas de La Libertad"
+      },
+      {
+        "en": "Mountain scenery and local flora",
+        "es": "Paisaje montañoso y flora local"
+      }
+    ],
+    "lat": 13.4882,
+    "lng": -89.3211,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3161,
+    "tokens_out": 472,
+    "cost_usd": 0.00137267,
+    "finish_reason": "stop",
+    "latency_ms": 3835
+  },
+  "remax|001462660116": {
+    "ts": "2026-08-01T06:23:26.125556+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lot 31 in Altos de Las Piletas, Comasagua Road",
+      "es": "Lote 31 en Altos de Las Piletas, carretera a Comasagua"
+    },
+    "short_description_canonical": {
+      "en": "Lot 31 is a 719.23 m² residential lot in Altos de Las Piletas, an exclusive development at Km 12.5 on the road to Comasagua. It has a 20.80-meter frontage and 34.58-meter length, with underground utilities, individual water rights, and a security gatehouse. The development includes recreational areas, green spaces, and visitor parking.",
+      "es": "El Lote 31 es un lote residencial de 719.23 m² en Altos de Las Piletas, un desarrollo exclusivo en el Km 12.5 de la carretera a Comasagua. Tiene 20.80 metros de frente y 34.58 metros de largo, con servicios subterráneos, derechos de agua individuales y caseta de seguridad. El desarrollo incluye áreas recreativas, zonas verdes y estacionamiento para visitantes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "20.80m frontage, 34.58m length",
+        "es": "20.80m de frente, 34.58m de largo"
+      },
+      {
+        "en": "Underground electrical and utility infrastructure",
+        "es": "Infraestructura eléctrica y de servicios subterránea"
+      },
+      {
+        "en": "Individual potable water connection rights",
+        "es": "Derechos de conexión de agua potable individual"
+      },
+      {
+        "en": "Security gatehouse and recreational areas",
+        "es": "Caseta de seguridad y áreas recreativas"
+      },
+      {
+        "en": "Near ESEN, Lamatepec, La Floresta schools",
+        "es": "Cerca de ESEN, Lamatepec, La Floresta"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Conchagua, La Unión",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3405,
+    "tokens_out": 598,
+    "cost_usd": 0.00157715,
+    "finish_reason": "stop",
+    "latency_ms": 4298
+  },
+  "remax|001461331204": {
+    "ts": "2026-08-01T06:23:26.326918+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Ocean-view lot in Cerromar II, Km 42 Litoral",
+      "es": "Lote con vista al mar en Cerromar II, Km 42 Litoral"
+    },
+    "short_description_canonical": {
+      "en": "Sloped lot of 1532.86 v² (approx. 1071.31 m²) in the gated community Cerromar II, at Km 42 of the Carretera del Litoral, north of Club Tecleño and Club Salvadoreño El Sunzal. It offers panoramic Pacific Ocean views and is minutes from El Tunco and El Sunzal beaches, near the Port of La Libertad boardwalk. The community has controlled access and security; the terrain allows terraced architecture.",
+      "es": "Lote en pendiente de 1532.86 v² (aprox. 1071.31 m²) en el condominio cerrado Cerromar II, en el Km 42 de la Carretera del Litoral, al norte del Club Tecleño y Club Salvadoreño El Sunzal. Ofrece vista panorámica al Océano Pacífico y está a minutos de las playas El Tunco y El Sunzal, cerca del malecón del Puerto de La Libertad. La comunidad tiene acceso controlado y seguridad; el terreno permite arquitectura en terrazas."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Panoramic Pacific Ocean view",
+        "es": "Vista panorámica al Océano Pacífico"
+      },
+      {
+        "en": "Gated community with security",
+        "es": "Condominio cerrado con seguridad"
+      },
+      {
+        "en": "Minutes from El Tunco and El Sunzal",
+        "es": "Minutos de El Tunco y El Sunzal"
+      },
+      {
+        "en": "High appreciation potential area",
+        "es": "Zona con alto potencial de plusvalía"
+      }
+    ],
+    "lat": 13.4983,
+    "lng": -89.5856,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Sunza beach (near El Tunco and El Sunzal)",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3276,
+    "tokens_out": 588,
+    "cost_usd": 0.00153132,
+    "finish_reason": "stop",
+    "latency_ms": 4158
+  },
+  "encuentra24|28973653": {
+    "ts": "2026-08-01T07:09:27.765123+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Villa Níspero: 400m² Luxury Villa Near Playa Venao",
+      "es": "Villa Níspero: Villa de lujo de 400m² cerca de Playa Venao"
+    },
+    "short_description_canonical": {
+      "en": "Villa Níspero is a 400m² luxury villa on 2,500m² of land in Sanctuary Garden, a private development 10 minutes from Playa Venao, Panama. Under construction, completion scheduled for November 2026. Features 3 bedrooms, 3.5 bathrooms, 4 parking spaces, infinity pool, and panoramic ocean and jungle views. Includes a signature internal garden around a Níspero tree and qualifies for Panama residency in about 45 days.",
+      "es": "Villa Níspero es una villa de lujo de 400m² en un terreno de 2,500m² en Sanctuary Garden, un desarrollo privado a 10 minutos de Playa Venao, Panamá. En construcción, finalización prevista para noviembre de 2026. Cuenta con 3 habitaciones, 3.5 baños, 4 estacionamientos, piscina infinita y vistas panorámicas al océano y la selva. Incluye un jardín interno alrededor de un árbol de níspero y califica para residencia panameña en unos 45 días."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "10 minutes from Playa Venao",
+        "es": "A 10 minutos de Playa Venao"
+      },
+      {
+        "en": "Infinity pool and 360° views",
+        "es": "Piscina infinita y vistas de 360°"
+      },
+      {
+        "en": "Panama residency in ~45 days",
+        "es": "Residencia panameña en ~45 días"
+      },
+      {
+        "en": "2,500m² private lot",
+        "es": "Lote privado de 2,500m²"
+      },
+      {
+        "en": "Completion November 2026",
+        "es": "Finalización noviembre 2026"
+      }
+    ],
+    "lat": 7.4167,
+    "lng": -80.2667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Venao, Panama",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.5,
+      "built_area_m2": 400.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2539,
+    "tokens_out": 637,
+    "cost_usd": 0.00138623,
+    "finish_reason": "stop",
+    "latency_ms": 5383
   }
 }
