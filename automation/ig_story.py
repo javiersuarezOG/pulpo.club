@@ -29,26 +29,36 @@ from automation import ig_photo_gate
 MAX_SLIDES = 10  # Instagram carousel hard cap
 MIN_SLIDES = 4
 
-# Short, overlay-length lines. OPENER stops the scroll; MEANING pays it off.
-# Kept distinct from the caption hook so the carousel and the caption don't
-# read as the same sentence twice.
+# Short, overlay-length lines. OPENER stops the scroll with a CURIOSITY GAP —
+# it withholds, it doesn't announce. MEANING pays it off on the second-to-last
+# slide. Written in the three angles Javi picked (diáspora / POV / humor-ranking)
+# with voseo + local voice. Kept distinct from the caption hook so the carousel
+# and the caption don't read as the same sentence twice.
 _OPENER: dict[str, tuple[str, str]] = {
-    "scarcity":       ("Frente al mar. Y ya casi no queda.", "Oceanfront. And barely any left."),
-    "authority":      ("El mundo volteó a ver El Salvador.", "The world turned to look at El Salvador."),
-    "social_proof":   ("Los de afuera ya están comprando.", "Outsiders are already buying."),
-    "aspiration":     ("Imaginate despertar aquí.", "Imagine waking up here."),
-    "investment":     ("Tierra: activo duro, en dólares.", "Land: a hard asset, in dollars."),
-    "transformation": ("El país que recordás ya cambió.", "The country you remember has changed."),
-    "education":      ("Todo El Salvador, en un solo lugar.", "All of El Salvador, in one place."),
+    "scarcity":       ("Nadie está haciendo más tierra frente al mar.",
+                       "Nobody's making more oceanfront land."),
+    "authority":      ("Hace 5 años, nadie invertía aquí.",
+                       "Five years ago, nobody invested here."),
+    "social_proof":   ("Los de afuera ya se dieron cuenta. ¿Y vos?",
+                       "Outsiders already figured it out. And you?"),
+    "aspiration":     ("POV: nadie sabe todavía que esto es tuyo.",
+                       "POV: nobody knows yet that this is yours."),
+    "investment":     ("Le mandás plata a tu familia cada mes.",
+                       "You send money home every month."),
+    "transformation": ("El país que dejaste ya no existe.",
+                       "The country you left no longer exists."),
+    "education":      ("Revisé 1,891 propiedades. Una me quitó el sueño.",
+                       "I went through 1,891 listings. One kept me up at night."),
 }
 _MEANING: dict[str, tuple[str, str]] = {
-    "scarcity":       ("Lo bueno se vende primero.", "The good ones sell first."),
-    "authority":      ("Vos ya estás aquí. Llevás ventaja.", "You're already here. You're ahead."),
-    "social_proof":   ("Vení antes que crezca la fila.", "Get in before the line grows."),
-    "aspiration":     ("Tu pedazo de paraíso.", "Your piece of paradise."),
-    "investment":     ("No se devalúa mientras dormís.", "It doesn't lose value while you sleep."),
-    "transformation": ("Y esto apenas empieza.", "And this is just the start."),
-    "education":      ("Abrí una página y vé lo mejor.", "Open one page, see the best."),
+    "scarcity":       ("Esta es de las últimas.", "This is one of the last."),
+    "authority":      ("Mirá quién está comprando ahora.", "Look who's buying now."),
+    "social_proof":   ("No llegués tarde a tu propio país.", "Don't arrive late to your own country."),
+    "aspiration":     ("Y tu domingo empieza acá.", "And your Sunday starts here."),
+    "investment":     ("Por ese monto, en unos años, esto es tuyo.",
+                       "For that amount, in a few years, this is yours."),
+    "transformation": ("El que hay ahora te va a sorprender.", "The one here now will surprise you."),
+    "education":      ("Es esta. Deslizá.", "It's this one. Swipe."),
 }
 _CTA: tuple[str, str] = ("pulpo.club · link en bio", "pulpo.club · link in bio")
 
