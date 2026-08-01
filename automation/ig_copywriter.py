@@ -105,13 +105,13 @@ def _feature_line(listing: dict) -> str:
 
 def _det_scarcity(listing, fact):
     zone = _zone_label(listing)
-    hook_es = "La tierra frente al mar no se fabrica. Y ya casi no queda."
+    hook_es = "Nadie está fabricando más tierra frente al mar. Y esta es de las últimas."
     body_es = (
         f"Como este terreno en {zone}: {_feature_line(listing)}.\n"
         "En Pulpo las tenemos todas juntas y rankeadas, para que veás las mejores "
         "sin revisar mil sitios."
     )
-    hook_en = "Oceanfront land isn't being made — and there's barely any left."
+    hook_en = "Nobody's making more oceanfront land. And this is one of the last."
     body_en = (
         f"Like this one in {zone}: {_feature_line(listing)}.\n"
         "At Pulpo we keep them all in one place, ranked, so you see the best "
@@ -122,13 +122,13 @@ def _det_scarcity(listing, fact):
 
 def _det_authority(listing, fact):
     zone = _zone_label(listing)
-    hook_es = "El mundo entero volteó a ver El Salvador. Y apenas están llegando."
+    hook_es = "Hace cinco años, a esta costa no le paraba bola nadie."
     body_es = (
         f"{fact['statement_es']}\n"
-        f"Propiedades como esta en {zone} son las que vienen buscando. Vos ya "
+        f"Ahora propiedades como esta en {zone} son las que vienen buscando. Vos ya "
         "estás aquí — llevás ventaja."
     )
-    hook_en = "The whole world turned to look at El Salvador. And they're just arriving."
+    hook_en = "Five years ago, nobody paid this coast any attention."
     body_en = (
         f"{fact['statement_en']}\n"
         f"Places like this one in {zone} are exactly what they come looking for. "
@@ -139,13 +139,13 @@ def _det_authority(listing, fact):
 
 def _det_social_proof(listing, fact):
     zone = _zone_label(listing)
-    hook_es = "El mundo descubrió El Salvador. Vos naciste aquí."
+    hook_es = "Los extranjeros ya se dieron cuenta. Vos que naciste aquí, ¿vas a llegar tarde?"
     body_es = (
         f"{fact['statement_es']}\n"
         f"Gente de afuera ya está comprando su pedazo — como este en {zone}. "
         "Lo bueno se vende primero; con Pulpo lo ves antes que la fila crezca."
     )
-    hook_en = "The world discovered El Salvador. You were born here."
+    hook_en = "Foreigners already figured it out. You were born here — going to arrive late?"
     body_en = (
         f"{fact['statement_en']}\n"
         f"People from abroad are already buying their piece — like this one in "
@@ -156,12 +156,12 @@ def _det_social_proof(listing, fact):
 
 def _det_aspiration(listing, fact):
     zone = _zone_label(listing)
-    hook_es = "Domingo, 7 de la mañana, y el Pacífico a treinta metros."
+    hook_es = "POV: son las 6 de la mañana y nadie sabe todavía que esto es tuyo."
     body_es = (
         f"Así se despierta en {zone}. {_feature_line(listing).capitalize()}.\n"
         "Tu pedazo de paraíso, antes que se acabe."
     )
-    hook_en = "Sunday, 7am, the Pacific thirty metres away."
+    hook_en = "POV: it's 6am and nobody knows yet that this is yours."
     body_en = (
         f"That's waking up in {zone}. {_feature_line(listing).capitalize()}.\n"
         "Your piece of paradise, before it's gone."
@@ -173,13 +173,13 @@ def _det_investment(listing, fact):
     zone = _zone_label(listing)
     price = _price(listing)
     tail_es = f" Este en {zone}: {price}." if price else f" Como este en {zone}."
-    hook_es = "Un activo duro, en una economía en dólares."
+    hook_es = "Le mandás plata a tu familia cada mes. Hacé la cuenta de lo que sigue."
     body_es = (
         f"{fact['statement_es']}\n"
         f"La tierra frente al mar no se devalúa mientras dormís.{tail_es}"
     )
     tail_en = f" This one in {zone}: {price}." if price else f" Like this one in {zone}."
-    hook_en = "A hard asset, in a dollar economy."
+    hook_en = "You send money home every month. Do the math on what comes next."
     body_en = (
         f"{fact['statement_en']}\n"
         f"Oceanfront land doesn't lose value while you sleep.{tail_en}"
@@ -188,13 +188,13 @@ def _det_investment(listing, fact):
 
 
 def _det_transformation(listing, fact):
-    hook_es = "El país que recordás no es el país de hoy."
+    hook_es = "El país que dejaste ya no existe. El que hay ahora te va a sorprender."
     body_es = (
         f"{fact['statement_es']}\n"
         "De olvidado a uno de los mercados emergentes del momento. Y esto apenas "
         "empieza — mirá lo que hay disponible en Pulpo."
     )
-    hook_en = "The country you remember isn't the country today."
+    hook_en = "The country you left no longer exists. The one here now will surprise you."
     body_en = (
         f"{fact['statement_en']}\n"
         "From forgotten to one of the emerging markets of the moment. And this is "
@@ -204,18 +204,18 @@ def _det_transformation(listing, fact):
 
 
 def _det_education(listing, fact):
-    hook_es = "Dejá de revisar 20 sitios para encontrar tu terreno."
+    zone = _zone_label(listing)
+    hook_es = "Revisé las 1,891 propiedades del país esta semana. Una me quitó el sueño."
     body_es = (
-        "Encuentra24, ReMax, grupos de Facebook, el conocido que “vende barato”… "
-        "agotador.\n"
-        "Pulpo junta todas las propiedades de El Salvador en un solo lugar y las "
-        "ordena de mejor a peor. Vos abrís una sola página y ves lo mejor."
+        f"Es esta, en {zone}: {_feature_line(listing)}.\n"
+        "En Pulpo están todas las del país, rankeadas de mejor a peor. Vos abrís una "
+        "sola página y ves la que gana — sin revisar veinte sitios."
     )
-    hook_en = "Stop checking 20 sites to find your land."
+    hook_en = "I went through all 1,891 listings in the country this week. One kept me up."
     body_en = (
-        "Encuentra24, ReMax, Facebook groups, the guy who “sells cheap”… exhausting.\n"
-        "Pulpo pulls every property in El Salvador into one place and ranks them "
-        "best to worst. You open one page and see the best."
+        f"It's this one, in {zone}: {_feature_line(listing)}.\n"
+        "Pulpo has every property in the country, ranked best to worst. You open one "
+        "page and see the one that wins — without digging through twenty sites."
     )
     return hook_es, body_es, hook_en, body_en
 
