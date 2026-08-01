@@ -38,11 +38,34 @@ def test_storyboard_has_at_least_four_slides():
     assert len(sb) >= ig_story.MIN_SLIDES
 
 
-def test_arc_opens_on_hero_and_closes_on_cta():
+def test_opener_and_cta_are_designed_middle_is_real_photos():
     sb = ig_story.build_storyboard(_listing(), "aspiration")
-    assert sb[0]["role"] == "opener"
-    assert sb[0]["image"].endswith("pic0.jpg")   # hero = first ordered photo
-    assert sb[-1]["role"] == "cta"
+    assert sb[0]["role"] == "opener" and sb[0]["designed"] is True
+    assert sb[-1]["role"] == "cta" and sb[-1]["designed"] is True
+    # opener without a curated zone image = poster fallback (no raw photo)
+    assert sb[0]["kind"] == "poster" and sb[0]["image"] is None
+    # middle slides are real listing photos, flagged for human watermark review
+    middle = sb[1:-1]
+    assert middle and all(s["designed"] is False and s["needs_review"] for s in middle)
+    assert all(s["kind"] == "listing_photo" and s["image"] for s in middle)
+
+
+def test_curated_zone_image_becomes_the_opener(monkeypatch):
+    monkeypatch.setitem(ig_story.ig_zone_images.ZONE_IMAGES, "el-tunco", {
+        "image": "web/data/ig_assets/zones/el-tunco.jpg",
+        "credit": "Pulpo", "license": "pulpo_owned",
+    })
+    sb = ig_story.build_storyboard(_listing(), "aspiration")
+    assert sb[0]["kind"] == "zone_photo"
+    assert sb[0]["image"].endswith("el-tunco.jpg")
+    assert sb[0]["needs_review"] is False   # curated + licensed = trusted
+
+
+def test_designed_slides_never_need_review():
+    sb = ig_story.build_storyboard(_listing(), "scarcity")
+    for s in sb:
+        if s["designed"]:
+            assert s["needs_review"] is False
 
 
 def test_middle_slides_are_the_listings_own_reasons():
@@ -53,21 +76,22 @@ def test_middle_slides_are_the_listings_own_reasons():
     assert "3 minutos a la playa" in proof
 
 
-def test_every_slide_has_an_image_and_both_languages():
+def test_every_slide_has_text_both_languages():
     sb = ig_story.build_storyboard(_listing(), "social_proof")
     for s in sb:
-        assert s["image"] and s["text_es"] and s["text_en"]
+        assert s["text_es"] and s["text_en"]
         assert s["text_es"] != s["text_en"] or s["role"] == "cta"  # cta line is shared
 
 
-def test_never_more_slides_than_photos_no_blanks():
+def test_real_photo_slides_never_exceed_available_photos():
     li = _listing(photo_urls=["https://cdn/a.jpg", "https://cdn/b.jpg",
                               "https://cdn/c.jpg", "https://cdn/d.jpg"], photos_count=4)
     sb = ig_story.build_storyboard(li, "scarcity")
-    assert len(sb) <= 4
-    assert len({s["index"] for s in sb}) == len(sb)  # indices unique
-    imgs = [s["image"] for s in sb]
-    assert all(imgs)
+    assert len({s["index"] for s in sb}) == len(sb)          # indices unique
+    real = [s for s in sb if s["kind"] == "listing_photo"]
+    assert len(real) <= 4 and all(s["image"] for s in real)  # no blank real slides
+    # each real slide gets a distinct photo (no repeats)
+    assert len({s["image"] for s in real}) == len(real)
 
 
 def test_capped_at_ten_and_cta_survives_trim():

@@ -25,6 +25,7 @@ never invented. Pure + deterministic — no network, no model, no publish.
 from __future__ import annotations
 
 from automation import ig_photo_gate
+from automation import ig_zone_images
 
 MAX_SLIDES = 10  # Instagram carousel hard cap
 MIN_SLIDES = 4
@@ -116,47 +117,66 @@ def _reason_beats(listing: dict) -> list[tuple[str, str]]:
     return out
 
 
-def _slide(index: int, role: str, image: str, es: str, en: str) -> dict:
-    return {"index": index, "role": role, "image": image, "text_es": es, "text_en": en}
+def _slide(index, role, image, es, en, *, designed, needs_review, kind) -> dict:
+    """A slide. `designed` = a Pulpo-rendered graphic (opener/CTA — always
+    brand-safe). `needs_review` = a raw listing photo that a human MUST clear of
+    broker watermarks/phones before publish (the overlay detector is not
+    trusted). `kind` tells the renderer which surface to build."""
+    return {
+        "index": index, "role": role, "image": image,
+        "text_es": es, "text_en": en,
+        "designed": designed, "needs_review": needs_review, "kind": kind,
+    }
 
 
 def build_storyboard(listing: dict, lever: str, *, max_slides: int = MAX_SLIDES) -> list[dict]:
-    """Ordered slides (opener → place → proof… → meaning → cta), each with an
-    image URL + a short bilingual beat. Always ≥4 slides when the listing has
-    the photos for it; never more than it has photos (no blank slides)."""
+    """Hybrid carousel (Javi's chosen direction):
+
+      • OPENER  — a DESIGNED slide with the hook. If the zone has a curated,
+        license-clear establishing photo (ig_zone_images) it's laid under the
+        hook (real location, brand-safe); otherwise a designed poster fallback.
+        Never a raw broker photo — that's what made openers ugly/unsafe.
+      • MIDDLE  — place + the listing's own reasons_to_buy, each on a REAL
+        listing photo, flagged needs_review=True (a human clears watermarks
+        before publish; the detector isn't trusted).
+      • CTA     — a designed closer.
+
+    ≥4 slides when the listing has ≥2 real photos; capped at IG's 10."""
     photos = _ordered_photos(listing, max_slides)
     if not photos:
         return []
 
-    opener = _OPENER.get(lever, _OPENER["aspiration"])
-    meaning = _MEANING.get(lever, _MEANING["aspiration"])
+    opener_txt = _OPENER.get(lever, _OPENER["aspiration"])
+    meaning_txt = _MEANING.get(lever, _MEANING["aspiration"])
     place = _place_beat(listing)
     reasons = _reason_beats(listing)
 
-    # Beat plan (before pairing with photos): opener, place, each reason,
-    # meaning, cta — then trimmed to the number of photos available.
-    beats: list[tuple[str, str, str]] = [("opener", *opener), ("place", *place)]
-    beats += [("proof", es, en) for es, en in reasons]
-    beats += [("meaning", *meaning), ("cta", *_CTA)]
+    # Middle beats — each consumes ONE real listing photo. place + reasons +
+    # meaning; trimmed to available photos and to the carousel budget (10 total,
+    # minus the designed opener + CTA = 8 real-photo slides max).
+    middle_beats = [("place", *place)]
+    middle_beats += [("proof", es, en) for es, en in reasons]
+    middle_beats += [("meaning", *meaning_txt)]
+    budget = min(len(photos), max_slides - 2)
+    middle_beats = middle_beats[:budget]
 
-    n = min(len(beats), len(photos), max_slides)
-    if n < MIN_SLIDES:
-        # Too few reasons AND few photos: pad the middle by repeating the best
-        # photo under remaining reason/meaning beats rather than drop below 4.
-        # (In practice every gated listing has ≥6 photos, so this is a floor.)
-        n = min(MIN_SLIDES, len(beats))
-    # Always keep the CTA as the closer: if trimming, drop from the middle
-    # (proof beats), never the opener/place/meaning/cta anchors.
-    if len(beats) > n:
-        anchors = [beats[0], beats[1], beats[-2], beats[-1]]  # opener, place, meaning, cta
-        middle = beats[2:-2]
-        keep_mid = middle[: max(0, n - len(anchors))]
-        beats = [beats[0], beats[1], *keep_mid, beats[-2], beats[-1]]
-        n = len(beats)
-
+    zone_img = ig_zone_images.get(listing.get("zone"))
     slides: list[dict] = []
-    for i in range(n):
-        role, es, en = beats[i]
-        image = photos[i] if i < len(photos) else photos[-1]
-        slides.append(_slide(i + 1, role, image, es, en))
+
+    # 1 — designed opener (zone photo if curated, else poster fallback)
+    if zone_img:
+        slides.append(_slide(1, "opener", zone_img["image"], *opener_txt,
+                             designed=True, needs_review=False, kind="zone_photo"))
+    else:
+        slides.append(_slide(1, "opener", None, *opener_txt,
+                             designed=True, needs_review=False, kind="poster"))
+
+    # 2..N-1 — real listing photos (human-verified before publish)
+    for j, (role, es, en) in enumerate(middle_beats):
+        slides.append(_slide(len(slides) + 1, role, photos[j], es, en,
+                             designed=False, needs_review=True, kind="listing_photo"))
+
+    # N — designed CTA closer
+    slides.append(_slide(len(slides) + 1, "cta", None, *_CTA,
+                         designed=True, needs_review=False, kind="cta_poster"))
     return slides

@@ -177,5 +177,7 @@ def generate_batch(
             "hero_photo_path": li.get("hero_photo_path"),
             "slides": slides,
             "slide_count": len(slides),
+            "opener_kind": (slides[0]["kind"] if slides else None),
+            "photos_needing_review": sum(1 for s in slides if s.get("needs_review")),
         })
     return out
