@@ -28,11 +28,17 @@ def _listing(sid, zone, price, *, safe=True):
         "property_type": "terreno", "price_usd": price, "rank_score": price / 1000.0,
         "hero_photo_path": f"web/photos/{sid}.jpg",
         "title_canonical": {"en": f"Land {sid}", "es": f"Terreno {sid}"},
-        "size_m2": 4000, "photos": [f"{sid}_1.jpg", f"{sid}_2.jpg", f"{sid}_3.jpg"],
+        "size_m2": 4000, "dist_beach_km": 0.3,
+        "photo_urls": [f"https://cdn/{sid}_{i}.jpg" for i in range(6)], "photos_count": 6,
+        "reasons_to_buy": [
+            {"es": "frente amplio", "en": "wide frontage"},
+            {"es": "cerca del mar", "en": "near the sea"},
+        ],
     }
     if not safe:
         li["hero_photo_path"] = None
-        li["photos"] = []
+        li["photo_urls"] = []
+        li["photos_count"] = 0
     return li
 
 
@@ -68,6 +74,8 @@ def test_generate_batch_shape_and_coverage():
         assert p["comment_es"] and p["comment_en"]
         assert p["hero_photo_path"]           # brand-safe: real photo
         assert p["zone"]
+        assert p["slide_count"] >= 4          # every post is a ≥4-slide story
+        assert p["slides"][0]["role"] == "opener" and p["slides"][-1]["role"] == "cta"
 
 
 def test_every_code_is_router_valid_and_day_sequenced():
