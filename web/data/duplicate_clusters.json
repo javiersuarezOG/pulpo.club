@@ -1404,6 +1404,34 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "920bde86150de4ff504b5970c56ef1454bae2bd8",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 1600000.0,
+        "source": "csbr",
+        "source_id": "venta-casa-con-piscina-frente-al-lago-de-coatepeque-ideal-inversion-2",
+        "title": "CASA ORILLA LAGO DE COATEPEQUE",
+        "url": "https://www.camarabienesraices.com.sv/propiedad/venta-casa-con-piscina-frente-al-lago-de-coatepeque-ideal-inversion-2/",
+        "zone": "lago-coatepeque"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 1600000.0,
+        "source": "csbr",
+        "source_id": "venta-casa-con-piscina-frente-al-lago-de-coatepeque-ideal-inversion",
+        "title": "CASA ORILLA LAGO DE COATEPEQUE",
+        "url": "https://www.camarabienesraices.com.sv/propiedad/venta-casa-con-piscina-frente-al-lago-de-coatepeque-ideal-inversion/",
+        "zone": "lago-coatepeque"
+      }
+    ],
+    "sources": [
+      "csbr"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "936015b904b5fc9bae3bea5189ad25bbeb06f623",
     "samples": [
       {
@@ -1511,6 +1539,34 @@
     ],
     "sources": [
       "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "bd93293dcefd94a6f862800e8cfa9f8ca0b58437",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 2906809.0,
+        "source": "csbr",
+        "source_id": "venta-terreno-industrial-lourdes-colon-2",
+        "title": "VENTA TERRENO ZONA INDUSTRIAL LOURDES COLON",
+        "url": "https://www.camarabienesraices.com.sv/propiedad/venta-terreno-industrial-lourdes-colon-2/",
+        "zone": "colon"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 2906809.0,
+        "source": "csbr",
+        "source_id": "venta-terreno-industrial-lourdes-colon",
+        "title": "VENTA TERRENO ZONA INDUSTRIAL LOURDES COLON",
+        "url": "https://www.camarabienesraices.com.sv/propiedad/venta-terreno-industrial-lourdes-colon/",
+        "zone": "colon"
+      }
+    ],
+    "sources": [
+      "csbr"
     ]
   },
   {
