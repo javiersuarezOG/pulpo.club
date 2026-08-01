@@ -187,9 +187,9 @@ _BANNED_TOPIC_RE = re.compile(
         homicid              |  # homicidio / homicide
         \bcrim(?:e|en|inal)  |  # crime / crimen / criminal
         \bgang(?:s|as)?\b    |  # gang(s)
-        pandill              |  # pandilla / pandillas
-        maras?\b             |  # mara / maras
-        violenc              |  # violencia / violence
+        \bpandill            |  # pandilla / pandillas
+        \bmaras?\b           |  # mara / maras (leading \b so "cámaras" ≠ maras)
+        \bviolenc            |  # violencia / violence
         \bmurder             |  # murder(s)
         homicide[\s-]*rate   |
         tasa\s+de\s+homicid  |

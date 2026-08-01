@@ -48,6 +48,27 @@ def _pool():
     return [_listing(f"s{i}", z, 50_000 + i * 40_000) for i, z in enumerate(zones)]
 
 
+def _mixed_pool():
+    """Varied property types + categories so diversity can be asserted."""
+    spec = [
+        ("h1", "el-tunco", 350_000, "house", "beach"),
+        ("c1", "la-libertad", 538_000, "condo", "beach"),
+        ("l1", "coatepeque", 365_000, "land", "lake"),
+        ("t1", "el-zonte", 89_000, "land", "beach"),
+        ("h2", "el-cuco", 220_000, "house", "beach"),
+        ("t2", "la-union", 1_100_000, "land", "beach"),
+        ("c2", "san-salvador", 300_000, "condo", "other"),
+        ("l2", "ilopango", 170_000, "land", "lake"),
+    ]
+    out = []
+    for sid, z, price, pt, cat in spec:
+        li = _listing(sid, z, price)
+        li["property_type"] = pt
+        li["master_category"] = cat
+        out.append(li)
+    return out
+
+
 def test_rotate_levers_covers_every_lever_no_starvation():
     levers = gen.rotate_levers(len(cats.SLUGS))
     assert set(levers) == set(cats.SLUGS)
@@ -57,11 +78,27 @@ def test_rotate_levers_offset_varies_the_lead():
     assert gen.rotate_levers(3, start=0)[0] != gen.rotate_levers(3, start=1)[0]
 
 
+def test_rotate_levers_weights_favored_viral_angles_first():
+    # The three chosen angles (POV=aspiration, ranking=education, diáspora=
+    # social_proof/transformation/investment) lead a short run.
+    lead2 = gen.rotate_levers(2)
+    assert set(lead2) == {"aspiration", "education"}
+    # scarcity/authority still appear across a full week (no starvation)
+    assert {"scarcity", "authority"} <= set(gen.rotate_levers(7))
+
+
 def test_pick_listings_is_zone_diversified():
     picks = gen.pick_listings(_pool(), 7)
     zones = [p["zone"] for p in picks]
     assert len(zones) == 7
     assert len(set(zones)) == 7  # every pick a distinct zone
+
+
+def test_pick_listings_diversifies_type_and_category():
+    picks = gen.pick_listings(_mixed_pool(), 6)
+    assert len({p.get("property_type") for p in picks}) >= 3   # house + condo + land
+    assert len({p.get("master_category") for p in picks}) >= 2  # beach + lake at least
+    assert any(p.get("master_category") == "lake" for p in picks)  # lake makes the cut
 
 
 def test_generate_batch_shape_and_coverage():
