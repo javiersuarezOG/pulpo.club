@@ -122,17 +122,17 @@ def _det_scarcity(listing, fact):
 
 def _det_authority(listing, fact):
     zone = _zone_label(listing)
-    hook_es = "El país más seguro del hemisferio ya no es un sueño — es un dato."
+    hook_es = "El mundo entero volteó a ver El Salvador. Y apenas están llegando."
     body_es = (
         f"{fact['statement_es']}\n"
-        f"Por eso propiedades como esta en {zone} valen la pena. Vos naciste aquí: "
-        "llevás ventaja."
+        f"Propiedades como esta en {zone} son las que vienen buscando. Vos ya "
+        "estás aquí — llevás ventaja."
     )
-    hook_en = "The safest country in the hemisphere isn't a dream — it's data."
+    hook_en = "The whole world turned to look at El Salvador. And they're just arriving."
     body_en = (
         f"{fact['statement_en']}\n"
-        f"That's why places like this one in {zone} are worth it. You were born "
-        "here — you're ahead."
+        f"Places like this one in {zone} are exactly what they come looking for. "
+        "You're already here — you're ahead."
     )
     return hook_es, body_es, hook_en, body_en
 
@@ -281,6 +281,8 @@ def _validate(post: dict) -> list[str]:
             problems.append(f"{key}:{v.get('code')}:{v.get('matched')}")
         for stat in ig_facts.stat_violations(text):
             problems.append(f"{key}:UNSOURCED_STAT:{stat}")
+        for banned in ig_facts.mentions_banned_topic(text):
+            problems.append(f"{key}:BANNED_TOPIC:{banned}")
     return problems
 
 

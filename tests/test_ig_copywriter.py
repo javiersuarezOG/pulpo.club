@@ -58,6 +58,15 @@ def test_wire_format_joins_es_then_en():
     assert cw.DIV in wire
 
 
+def test_no_lever_ever_mentions_a_banned_topic():
+    # HARD RULE: crime / homicide / "safest country" framing is banned on every
+    # lever, both languages, caption + comment. This is a brand line we never cross.
+    for lever in cats.SLUGS:
+        p = cw.generate_post(LISTING, lever)
+        for key in ("caption_es", "caption_en", "comment_es", "comment_en"):
+            assert ig_facts.mentions_banned_topic(p[key]) == [], f"{lever}/{key} named a banned topic"
+
+
 def test_unknown_lever_raises():
     with pytest.raises(ValueError):
         cw.generate_post(LISTING, "clickbait")
