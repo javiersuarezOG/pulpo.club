@@ -134441,5 +134441,466 @@
     "cost_usd": 0.00138623,
     "finish_reason": "stop",
     "latency_ms": 5383
+  },
+  "realestate_au_sv|a-solo-3-minutos-de-la-carretera-longitudinal-del-norte-osicala-morazan-osicala-morazan-department-310109606793": {
+    "ts": "2026-08-02T06:23:26.219039+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land near Northern Longitudinal Highway, Osicala",
+      "es": "Terreno cerca de Carretera Longitudinal del Norte, Osicala"
+    },
+    "short_description_canonical": {
+      "en": "Land for sale in Osicala, Morazán, 3 minutes from the Northern Longitudinal Highway. The property is listed by RE/MAX CAPITAL. Price: $125,000.",
+      "es": "Terreno en venta en Osicala, Morazán, a 3 minutos de la Carretera Longitudinal del Norte. La propiedad está listada por RE/MAX CAPITAL. Precio: $125,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3 minutes from Northern Longitudinal Highway",
+        "es": "A 3 minutos de la Carretera Longitudinal del Norte"
+      },
+      {
+        "en": "Listed by RE/MAX CAPITAL",
+        "es": "Listado por RE/MAX CAPITAL"
+      },
+      {
+        "en": "Price: $125,000",
+        "es": "Precio: $125,000"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -88.15,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Osicala, Morazán",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3086,
+    "tokens_out": 392,
+    "cost_usd": 0.00126442,
+    "finish_reason": "stop",
+    "latency_ms": 3246
+  },
+  "realestate_au_sv|on-ayuta-lotificacion-santa-adela-tercera-etapa-porcion-b-santa-ana-poligono-cuatro-lotes-numero-nueve-y-dieciseis-ayuta-santa-ana-ayuta-santa-ana-310109606804": {
+    "ts": "2026-08-02T06:23:26.570671+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Two Land Lots in Santa Adela, Santa Ana",
+      "es": "Dos lotes en Santa Adela, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Two land lots (numbers 9 and 16) in Polygon 4, Lotificación Santa Adela, third stage, Ayuta, Santa Ana. The property is offered for sale at USD 108,000. No further details on terrain or utilities are provided.",
+      "es": "Dos lotes (números 9 y 16) en el polígono 4, Lotificación Santa Adela, tercera etapa, Ayuta, Santa Ana. La propiedad se ofrece en venta por USD 108,000. No se proporcionan más detalles sobre el terreno o servicios."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Two adjacent lots in one sale",
+        "es": "Dos lotes contiguos en una venta"
+      },
+      {
+        "en": "Located in Santa Adela, Santa Ana",
+        "es": "Ubicados en Santa Adela, Santa Ana"
+      },
+      {
+        "en": "Listed at USD 108,000 total",
+        "es": "Listados en USD 108,000 en total"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5566,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3108,
+    "tokens_out": 424,
+    "cost_usd": 0.00130556,
+    "finish_reason": "stop",
+    "latency_ms": 3598
+  },
+  "encuentra24|32691999": {
+    "ts": "2026-08-02T06:23:26.925934+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Investment Lot 700 vrs², La Unión City",
+      "es": "Terreno de Inversión 700 vrs², Ciudad de La Unión"
+    },
+    "short_description_canonical": {
+      "en": "Investment lot of 700 square varas (about 585 m²) on Calle a Amapalita, behind Policlínica Bienestar Magisterial, 300 m from La Unión city center. Near businesses and supermarkets, with all basic services. Ideal for a small hotel, hostel, or similar. Price $130,000.",
+      "es": "Terreno de inversión de 700 varas cuadradas (aprox. 585 m²) sobre Calle a Amapalita, detrás de la Policlínica Bienestar Magisterial, a 300 m del centro de la ciudad de La Unión. Cerca de negocios y supermercados, con todos los servicios básicos. Ideal para hotelito, hostal u otro. Precio $130,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "300 m from city center",
+        "es": "A 300 m del centro de la ciudad"
+      },
+      {
+        "en": "All basic services available",
+        "es": "Todos los servicios básicos disponibles"
+      },
+      {
+        "en": "Near businesses and supermarkets",
+        "es": "Cerca de negocios y supermercados"
+      },
+      {
+        "en": "Ideal for hotel or hostel",
+        "es": "Ideal para hotel o hostal"
+      }
+    ],
+    "lat": 13.3367,
+    "lng": -87.8439,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Unión city center",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3213,
+    "tokens_out": 493,
+    "cost_usd": 0.00140981,
+    "finish_reason": "stop",
+    "latency_ms": 3954
+  },
+  "realestate_au_sv|canton-ayuta-lotificacion-santa-adela-tercera-etapa-porcion-b-santa-ana-poligono-treinta-y-uno-lotes-dieciseis-y-veinticinco-ayuta-santa-ana-ayuta-santa-ana-310109606799": {
+    "ts": "2026-08-02T06:23:28.971331+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Santa Ana, El Salvador",
+      "es": "Terreno en Venta en Santa Ana, El Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Cantón Ayuta, Lotificación Santa Adela, third stage, portion B, Santa Ana. It comprises lots 16 and 25 in polygon 31. Offered by RE/MAX Expertos Inmobiliarios.",
+      "es": "Terreno en Cantón Ayuta, Lotificación Santa Adela, tercera etapa, porción B, Santa Ana. Comprende los lotes 16 y 25 del polígono 31. Ofrecido por RE/MAX Expertos Inmobiliarios."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Santa Ana department",
+        "es": "Ubicado en el departamento de Santa Ana"
+      },
+      {
+        "en": "Two lots in one parcel",
+        "es": "Dos lotes en una sola parcela"
+      },
+      {
+        "en": "Listed by RE/MAX Expertos",
+        "es": "Listado por RE/MAX Expertos"
+      }
+    ],
+    "lat": 13.9947,
+    "lng": -89.5598,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3113,
+    "tokens_out": 404,
+    "cost_usd": 0.00128491,
+    "finish_reason": "stop",
+    "latency_ms": 2974
+  },
+  "realestate_au_sv|lotificacion-el-mango-ubicacion-geografica-la-libertad-la-libertad-costa-la-libertad-la-libertad-la-libertad-la-libertad-department-310109606806": {
+    "ts": "2026-08-02T06:23:29.099959+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in El Mango, La Libertad Coast",
+      "es": "Terreno en El Mango, Costa de La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land lot in El Mango, La Libertad, on the La Libertad coast. Offered for sale at USD 250,000. No further details on size or features are provided.",
+      "es": "Lote de terreno en El Mango, La Libertad, en la costa de La Libertad. Se ofrece en venta por USD 250,000. No se proporcionan más detalles sobre tamaño o características."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located on La Libertad coast",
+        "es": "Ubicado en la costa de La Libertad"
+      },
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Publicado por RE/MAX Central"
+      },
+      {
+        "en": "Asking price USD 250,000",
+        "es": "Precio de venta USD 250,000"
+      }
+    ],
+    "lat": 13.4882,
+    "lng": -89.3211,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Libertad coast (Puerto de La Libertad)",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3100,
+    "tokens_out": 393,
+    "cost_usd": 0.0012693,
+    "finish_reason": "stop",
+    "latency_ms": 3018
+  },
+  "realestate_au_sv|canton-morro-grande-parcela-7-hacienda-san-carlos-acajutla-sonsonate-acajutla-sonsonate-acajutla-sonsonate-310109606780": {
+    "ts": "2026-08-02T06:23:29.120127+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land Parcel in Acajutla, Sonsonate",
+      "es": "Terreno en Acajutla, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel #7 in Canton Morro Grande, Hacienda San Carlos, Acajutla, Sonsonate. The property includes 2 bathrooms and is offered for sale at USD 130,000. No further details on size or features are provided.",
+      "es": "Parcela #7 en Cantón Morro Grande, Hacienda San Carlos, Acajutla, Sonsonate. La propiedad incluye 2 baños y se ofrece en venta por USD 130,000. No se proporcionan más detalles sobre tamaño o características."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Acajutla, Sonsonate",
+        "es": "Ubicado en Acajutla, Sonsonate"
+      },
+      {
+        "en": "Includes 2 bathrooms",
+        "es": "Incluye 2 baños"
+      },
+      {
+        "en": "Priced at USD 130,000",
+        "es": "Precio de USD 130,000"
+      }
+    ],
+    "lat": 13.5928,
+    "lng": -89.8275,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Acajutla",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": 2.0,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3100,
+    "tokens_out": 415,
+    "cost_usd": 0.0012935,
+    "finish_reason": "stop",
+    "latency_ms": 3009
+  },
+  "realestate_au_sv|segregacion-de-porcion-dos-ubicada-en-canton-las-delicias-finca-apachulco-nejapa-apopa-apopa-san-salvador-apopa-san-salvador-310119458974": {
+    "ts": "2026-08-02T06:23:29.257013+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Las Delicias, Nejapa, San Salvador",
+      "es": "Terreno en Las Delicias, Nejapa, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Cantón Las Delicias, Finca Apachulco, Nejapa, San Salvador. This is a portion of a larger property, offered for sale. No details on size, utilities, or zoning are provided.",
+      "es": "Parcela de terreno en Cantón Las Delicias, Finca Apachulco, Nejapa, San Salvador. Es una porción de una propiedad más grande, ofrecida en venta. No se proporcionan detalles sobre tamaño, servicios o zonificación."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Nejapa, San Salvador",
+        "es": "Ubicado en Nejapa, San Salvador"
+      },
+      {
+        "en": "Part of Finca Apachulco",
+        "es": "Parte de la Finca Apachulco"
+      },
+      {
+        "en": "For sale via RE/MAX Central",
+        "es": "En venta a través de RE/MAX Central"
+      }
+    ],
+    "lat": 13.8167,
+    "lng": -89.2333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nejapa, San Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3103,
+    "tokens_out": 415,
+    "cost_usd": 0.00129431,
+    "finish_reason": "stop",
+    "latency_ms": 3037
+  },
+  "remax|002284533007": {
+    "ts": "2026-08-02T06:23:30.592398+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "57,433 m² Land for Development in Ciudad Arce",
+      "es": "Terreno de 57,433 m² para Desarrollo en Ciudad Arce"
+    },
+    "short_description_canonical": {
+      "en": "57,433 m² (approx. 14.19 acres) land in Ciudad Arce, La Libertad, minutes from town center and services. Mountainous terrain with slopes and terraces, panoramic views, electricity, a 5-meter-deep water well, and a seasonal creek. Suitable for eco-tourism, glamping, cabins, or low-density residential development.",
+      "es": "Terreno de 57,433 m² (aprox. 14.19 acres) en Ciudad Arce, La Libertad, a minutos del centro y servicios. Topografía montañosa con pendientes y terrazas, vistas panorámicas, electricidad, pozo de agua de 5 metros de profundidad y quebrada estacional. Apto para ecoturismo, glamping, cabañas o desarrollo residencial de baja densidad."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "57,433 m² (14.19 acres) of land",
+        "es": "57,433 m² (14.19 acres) de terreno"
+      },
+      {
+        "en": "Electricity and 5m-deep water well",
+        "es": "Electricidad y pozo de agua de 5m"
+      },
+      {
+        "en": "Seasonal creek on the property",
+        "es": "Quebrada estacional en la propiedad"
+      },
+      {
+        "en": "Minutes from Ciudad Arce center",
+        "es": "Minutos del centro de Ciudad Arce"
+      },
+      {
+        "en": "Mature fruit and forest trees",
+        "es": "Árboles frutales y forestales maduros"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -89.4333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ciudad Arce, La Libertad, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3374,
+    "tokens_out": 564,
+    "cost_usd": 0.00153138,
+    "finish_reason": "stop",
+    "latency_ms": 4021
+  },
+  "encuentra24|30429142": {
+    "ts": "2026-08-02T07:11:20.671576+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in Punta Barco, Panama Oeste",
+      "es": "Casa en Venta en Punta Barco, Panamá Oeste"
+    },
+    "short_description_canonical": {
+      "en": "House on a 2,868 m² lot in Punta Barco, San Carlos, minutes from Coronado. Built area of 294 m² with 3 bedrooms, 4 full baths, service quarters, and a den. Features private pool, half basketball court, covered parking for 3 cars, water well, and solid 2004 construction. Includes a mulita (utility vehicle).",
+      "es": "Casa en terreno de 2,868 m² en Punta Barco, San Carlos, a minutos de Coronado. Área construida de 294 m² con 3 recámaras, 4 baños completos, cuarto de servicio y den. Cuenta con piscina privada, media cancha de baloncesto, estacionamiento techado para 3 autos, pozo de agua y construcción sólida de 2004. Incluye mulita."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Large 2,868 m² lot",
+        "es": "Amplio terreno de 2,868 m²"
+      },
+      {
+        "en": "Private pool and basketball court",
+        "es": "Piscina privada y cancha de baloncesto"
+      },
+      {
+        "en": "Minutes from Coronado",
+        "es": "A minutos de Coronado"
+      },
+      {
+        "en": "Built 2004, solid construction",
+        "es": "Construcción sólida de 2004"
+      },
+      {
+        "en": "Includes utility vehicle (mulita)",
+        "es": "Incluye mulita"
+      }
+    ],
+    "lat": 8.5,
+    "lng": -79.9,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Punta Barco, San Carlos, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": 2004,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 4.0,
+      "built_area_m2": 294.43,
+      "parking_spaces": 3,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2569,
+    "tokens_out": 564,
+    "cost_usd": 0.00131403,
+    "finish_reason": "stop",
+    "latency_ms": 4674
   }
 }
