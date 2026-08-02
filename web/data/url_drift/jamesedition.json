@@ -2,13 +2,13 @@
   "source": "jamesedition",
   "drift_state": "unreachable",
   "reason": "http_status=403",
-  "probed_at": "2026-08-02T08:39:35.309933+00:00",
+  "probed_at": "2026-08-02T14:03:16.949456+00:00",
   "last_probe": {
     "probed_url": "https://www.jamesedition.com/es/real_estate/house-lago-de-coatepeque-el-salvador",
     "status_code": 403,
     "final_url": "https://www.jamesedition.com/es/real_estate/house-lago-de-coatepeque-el-salvador",
     "response_size_bytes": null,
-    "duration_ms": 103,
+    "duration_ms": 119,
     "error": null
   },
   "baseline": null
