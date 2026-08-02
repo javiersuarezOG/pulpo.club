@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-01T06:23:13.137994+00:00",
+  "computed_at": "2026-08-02T06:23:21.914596+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -112,19 +112,10 @@
       ]
     },
     {
-      "count": 5,
+      "count": 4,
       "cross_source": false,
       "fingerprint": "9d3d41d0e424326dc335a37e3f1985f65354bc68",
       "samples": [
-        {
-          "area_m2": null,
-          "price_usd": 35000.0,
-          "source": "realestate_au_sv",
-          "source_id": "portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485867",
-          "title": "Portezuelo atras de MC El Brasil, Porvenir Jocotillo, Santa Ana, Porvenir Jocotillo, Santa Ana Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485867/",
-          "zone": "santa-ana"
-        },
         {
           "area_m2": null,
           "price_usd": 35000.0,
@@ -298,43 +289,6 @@
           "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
           "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650148/",
           "zone": "suchitoto"
-        }
-      ],
-      "sources": [
-        "realestate_au_sv"
-      ]
-    },
-    {
-      "count": 3,
-      "cross_source": false,
-      "fingerprint": "3a2fdf644646a6f80a0eb9fa2d617250b3907cf6",
-      "samples": [
-        {
-          "area_m2": null,
-          "price_usd": 411236.0,
-          "source": "realestate_au_sv",
-          "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395392",
-          "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395392/",
-          "zone": "santa-tecla"
-        },
-        {
-          "area_m2": null,
-          "price_usd": 411236.0,
-          "source": "realestate_au_sv",
-          "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287054",
-          "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287054/",
-          "zone": "santa-tecla"
-        },
-        {
-          "area_m2": null,
-          "price_usd": 411236.0,
-          "source": "realestate_au_sv",
-          "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109225053",
-          "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109225053/",
-          "zone": "santa-tecla"
         }
       ],
       "sources": [
@@ -781,6 +735,34 @@
           "title": "Nejapa, Nejapa, San Salvador, Nejapa, San Salvador Land for Sale - realestate.com.au",
           "url": "https://www.realestate.com.au/international/sv/nejapa-nejapa-san-salvador-nejapa-san-salvador-310101864512/",
           "zone": "nejapa"
+        }
+      ],
+      "sources": [
+        "realestate_au_sv"
+      ]
+    },
+    {
+      "count": 2,
+      "cross_source": false,
+      "fingerprint": "3a2fdf644646a6f80a0eb9fa2d617250b3907cf6",
+      "samples": [
+        {
+          "area_m2": null,
+          "price_usd": 411236.0,
+          "source": "realestate_au_sv",
+          "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395392",
+          "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395392/",
+          "zone": "santa-tecla"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 411236.0,
+          "source": "realestate_au_sv",
+          "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287054",
+          "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287054/",
+          "zone": "santa-tecla"
         }
       ],
       "sources": [
@@ -1434,34 +1416,6 @@
     {
       "count": 2,
       "cross_source": false,
-      "fingerprint": "936015b904b5fc9bae3bea5189ad25bbeb06f623",
-      "samples": [
-        {
-          "area_m2": null,
-          "price_usd": 433812.0,
-          "source": "realestate_au_sv",
-          "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395394",
-          "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395394/",
-          "zone": "santa-tecla"
-        },
-        {
-          "area_m2": null,
-          "price_usd": 433812.0,
-          "source": "realestate_au_sv",
-          "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287044",
-          "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287044/",
-          "zone": "santa-tecla"
-        }
-      ],
-      "sources": [
-        "realestate_au_sv"
-      ]
-    },
-    {
-      "count": 2,
-      "cross_source": false,
       "fingerprint": "a2239abf184705466f0a047da292a34dbfa01dd9",
       "samples": [
         {
@@ -1885,10 +1839,10 @@
       "unique_in_source": 278
     },
     "encuentra24": {
-      "kept_as_unique": 30,
-      "raw": 30,
+      "kept_as_unique": 28,
+      "raw": 28,
       "shared_with_others": 0,
-      "unique_in_source": 30
+      "unique_in_source": 28
     },
     "essurf": {
       "kept_as_unique": 33,
@@ -1915,10 +1869,10 @@
       "unique_in_source": 25
     },
     "realestate_au_sv": {
-      "kept_as_unique": 285,
-      "raw": 337,
+      "kept_as_unique": 289,
+      "raw": 338,
       "shared_with_others": 0,
-      "unique_in_source": 285
+      "unique_in_source": 289
     },
     "remax": {
       "kept_as_unique": 330,
@@ -1945,6 +1899,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2084,
-  "total_unique_fingerprints": 2001
+  "total_in_dataset": 2083,
+  "total_unique_fingerprints": 2003
 }

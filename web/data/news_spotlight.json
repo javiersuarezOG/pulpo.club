@@ -1,22 +1,22 @@
 {
   "en": {
     "candidates_seen": 1,
-    "llm_cost_usd": 0.00022786,
-    "paragraph": "El Salvador's labor ministry is stepping up inspections of restaurants and hotels during the August holidays. If you're buying coastal or lake property, this signals tighter enforcement of labor rules in hospitality, which could affect operating costs or compliance for any business you plan to run. Stay informed and ensure any property you buy is compliant.",
-    "picked_at": "2026-08-01",
-    "source_date": "31 Jul 2026",
+    "llm_cost_usd": 0.00026567,
+    "paragraph": "El Salvador's government kicked off its 2026 vacation safety plan, deploying civil protection teams and running drills at beaches. For you as a coastal property buyer, this signals improved safety and infrastructure around key tourist areas, which can boost property values and rental appeal. Expect more visitors and activity; consider how this affects your investment's desirability and local services.",
+    "picked_at": "2026-08-02",
+    "source_date": "1 Aug 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/general/trabajo-advierte-sanciones-a-empresas-que-incumplan-la-ley-durante-las-vacaciones/?utm_source=rss&utm_medium=rss&utm_campaign=trabajo-advierte-sanciones-a-empresas-que-incumplan-la-ley-durante-las-vacaciones",
-    "title": "Labor inspections during holidays"
+    "source_url": "https://lapagina.com.sv/general/en-la-medida-en-que-acatemos-las-recomendaciones-la-vacacion-transcurrira-como-un-periodo-que-nos-deje-buenos-recuerdos-y-no-momentos-tristes-para-toda-la-vida-luis-amaya/?utm_source=rss&utm_medium=rss&utm_campaign=en-la-medida-en-que-acatemos-las-recomendaciones-la-vacacion-transcurrira-como-un-periodo-que-nos-deje-buenos-recuerdos-y-no-momentos-tristes-para-toda-la-vida-luis-amaya",
+    "title": "Vacation safety plan launched for El Salvador beaches"
   },
   "es": {
     "candidates_seen": 1,
-    "llm_cost_usd": 0.00031099000000000003,
-    "paragraph": "El Ministerio de Trabajo reforzará inspecciones en restaurantes y hoteles durante las vacaciones agostinas, verificando el cumplimiento de la ley laboral. Si estás comprando propiedad costera o de lago, esto puede afectar a los negocios que operan en tu zona, ya que posibles sanciones podrían impactar su operación. Conocé las normativas laborales vigentes para asegurarte de que tu futura inversión cumpla con la ley y evites problemas legales o multas.",
-    "picked_at": "2026-08-01",
-    "source_date": "31 jul 2026",
+    "llm_cost_usd": 0.00036530000000000004,
+    "paragraph": "El Plan Vacación 2026 arrancó con operativos en playas y simulacros de Protección Civil. Para vos, que estás evaluando comprar propiedad costera o de lago, esto significa que las zonas turísticas tendrán mayor presencia de seguridad y servicios de emergencia durante la temporada alta. Aprovechá para visitar tus zonas de interés y observá cómo funcionan los protocolos en la práctica. Esto te dará una idea real de la infraestructura de seguridad disponible, un factor clave para tu inversión.",
+    "picked_at": "2026-08-02",
+    "source_date": "1 ago 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/general/trabajo-advierte-sanciones-a-empresas-que-incumplan-la-ley-durante-las-vacaciones/?utm_source=rss&utm_medium=rss&utm_campaign=trabajo-advierte-sanciones-a-empresas-que-incumplan-la-ley-durante-las-vacaciones",
-    "title": "Trabajo advierte sanciones a empresas que incumplan la ley durante las vacaciones"
+    "source_url": "https://lapagina.com.sv/general/en-la-medida-en-que-acatemos-las-recomendaciones-la-vacacion-transcurrira-como-un-periodo-que-nos-deje-buenos-recuerdos-y-no-momentos-tristes-para-toda-la-vida-luis-amaya/?utm_source=rss&utm_medium=rss&utm_campaign=en-la-medida-en-que-acatemos-las-recomendaciones-la-vacacion-transcurrira-como-un-periodo-que-nos-deje-buenos-recuerdos-y-no-momentos-tristes-para-toda-la-vida-luis-amaya",
+    "title": "«En la medida en que acatemos las recomendaciones, la vacación transcurrirá como un período que nos deje buenos recuerdos y no momentos tristes para toda la vida»; Luis Amaya"
   }
 }
