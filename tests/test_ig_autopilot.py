@@ -25,7 +25,7 @@ from automation.ig_autopilot import (   # noqa: E402
     _ordered_fresh_urls,
     _pick_candidate,
 )
-from automation.ig_story_series import STORIES, story_for_index   # noqa: E402
+from automation.ig_story_series import STORIES   # noqa: E402
 from automation.ig_caption_lint import check as lint_check   # noqa: E402
 
 
@@ -39,7 +39,9 @@ def _cand(lid, rank=50.0, zone="el-tunco"):
 
 
 CANDS = [_cand(f"src__{i}", rank=100 - i, zone=f"z{i}") for i in range(20)]
-RANKED_INDEX = {c["listing_id"]: {"photo_urls": ["http://x/1", "http://x/2"]} for c in CANDS}
+# coastal listings → all 14 stories (incl. coast lines) are eligible
+RANKED_INDEX = {c["listing_id"]: {"photo_urls": ["http://x/1", "http://x/2"],
+                                  "has_ocean_view": True} for c in CANDS}
 NOW = datetime(2026, 7, 6, 12, 0, tzinfo=timezone.utc)
 
 
@@ -47,12 +49,12 @@ def _fake_render(spec, color, out):
     return out  # no I/O
 
 
-def _fake_selector(listing, assets_dir, slug, *, used_urls=frozenset(), **_):
-    # a unique gorgeous cover per listing/day; honours the never-reuse ledger
+def _fake_selector(listing, assets_dir, slug, *, used_urls=frozenset(), score=80.0, **_):
+    # a unique cover per listing/day (score 80 = great); honours the ledger
     url = f"http://x/{slug}.jpg"
     if url in used_urls:
         return None
-    return f"web/data/ig_assets/autopilot/{slug}/photo_1.jpg", url
+    return f"web/data/ig_assets/autopilot/{slug}/photo_1.jpg", url, score
 
 
 def _run(queue, lookahead=4, cadence=1, photo_selector=_fake_selector):
@@ -80,10 +82,30 @@ def test_every_item_is_a_lintclean_approved_story():
 
 
 def test_stories_rotate_with_no_repeat_in_a_cycle():
+    # coastal listings → all 14 stories eligible → a full cycle has no repeat
     added = _run({"items": []}, lookahead=len(STORIES))
     ids = [it["story_id"] for it in added]
     assert len(set(ids)) == len(ids), "a story repeated inside one 14-post cycle"
-    assert ids == [story_for_index(i)["id"] for i in range(len(added))]
+    assert set(ids) == {s["id"] for s in STORIES}
+
+
+def test_coast_stories_only_on_coastal_listings():
+    from automation.ig_story_series import _COAST_STORIES
+    # inland-only listings → coast/sea stories must never be assigned
+    inland_index = {c["listing_id"]: {"photo_urls": ["u1", "u2"], "dist_beach_km": 40}
+                    for c in CANDS}
+    added = topup({"items": []}, CANDS, inland_index, now=NOW, lookahead=10, cadence_days=1,
+                  assets_root=Path("/tmp/x"), skip_render=True,
+                  slide_renderer=_fake_render, photo_selector=_fake_selector)
+    used = {it["story_id"] for it in added}
+    assert used.isdisjoint(_COAST_STORIES), "a coast story landed on an inland listing"
+
+
+def test_coverage_spreads_across_listings():
+    # every post features a distinct listing while inventory allows
+    added = _run({"items": []}, lookahead=10)
+    lids = [it["primary_listing_id"] for it in added]
+    assert len(set(lids)) == len(lids), "the same listing was re-featured while others qualified"
 
 
 def test_post_is_cover_plus_photofree_closer():
@@ -188,7 +210,7 @@ def test_next_slot_ignores_skipped_items():
     assert nxt.date().isoformat() == "2026-07-26"   # backfills, not Aug 1
 
 
-def test_build_item_returns_none_when_no_gorgeous_photo():
+def test_build_item_returns_none_when_no_photo():
     def _no_cover(listing, assets_dir, slug, *, used_urls=frozenset(), **_):
         return None
     item = build_item(
@@ -197,6 +219,54 @@ def test_build_item_returns_none_when_no_gorgeous_photo():
         skip_render=True, slide_renderer=_fake_render, photo_selector=_no_cover,
     )
     assert item is None
+
+
+def _poor_selector(listing, assets_dir, slug, *, used_urls=frozenset(), **_):
+    return f"web/data/ig_assets/autopilot/{slug}/photo_1.jpg", f"http://x/{slug}.jpg", 30.0  # poor
+
+
+def test_poor_photo_non_gem_is_skipped():
+    from automation.ig_autopilot import is_value_gem
+    cand = _cand("src__0")               # price_vs_zone_pct = -20 → not a gem (<-25)
+    assert not is_value_gem(cand)
+    item = build_item(
+        day=101, story=STORIES[0], candidate=cand, listing={},
+        scheduled_for="2026-07-07T01:00:00+00:00", assets_root=Path("/tmp/x"),
+        skip_render=True, slide_renderer=_fake_render, photo_selector=_poor_selector,
+    )
+    assert item is None                  # poor photo + not a gem → skipped
+
+
+def test_poor_photo_value_gem_posts_with_humor():
+    from automation.ig_autopilot import is_value_gem
+    cand = {**_cand("src__0"), "price_vs_zone_pct": -40.0}   # true gem
+    assert is_value_gem(cand)
+    item = build_item(
+        day=101, story=STORIES[0], candidate=cand, listing={},
+        scheduled_for="2026-07-07T01:00:00+00:00", assets_root=Path("/tmp/x"),
+        skip_render=True, slide_renderer=_fake_render, photo_selector=_poor_selector,
+    )
+    assert item is not None
+    assert item["photo_tier"] == "poor" and item["humor"] is True
+    assert "foto no" in item["caption"].lower()             # owns the bad photo
+
+
+def test_poor_photo_gem_blocked_when_over_budget():
+    cand = {**_cand("src__0"), "price_vs_zone_pct": -40.0}
+    item = build_item(
+        day=101, story=STORIES[0], candidate=cand, listing={},
+        scheduled_for="2026-07-07T01:00:00+00:00", assets_root=Path("/tmp/x"),
+        skip_render=True, allow_poor=False,                 # <20% budget exhausted
+        slide_renderer=_fake_render, photo_selector=_poor_selector,
+    )
+    assert item is None
+
+
+def test_every_post_has_a_hero_photo():
+    added = _run({"items": []}, lookahead=6)
+    for it in added:
+        assert it["poster_path"].endswith(".jpg")
+        assert it.get("cover_photo_url"), "every post carries a real hero photo"
 
 
 def test_item_records_cover_url_and_never_repeats(tmp_path):
@@ -223,22 +293,23 @@ def test_ordered_fresh_urls_drops_rejected_and_used():
     assert "http://x/hero.jpg" not in fresh2
 
 
-def test_select_beautiful_cover_picks_best_and_skips_dull(tmp_path):
-    """Scores each fresh photo and returns the most beautiful; returns None
-    when the best isn't gorgeous enough (skip the listing)."""
+def test_select_beautiful_cover_picks_best_and_scores(tmp_path):
+    """Returns the MOST beautiful frame + its score (tiering is the caller's
+    job now); None only when there's no usable photo at all."""
     from PIL import Image
+    from automation.ig_photo_beauty import GORGEOUS_MIN
     imgs = {
         "http://x/dull.jpg": Image.new("RGB", (1200, 1500), (150, 150, 150)),   # concrete
         "http://x/ocean.jpg": Image.new("RGB", (1200, 1500), (85, 155, 230)),   # sky/ocean
     }
     listing = {"photo_urls": list(imgs), "photos_count": 2,
                "selected_photo_url": "http://x/dull.jpg"}
-    sel = select_beautiful_cover(listing, tmp_path, "d1__el_mar",
-                                 fetcher=lambda u: imgs[u])
-    assert sel is not None
-    assert sel[1] == "http://x/ocean.jpg"              # the beautiful one wins
+    path, url, score = select_beautiful_cover(listing, tmp_path, "d1__el_mar",
+                                              fetcher=lambda u: imgs[u])
+    assert url == "http://x/ocean.jpg" and score >= GORGEOUS_MIN   # beautiful one wins
 
     dull_only = {"photo_urls": ["http://x/dull.jpg"], "photos_count": 1,
                  "selected_photo_url": "http://x/dull.jpg"}
-    assert select_beautiful_cover(dull_only, tmp_path, "d2__el_mar",
-                                  fetcher=lambda u: imgs["http://x/dull.jpg"]) is None
+    _p, _u, sc = select_beautiful_cover(dull_only, tmp_path, "d2__el_mar",
+                                        fetcher=lambda u: imgs["http://x/dull.jpg"])
+    assert sc < GORGEOUS_MIN            # returns it, but flagged poor (caller decides)

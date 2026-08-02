@@ -108,6 +108,17 @@ STORIES: tuple[dict, ...] = (
             "tiempo de tener la tuya."},
 )
 
+# Stories whose LINE names the sea/coast/water (or is a come-home-to-the-
+# coast diaspora line). These may only run on a coastal listing — otherwise
+# you get "Tu abuelo caminó esta costa" over an inland city lot (the Santa
+# Tecla mismatch, 2026-07-27). The other 7 stories are place-agnostic.
+_COAST_STORIES = {
+    "el_mar", "aprendan_nadar", "semaforo_marea", "horizonte",
+    "abuelo", "distancia", "queda_paraiso",
+}
+for _s in STORIES:
+    _s["needs_coast"] = _s["id"] in _COAST_STORIES
+
 _BY_ID = {s["id"]: s for s in STORIES}
 
 
@@ -147,19 +158,43 @@ def story_for_index(post_index: int) -> dict:
     return STORIES[post_index % len(STORIES)]
 
 
+def pick_story(recent_ids, coastal: bool) -> dict:
+    """Choose the next story that FITS this listing's place: coast/sea lines
+    only on a coastal listing; place-agnostic lines anywhere. Picks the
+    fitting story used LONGEST ago (never-used first), so it cycles through
+    the whole fitting set before repeating — even the inland-only set of 7.
+
+    ``recent_ids`` is the recent story-id history, MOST-RECENT-FIRST."""
+    fits = [s for s in STORIES if coastal or not s.get("needs_coast")]
+    recent = list(recent_ids or [])
+
+    def staleness(s):
+        try:
+            return recent.index(s["id"])          # 0 = just used → least stale
+        except ValueError:
+            return len(recent) + 1                # never used → most stale
+    # most stale (or never used); ties break by STORIES order for determinism
+    return max(fits, key=lambda s: (staleness(s), -STORIES.index(s)))
+
+
 def min_photos(_story: Optional[dict] = None) -> int:
     return 1  # a story needs only its cover; a 2nd clean photo is a bonus
 
 
 # ── build ─────────────────────────────────────────────────────────────
 
-def build_post(story: dict, candidate: dict, listing: dict, photos: list[str]) -> Optional[dict]:
+def build_post(story: dict, candidate: dict, listing: dict, photos: list[str],
+               *, humor: bool = False) -> Optional[dict]:
     """Build the Post for a story. Brand-safety first: the ONLY listing photo
     shown is the pipeline-vetted hero (``photos[0]``); slide 2 is a
     photo-free brand closer, so no second (less-vetted) image can leak a
     broker logo or phone number. Returns None if no usable photo.
 
-    slides → [story cover (hero photo), cta closer (no photo)].
+    ``humor=True`` is the poor-photo-but-true-value-gem treatment (Javi,
+    2026-08-02): the copy owns the weak photo with Salvadoran wit and pivots
+    to the value, so a genuine bargain still gets posted (< 20% of the feed).
+
+    slides → [story cover (hero photo), property card (no photo)].
     Caption inspires; the first comment whispers the real listing details."""
     if isinstance(story, str):
         story = _BY_ID[story]
@@ -171,18 +206,36 @@ def build_post(story: dict, candidate: dict, listing: dict, photos: list[str]) -
     area = format_area_m2(candidate.get("area_m2"))
     price = format_price_usd(candidate.get("price_usd"))
     noun = _NOUN.get((candidate.get("property_type") or "").lower(), "propiedad")
+    pct = candidate.get("price_vs_zone_pct")
+    disc = abs(round(pct)) if isinstance(pct, (int, float)) else None
 
-    # Cover: the emotional line stays the hero, but the eyebrow now names the
-    # place so the beautiful image is tied to a real location, not a quote.
-    cover = {"t": "story", "img": photos[0],
-             "eye": f"{story['eye']} · {zone}",
-             "line": story["line"], "accent": story.get("accent", "")}
-    if story.get("sub"):
-        cover["sub"] = story["sub"]
-    if story.get("small"):
-        cover["small"] = True
-    cover["pos"] = story.get("pos", "bottom")
-    cover["scrim"] = story.get("scrim", "down")
+    if humor:
+        # Own the bad photo, sell the value. Voseo, one wink, lint-clean.
+        val = f"{disc}% bajo el precio de la zona." if disc else "Un precio de los que no se repiten seguido."
+        cover = {"t": "story", "img": photos[0],
+                 "eye": f"Seamos honestos · {zone}",
+                 "line": "La foto no gana premios.\nEl precio, sí.",
+                 "accent": "El precio, sí.",
+                 "sub": val, "small": True, "pos": "bottom", "scrim": "down"}
+        gem_cap = (
+            "Seamos honestos: la foto no le hace justicia (y el que la tomó, "
+            "menos 😅). Pero mirá los números — "
+            + (f"{disc}% bajo el precio de la zona. " if disc else "un precio difícil de repetir. ")
+            + f"Un {noun} así, a ese precio, no se queda mucho. Vos sabés lo que vale.\n\n"
+            f"📍 {zone}. Mirá esta y las demás en pulpo.club — link en bio."
+        )
+    else:
+        # Cover: the emotional line stays the hero, but the eyebrow now names
+        # the place so the beautiful image is tied to a real location.
+        cover = {"t": "story", "img": photos[0],
+                 "eye": f"{story['eye']} · {zone}",
+                 "line": story["line"], "accent": story.get("accent", "")}
+        if story.get("sub"):
+            cover["sub"] = story["sub"]
+        if story.get("small"):
+            cover["small"] = True
+        cover["pos"] = story.get("pos", "bottom")
+        cover["scrim"] = story.get("scrim", "down")
     # Slide 2 is now a real PROPERTY card (was a generic brand closer) — it
     # references the actual listing on the image: location · size/type ·
     # price · pulpo.club. Still photo-free (no broker-watermark risk).
@@ -191,7 +244,7 @@ def build_post(story: dict, candidate: dict, listing: dict, photos: list[str]) -
               "facts": f"{facts} · en pulpo.club", "loc": loc}
     slides = [cover, closer]
 
-    caption = f"{story['cap']}\n\n📍 {zone}. Mirá esta y las demás en pulpo.club — link en bio."
+    caption = gem_cap if humor else f"{story['cap']}\n\n📍 {zone}. Mirá esta y las demás en pulpo.club — link en bio."
 
     # The first comment reinforces the details + carries discovery hashtags.
     spec = " · ".join(x for x in (zone, area, price) if x and x != "—")

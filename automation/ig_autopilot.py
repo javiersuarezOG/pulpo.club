@@ -77,6 +77,48 @@ def _used_listing_ids(items: list, recent: int = 12) -> set:
     return used
 
 
+def _featured_listing_ids(items: list) -> set:
+    """Every listing featured by a non-skipped queue item (posted or
+    upcoming). Used to spread photo coverage across listings/zones rather
+    than re-featuring the same lot with a different frame."""
+    out: set = set()
+    for it in items:
+        if it.get("skipped"):
+            continue
+        if it.get("primary_listing_id"):
+            out.add(it["primary_listing_id"])
+    return out
+
+
+# A "true value gem" (Javi, 2026-08-02): the only listings allowed to post
+# with a poor photo (via humor copy). Exceptional value = priced well below
+# its zone. Candidate carries price_vs_zone_pct (negative = under zone).
+GEM_ZONE_DISCOUNT = -25.0        # ≥25% below the zone price
+POOR_PHOTO_MAX_SHARE = 0.20      # ≤20% of the feed may be poor-photo gems
+
+
+def is_value_gem(candidate: dict) -> bool:
+    pct = candidate.get("price_vs_zone_pct")
+    return isinstance(pct, (int, float)) and pct <= GEM_ZONE_DISCOUNT
+
+
+def _poor_share(items: list) -> float:
+    live = [it for it in items if it.get("primary_listing_id") and not it.get("skipped")]
+    if not live:
+        return 0.0
+    poor = sum(1 for it in live if it.get("photo_tier") == "poor")
+    return poor / len(live)
+
+
+def _is_coastal(listing: dict) -> bool:
+    """Coastal enough for a sea/coast story line: an ocean view or within
+    ~2 km of the beach."""
+    if listing.get("has_ocean_view"):
+        return True
+    d = listing.get("dist_beach_km")
+    return d is not None and d <= 2.0
+
+
 def _next_day(items: list) -> int:
     return (max((it.get("day") or 0) for it in items) + 1) if items else 101
 
@@ -264,15 +306,17 @@ def select_beautiful_cover(
     used_urls: frozenset = frozenset(),
     fetcher: Callable = _download_image,
     scorer: Callable = None,
-    min_score: float = None,
     cap: int = _COVER_SCAN_CAP,
 ) -> Optional[tuple]:
-    """Download + score the listing's brand-safe, unused photos; return
-    ``(web_relative_path, chosen_url)`` for the most beautiful one — or None
-    if the best isn't gorgeous enough (skip the listing)."""
-    from automation.ig_photo_beauty import score_photo, GORGEOUS_MIN
+    """Download + score the listing's brand-safe, unused photos; save + return
+    ``(web_relative_path, chosen_url, score)`` for the MOST beautiful one — or
+    None only when the listing has no usable photo at all.
+
+    The tier decision lives with the caller (Javi, 2026-08-02): a great photo
+    posts as-is; a poor photo posts ONLY if the listing is a true value gem
+    (with humor copy); otherwise the caller skips it."""
+    from automation.ig_photo_beauty import score_photo
     scorer = scorer or score_photo
-    min_score = GORGEOUS_MIN if min_score is None else min_score
 
     best = None                                       # (score, img, url)
     for url in _ordered_fresh_urls(listing, used_urls)[:cap]:
@@ -284,7 +328,7 @@ def select_beautiful_cover(
         sc = scorer(img)
         if best is None or sc > best[0]:
             best = (sc, img, url)
-    if best is None or best[0] < min_score:
+    if best is None:
         return None
     slide = _fit_slide(best[1])
     if slide is None:
@@ -292,17 +336,17 @@ def select_beautiful_cover(
     assets_dir.mkdir(parents=True, exist_ok=True)
     slide.save(assets_dir / "photo_1.jpg", "JPEG", quality=90, optimize=True)
     print(f"[ig_autopilot] cover beauty={best[0]:.0f} {best[2][:70]}")
-    return f"web/data/ig_assets/autopilot/{slug}/photo_1.jpg", best[2]
+    return f"web/data/ig_assets/autopilot/{slug}/photo_1.jpg", best[2], best[0]
 
 
 def _predict_cover(listing, assets_dir, slug, *, used_urls=frozenset(), **_) -> Optional[tuple]:
     """Offline stand-in for select_beautiful_cover (no download / no score) —
     used by --skip-render dry runs and tests. Returns the first fresh
-    brand-safe url as the 'chosen' cover."""
+    brand-safe url with a nominal 'great' score (80)."""
     urls = _ordered_fresh_urls(listing, used_urls)
     if not urls:
         return None
-    return f"web/data/ig_assets/autopilot/{slug}/photo_1.jpg", urls[0]
+    return f"web/data/ig_assets/autopilot/{slug}/photo_1.jpg", urls[0], 80.0
 
 
 # ── item construction ─────────────────────────────────────────────────
@@ -317,28 +361,39 @@ def build_item(
     assets_root: Path,
     skip_render: bool,
     used_urls: frozenset = frozenset(),
+    allow_poor: bool = True,
     slide_renderer: Callable = _render_slide,
     photo_selector: Callable = select_beautiful_cover,
 ) -> Optional[dict]:
-    """Build one approved queue item for `story`: the cinematic cover (the
-    listing's OWN most-beautiful, unused, brand-safe photo) + a photo-free
-    brand closer, an inspirational caption, and a first comment that whispers
-    the listing details. Returns None when the listing has no gorgeous-enough
-    unused photo (caller tries another listing)."""
+    """Build one approved queue item. EVERY post has a real hero photo (the
+    listing's own best, unused, brand-safe frame). Tiering (Javi, 2026-08-02):
+    a great photo (score ≥ GORGEOUS_MIN) posts as-is; a poor photo posts ONLY
+    when the listing is a true value gem AND the <20% poor budget allows
+    (``allow_poor``) — with Salvadoran-humor copy that owns the bad photo;
+    otherwise the listing is skipped and the caller tries another."""
+    from automation.ig_photo_beauty import GORGEOUS_MIN
     sid = story["id"]
     slug = f"d{day:03d}__{sid}"
     assets_dir = assets_root / slug
 
     sel = photo_selector(listing, assets_dir, slug, used_urls=used_urls)
     if sel is None:
-        print(
-            f"[ig_autopilot] d{day} skip {candidate.get('listing_id')}: "
-            f"no gorgeous unused photo for story {sid}",
-            file=sys.stderr,
-        )
+        print(f"[ig_autopilot] d{day} skip {candidate.get('listing_id')}: no usable photo",
+              file=sys.stderr)
         return None
-    cover_path, cover_url = sel
-    post = _series.build_post(story, candidate, listing, [cover_path])
+    cover_path, cover_url, score = sel
+
+    humor = False
+    if score < GORGEOUS_MIN:
+        # poor photo → only a true value gem earns a slot, and only within
+        # the <20% poor budget; otherwise skip and try a better listing.
+        if not is_value_gem(candidate) or not allow_poor:
+            print(f"[ig_autopilot] d{day} skip {candidate.get('listing_id')}: "
+                  f"poor photo (beauty={score:.0f}), not a gem/over budget", file=sys.stderr)
+            return None
+        humor = True
+
+    post = _series.build_post(story, candidate, listing, [cover_path], humor=humor)
     if post is None:
         return None
 
@@ -382,6 +437,10 @@ def build_item(
         # the exact photo used — appended to the no-repeat ledger so it's
         # never reused as a cover again.
         "cover_photo_url": cover_url,
+        # photo tier for the <20%-poor budget + observability.
+        "photo_tier": "poor" if humor else "great",
+        "cover_beauty": round(score, 1),
+        "humor": humor,
         "status": "scheduled",
         # Auto-approve model: posts publish on schedule; operator only skips.
         "approved": True,
@@ -425,23 +484,31 @@ def topup(
     max_iters = lookahead * 6 + 4          # room to skip thin listings
     while _future_approved_count(items + added, now) < lookahead and guard < max_iters:
         guard += 1
-        used_listings = _used_listing_ids(items + added) | failed
+        # Photo COVERAGE: spread across listings — exclude every listing
+        # already featured anywhere (posted or upcoming), not just the recent
+        # window, so we don't re-feature the same lot while others qualify.
+        # _pick_candidate falls back to the full pool if that empties.
+        used_listings = _featured_listing_ids(items + added) | failed
         cand = _pick_candidate(candidates, used_listings, ranked_index)
         if cand is None:
             print("[ig_autopilot] no candidates available — stopping topup", file=sys.stderr)
             break
         day = _next_day(items + added)
-        # Rotate the story by the count of autopilot posts so far (existing +
-        # this run) so no two consecutive days repeat and the console can
-        # preview what's coming.
-        autopilot_so_far = sum(1 for it in items + added if str(it.get("selector")) == "autopilot")
-        story = _series.story_for_index(autopilot_so_far)
-        scheduled = _next_slot(items + added, now, cadence_days).isoformat()
         listing = ranked_index.get(cand.get("listing_id"), {})
+        # Candidate-first, then a story that FITS the place: coast/sea lines
+        # only on coastal listings (no "caminó esta costa" over an inland
+        # lot). Least-recently-used → cycles the fitting set before repeating.
+        recent_stories = [it.get("story_id") for it in reversed(items + added) if it.get("story_id")]
+        story = _series.pick_story(recent_stories, _is_coastal(listing))
+        scheduled = _next_slot(items + added, now, cadence_days).isoformat()
+        # <20% poor-photo budget: only allow a poor-photo gem while the feed's
+        # poor share is under the cap.
+        allow_poor = _poor_share(items + added) < POOR_PHOTO_MAX_SHARE
         item = build_item(
             day=day, story=story, candidate=cand, listing=listing,
             scheduled_for=scheduled, assets_root=assets_root,
             skip_render=skip_render, used_urls=frozenset(used_photos),
+            allow_poor=allow_poor,
             slide_renderer=slide_renderer, photo_selector=photo_selector,
         )
         if item is None:                    # no gorgeous unused photo → try another
@@ -451,12 +518,21 @@ def topup(
             used_photos.add(item["cover_photo_url"])
         added.append(item)
         print(
-            f"[ig_autopilot] queued d{day} story={story['id']} "
+            f"[ig_autopilot] queued d{day} story={story['id']} coast={_is_coastal(listing)} "
             f"listing={cand.get('listing_id')} scheduled={scheduled} "
             f"slides={1 + len(item['carousel_photo_paths'])} "
             f"caption_status={item['caption_status']}"
         )
     items.extend(added)
+
+    # Coverage visibility: how much gorgeous, unfeatured inventory is left.
+    featured = _featured_listing_ids(items)
+    runway = sum(1 for c in candidates if c.get("listing_id") not in featured)
+    print(f"[ig_autopilot] photo coverage: {runway} unfeatured candidate(s) remain "
+          f"of {len(candidates)} (added {len(added)} this run)")
+    if len(added) < lookahead:
+        print(f"[ig_autopilot] WARNING: only filled {len(added)}/{lookahead} — "
+              f"gorgeous/unused photo inventory is thin", file=sys.stderr)
     return added
 
 
