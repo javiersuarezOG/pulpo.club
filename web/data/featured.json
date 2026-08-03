@@ -18,8 +18,8 @@
       "pick_count": 3
     }
   },
-  "picked_at": "2026-08-02T06:34:44.767115+00:00",
-  "expires_at": "2026-08-03T00:00:00+00:00",
+  "picked_at": "2026-08-03T06:55:31.018365+00:00",
+  "expires_at": "2026-08-04T00:00:00+00:00",
   "tier": "elite",
   "listing_id": "citymax|156276",
   "rank_score": 80.06,
@@ -43,6 +43,12 @@
       "rank_score": 77.27,
       "hero_photo_quality_score": 100,
       "photos_count": 30
+    },
+    {
+      "listing_id": "encuentra24|31345998",
+      "rank_score": 77.16,
+      "hero_photo_quality_score": 90,
+      "photos_count": 13
     },
     {
       "listing_id": "bienesraices|2191",

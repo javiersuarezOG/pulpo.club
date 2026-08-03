@@ -1,11 +1,11 @@
 {
-  "computed_at": "2026-08-02T06:34:33.827148+00:00",
+  "computed_at": "2026-08-03T06:55:20.780807+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 15,
     "per_shelf_visible": {
       "beach_condos": {
-        "count": 24,
+        "count": 25,
         "renders_on_homepage": true
       },
       "beach_homes": {
@@ -21,7 +21,7 @@
         "renders_on_homepage": false
       },
       "lake_homes": {
-        "count": 12,
+        "count": 11,
         "renders_on_homepage": true
       },
       "lake_land": {
@@ -39,7 +39,7 @@
       },
       "bienesraices": {
         "coverage_pct_vs_discovered": null,
-        "kept": 426,
+        "kept": 425,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -123,7 +123,7 @@
       },
       "realestate_au_sv": {
         "coverage_pct_vs_discovered": null,
-        "kept": 328,
+        "kept": 331,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -137,14 +137,14 @@
       },
       "remax": {
         "coverage_pct_vs_discovered": null,
-        "kept": 293,
+        "kept": 292,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
       },
       "santizo": {
-        "coverage_pct_vs_discovered": 58.7,
-        "kept": 88,
+        "coverage_pct_vs_discovered": 60.0,
+        "kept": 90,
         "status": "green",
         "target_discovered": null,
         "target_prd": 150
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 5,
     "shelves_total": 6,
-    "total_in_dataset": 1899,
-    "total_visible_listings": 1687
+    "total_in_dataset": 1902,
+    "total_visible_listings": 1689
   },
   "min_real_listings": 4
 }

@@ -134902,5 +134902,425 @@
     "cost_usd": 0.00131403,
     "finish_reason": "stop",
     "latency_ms": 4674
+  },
+  "realestate_au_sv|lote-numero-3-y-4-poligono-c-residencial-el-cortijo-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119473333": {
+    "ts": "2026-08-03T06:44:07.786041+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Residencial El Cortijo, Santa Tecla",
+      "es": "Terreno en Venta en Residencial El Cortijo, Santa Tecla"
+    },
+    "short_description_canonical": {
+      "en": "Two adjacent lots (3 and 4) in Polígono C, Residencial El Cortijo, Santa Tecla, La Libertad. Residential land in a gated community. Price: USD 490,000.",
+      "es": "Dos lotes contiguos (3 y 4) en Polígono C, Residencial El Cortijo, Santa Tecla, La Libertad. Terreno residencial en comunidad cerrada. Precio: USD 490,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Two adjacent lots in gated community",
+        "es": "Dos lotes contiguos en comunidad cerrada"
+      },
+      {
+        "en": "Located in Santa Tecla, La Libertad",
+        "es": "Ubicado en Santa Tecla, La Libertad"
+      },
+      {
+        "en": "Price USD 490,000",
+        "es": "Precio USD 490,000"
+      }
+    ],
+    "lat": 13.6741,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3093,
+    "tokens_out": 414,
+    "cost_usd": 0.00129051,
+    "finish_reason": "stop",
+    "latency_ms": 3537
+  },
+  "realestate_au_sv|barrio-candelaria-calle-madrid-lote-s-n-san-salvador-san-salvador-san-salvador-san-salvador-310109606794": {
+    "ts": "2026-08-03T06:44:07.849282+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Barrio Candelaria, San Salvador",
+      "es": "Terreno en Venta en Barrio Candelaria, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Barrio Candelaria, Calle Madrid, San Salvador. The lot is offered for sale at $1,450,000. No further details on size or features are provided.",
+      "es": "Terreno en Barrio Candelaria, Calle Madrid, San Salvador. Se ofrece en venta por $1,450,000. No se proporcionan más detalles sobre tamaño o características."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Barrio Candelaria, San Salvador",
+        "es": "Ubicado en Barrio Candelaria, San Salvador"
+      },
+      {
+        "en": "Asking price $1,450,000",
+        "es": "Precio de venta $1,450,000"
+      },
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Publicado por RE/MAX Central"
+      }
+    ],
+    "lat": 13.7,
+    "lng": -89.2,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Salvador municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3083,
+    "tokens_out": 394,
+    "cost_usd": 0.00126581,
+    "finish_reason": "stop",
+    "latency_ms": 3599
+  },
+  "realestate_au_sv|condominio-quintas-recreativas-cerromar-etapa-ii-block-c-lote-18-tamanique-la-libertad-tamanique-la-libertad-department-310119473332": {
+    "ts": "2026-08-03T06:44:07.992361+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Cerromar Phase II Lot 18, Tamanique",
+      "es": "Lote 18, Cerromar Etapa II, Tamanique"
+    },
+    "short_description_canonical": {
+      "en": "Land lot 18 in Cerromar Phase II, Block C, Tamanique, La Libertad. Located in a recreational condominium development. Offered at $300,000.",
+      "es": "Lote 18 en Cerromar Etapa II, Block C, Tamanique, La Libertad. Ubicado en un condominio recreativo. Precio: $300,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Recreational condo community",
+        "es": "Comunidad condominial recreativa"
+      },
+      {
+        "en": "Phase II, Block C, lot 18",
+        "es": "Etapa II, Block C, lote 18"
+      },
+      {
+        "en": "Listed at $300,000",
+        "es": "Precio de $300,000"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -89.4167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Tamanique, La Libertad, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3094,
+    "tokens_out": 393,
+    "cost_usd": 0.00126768,
+    "finish_reason": "stop",
+    "latency_ms": 3743
+  },
+  "realestate_au_sv|km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119473326": {
+    "ts": "2026-08-03T06:44:08.192789+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale on Comasagua Road, Santa Tecla",
+      "es": "Terreno en Venta en Carretera a Comasagua, Santa Tecla"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel located at Km 12.5 on the Comasagua highway, Santa Tecla, La Libertad. The listing provides no details on terrain, utilities, or zoning. Price is USD 433,812.",
+      "es": "Terreno ubicado en el Km 12.5 de la carretera a Comasagua, Santa Tecla, La Libertad. El anuncio no proporciona detalles sobre terreno, servicios ni zonificación. Precio: USD 433,812."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located on main Comasagua highway",
+        "es": "Ubicado en carretera principal a Comasagua"
+      },
+      {
+        "en": "Near Santa Tecla, La Libertad",
+        "es": "Cerca de Santa Tecla, La Libertad"
+      },
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Publicado por RE/MAX Central"
+      }
+    ],
+    "lat": 13.6722,
+    "lng": -89.2794,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3098,
+    "tokens_out": 418,
+    "cost_usd": 0.00129626,
+    "finish_reason": "stop",
+    "latency_ms": 3943
+  },
+  "santizo|10237629": {
+    "ts": "2026-08-03T06:44:11.520648+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Modern House for Sale in El Encanto",
+      "es": "Casa Moderna en Venta en El Encanto"
+    },
+    "short_description_canonical": {
+      "en": "Modern house for sale in exclusive Residencial El Encanto. Two levels with vestibule, social bathroom, living room, dining room, open kitchen, master bedroom with closet and full bath, two bedrooms sharing a bath, full service area, and wide terraces with panoramic decks. Amenities include Encanto Country Club golf and 24/7 security.",
+      "es": "Casa moderna en venta en exclusiva Residencial El Encanto. Dos niveles con vestíbulo, baño social, sala, comedor, cocina abierta, habitación master con closet y baño completo, dos habitaciones con baño compartido, área de servicio completa y terrazas amplias con decks panorámicos. Amenidades incluyen golf en Encanto Country Club y seguridad 24/7."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Exclusive gated community El Encanto",
+        "es": "Exclusivo residencial El Encanto"
+      },
+      {
+        "en": "Golf club access on site",
+        "es": "Acceso a club de golf en el lugar"
+      },
+      {
+        "en": "24/7 security included",
+        "es": "Seguridad 24/7 incluida"
+      },
+      {
+        "en": "Two levels with panoramic decks",
+        "es": "Dos niveles con decks panorámicos"
+      }
+    ],
+    "lat": 13.69294,
+    "lng": -89.21819,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Salvador, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3285,
+    "tokens_out": 489,
+    "cost_usd": 0.00142485,
+    "finish_reason": "stop",
+    "latency_ms": 3921
+  },
+  "santizo|10238134": {
+    "ts": "2026-08-03T06:44:11.952004+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury Condo in Azule, Costa del Sol",
+      "es": "Apartamento de lujo en Azule, Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Luxury condo in the exclusive Azule condominium, Km 63 1/2 Boulevard Costa del Sol. Built area 180.05 m² plus 42.05 m² terrace, with 3 bedrooms each with full bath, a study with full bath, and social bath. Direct beach access, infinity pools, gym, rooftop, and 24/7 security.",
+      "es": "Apartamento de lujo en el exclusivo condominio Azule, Km 63 1/2 Boulevard Costa del Sol. Área construida de 180.05 m² más terraza de 42.05 m², con 3 habitaciones cada una con baño completo, estudio con baño completo y baño social. Acceso directo al mar, piscinas infinity, gimnasio, rooftop y seguridad 24/7."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct beach access",
+        "es": "Acceso directo al mar"
+      },
+      {
+        "en": "Infinity pools facing the sea",
+        "es": "Piscinas infinity frente al mar"
+      },
+      {
+        "en": "Rooftop with panoramic views",
+        "es": "Rooftop con vistas panorámicas"
+      },
+      {
+        "en": "24/7 security",
+        "es": "Seguridad 24/7"
+      },
+      {
+        "en": "Ideal for Airbnb",
+        "es": "Ideal para Airbnb"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 4.0,
+      "built_area_m2": 180.05,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3363,
+    "tokens_out": 527,
+    "cost_usd": 0.00148771,
+    "finish_reason": "stop",
+    "latency_ms": 4329
+  },
+  "encuentra24|32541710": {
+    "ts": "2026-08-03T07:31:40.993860+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Renovated Beach House with Pool in Las Palmeras de Gorgona",
+      "es": "Casa playera remodelada con piscina en Las Palmeras de Gorgona"
+    },
+    "short_description_canonical": {
+      "en": "Renovated beach house with new roof in Las Palmeras de Gorgona, Nueva Gorgona. 128 m² built, 3 bedrooms, 3 full bathrooms, pool, and parking for 4 cars. Walk to the beach from this secure, well-located property.",
+      "es": "Casa playera remodelada con techo nuevo en Las Palmeras de Gorgona, Nueva Gorgona. 128 m² construidos, 3 dormitorios, 3 baños completos, piscina y estacionamiento para 4 autos. Camine a la playa desde esta propiedad segura y bien ubicada."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Renovated with new roof",
+        "es": "Remodelada con techo nuevo"
+      },
+      {
+        "en": "3 bedrooms, 3 full baths",
+        "es": "3 dormitorios, 3 baños completos"
+      },
+      {
+        "en": "Private pool on site",
+        "es": "Piscina privada en el lugar"
+      },
+      {
+        "en": "Walk to the beach",
+        "es": "Camine a la playa"
+      },
+      {
+        "en": "Parking for 4 cars",
+        "es": "Estacionamiento para 4 autos"
+      }
+    ],
+    "lat": 8.5333,
+    "lng": -79.8667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Gorgona, Las Palmeras de Gorgona",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": 128.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2314,
+    "tokens_out": 514,
+    "cost_usd": 0.00119018,
+    "finish_reason": "stop",
+    "latency_ms": 4297
+  },
+  "encuentra24|32169155": {
+    "ts": "2026-08-03T07:31:41.374454+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront 2-Level House in Buenaventura, 5 Bedrooms",
+      "es": "Casa frente al mar de 2 niveles en Buenaventura, 5 habitaciones"
+    },
+    "short_description_canonical": {
+      "en": "Two-level beachfront house in the exclusive Buenaventura sector, with 1,334.57 m² of land and 761.55 m² of construction. It features 5 bedrooms, 5 bathrooms, a private pool, direct beach access, and 3 parking spaces. Offered for sale at $3,800,000 or rent at $18,000 per month.",
+      "es": "Casa frente al mar de dos niveles en el exclusivo sector de Buenaventura, con 1.334,57 m² de terreno y 761,55 m² de construcción. Cuenta con 5 habitaciones, 5 baños, piscina privada, acceso directo a la playa y 3 estacionamientos. Se ofrece en venta por $3,800,000 o alquiler por $18,000 al mes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct beach access",
+        "es": "Acceso directo a la playa"
+      },
+      {
+        "en": "Private pool",
+        "es": "Piscina privada"
+      },
+      {
+        "en": "5 bedrooms, 5 bathrooms",
+        "es": "5 habitaciones, 5 baños"
+      },
+      {
+        "en": "Large lot 1,334.57 m²",
+        "es": "Terreno amplio de 1.334,57 m²"
+      },
+      {
+        "en": "Exclusive Buenaventura sector",
+        "es": "Sector exclusivo de Buenaventura"
+      }
+    ],
+    "lat": 8.2,
+    "lng": -82.2,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Buenaventura beach area, Chiriquí, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 5,
+      "bathrooms": 5.0,
+      "built_area_m2": 761.55,
+      "parking_spaces": 3,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2353,
+    "tokens_out": 563,
+    "cost_usd": 0.00125461,
+    "finish_reason": "stop",
+    "latency_ms": 4677
   }
 }

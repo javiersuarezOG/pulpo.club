@@ -1,97 +1,97 @@
 {
-  "generated_at": "2026-08-02T07:12:20.135550+00:00",
-  "total_listings": 32,
+  "generated_at": "2026-08-03T07:32:50.648116+00:00",
+  "total_listings": 33,
   "ui_gate_pct": 15,
   "existing": [
     {
       "field": "url",
-      "hits": 32,
+      "hits": 33,
       "pct": 100.0
     },
     {
       "field": "title",
-      "hits": 32,
+      "hits": 33,
       "pct": 100.0
     },
     {
       "field": "description>20",
-      "hits": 32,
+      "hits": 33,
       "pct": 100.0
     },
     {
       "field": "price_usd",
-      "hits": 32,
+      "hits": 33,
       "pct": 100.0
     },
     {
       "field": "first_seen_at",
-      "hits": 32,
+      "hits": 33,
       "pct": 100.0
     },
     {
       "field": "scraped_at",
-      "hits": 32,
+      "hits": 33,
       "pct": 100.0
     },
     {
       "field": "photo_urls>0",
-      "hits": 32,
+      "hits": 33,
       "pct": 100.0
     },
     {
       "field": "photos_count>0",
-      "hits": 32,
+      "hits": 33,
       "pct": 100.0
     },
     {
       "field": "broker_name",
-      "hits": 32,
+      "hits": 33,
       "pct": 100.0
     },
     {
       "field": "property_type!=land",
-      "hits": 32,
+      "hits": 33,
       "pct": 100.0
     },
     {
       "field": "days_listed",
-      "hits": 32,
+      "hits": 33,
       "pct": 100.0
     },
     {
       "field": "lat",
-      "hits": 28,
-      "pct": 87.5
+      "hits": 29,
+      "pct": 87.9
     },
     {
       "field": "lng",
-      "hits": 28,
-      "pct": 87.5
+      "hits": 29,
+      "pct": 87.9
+    },
+    {
+      "field": "is_beachfront",
+      "hits": 9,
+      "pct": 27.3
     },
     {
       "field": "is_in_development",
       "hits": 8,
-      "pct": 25.0
-    },
-    {
-      "field": "is_beachfront",
-      "hits": 7,
-      "pct": 21.9
+      "pct": 24.2
     },
     {
       "field": "zone",
       "hits": 6,
-      "pct": 18.8
+      "pct": 18.2
     },
     {
       "field": "department",
       "hits": 6,
-      "pct": 18.8
+      "pct": 18.2
     },
     {
       "field": "is_repriced",
       "hits": 1,
-      "pct": 3.1
+      "pct": 3.0
     },
     {
       "field": "area_m2",
@@ -131,7 +131,7 @@
     {
       "field": "has_ocean_view",
       "hits": 8,
-      "pct": 25.0,
+      "pct": 24.2,
       "prd_target": 0,
       "verdict": "GREEN",
       "verdict_label": "🟢 surface-eligible"
@@ -147,7 +147,7 @@
     {
       "field": "has_power",
       "hits": 4,
-      "pct": 12.5,
+      "pct": 12.1,
       "prd_target": 40,
       "verdict": "AMBER",
       "verdict_label": "🟡 computed only, below UI gate"
@@ -155,15 +155,15 @@
     {
       "field": "has_water",
       "hits": 8,
-      "pct": 25.0,
+      "pct": 24.2,
       "prd_target": 40,
       "verdict": "AMBER",
       "verdict_label": "🟡 above 15% gate, below PRD target"
     },
     {
       "field": "has_water_body",
-      "hits": 10,
-      "pct": 31.2,
+      "hits": 11,
+      "pct": 33.3,
       "prd_target": 0,
       "verdict": "GREEN",
       "verdict_label": "🟢 surface-eligible"
@@ -171,15 +171,15 @@
     {
       "field": "is_agricultural",
       "hits": 3,
-      "pct": 9.4,
+      "pct": 9.1,
       "prd_target": 0,
       "verdict": "AMBER",
       "verdict_label": "🟡 computed only, below UI gate"
     },
     {
       "field": "is_beachfront",
-      "hits": 7,
-      "pct": 21.9,
+      "hits": 9,
+      "pct": 27.3,
       "prd_target": 15,
       "verdict": "GREEN",
       "verdict_label": "🟢 meets PRD target"
@@ -195,7 +195,7 @@
     {
       "field": "is_flat",
       "hits": 8,
-      "pct": 25.0,
+      "pct": 24.2,
       "prd_target": 0,
       "verdict": "GREEN",
       "verdict_label": "🟢 surface-eligible"
@@ -203,15 +203,15 @@
     {
       "field": "is_motivated",
       "hits": 6,
-      "pct": 18.8,
+      "pct": 18.2,
       "prd_target": 0,
       "verdict": "GREEN",
       "verdict_label": "🟢 surface-eligible"
     },
     {
       "field": "is_on_beach",
-      "hits": 7,
-      "pct": 21.9,
+      "hits": 9,
+      "pct": 27.3,
       "prd_target": 0,
       "verdict": "GREEN",
       "verdict_label": "🟢 surface-eligible"
@@ -219,7 +219,7 @@
     {
       "field": "is_on_lake",
       "hits": 1,
-      "pct": 3.1,
+      "pct": 3.0,
       "prd_target": 0,
       "verdict": "RED",
       "verdict_label": "🔴 below 5% — needs scraper depth"
@@ -227,15 +227,15 @@
     {
       "field": "is_tourist",
       "hits": 8,
-      "pct": 25.0,
+      "pct": 24.2,
       "prd_target": 0,
       "verdict": "GREEN",
       "verdict_label": "🟢 surface-eligible"
     },
     {
       "field": "is_walk_to_beach",
-      "hits": 1,
-      "pct": 3.1,
+      "hits": 0,
+      "pct": 0.0,
       "prd_target": 0,
       "verdict": "RED",
       "verdict_label": "🔴 below 5% — needs scraper depth"
@@ -259,7 +259,7 @@
     {
       "field": "zoning_residential",
       "hits": 4,
-      "pct": 12.5,
+      "pct": 12.1,
       "prd_target": 0,
       "verdict": "AMBER",
       "verdict_label": "🟡 computed only, below UI gate"
@@ -283,7 +283,7 @@
     {
       "field": "land_recreational",
       "hits": 2,
-      "pct": 6.2,
+      "pct": 6.1,
       "prd_target": 0,
       "verdict": "AMBER",
       "verdict_label": "🟡 computed only, below UI gate"
@@ -308,20 +308,20 @@
       },
       {
         "bucket": "200-500",
-        "count": 4,
-        "pct": 12.5
+        "count": 6,
+        "pct": 18.2
       },
       {
         "bucket": ">=500",
-        "count": 28,
-        "pct": 87.5
+        "count": 27,
+        "pct": 81.8
       }
     ],
     "per_source": [
       {
         "source": "encuentra24",
-        "n": 32,
-        "avg_chars": 1156,
+        "n": 33,
+        "avg_chars": 1107,
         "pct_short_lt50": 0.0
       }
     ]
@@ -329,7 +329,7 @@
   "us01_cohort": {
     "any_one_signal": {
       "hits": 11,
-      "pct": 34.4
+      "pct": 33.3
     },
     "all_three_signals": {
       "hits": 0,
