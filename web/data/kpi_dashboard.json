@@ -1,11 +1,11 @@
 {
-  "computed_at": "2026-08-03T06:55:20.780807+00:00",
+  "computed_at": "2026-08-04T06:21:44.207060+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 15,
     "per_shelf_visible": {
       "beach_condos": {
-        "count": 25,
+        "count": 23,
         "renders_on_homepage": true
       },
       "beach_homes": {
@@ -13,7 +13,7 @@
         "renders_on_homepage": true
       },
       "beach_land": {
-        "count": 486,
+        "count": 485,
         "renders_on_homepage": true
       },
       "lake_condos": {
@@ -59,8 +59,8 @@
         "target_prd": null
       },
       "citymax_sc": {
-        "coverage_pct_vs_discovered": 47.7,
-        "kept": 143,
+        "coverage_pct_vs_discovered": 47.3,
+        "kept": 142,
         "status": "green",
         "target_discovered": null,
         "target_prd": 300
@@ -80,8 +80,8 @@
         "target_prd": null
       },
       "encuentra24": {
-        "coverage_pct_vs_discovered": 1.0,
-        "kept": 28,
+        "coverage_pct_vs_discovered": 0.9,
+        "kept": 26,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -123,7 +123,7 @@
       },
       "realestate_au_sv": {
         "coverage_pct_vs_discovered": null,
-        "kept": 331,
+        "kept": 332,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 5,
     "shelves_total": 6,
-    "total_in_dataset": 1902,
-    "total_visible_listings": 1689
+    "total_in_dataset": 1900,
+    "total_visible_listings": 1688
   },
   "min_real_listings": 4
 }
