@@ -135322,5 +135322,54 @@
     "cost_usd": 0.00125461,
     "finish_reason": "stop",
     "latency_ms": 4677
+  },
+  "realestate_au_sv|lote-802-poligono-g-las-cruces-hacienda-zapotitan-ciudad-arce-la-libertad-centro-ciudad-arce-la-libertad-ciudad-arce-la-libertad-department-310119477671": {
+    "ts": "2026-08-04T06:09:47.369973+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Las Cruces, Hacienda Zapotitan, Ciudad Arce",
+      "es": "Terreno en Las Cruces, Hacienda Zapotitan, Ciudad Arce"
+    },
+    "short_description_canonical": {
+      "en": "Land lot 802 in Polígono G, Las Cruces, Hacienda Zapotitan, Ciudad Arce, La Libertad. This is a residential land parcel in a gated community. The lot is offered for sale at USD 449,000.",
+      "es": "Lote 802 en Polígono G, Las Cruces, Hacienda Zapotitan, Ciudad Arce, La Libertad. Es un terreno residencial en una comunidad cerrada. El lote se ofrece en venta por USD 449,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Gated community in Hacienda Zapotitan",
+        "es": "Comunidad cerrada en Hacienda Zapotitan"
+      },
+      {
+        "en": "Located in Ciudad Arce, La Libertad",
+        "es": "Ubicado en Ciudad Arce, La Libertad"
+      },
+      {
+        "en": "Listed by RE/MAX Capital",
+        "es": "Anunciado por RE/MAX Capital"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -89.4333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ciudad Arce, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3113,
+    "tokens_out": 436,
+    "cost_usd": 0.00132011,
+    "finish_reason": "stop",
+    "latency_ms": 3680
   }
 }

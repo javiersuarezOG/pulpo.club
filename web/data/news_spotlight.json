@@ -1,22 +1,22 @@
 {
   "en": {
     "candidates_seen": 1,
-    "llm_cost_usd": 0.00025017,
-    "paragraph": "A swimmer was rescued from drowning at Playa San Blas, a popular beach. This highlights the importance of heeding safety warnings. For you as a property buyer, it's a reminder to consider beach safety and proximity to lifeguard services when choosing a coastal property. Always check local conditions and emergency response availability.",
-    "picked_at": "2026-08-03",
-    "source_date": "2 Aug 2026",
+    "llm_cost_usd": 0.00024828000000000003,
+    "paragraph": "Seven foreigners were sentenced for trafficking over 1.5 tons of cocaine, showing authorities are actively cracking down on coastal crime. For you as a property buyer, this means safer communities and stronger rule of law near the shore. While not directly about real estate, it's a positive sign for long-term investment. Stay informed on local safety trends.",
+    "picked_at": "2026-08-04",
+    "source_date": "3 Aug 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/general/rescatan-a-persona-que-estuvo-apunto-de-ahogarse-en-playa-san-blas/?utm_source=rss&utm_medium=rss&utm_campaign=rescatan-a-persona-que-estuvo-apunto-de-ahogarse-en-playa-san-blas",
-    "title": "Lifeguard Rescue at San Blas Beach"
+    "source_url": "https://lapagina.com.sv/nacionales/condenan-a-siete-extranjeros-por-trafico-de-drogas/?utm_source=rss&utm_medium=rss&utm_campaign=condenan-a-siete-extranjeros-por-trafico-de-drogas",
+    "title": "Drug Convictions Signal Coastal Security"
   },
   "es": {
     "candidates_seen": 1,
-    "llm_cost_usd": 0.0003168,
-    "paragraph": "Esta semana se reportó un rescate acuático en Playa San Blas, una de las playas más concurridas del país. Aunque no hubo víctimas, el incidente subraya los riesgos del mar en esa zona. Si estás considerando comprar propiedad costera, es clave evaluar la seguridad de la playa y la cercanía a servicios de rescate. Revisá los historiales de incidentes y las condiciones del oleaje antes de decidir. Priorizá ubicaciones con vigilancia y acceso rápido a ayuda.",
-    "picked_at": "2026-08-03",
-    "source_date": "2 ago 2026",
+    "llm_cost_usd": 0.00031491,
+    "paragraph": "Esta semana, siete extranjeros fueron condenados por tráfico de drogas en El Salvador, un caso que refleja la actividad ilegal en la costa. Para vos, que estás considerando comprar propiedad costera o de lago, esto subraya la importancia de investigar la seguridad de la zona y la presencia de actividades ilícitas. Antes de invertir, verificá los índices de criminalidad y consultá con locales o autoridades. Una zona con historial de narcotráfico puede afectar tu tranquilidad y el valor de tu propiedad. Tomá decisiones informadas.",
+    "picked_at": "2026-08-04",
+    "source_date": "3 ago 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/general/rescatan-a-persona-que-estuvo-apunto-de-ahogarse-en-playa-san-blas/?utm_source=rss&utm_medium=rss&utm_campaign=rescatan-a-persona-que-estuvo-apunto-de-ahogarse-en-playa-san-blas",
-    "title": "Rescataron a persona que estuvo a punto de ahogarse en Playa San Blas"
+    "source_url": "https://lapagina.com.sv/nacionales/condenan-a-siete-extranjeros-por-trafico-de-drogas/?utm_source=rss&utm_medium=rss&utm_campaign=condenan-a-siete-extranjeros-por-trafico-de-drogas",
+    "title": "Condenan a siete extranjeros por tráfico de drogas"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-03T06:44:03.410602+00:00",
+  "computed_at": "2026-08-04T06:09:42.833414+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -1827,10 +1827,10 @@
       "unique_in_source": 34
     },
     "citymax_sc": {
-      "kept_as_unique": 149,
-      "raw": 149,
+      "kept_as_unique": 148,
+      "raw": 148,
       "shared_with_others": 0,
-      "unique_in_source": 149
+      "unique_in_source": 148
     },
     "csbr": {
       "kept_as_unique": 278,
@@ -1839,10 +1839,10 @@
       "unique_in_source": 278
     },
     "encuentra24": {
-      "kept_as_unique": 28,
-      "raw": 28,
+      "kept_as_unique": 26,
+      "raw": 26,
       "shared_with_others": 0,
-      "unique_in_source": 28
+      "unique_in_source": 26
     },
     "essurf": {
       "kept_as_unique": 33,
@@ -1869,10 +1869,10 @@
       "unique_in_source": 25
     },
     "realestate_au_sv": {
-      "kept_as_unique": 292,
-      "raw": 341,
+      "kept_as_unique": 293,
+      "raw": 342,
       "shared_with_others": 0,
-      "unique_in_source": 292
+      "unique_in_source": 293
     },
     "remax": {
       "kept_as_unique": 329,
@@ -1899,6 +1899,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2086,
-  "total_unique_fingerprints": 2006
+  "total_in_dataset": 2084,
+  "total_unique_fingerprints": 2004
 }
