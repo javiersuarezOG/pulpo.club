@@ -19,7 +19,7 @@
 // new routing is the default; the flag exists only to disable it.
 
 import { useEffect, useState } from "react";
-import { isFeatureEnabled, onFeatureFlagsLoaded } from "../telemetry/client";
+import { featureFlagVariant, isFeatureEnabled, onFeatureFlagsLoaded } from "../telemetry/client";
 
 function readUrlOverride(key: string): boolean | null {
   if (typeof window === "undefined") return null;
@@ -28,6 +28,21 @@ function readUrlOverride(key: string): boolean | null {
     if (v === "1") return true;
     if (v === "0") return false;
     return null;
+  } catch {
+    return null;
+  }
+}
+
+// Variant escape hatch: `?ff_<key>=<variant>` forces a multivariate flag
+// to a named arm for the current load (Playwright drives both arms this
+// way without the PostHog dashboard). Returns the raw string or null.
+// "1"/"0" are reserved for the boolean override above and ignored here.
+function readUrlVariantOverride(key: string): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const v = new URLSearchParams(window.location.search).get(`ff_${key}`);
+    if (v === null || v === "1" || v === "0") return null;
+    return v;
   } catch {
     return null;
   }
@@ -47,6 +62,35 @@ export function useFeatureFlag(key: string, fallback: boolean): boolean {
     // finishes loading mid-render.
     const unsubscribe = onFeatureFlagsLoaded(() => {
       setValue(readFeatureFlag(key, fallback));
+    });
+    return unsubscribe;
+  }, [key, fallback]);
+  return value;
+}
+
+// ─── Multivariate (A/B experiment) reads ────────────────────────────
+//
+// Returns the string variant of a PostHog multivariate flag (e.g.
+// "control" | "variant_a"). Calling featureFlagVariant() triggers
+// posthog-js's `$feature_flag_called`, which is what PostHog's native
+// experiment analysis joins conversions to — so an A/B goal that reads a
+// variant here is automatically measurable, no extra capture needed.
+//
+// At low traffic this is the preferred shape for funnel loops (both arms
+// run concurrently) over one-at-a-time variable edits — see
+// goals/README.md decision.method: ab-flag.
+
+export function readFeatureVariant(key: string, fallback: string): string {
+  const override = readUrlVariantOverride(key);
+  if (override !== null) return override;
+  return featureFlagVariant(key, fallback);
+}
+
+export function useFeatureVariant(key: string, fallback: string): string {
+  const [value, setValue] = useState<string>(() => readFeatureVariant(key, fallback));
+  useEffect(() => {
+    const unsubscribe = onFeatureFlagsLoaded(() => {
+      setValue(readFeatureVariant(key, fallback));
     });
     return unsubscribe;
   }, [key, fallback]);
