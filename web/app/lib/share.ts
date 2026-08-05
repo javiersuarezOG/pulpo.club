@@ -62,12 +62,27 @@ export function decodeShareToken(token: string): string | null {
 //
 // Falls back to window.location.origin when window is defined (browser)
 // so dev/preview environments produce links that point to themselves.
-export function shareUrlFor(listingId: string): string {
+export function shareUrlFor(listingId: string, referrerId?: string | null): string {
   const token = encodeShareToken(listingId);
   const origin = typeof window !== "undefined" && window.location?.origin
     ? window.location.origin
     : "https://pulpo.club";
-  return `${origin}/browse?pin=${token}`;
+  const base = `${origin}/browse?pin=${token}`;
+  const sr = sanitizeReferrer(referrerId);
+  return sr ? `${base}&sr=${encodeURIComponent(sr)}` : base;
+}
+
+// Referrer tokens carried on share links (`&sr=…`) are the sharer's
+// PostHog distinct_id — an opaque, stable id the referral webhook (P1)
+// can map back to the sharer's Person → Clerk/Stripe customer to grant
+// the reward. Constrain the charset so a malformed distinct_id can never
+// produce a weird or injectable URL; anything off-shape is dropped
+// (link still works, just unattributed).
+const REFERRER_RE = /^[A-Za-z0-9._-]{1,64}$/;
+
+export function sanitizeReferrer(ref: string | null | undefined): string | null {
+  if (!ref) return null;
+  return REFERRER_RE.test(ref) ? ref : null;
 }
 
 // Listing IDs in the catalog: alphanumerics, dashes, underscores, dots.

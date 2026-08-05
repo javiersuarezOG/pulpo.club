@@ -76,6 +76,22 @@ export type EventMap = {
     source_view: "discover" | "browse" | "saved";
     source_shelf?: string;
   };
+  // Card impression — fires once per listing per page-view when a card
+  // first crosses 50% visibility (IntersectionObserver, dedupe by
+  // listing_id within the mounted list). `position` is the 0-based index
+  // in the rendered list; `surface` distinguishes where the card lives so
+  // CTR (card.clicked / card_impression) can be sliced per surface. To
+  // control PostHog event volume at ~1500 listings, impressions are
+  // batched: one event carries up to IMPRESSION_BATCH listing_ids +
+  // positions (parallel arrays, same length). Consumers: the
+  // ranking-relevance goal (CTR@20) and the image-quality goal (hero CTR)
+  // in goals/. See web/app/lib/card-impressions.ts.
+  "browse.card_impression": {
+    listing_ids: string[];
+    positions: number[];
+    surface: "browse" | "saved" | "similar";
+    sort: string;
+  };
   "browse.filter_changed": { filter_key: string; value: string | number | boolean | null; active_count: number };
   "browse.sort_changed": { sort: string };
   "browse.view_toggled": { view: "cards" | "table" };
@@ -116,6 +132,13 @@ export type EventMap = {
   // session. Invalid/incomplete pins clear ?pin silently and do NOT
   // fire this event.
   "browse.pin_consumed": { listing_id: string };
+  // Share-link visit WITH referral attribution — fires once per
+  // /browse?pin=…&sr=… landing when the pin resolves AND an sr referrer
+  // token is present. Distinct from browse.pin_consumed (which fires for
+  // every pin, referred or not) so the referral funnel — share visit →
+  // signup → paid — is queryable on this event alone. `referrer` is the
+  // sharer's distinct_id (see lib/share.ts). Consumed by goals/referral-k.
+  "share.link_visited": { listing_id: string; referrer: string };
 
   // ───── New homepage (rewrite Phase 4) ─────
   // Email form on the rewritten hero. Phase 6 wires the actual
@@ -366,6 +389,21 @@ export type EventMap = {
   "paywall.bypassed": { kind: "detail_view" | "off_market" | "save_cap"; action: "upgrade" | "dismiss" | "have_account"; listing_id?: string };
   "plans.viewed": { source: "topnav" | "footer" | "paywall" | "manual" };
   "view_original.clicked": { listing_id: string; source_label: string };
+  // Broker outbound click — fires alongside view_original.clicked when
+  // the user follows the external source link off-platform. This is the
+  // ultimate "the listing produced value" signal: a session that reaches
+  // a broker is the closest proxy we own for intent-to-transact.
+  // Distinct from view_original.clicked (which stays a UI-label event) so
+  // the ranking-relevance goal can use outbound-per-session as a
+  // secondary objective without depending on the older event's shape.
+  // `auth_state`/`listing_state` let dashboards separate paid vs anon and
+  // active vs off-market outbound. See goals/ranking-relevance.
+  "detail.source_outbound_clicked": {
+    listing_id: string;
+    source: string;
+    auth_state: AuthState;
+    listing_state: "active" | "off_market";
+  };
 
   // Wave-1 CTA routing — fires once per click on any CTA that flows
   // through lib/cta-routing.ts. Property shape is locked at ship; the

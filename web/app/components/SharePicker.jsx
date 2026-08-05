@@ -14,7 +14,7 @@
 import React, { useEffect, useRef } from "react";
 import { t, tr, formatPriceI18n } from "../i18n.jsx";
 import { Icon, PulpoMark } from "../components.jsx";
-import { track } from "../telemetry/hook";
+import { track, getDistinctId } from "../telemetry/hook";
 import { shareUrlFor } from "../lib/share.ts";
 
 // Pick the one-line hook printed under the title in the WhatsApp
@@ -63,7 +63,9 @@ const CHANNELS = {
 export default function SharePicker({ listing, app, onClose }) {
   const lc = app.locale;
   const dialogRef = useRef(null);
-  const shareUrl = shareUrlFor(listing.id);
+  // Embed the sharer's distinct_id as ?sr= so a recipient who converts
+  // can be attributed back to this sharer for the referral reward (P1).
+  const shareUrl = shareUrlFor(listing.id, getDistinctId());
   const caption = buildCaption(listing, lc);
   const emailSubject = t("share.email.subject", lc, { title: tr(listing.title, lc) });
 

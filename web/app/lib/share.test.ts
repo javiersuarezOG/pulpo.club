@@ -6,7 +6,13 @@
 // in lockstep.
 
 import { describe, expect, it, vi } from "vitest";
-import { encodeShareToken, decodeShareToken, shareUrlFor, resolvePinFromParam } from "./share";
+import {
+  encodeShareToken,
+  decodeShareToken,
+  shareUrlFor,
+  resolvePinFromParam,
+  sanitizeReferrer,
+} from "./share";
 
 describe("share token", () => {
   it("encodes a remax id without revealing the source name in the token", () => {
@@ -125,5 +131,45 @@ describe("resolvePinFromParam", () => {
     expect(resolvePinFromParam("../../etc/passwd")).toBeNull();
     expect(resolvePinFromParam("foo bar")).toBeNull();
     expect(resolvePinFromParam("foo/bar")).toBeNull();
+  });
+});
+
+describe("share-referral attribution (sr)", () => {
+  it("sanitizeReferrer accepts plausible distinct_ids, rejects junk", () => {
+    expect(sanitizeReferrer("0192f3ab-8c7d-7e10-b0a1-abc")).toBe("0192f3ab-8c7d-7e10-b0a1-abc");
+    expect(sanitizeReferrer("user_123.abc-DEF")).toBe("user_123.abc-DEF");
+    expect(sanitizeReferrer(null)).toBeNull();
+    expect(sanitizeReferrer(undefined)).toBeNull();
+    expect(sanitizeReferrer("")).toBeNull();
+    // Spaces, slashes, and query-injection chars are dropped so a
+    // malformed id can never corrupt the share URL.
+    expect(sanitizeReferrer("has space")).toBeNull();
+    expect(sanitizeReferrer("a/b")).toBeNull();
+    expect(sanitizeReferrer("a&x=1")).toBeNull();
+    // Over 64 chars → rejected.
+    expect(sanitizeReferrer("a".repeat(65))).toBeNull();
+    expect(sanitizeReferrer("a".repeat(64))).toBe("a".repeat(64));
+  });
+
+  it("appends &sr= when a valid referrer is supplied", () => {
+    vi.stubGlobal("window", { location: { origin: "https://pulpo.club" } });
+    try {
+      const url = shareUrlFor("remax__001461165132", "distinct-abc_123");
+      expect(url).toContain("/browse?pin=");
+      expect(url).toContain("&sr=distinct-abc_123");
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("omits sr entirely when no referrer (or an invalid one) is given", () => {
+    vi.stubGlobal("window", { location: { origin: "https://pulpo.club" } });
+    try {
+      expect(shareUrlFor("remax__1")).not.toContain("sr=");
+      expect(shareUrlFor("remax__1", null)).not.toContain("sr=");
+      expect(shareUrlFor("remax__1", "bad token")).not.toContain("sr=");
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

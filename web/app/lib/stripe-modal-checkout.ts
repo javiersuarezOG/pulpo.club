@@ -10,6 +10,7 @@
 // function keeps the surface small and unit-test-friendly.
 
 import { track, getDistinctId } from "../telemetry/hook";
+import { captureCampaignParams } from "./campaign";
 
 export type StartCheckoutInput = {
   // Locale forwarded to the server so the Stripe success/cancel URLs
@@ -47,6 +48,13 @@ export type StartCheckoutResult =
   | { kind: "error"; reason: string };
 
 async function postCheckout(input: StartCheckoutInput, includeCode: boolean): Promise<Response> {
+  // Referral attribution: read the persisted sharer distinct_id (captured
+  // at app boot from a /browse?pin=…&sr= link). Stamped into Stripe
+  // session metadata so the referral webhook (P1) can credit the sharer.
+  // Read here rather than threaded through every modal caller — sr is
+  // already persisted to sessionStorage, mirroring how posthog_anon_id is
+  // read from a global rather than passed in.
+  const sr = captureCampaignParams().shareReferrer || null;
   return fetch("/api/stripe/start-checkout", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -64,6 +72,7 @@ async function postCheckout(input: StartCheckoutInput, includeCode: boolean): Pr
       // for anonymous visitors → Stripe collects it).
       email: input.email || null,
       source: input.source || null,
+      ...(sr ? { sr } : {}),
       ...(input.utms || {}),
     }),
   });

@@ -41,6 +41,7 @@ import { safeLocalGet, safeLocalSet } from "./lib/safe-storage";
 import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
 import { markUpsellDismissed, decideShouldShowUpsell } from "./lib/upsell-config";
 import { captureCampaignParams } from "./lib/campaign";
+import { resetImpressions } from "./lib/card-impressions.ts";
 import { startCheckoutFromModal } from "./lib/stripe-modal-checkout";
 import { tokenize, matchesQuery, scoreListing, buildSuggestions } from "./lib/search-match";
 import {
@@ -1605,6 +1606,12 @@ function BrowsePage({ app }) {
     debouncedFilters.readiness, debouncedFilters.rank_max,
   ]), [debouncedFilters, sort]);
 
+  // When the browse result set changes (filters or sort), a listing
+  // re-entering the viewport under the new ordering is a fresh
+  // impression — clear the dedupe set so it counts again. Flushes any
+  // pending batch first. See lib/card-impressions.ts.
+  pUseEffect(() => { resetImpressions("browse"); }, [searchSig]);
+
   pUseEffect(() => {
     if (view !== "map") { didInitMapRef.current = false; searchSigRef.current = null; return; }
     if (!didInitMapRef.current) {
@@ -1754,6 +1761,14 @@ function BrowsePage({ app }) {
     }
     pinTelemetryFiredRef.current = true;
     track("browse.pin_consumed", { listing_id: pinnedListingId });
+    // If this pin arrived via a share link carrying a referrer token,
+    // also fire the referral-funnel event. captureCampaignParams has
+    // already persisted ?sr at app boot; read it back here (shape-gated
+    // inside campaign.ts). Empty string when this wasn't a referred visit.
+    const referrer = captureCampaignParams().shareReferrer;
+    if (referrer) {
+      track("share.link_visited", { listing_id: pinnedListingId, referrer });
+    }
   }, [pinnedListingId, listingsState.state.status, LISTINGS, clearPin]);
 
   // === Hooks done — branch on load state. ===
@@ -2034,6 +2049,7 @@ function BrowsePage({ app }) {
                       app={app}
                       priority={i < ABOVE_FOLD_COUNT}
                       source="browse"
+                      impressionMeta={{ surface: "browse", position: i, sort }}
                       topRank={topRankMap.get(l.id)}
                       sharedPin={pinned != null && l.id === pinned.id}
                       onOpen={() => {
@@ -3105,6 +3121,15 @@ function ListingDetail({ listing, app, asPanel = true }) {
                   listing_id: listing.id,
                   source_label: listing.source_label,
                 });
+                // The value signal: this session reached the broker.
+                // Consumed by goals/ranking-relevance as a secondary
+                // objective (outbound-per-session).
+                track("detail.source_outbound_clicked", {
+                  listing_id: listing.id,
+                  source: listing.source_id || listing.source_label,
+                  auth_state: !app.user ? "anonymous" : (isPaid ? "pro" : "free"),
+                  listing_state: isOffMarket ? "off_market" : "active",
+                });
                 trackCtaRouted("broker_outbound", app.user, "passthrough", true);
               }}
             >
@@ -3209,6 +3234,9 @@ function SavedPage({ app }) {
     return arr;
   }, [items, sort]);
 
+  // Re-count impressions when the saved list is re-sorted or items change.
+  pUseEffect(() => { resetImpressions("saved"); }, [sort, items]);
+
   if (items.length === 0) {
     return (
       <div className="page page-saved">
@@ -3271,6 +3299,7 @@ function SavedPage({ app }) {
               app={app}
               priority={i < 6}
               source="saved"
+              impressionMeta={{ surface: "saved", position: i, sort }}
               topRank={topRankMap.get(l.id)}
               onOpen={() => {
                 track("card.clicked", { listing_id: l.id, source_view: "saved" });

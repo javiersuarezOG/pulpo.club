@@ -110,3 +110,47 @@ describe("captureCampaignParams — combined snapshot", () => {
     expect(out.upsellOverride).toBe("1");
   });
 });
+
+describe("captureCampaignParams — share referrer (sr)", () => {
+  it("captures a valid ?sr= token and persists it to sessionStorage", () => {
+    setLocation("?pin=abc&sr=distinct-abc_123");
+    const out = captureCampaignParams();
+    expect(out.shareReferrer).toBe("distinct-abc_123");
+    expect(store.data["pulpo-sr"]).toBe("distinct-abc_123");
+  });
+
+  it("falls back to sessionStorage when the URL has no sr (survives navigation)", () => {
+    store.data["pulpo-sr"] = "referrer-xyz";
+    setLocation("");
+    const out = captureCampaignParams();
+    expect(out.shareReferrer).toBe("referrer-xyz");
+  });
+
+  it("URL sr wins over a stale stored value (new share link wins)", () => {
+    store.data["pulpo-sr"] = "old-referrer";
+    setLocation("?sr=new-referrer");
+    const out = captureCampaignParams();
+    expect(out.shareReferrer).toBe("new-referrer");
+    expect(store.data["pulpo-sr"]).toBe("new-referrer");
+  });
+
+  it("drops a malformed sr (spaces / injection chars) rather than persisting junk", () => {
+    setLocation("?sr=" + encodeURIComponent("bad token&x=1"));
+    const out = captureCampaignParams();
+    expect(out.shareReferrer).toBe("");
+    expect(store.data["pulpo-sr"]).toBeUndefined();
+  });
+
+  it("ignores a malformed cached sr", () => {
+    store.data["pulpo-sr"] = "has space";
+    setLocation("");
+    const out = captureCampaignParams();
+    expect(out.shareReferrer).toBe("");
+  });
+
+  it("shareReferrer is empty on SSR / no-window", () => {
+    vi.stubGlobal("window", undefined as never);
+    const out = captureCampaignParams();
+    expect(out.shareReferrer).toBe("");
+  });
+});

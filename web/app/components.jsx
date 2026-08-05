@@ -8,6 +8,7 @@ import { readFeatureFlag } from "./lib/feature-flag";
 import { buildSrcSet } from "./lib/img-url";
 import { deriveLocationPrecision } from "./lib/location-precision";
 import { isCardImageDisplayable } from "./lib/card-image";
+import { useCardImpression } from "./lib/card-impressions.ts";
 
 // ===== Formatters =====
 // Locale-aware wrappers — pull current locale from <html lang> so plain helpers work.
@@ -857,7 +858,16 @@ function ListingCard({
   // matching marker. data-listing-id lets the card panel scroll a card
   // into view when its marker is hovered.
   highlighted = false, onHover,
+  // Impression tracking — when a list surface passes {surface, position,
+  // sort}, the card fires `browse.card_impression` once on first 50%
+  // visibility. Omitted (null) on surfaces that don't count impressions
+  // (map markers, single detail hero, etc.). listing_id is supplied here
+  // so callers only thread position/sort/surface.
+  impressionMeta = null,
 }) {
+  const impressionRef = useCardImpression(
+    impressionMeta ? { ...impressionMeta, listingId: listing.id } : null,
+  );
   const [photoIdx, setPhotoIdx] = useState(0);
   const [hovered, setHovered] = useState(false);
   const navStartRef = useRef(null);    // performance.now() at last arrow click
@@ -928,6 +938,7 @@ function ListingCard({
 
   return (
     <article
+      ref={impressionRef}
       data-listing-id={listing.id}
       className={`listing-card ${compact ? "compact" : ""} ${isMag ? "listing-card-magazine" : ""} ${sharedPin ? "listing-card-shared-pinned" : ""} ${highlighted ? "listing-card-highlighted" : ""}`}
       onClick={handleClick}

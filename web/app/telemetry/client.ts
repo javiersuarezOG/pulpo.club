@@ -77,6 +77,9 @@ const URL_PARAM_ALLOWLIST = new Set([
   // Marketing attribution — preserved for funnel analysis.
   "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term",
   "ref", "gclid", "fbclid",
+  // Share-referral attribution — the sharer's distinct_id on /browse?pin=
+  // links (see lib/share.ts). Kept so the referral funnel is queryable.
+  "sr",
   // Locale.
   "lang",
   // Browse filter state (must round-trip for funnel analysis).

@@ -109,6 +109,16 @@ module.exports = async (req, res) => {
     ? body.locale === "es" ? "es-419" : "en"
     : null;
   const utms = pickUtms(body);
+  // Share-referral token — the sharer's distinct_id, carried from a
+  // /browse?pin=…&sr= link through the client campaign chain. Stamped
+  // into Stripe session metadata below so the referral webhook (P1 —
+  // "give a month, get a month") can credit the sharer once this
+  // checkout completes. Shape-gated (alnum + . _ -, ≤64) to match
+  // lib/share.ts sanitizeReferrer; empty when absent. Producer of the
+  // metadata.sr field; consumer is the future referral handler in
+  // api/stripe/webhook.js.
+  const rawSr = safeStr(body.sr).trim();
+  const shareReferrer = /^[A-Za-z0-9._-]{1,64}$/.test(rawSr) ? rawSr : "";
 
   // Distinct ID used for every PostHog event below — hashed email when
   // available so we can chain anonymous client-side events through the
@@ -230,6 +240,9 @@ module.exports = async (req, res) => {
     // SUPPORTED_LOCALES mapping above); webhook normalizes to the
     // BCP-47 root for Clerk.
     locale: locale || "",
+    // Referral attribution (P1 consumer: referral handler in webhook.js).
+    // Only stamped when present so non-referred sessions stay clean.
+    ...(shareReferrer ? { sr: shareReferrer } : {}),
     ...utms,
   };
 
@@ -323,6 +336,9 @@ module.exports = async (req, res) => {
     utm_campaign: utms.utm_campaign || "",
     utm_term: utms.utm_term || "",
     utm_content: utms.utm_content || "",
+    // Referral funnel: boolean only — the raw sr token lives in Stripe
+    // metadata, not in PostHog event props (privacy).
+    has_referral: !!shareReferrer,
     ms: Date.now() - t0,
   });
   await posthog.flush();
