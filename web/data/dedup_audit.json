@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-04T06:09:42.833414+00:00",
+  "computed_at": "2026-08-05T06:11:44.298783+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -1809,10 +1809,10 @@
   "overlap_matrix": {},
   "per_source": {
     "bienesraices": {
-      "kept_as_unique": 506,
-      "raw": 507,
+      "kept_as_unique": 507,
+      "raw": 508,
       "shared_with_others": 0,
-      "unique_in_source": 506
+      "unique_in_source": 507
     },
     "century21": {
       "kept_as_unique": 13,
@@ -1827,10 +1827,10 @@
       "unique_in_source": 34
     },
     "citymax_sc": {
-      "kept_as_unique": 148,
-      "raw": 148,
+      "kept_as_unique": 150,
+      "raw": 150,
       "shared_with_others": 0,
-      "unique_in_source": 148
+      "unique_in_source": 150
     },
     "csbr": {
       "kept_as_unique": 278,
@@ -1839,10 +1839,10 @@
       "unique_in_source": 278
     },
     "encuentra24": {
-      "kept_as_unique": 26,
-      "raw": 26,
+      "kept_as_unique": 28,
+      "raw": 28,
       "shared_with_others": 0,
-      "unique_in_source": 26
+      "unique_in_source": 28
     },
     "essurf": {
       "kept_as_unique": 33,
@@ -1869,22 +1869,22 @@
       "unique_in_source": 25
     },
     "realestate_au_sv": {
-      "kept_as_unique": 293,
-      "raw": 342,
+      "kept_as_unique": 292,
+      "raw": 341,
       "shared_with_others": 0,
-      "unique_in_source": 293
+      "unique_in_source": 292
     },
     "remax": {
-      "kept_as_unique": 329,
-      "raw": 348,
+      "kept_as_unique": 315,
+      "raw": 334,
       "shared_with_others": 0,
-      "unique_in_source": 329
+      "unique_in_source": 315
     },
     "santizo": {
-      "kept_as_unique": 90,
-      "raw": 90,
+      "kept_as_unique": 86,
+      "raw": 86,
       "shared_with_others": 0,
-      "unique_in_source": 90
+      "unique_in_source": 86
     },
     "vivolatam": {
       "kept_as_unique": 157,
@@ -1899,6 +1899,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2084,
-  "total_unique_fingerprints": 2004
+  "total_in_dataset": 2070,
+  "total_unique_fingerprints": 1990
 }
