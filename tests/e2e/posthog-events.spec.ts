@@ -76,6 +76,24 @@ test.describe("PostHog event catalog — new homepage journey emits the expected
         "route.changed should fire with /browse as to_path",
       ).toBeTruthy();
 
+      // ── 2b. Browse cards in view emit browse.card_impression ─────
+      // Above-fold cards cross 50% visibility on load; the batching
+      // module (lib/card-impressions.ts) flushes after a 1s debounce.
+      // Poll a little longer than the debounce so the batch lands.
+      await expect.poll(async () => {
+        const list = await getEvents(page);
+        return list.some((e) => e.name === "browse.card_impression");
+      }, { timeout: 4_000, message: "expected browse.card_impression after cards enter the viewport" }).toBeTruthy();
+      {
+        const imp = (await getEvents(page)).find((e) => e.name === "browse.card_impression")!;
+        // Parallel arrays + surface contract (events.ts declaration).
+        expect(Array.isArray(imp.props.listing_ids)).toBe(true);
+        expect(Array.isArray(imp.props.positions)).toBe(true);
+        expect((imp.props.listing_ids as unknown[]).length)
+          .toBe((imp.props.positions as unknown[]).length);
+        expect(imp.props.surface).toBe("browse");
+      }
+
       // ── 3. Toggle a filter chip on Browse → browse.filter_changed
       // The discovery-tag chip group is always present (no data dep)
       // and clicking ANY chip emits the event Phase 7 wired.

@@ -139,6 +139,12 @@ module.exports = async (req, res) => {
     const v = safeStr(body[k]).slice(0, 100);
     if (v) utms[k] = v;
   }
+  // Share-referral token — mirrors the anonymous /start-checkout path.
+  // Stamped into Stripe metadata so the referral webhook (P1) can credit
+  // the sharer. Shape-gated to match lib/share.ts sanitizeReferrer.
+  const rawSr = safeStr(body.sr).trim();
+  const shareReferrer = /^[A-Za-z0-9._-]{1,64}$/.test(rawSr) ? rawSr : "";
+  const referralMeta = shareReferrer ? { sr: shareReferrer } : {};
 
   let discounts = null;
   let promoSucceeded = null; // null = not attempted, true/false = lookup result
@@ -177,9 +183,9 @@ module.exports = async (req, res) => {
     subscription_data: {
       // Stamp UTMs into subscription metadata so cohort attribution
       // survives renewals. clerkUserId is always present.
-      metadata: { clerkUserId: userId, locale: locale || "", ...utms },
+      metadata: { clerkUserId: userId, locale: locale || "", ...referralMeta, ...utms },
     },
-    metadata: { locale: locale || "", ...utms },
+    metadata: { locale: locale || "", ...referralMeta, ...utms },
     // If we already have a Stripe customer for this user, reuse it
     // so card-on-file + billing history stay attached. Otherwise let
     // Stripe create one based on the email we collected from Clerk.
@@ -230,6 +236,8 @@ module.exports = async (req, res) => {
     locale: locale || "auto",
     has_promo: !!discounts,
     promo_succeeded: promoSucceeded === null ? null : promoSucceeded === true,
+    // Referral funnel: boolean only (raw sr lives in Stripe metadata).
+    has_referral: !!shareReferrer,
     ms: Date.now() - t0,
   });
 

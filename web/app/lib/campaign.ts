@@ -32,10 +32,20 @@ export type CampaignParams = {
   /** Optional explicit upsell override. `1` force-show, `0` force-hide,
    *  `null` defer to the auto-trigger logic. */
   upsellOverride: "1" | "0" | null;
+  /** Share-referral token (`?sr=…`) — the sharer's distinct_id, carried
+   *  from a /browse?pin= link. URL-wins + sessionStorage-fallback like
+   *  the UTMs so it survives to the eventual checkout, where it's stamped
+   *  into Stripe metadata for the referral webhook (P1) to reward the
+   *  sharer. Empty when absent/malformed. */
+  shareReferrer: string;
 };
 
 const SS_KEY_PREFIX = "pulpo-";
 const SS_KEY_CODE = "pulpo-code";
+const SS_KEY_REFERRER = "pulpo-sr";
+// Same shape guard as lib/share.ts sanitizeReferrer — reject anything
+// that isn't a plausible distinct_id before it reaches a checkout body.
+const REFERRER_RE = /^[A-Za-z0-9._-]{1,64}$/;
 
 // Read URL → capture into sessionStorage → return a normalized snapshot.
 // Memoized at the component level via useCampaignParams() below.
@@ -48,13 +58,13 @@ const SS_KEY_CODE = "pulpo-code";
 // and then clicking Upgrade from /plans lost the code mid-session.
 export function captureCampaignParams(): CampaignParams {
   if (typeof window === "undefined") {
-    return { urlCode: "", utms: {}, isCancelled: false, upsellOverride: null };
+    return { urlCode: "", utms: {}, isCancelled: false, upsellOverride: null, shareReferrer: "" };
   }
   let params: URLSearchParams;
   try {
     params = new URLSearchParams(window.location.search);
   } catch {
-    return { urlCode: "", utms: {}, isCancelled: false, upsellOverride: null };
+    return { urlCode: "", utms: {}, isCancelled: false, upsellOverride: null, shareReferrer: "" };
   }
 
   const utms: Utms = {};
@@ -85,12 +95,24 @@ export function captureCampaignParams(): CampaignParams {
       if (cached) urlCode = cached;
     } catch { /* ignore */ }
   }
+  // Share-referral token: URL-wins + sessionStorage-fallback, shape-gated.
+  const rawSr = params.get("sr");
+  let shareReferrer = rawSr && REFERRER_RE.test(rawSr) ? rawSr : "";
+  if (shareReferrer) {
+    try { sessionStorage.setItem(SS_KEY_REFERRER, shareReferrer); } catch { /* ignore */ }
+  } else {
+    try {
+      const cached = sessionStorage.getItem(SS_KEY_REFERRER);
+      if (cached && REFERRER_RE.test(cached)) shareReferrer = cached;
+    } catch { /* ignore */ }
+  }
+
   const isCancelled = params.get("cancelled") === "1";
   const upsellFlag = params.get("upsell");
   const upsellOverride: "1" | "0" | null =
     upsellFlag === "1" ? "1" : upsellFlag === "0" ? "0" : null;
 
-  return { urlCode, utms, isCancelled, upsellOverride };
+  return { urlCode, utms, isCancelled, upsellOverride, shareReferrer };
 }
 
 // React hook — captures campaign params once per mount + persists.

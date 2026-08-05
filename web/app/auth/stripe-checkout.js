@@ -35,7 +35,7 @@ export async function startStripeCheckout({ onError, locale } = {}) {
     const payload = {};
     if (locale) payload.locale = locale;
     if (readFeatureFlag("promo_code_forwarding_v2", true)) {
-      const { urlCode, utms } = captureCampaignParams();
+      const { urlCode, utms, shareReferrer } = captureCampaignParams();
       if (urlCode) {
         payload.promoCode = urlCode;
         hasPromo = true;
@@ -43,6 +43,9 @@ export async function startStripeCheckout({ onError, locale } = {}) {
       for (const [k, v] of Object.entries(utms || {})) {
         if (v) payload[k] = v;
       }
+      // Referral attribution — stamped into Stripe session metadata so
+      // the referral webhook (P1) can credit the sharer's reward.
+      if (shareReferrer) payload.sr = shareReferrer;
     }
     if (Object.keys(payload).length > 0) {
       body = JSON.stringify(payload);
