@@ -135371,5 +135371,221 @@
     "cost_usd": 0.00132011,
     "finish_reason": "stop",
     "latency_ms": 3680
+  },
+  "citymax_sc|vendo-ofibodega-alquilada-cerca-de-redondel-integracion": {
+    "ts": "2026-08-05T06:11:49.216155+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Warehouse for Sale in Nejapa, El Salvador",
+      "es": "Bodega en Venta en Nejapa, El Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Warehouse for sale in Nejapa, San Salvador department. Suitable for investment use. Price: USD 716,235.",
+      "es": "Bodega en venta en Nejapa, departamento de San Salvador. Adecuada para uso de inversión. Precio: USD 716,235."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Investment warehouse in Nejapa",
+        "es": "Bodega de inversión en Nejapa"
+      },
+      {
+        "en": "Located in San Salvador department",
+        "es": "Ubicada en departamento de San Salvador"
+      },
+      {
+        "en": "Price USD 716,235",
+        "es": "Precio USD 716,235"
+      }
+    ],
+    "lat": 13.8167,
+    "lng": -89.2333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nejapa, San Salvador, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3067,
+    "tokens_out": 361,
+    "cost_usd": 0.00122519,
+    "finish_reason": "stop",
+    "latency_ms": 3886
+  },
+  "bienesraices|2442": {
+    "ts": "2026-08-05T06:11:50.200881+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Lot in Joyas del Pacífico, Costa del Sol",
+      "es": "Terreno Plano en Joyas del Pacífico, Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Flat 508 m² lot in Residencial Joyas del Pacífico, a secure private development on Costa del Sol, La Paz. The land fronts the estuary and includes beach access with rights to a private club. Priced at $150,000 USD, ideal for a beach residence or vacation rental project.",
+      "es": "Terreno plano de 508 m² en Residencial Joyas del Pacífico, un desarrollo privado y seguro en la Costa del Sol, La Paz. El lote colinda con el estero e incluye acceso al mar con derecho a club privado. Precio de $150,000 USD, ideal para residencia de playa o proyecto de alquiler vacacional."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Secure private development, high appreciation",
+        "es": "Desarrollo privado y seguro, alta plusvalía"
+      },
+      {
+        "en": "Estuary frontage and beach access",
+        "es": "Frente al estero y acceso al mar"
+      },
+      {
+        "en": "Rights to private club included",
+        "es": "Incluye derecho a club privado"
+      },
+      {
+        "en": "Flat lot, ready to build",
+        "es": "Terreno plano, listo para construir"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3442,
+    "tokens_out": 483,
+    "cost_usd": 0.00146064,
+    "finish_reason": "stop",
+    "latency_ms": 4872
+  },
+  "remax|002282685124": {
+    "ts": "2026-08-05T06:11:50.374865+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Spacious House Near Playa San Diego, 3,932 m²",
+      "es": "Amplia Casa Cerca de Playa San Diego, 3,932 m²"
+    },
+    "short_description_canonical": {
+      "en": "House on a 3,932 m² lot in Playa San Diego, La Libertad, with 405 m² of built area. It includes 3 bedrooms, 3 bathrooms, a main pool, a jacuzzi pool, and a 190 m² recreational area. Located on the second street, a 3-minute walk to the beach, ideal for family or tourism investment.",
+      "es": "Casa en lote de 3,932 m² en Playa San Diego, La Libertad, con 405 m² de construcción. Incluye 3 habitaciones, 3 baños, piscina principal, piscina jacuzzi y área recreativa de 190 m². Ubicada en la segunda calle, a 3 minutos caminando de la playa, ideal para familia o inversión turística."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3-minute walk to the beach",
+        "es": "A 3 minutos caminando de la playa"
+      },
+      {
+        "en": "Large lot of 3,932 m²",
+        "es": "Lote amplio de 3,932 m²"
+      },
+      {
+        "en": "Main pool and jacuzzi pool",
+        "es": "Piscina principal y piscina jacuzzi"
+      },
+      {
+        "en": "3 bedrooms, 3 bathrooms, 405 m² built",
+        "es": "3 habitaciones, 3 baños, 405 m² construidos"
+      },
+      {
+        "en": "Fruit trees and coconut palms on site",
+        "es": "Árboles frutales y cocoteros en el terreno"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bocana San Diego",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": 405.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3374,
+    "tokens_out": 583,
+    "cost_usd": 0.00155228,
+    "finish_reason": "stop",
+    "latency_ms": 5044
+  },
+  "encuentra24|31359102": {
+    "ts": "2026-08-05T06:55:55.242999+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4-Bed Townhome in Santa Maria Golf & Country Club",
+      "es": "Townhome de 4 recámaras en Santa Maria Golf & Country Club"
+    },
+    "short_description_canonical": {
+      "en": "Three-story townhome with 400 m² of construction in Santa Maria Golf & Country Club, next to Costa del Este. It features 4 bedrooms, each with walk-in closet and private bath, plus a master suite on the third floor. The social area includes lagoon pool, semi-Olympic pool, artificial beach, and sports courts. Community offers 24/7 security and access to a Nicklaus Design golf course.",
+      "es": "Townhome de tres plantas con 400 m² de construcción en Santa Maria Golf & Country Club, junto a Costa del Este. Cuenta con 4 recámaras, cada una con walk-in closet y baño privado, más suite principal en la tercera planta. El área social incluye lagoon pool, piscina semiolímpica, playa artificial y canchas deportivas. La comunidad ofrece seguridad 24/7 y acceso a un campo de golf diseñado por Nicklaus Design."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "400 m² built, 4 en-suite bedrooms",
+        "es": "400 m² construidos, 4 recámaras con baño"
+      },
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Comunidad cerrada con seguridad 24/7"
+      },
+      {
+        "en": "Access to Nicklaus Design golf course",
+        "es": "Acceso a campo de golf Nicklaus Design"
+      },
+      {
+        "en": "Resort amenities: pools, beach, gym",
+        "es": "Amenidades resort: piscinas, playa, gimnasio"
+      },
+      {
+        "en": "3 parking spaces and service quarters",
+        "es": "3 estacionamientos y cuarto de servicio"
+      }
+    ],
+    "lat": 8.9833,
+    "lng": -79.5167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Maria Golf & Country Club, near Costa del Este, Panama City",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.0,
+      "built_area_m2": 400.0,
+      "parking_spaces": 3,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2628,
+    "tokens_out": 606,
+    "cost_usd": 0.00137616,
+    "finish_reason": "stop",
+    "latency_ms": 5040
   }
 }

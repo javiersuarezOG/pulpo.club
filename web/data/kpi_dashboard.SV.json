@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-04T06:21:44.207060+00:00",
+  "computed_at": "2026-08-05T06:22:23.753984+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 15,
@@ -9,11 +9,11 @@
         "renders_on_homepage": true
       },
       "beach_homes": {
-        "count": 152,
+        "count": 154,
         "renders_on_homepage": true
       },
       "beach_land": {
-        "count": 485,
+        "count": 486,
         "renders_on_homepage": true
       },
       "lake_condos": {
@@ -21,7 +21,7 @@
         "renders_on_homepage": false
       },
       "lake_homes": {
-        "count": 11,
+        "count": 12,
         "renders_on_homepage": true
       },
       "lake_land": {
@@ -39,7 +39,7 @@
       },
       "bienesraices": {
         "coverage_pct_vs_discovered": null,
-        "kept": 425,
+        "kept": 426,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -59,8 +59,8 @@
         "target_prd": null
       },
       "citymax_sc": {
-        "coverage_pct_vs_discovered": 47.3,
-        "kept": 142,
+        "coverage_pct_vs_discovered": 48.0,
+        "kept": 144,
         "status": "green",
         "target_discovered": null,
         "target_prd": 300
@@ -80,8 +80,8 @@
         "target_prd": null
       },
       "encuentra24": {
-        "coverage_pct_vs_discovered": 0.9,
-        "kept": 26,
+        "coverage_pct_vs_discovered": 1.0,
+        "kept": 28,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -123,7 +123,7 @@
       },
       "realestate_au_sv": {
         "coverage_pct_vs_discovered": null,
-        "kept": 332,
+        "kept": 331,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -137,14 +137,14 @@
       },
       "remax": {
         "coverage_pct_vs_discovered": null,
-        "kept": 292,
+        "kept": 279,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
       },
       "santizo": {
-        "coverage_pct_vs_discovered": 60.0,
-        "kept": 90,
+        "coverage_pct_vs_discovered": 57.3,
+        "kept": 86,
         "status": "green",
         "target_discovered": null,
         "target_prd": 150
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 5,
     "shelves_total": 6,
-    "total_in_dataset": 1900,
-    "total_visible_listings": 1688
+    "total_in_dataset": 1887,
+    "total_visible_listings": 1675
   },
   "min_real_listings": 4
 }

@@ -1,22 +1,22 @@
 {
   "en": {
     "candidates_seen": 1,
-    "llm_cost_usd": 0.00024828000000000003,
-    "paragraph": "Seven foreigners were sentenced for trafficking over 1.5 tons of cocaine, showing authorities are actively cracking down on coastal crime. For you as a property buyer, this means safer communities and stronger rule of law near the shore. While not directly about real estate, it's a positive sign for long-term investment. Stay informed on local safety trends.",
-    "picked_at": "2026-08-04",
-    "source_date": "3 Aug 2026",
+    "llm_cost_usd": 0.00023681,
+    "paragraph": "The Red Cross reported about 40 assists at Apulo recreational center during August vacations, highlighting the area's popularity. For you as a property buyer, this signals strong demand for lakefront recreation. Expect busy weekends and consider proximity to amenities. Check safety measures and access when evaluating properties near Apulo.",
+    "picked_at": "2026-08-05",
+    "source_date": "5 Aug 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/nacionales/condenan-a-siete-extranjeros-por-trafico-de-drogas/?utm_source=rss&utm_medium=rss&utm_campaign=condenan-a-siete-extranjeros-por-trafico-de-drogas",
-    "title": "Drug Convictions Signal Coastal Security"
+    "source_url": "https://lapagina.com.sv/nacionales/cruz-roja-salvadorena-brinda-cerca-de-40-asistencias-en-apulo-durante-las-vacaciones-agostinas/?utm_source=rss&utm_medium=rss&utm_campaign=cruz-roja-salvadorena-brinda-cerca-de-40-asistencias-en-apulo-durante-las-vacaciones-agostinas",
+    "title": "Apulo lifeguards busy during August holidays"
   },
   "es": {
     "candidates_seen": 1,
-    "llm_cost_usd": 0.00031491,
-    "paragraph": "Esta semana, siete extranjeros fueron condenados por tráfico de drogas en El Salvador, un caso que refleja la actividad ilegal en la costa. Para vos, que estás considerando comprar propiedad costera o de lago, esto subraya la importancia de investigar la seguridad de la zona y la presencia de actividades ilícitas. Antes de invertir, verificá los índices de criminalidad y consultá con locales o autoridades. Una zona con historial de narcotráfico puede afectar tu tranquilidad y el valor de tu propiedad. Tomá decisiones informadas.",
-    "picked_at": "2026-08-04",
-    "source_date": "3 ago 2026",
+    "llm_cost_usd": 0.00030894000000000006,
+    "paragraph": "Esta semana, la Cruz Roja atendió cerca de 40 emergencias en el lago de Apulo, un destino popular para compradores de propiedad lacustre. Aunque no es una noticia de mercado, te indica que la zona tiene actividad turística y servicios de emergencia, lo que puede influir en tu decisión de compra. Considera la cercanía a estos servicios y la afluencia de visitantes al evaluar propiedades en Apulo.",
+    "picked_at": "2026-08-05",
+    "source_date": "5 ago 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/nacionales/condenan-a-siete-extranjeros-por-trafico-de-drogas/?utm_source=rss&utm_medium=rss&utm_campaign=condenan-a-siete-extranjeros-por-trafico-de-drogas",
-    "title": "Condenan a siete extranjeros por tráfico de drogas"
+    "source_url": "https://lapagina.com.sv/nacionales/cruz-roja-salvadorena-brinda-cerca-de-40-asistencias-en-apulo-durante-las-vacaciones-agostinas/?utm_source=rss&utm_medium=rss&utm_campaign=cruz-roja-salvadorena-brinda-cerca-de-40-asistencias-en-apulo-durante-las-vacaciones-agostinas",
+    "title": "Cruz Roja Salvadoreña brinda cerca de 40 asistencias en Apulo durante las vacaciones agostinas"
   }
 }
