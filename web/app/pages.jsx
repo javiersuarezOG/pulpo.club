@@ -42,6 +42,7 @@ import { priceForCountry, fetchPriceForCurrentGeo } from "./lib/pricing";
 import { markUpsellDismissed, decideShouldShowUpsell } from "./lib/upsell-config";
 import { captureCampaignParams } from "./lib/campaign";
 import { resetImpressions } from "./lib/card-impressions.ts";
+import { similarListings } from "./lib/similar-listings.ts";
 import { startCheckoutFromModal } from "./lib/stripe-modal-checkout";
 import { tokenize, matchesQuery, scoreListing, buildSuggestions } from "./lib/search-match";
 import {
@@ -2493,6 +2494,42 @@ function PriceContextBlock({ listing, locale }) {
   );
 }
 
+// Similar-listings shelf on the detail page. Pure-client, from the
+// already-loaded catalog (app.listings) via lib/similar-listings.ts —
+// no fetch, no new payload. Reuses ListingCard, so each card gets the
+// browse.card_impression{surface:"similar"} instrumentation for free.
+// Renders nothing when there's no comparable set (never an empty shelf).
+function SimilarListings({ listing, app, locale }) {
+  const items = pUseMemo(
+    () => similarListings(listing, app.listings || [], 4),
+    [listing.id, app.listings],
+  );
+  if (items.length === 0) return null;
+  return (
+    <section className="detail-similar" aria-label={t("detail.similar_heading", locale)}>
+      <div className="detail-similar-head">
+        <h3 className="detail-similar-title">{t("detail.similar_heading", locale)}</h3>
+        <p className="detail-similar-sub">{t("detail.similar_sub", locale)}</p>
+      </div>
+      <div className="card-grid detail-similar-grid">
+        {items.map((l, i) => (
+          <ListingCard
+            key={l.id}
+            listing={l}
+            app={app}
+            source="similar"
+            impressionMeta={{ surface: "similar", position: i, sort: "similar" }}
+            onOpen={() => {
+              track("card.clicked", { listing_id: l.id, source_view: "similar" });
+              app.openListing(l.id);
+            }}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function ListingDetail({ listing, app, asPanel = true }) {
   const [galleryIdx, setGalleryIdx] = pUseState(0);
   const [lightbox, setLightbox] = pUseState(false);
@@ -3069,6 +3106,11 @@ function ListingDetail({ listing, app, asPanel = true }) {
                 weight; the section stays useful without the chrome. */}
           </div>
         </div>
+
+        {/* Similar listings — client-side, from the already-loaded
+            catalog (no extra payload). Engagement + deeper-browse loop;
+            each card fires card_impression{surface:"similar"}. */}
+        <SimilarListings listing={listing} app={app} locale={lc} />
 
         {/* Wave-1: the off-market full-page overlay used to live here
             and blocked anon + free users from seeing the detail body

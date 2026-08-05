@@ -1126,6 +1126,8 @@ export const UI_STRINGS = {
                                es: "Off-market — mira los planes para contactar" },
   "detail.save":             { en: "Save",                          es: "Guardar" },
   "detail.saved":            { en: "Saved",                         es: "Guardado" },
+  "detail.similar_heading":  { en: "Similar listings",              es: "Propiedades similares" },
+  "detail.similar_sub":      { en: "Comparable spots nearby",       es: "Opciones comparables cerca" },
   "detail.share":            { en: "Share",                         es: "Compartir" },
   // Share picker (Airbnb-style modal opened from the Compartir button).
   // Caption strings are kept short so they fit the WhatsApp pre-fill on
