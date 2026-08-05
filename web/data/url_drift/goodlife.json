@@ -1,15 +1,15 @@
 {
   "source": "goodlife",
-  "drift_state": "ok",
-  "reason": "matches_baseline",
-  "probed_at": "2026-08-05T03:39:11.459139+00:00",
+  "drift_state": "unreachable",
+  "reason": "http_error: ReadTimeout: The read operation timed out",
+  "probed_at": "2026-08-05T09:10:56.055437+00:00",
   "last_probe": {
     "probed_url": "https://goodlifeelsalvador.com/",
-    "status_code": 200,
-    "final_url": "https://goodlifeelsalvador.com/",
+    "status_code": null,
+    "final_url": null,
     "response_size_bytes": null,
-    "duration_ms": 3007,
-    "error": null
+    "duration_ms": 10237,
+    "error": "ReadTimeout: The read operation timed out"
   },
   "baseline": {
     "source": "goodlife",
