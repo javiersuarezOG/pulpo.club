@@ -9166,6 +9166,19 @@ button[aria-busy="true"] { opacity: 0.7; cursor: progress; }
   .price-context__row       { flex-flow: row wrap; align-items: center; gap: var(--space-5); }
 }
 
+/* Similar-listings shelf on the detail page. Reuses .card-grid for the
+   grid mechanics; this only styles the section header + top spacing. */
+.detail-similar             { margin-top: var(--space-7); display: flex; flex-direction: column; gap: var(--space-4); }
+.detail-similar-head        { display: flex; flex-direction: column; gap: var(--space-2); }
+.detail-similar-title       { font-size: var(--type-section-title-size, var(--type-body-size)); font-weight: 600; color: var(--ink-1, var(--color-ink-primary)); margin: 0; }
+.detail-similar-sub         { font-size: var(--type-card-meta-size); color: var(--ink-3, var(--color-ink-muted)); margin: 0; }
+/* Denser than the full browse grid — these are secondary, so cap at two
+   columns on wider detail panels rather than the browse auto-fill. */
+.detail-similar-grid        { grid-template-columns: 1fr; }
+@media (min-width: 640px) {
+  .detail-similar-grid      { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 /* ── Free-join celebration (JoinCelebration.jsx) ──────────────────────────
    The branded octopus "you're in" moment. Deliberately single-look: a
    deep-sea scene that stays dark-green in both themes. Mobile-first. */

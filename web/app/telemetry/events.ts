@@ -73,7 +73,7 @@ export type EventMap = {
   // ───── Browse ─────
   "card.clicked": {
     listing_id: string;
-    source_view: "discover" | "browse" | "saved";
+    source_view: "discover" | "browse" | "saved" | "similar";
     source_shelf?: string;
   };
   // Card impression — fires once per listing per page-view when a card
