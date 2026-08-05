@@ -31,6 +31,7 @@ type PostHog = {
   opt_in_capturing: () => void;
   has_opted_out_capturing: () => boolean;
   isFeatureEnabled: (key: string) => boolean | undefined;
+  getFeatureFlag: (key: string) => string | boolean | undefined;
   onFeatureFlags: (cb: () => void) => void;
   get_distinct_id?: () => string | undefined;
 };
@@ -374,6 +375,24 @@ export function isFeatureEnabled(key: string, fallback: boolean): boolean {
   try {
     const v = posthog.isFeatureEnabled(key);
     if (typeof v === "boolean") return v;
+    return fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+// Multivariate read: returns the string variant of a PostHog feature flag
+// (e.g. "control" | "variant_a"). posthog-js fires `$feature_flag_called`
+// on the first getFeatureFlag() per flag per session, which is exactly
+// what PostHog's native experiment analysis joins on — so calling this
+// (rather than a cached local copy) is what makes an A/B experiment
+// measurable. Returns `fallback` before flags load, on error, or when the
+// flag resolves to a boolean (a boolean flag has no variant).
+export function featureFlagVariant(key: string, fallback: string): string {
+  if (!posthog) return fallback;
+  try {
+    const v = posthog.getFeatureFlag(key);
+    if (typeof v === "string") return v;
     return fallback;
   } catch {
     return fallback;
