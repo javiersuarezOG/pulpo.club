@@ -74,6 +74,12 @@ jobs:
       #      the active-filter chip + table-header leaks.
       # See scripts/i18n_lint.mjs and CLAUDE.md → "i18n".
       - run: node scripts/i18n_lint.mjs
+      # Price-sync guard — every currency literal on a hidden price
+      # surface (today: the Python newsletter renderer) must match the
+      # amounts in web/app/lib/pricing.ts, the price source of truth.
+      # Catches the "$19/month stale newsletter" drift class. See
+      # scripts/check_price_sync.mjs.
+      - run: node scripts/check_price_sync.mjs
       # Card-image gate guard — flags a raw <img> rendering a listing image
       # (thumbnail_url / selected_photo_url / .photos[...]) outside the gated
       # <Photo> component, the regression class behind the browse_table + map
