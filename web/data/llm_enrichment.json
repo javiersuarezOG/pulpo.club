@@ -135587,5 +135587,168 @@
     "cost_usd": 0.00137616,
     "finish_reason": "stop",
     "latency_ms": 5040
+  },
+  "encuentra24|31980652": {
+    "ts": "2026-08-06T06:48:28.579972+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Modern 3-Bed Home in Santa María Golf & Country Club",
+      "es": "Casa moderna de 3 habitaciones en Santa María Golf & Country Club"
+    },
+    "short_description_canonical": {
+      "en": "Modern 400 m² house in Santa María Golf & Country Club, Panama. 3 bedrooms, 3.5 baths, 2 parking spaces, built on 415 m² lot. Features include walk-in closet, modern kitchen, terrace, and service quarters. Resort-style amenities: Nicklaus Design golf course, parks, and 24/7 security.",
+      "es": "Casa moderna de 400 m² en Santa María Golf & Country Club, Panamá. 3 habitaciones, 3.5 baños, 2 estacionamientos, construida en lote de 415 m². Incluye walk-in closet, cocina moderna, terraza y cuarto de servicio. Amenidades tipo resort: campo de golf Nicklaus Design, parques y seguridad 24/7."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Golf course designed by Nicklaus Design",
+        "es": "Campo de golf diseñado por Nicklaus Design"
+      },
+      {
+        "en": "3.5 luxury baths, walk-in closet",
+        "es": "3.5 baños de lujo, walk-in closet"
+      },
+      {
+        "en": "2 parking spaces, service quarters",
+        "es": "2 estacionamientos, cuarto de servicio"
+      },
+      {
+        "en": "24/7 security, total power plant",
+        "es": "Seguridad 24/7, planta eléctrica total"
+      }
+    ],
+    "lat": 8.5376,
+    "lng": -80.1021,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa María Golf & Country Club, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.5,
+      "built_area_m2": 400.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2681,
+    "tokens_out": 528,
+    "cost_usd": 0.00130467,
+    "finish_reason": "stop",
+    "latency_ms": 4225
+  },
+  "encuentra24|32063611": {
+    "ts": "2026-08-06T06:48:28.666183+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury Golf Club Residence with Lake Views",
+      "es": "Residencia de lujo en club de golf con vista al lago"
+    },
+    "short_description_canonical": {
+      "en": "Imposing residence in an exclusive golf club in Panama, with 625 m² built on a 923 m² lot. It features 4 full bathrooms, 4 parking spaces, and large windows overlooking gardens and a lake. Located in a gated community with private security and private garden.",
+      "es": "Imponente residencia en exclusivo club de golf en Panamá, con 625 m² construidos en un terreno de 923 m². Dispone de 4 baños completos, 4 puestos de estacionamiento y grandes ventanales con vista a jardines y lago. Ubicada en residencial cerrado con vigilancia privada y jardín privado."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Gated community with private security",
+        "es": "Residencial cerrado con vigilancia privada"
+      },
+      {
+        "en": "Lake view from rear windows",
+        "es": "Vista al lago desde ventanales traseros"
+      },
+      {
+        "en": "625 m² built, 923 m² lot",
+        "es": "625 m² construidos, 923 m² de terreno"
+      },
+      {
+        "en": "4 parking spaces and 4 bathrooms",
+        "es": "4 estacionamientos y 4 baños"
+      }
+    ],
+    "lat": 9.015,
+    "lng": -79.52,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Brisas del Golf, Panama City",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.0,
+      "built_area_m2": 625.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2465,
+    "tokens_out": 491,
+    "cost_usd": 0.00120565,
+    "finish_reason": "stop",
+    "latency_ms": 4310
+  },
+  "encuentra24|31672266": {
+    "ts": "2026-08-06T06:48:29.301415+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Elegant Townhouse in Costa Blanca Golf & Villas",
+      "es": "Elegante Townhouse en Costa Blanca Golf & Villas"
+    },
+    "short_description_canonical": {
+      "en": "Elegant townhouse in the gated community Costa Blanca Golf & Villas, Farallón, Río Hato. Built area of 184 m² on a 250 m² lot, with 3 bedrooms and 4.5 bathrooms. Features a private terrace overlooking the 3rd hole of Mantarraya Golf Course, fenced backyard, and front parking. Amenities include golf membership, private beach club, common pool, tennis and pickleball courts, and 24/7 security.",
+      "es": "Elegante townhouse en la comunidad cerrada Costa Blanca Golf & Villas, Farallón, Río Hato. Área construida de 184 m² sobre un lote de 250 m², con 3 recámaras y 4,5 baños. Cuenta con terraza privada con vista al hoyo 3 del Mantarraya Golf Course, patio trasero cercado y estacionamiento frontal. Amenidades incluyen membresía de golf, club de playa privado, piscina común, canchas de tenis y pickleball, y seguridad 24/7."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "5-minute walk to private beach access",
+        "es": "A 5 minutos a pie del acceso privado a la playa"
+      },
+      {
+        "en": "Golf membership included",
+        "es": "Membresía de golf incluida"
+      },
+      {
+        "en": "Views of Mantarraya Golf Course hole 3",
+        "es": "Vistas al hoyo 3 del Mantarraya Golf Course"
+      },
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Comunidad cerrada con seguridad 24/7"
+      },
+      {
+        "en": "Fenced backyard ready to customize",
+        "es": "Patio trasero cercado listo para personalizar"
+      }
+    ],
+    "lat": 8.5833,
+    "lng": -80.0333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Farallón, Río Hato (coastal area)",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 4.5,
+      "built_area_m2": 184.0,
+      "parking_spaces": 1,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2624,
+    "tokens_out": 631,
+    "cost_usd": 0.00140258,
+    "finish_reason": "stop",
+    "latency_ms": 4945
   }
 }
