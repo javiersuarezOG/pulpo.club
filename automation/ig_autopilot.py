@@ -42,6 +42,8 @@ from automation.ig_campaign_poster import render_slide as _render_slide
 from automation.ig_campaign_poster import CATEGORY_COLORS, INSPIRACION
 from automation.ig_caption_lint import check as _lint_check
 from automation import ig_story_series as _series
+from automation import ig_learning as _learning
+from automation._config import env_bool
 
 DEFAULT_QUEUE = Path("web/data/ig_queue.json")
 DEFAULT_CANDIDATES = Path("web/data/ig_candidates.json")
@@ -477,6 +479,23 @@ def build_item(
     }
 
 
+def _story_weights() -> dict:
+    """Story-id → selection weight from the Growth Hacker scoreboard, or {}
+    when the learning loop is off (IG_LEARNING_ENABLED) or the scoreboard is
+    missing / has no trusted signal. Soft-fail: never raises, so a bad or
+    absent artifact just falls back to the legacy rotation."""
+    if not env_bool("IG_LEARNING_ENABLED", False):
+        return {}
+    try:
+        board = json.loads(_learning.LEARNING_ARTIFACT.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return {
+        s["id"]: _learning.pick_weight(board, "story_id", s["id"])
+        for s in _series.STORIES
+    }
+
+
 def topup(
     queue: dict,
     candidates: list,
@@ -509,6 +528,10 @@ def topup(
             used_photos.add(u)
     guard = 0
     max_iters = lookahead * 6 + 4          # room to skip thin listings
+    # Growth Hacker: bias story selection toward proven winners when the
+    # learning loop is on and the scoreboard has trusted signal. Off →
+    # empty map → pick_story keeps its exact legacy rotation.
+    story_weights = _story_weights()
     while _future_approved_count(items + added, now) < lookahead and guard < max_iters:
         guard += 1
         # Photo COVERAGE: spread across listings — exclude every listing
@@ -526,7 +549,7 @@ def topup(
         # only on coastal listings (no "caminó esta costa" over an inland
         # lot). Least-recently-used → cycles the fitting set before repeating.
         recent_stories = [it.get("story_id") for it in reversed(items + added) if it.get("story_id")]
-        story = _series.pick_story(recent_stories, _is_coastal(listing))
+        story = _series.pick_story(recent_stories, _is_coastal(listing), story_weights)
         scheduled = _next_slot(items + added, now, cadence_days).isoformat()
         # <20% poor-photo budget: only allow a poor-photo gem while the feed's
         # poor share is under the cap.

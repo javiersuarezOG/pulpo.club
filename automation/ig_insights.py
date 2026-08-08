@@ -171,6 +171,12 @@ def run(*, now: Optional[datetime] = None, client: Optional[httpx.Client] = None
                     "media_id": e["media_id"],
                     "day": e.get("day"),
                     "shelf": e.get("shelf"),
+                    # Carry the content dimensions forward (stamped on the
+                    # post-log entry) so ig_learning can join engagement to
+                    # story/emotion/category without re-reading the queue.
+                    "story_id": e.get("story_id"),
+                    "emotion": e.get("emotion"),
+                    "color_key": e.get("color_key"),
                     "posted_at": e.get("ts"),
                     "polled_at": now.isoformat(),
                     "maturity_h": h,
