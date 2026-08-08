@@ -275,19 +275,28 @@ def build_post(story: dict, candidate: dict, listing: dict, photos: list[str],
             cover["small"] = True
         cover["pos"] = story.get("pos", "bottom")
         cover["scrim"] = story.get("scrim", "down")
-    # ≥4 slides (Javi, 2026-08-02): cover → "por qué" reason cards → property
-    # card → CTA. All slides after the hero are photo-free design cards, so no
-    # second (less-vetted) image can leak a broker mark.
+    # Richer blend (Javi, 2026-08-08): hero cover → BOLD price reveal on a 2nd
+    # photo → punchy reasons → a 3rd photo → CTA. Uses up to 3 vetted photos so
+    # it isn't one photo + five identical gradient cards. `photos` is the
+    # beauty-ranked, brand-safe set (hero first); extra frames reuse the hero
+    # if the listing only has one good shot.
+    area = format_area_m2(candidate.get("area_m2"))
     reasons = _reasons(listing, candidate, disc)
+    ribbon = noun.upper()
+
+    p1 = photos[1] if len(photos) > 1 else photos[0]
+    price_reveal = {"t": "reveal", "img": p1, "ribbon": ribbon,
+                    "kicker": loc if area == "—" else f"{loc} · {area}", "price": price}
     reason_slides = [
         {"t": "usp", "eyebrow": f"Por qué · {i + 1}", "title": r, "body": ""}
-        for i, r in enumerate(reasons)
+        for i, r in enumerate(reasons[:3])
     ]
-    facts = " · ".join(x for x in (area, noun) if x and x != "—")
-    property_card = {"t": "detail", "eyebrow": "La propiedad", "price": price,
-                     "facts": f"{facts} · en pulpo.club", "loc": loc}
+    photo_slides = []
+    if len(photos) > 2:                      # a 3rd real photo breaks the monotony
+        badge = reasons[3] if len(reasons) > 3 else "Descubrila → pulpo.club"
+        photo_slides = [{"t": "photo", "img": photos[2], "ribbon": ribbon, "badge": badge}]
     cta = {"t": "cta", "big": "Tu pedazo\nde paraíso", "sub": "pulpo.club · link en bio"}
-    slides = [cover, *reason_slides, property_card, cta]
+    slides = [cover, price_reveal, *reason_slides[:2], *photo_slides, *reason_slides[2:3], cta]
 
     caption = gem_cap if humor else f"{story['cap']}\n\n📍 {zone}. Mirá esta y las demás en pulpo.club — link en bio."
 
