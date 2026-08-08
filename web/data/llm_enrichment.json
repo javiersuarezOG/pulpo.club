@@ -135750,5 +135750,307 @@
     "cost_usd": 0.00140258,
     "finish_reason": "stop",
     "latency_ms": 4945
+  },
+  "csbr|venta-hacienda-ganadera-y-agricola-acajutla-sonsonate": {
+    "ts": "2026-08-08T17:16:09.324456+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Agricultural Land with Cattle Ranch in Acajutla",
+      "es": "Terreno Agrícola con Hacienda Ganadera en Acajutla"
+    },
+    "short_description_canonical": {
+      "en": "Agricultural land with a cattle ranch for sale in Acajutla, Sonsonate. The property is listed on the Salvadoran Chamber of Real Estate. Price: $1,200,000.",
+      "es": "Terreno agrícola con hacienda ganadera en venta en Acajutla, Sonsonate. La propiedad está listada en la Cámara Salvadoreña de Bienes Raíces. Precio: $1,200,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Cattle ranch included",
+        "es": "Hacienda ganadera incluida"
+      },
+      {
+        "en": "Listed on official chamber",
+        "es": "Listado en cámara oficial"
+      },
+      {
+        "en": "Agricultural land in Acajutla",
+        "es": "Terreno agrícola en Acajutla"
+      }
+    ],
+    "lat": 13.5928,
+    "lng": -89.8275,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Acajutla",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3079,
+    "tokens_out": 392,
+    "cost_usd": 0.00126253,
+    "finish_reason": "stop",
+    "latency_ms": 3040
+  },
+  "realestate_au_sv|lotificacion-elisa-ii-poligono-9-lotes-4-5-10-11-apancoyo-sonsonate-apancoyo-sonsonate-310108315930": {
+    "ts": "2026-08-08T17:16:09.502060+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land Lots in Apancoyo, Sonsonate",
+      "es": "Lotes en Apancoyo, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Land lots in Lotificacion Elisa II, polygon 9, lots 4, 5, 10, 11, in Apancoyo, Sonsonate. Offered at $90,000. Contact RE/MAX Expertos Inmobiliarios for details.",
+      "es": "Lotes en Lotificación Elisa II, polígono 9, lotes 4, 5, 10, 11, en Apancoyo, Sonsonate. Se ofrecen en $90,000. Contacte a RE/MAX Expertos Inmobiliarios para detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Four lots in one polygon",
+        "es": "Cuatro lotes en un polígono"
+      },
+      {
+        "en": "Located in Apancoyo, Sonsonate",
+        "es": "Ubicado en Apancoyo, Sonsonate"
+      },
+      {
+        "en": "Listed by RE/MAX Expertos",
+        "es": "Listado por RE/MAX Expertos"
+      }
+    ],
+    "lat": 13.59,
+    "lng": -89.7,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Sonsonate municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3099,
+    "tokens_out": 419,
+    "cost_usd": 0.00129763,
+    "finish_reason": "stop",
+    "latency_ms": 3217
+  },
+  "realestate_au_sv|carretera-a-san-rafel-cedros-agua-zarca-ilobasco-cabanas-cabanas-department-310108952047": {
+    "ts": "2026-08-08T17:16:09.918647+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Ilobasco, Cabañas",
+      "es": "Terreno en Venta en Ilobasco, Cabañas"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel located on the road to San Rafael Cedros, in Agua Zarca, Ilobasco, Cabañas. The property is offered for sale by CENTURY 21 El Salvador. No further details are provided in the listing.",
+      "es": "Parcela de terreno ubicada en la carretera a San Rafael Cedros, en Agua Zarca, Ilobasco, Cabañas. La propiedad se ofrece en venta por CENTURY 21 El Salvador. No se proporcionan más detalles en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located on road to San Rafael Cedros",
+        "es": "Ubicado en carretera a San Rafael Cedros"
+      },
+      {
+        "en": "Listed by CENTURY 21 El Salvador",
+        "es": "Anunciado por CENTURY 21 El Salvador"
+      },
+      {
+        "en": "In Agua Zarca, Ilobasco, Cabañas",
+        "es": "En Agua Zarca, Ilobasco, Cabañas"
+      }
+    ],
+    "lat": 13.85,
+    "lng": -88.85,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ilobasco, Cabañas, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3084,
+    "tokens_out": 433,
+    "cost_usd": 0.00130898,
+    "finish_reason": "stop",
+    "latency_ms": 3634
+  },
+  "realestate_au_sv|canton-las-granadillas-la-palma-chalatenango-la-granadilla-chalatenango-la-granadilla-cuscatlan-department-120095815429": {
+    "ts": "2026-08-08T17:16:12.167437+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in La Granadilla, La Palma",
+      "es": "Terreno en Venta en La Granadilla, La Palma"
+    },
+    "short_description_canonical": {
+      "en": "Land for sale in Cantón Las Granadillas, La Palma, Chalatenango. The property is listed by RE/MAX Expertos Inmobiliarios. No further details are provided in the listing.",
+      "es": "Terreno en venta en Cantón Las Granadillas, La Palma, Chalatenango. La propiedad está listada por RE/MAX Expertos Inmobiliarios. No se proporcionan más detalles en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in La Palma, Chalatenango",
+        "es": "Ubicado en La Palma, Chalatenango"
+      },
+      {
+        "en": "Listed by RE/MAX Expertos Inmobiliarios",
+        "es": "Listado por RE/MAX Expertos Inmobiliarios"
+      },
+      {
+        "en": "Price: $175,000 USD",
+        "es": "Precio: $175,000 USD"
+      }
+    ],
+    "lat": 14.3183,
+    "lng": -89.1553,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Palma, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3096,
+    "tokens_out": 410,
+    "cost_usd": 0.00128692,
+    "finish_reason": "stop",
+    "latency_ms": 2766
+  },
+  "realestate_au_sv|parcelacion-el-espino-iii-poligono-h-lote-1-calle-los-cipreses-lugar-llamado-los-tarros-la-palma-chalatenango-norte-chalatenango-la-palma-chalatenango-la-palma-cuscatlan-department-310106752120": {
+    "ts": "2026-08-08T17:16:12.393593+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in La Palma, Chalatenango for Sale",
+      "es": "Terreno en La Palma, Chalatenango en Venta"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Parcelación El Espino III, Polígono H, Lot #1, Calle Los Cipreses, Los Tarros, La Palma, Chalatenango. Offered at $85,000. Details on terrain, access, and utilities are not specified in the listing.",
+      "es": "Parcela de terreno en Parcelación El Espino III, Polígono H, Lote #1, Calle Los Cipreses, Los Tarros, La Palma, Chalatenango. Precio de $85,000. No se especifican detalles sobre terreno, acceso y servicios en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Listed at $85,000",
+        "es": "Precio de $85,000"
+      },
+      {
+        "en": "Located in La Palma, Chalatenango",
+        "es": "Ubicado en La Palma, Chalatenango"
+      },
+      {
+        "en": "Part of Parcelación El Espino III",
+        "es": "Parte de Parcelación El Espino III"
+      }
+    ],
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Espino",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3132,
+    "tokens_out": 435,
+    "cost_usd": 0.00132414,
+    "finish_reason": "stop",
+    "latency_ms": 3278
+  },
+  "encuentra24|24901155": {
+    "ts": "2026-08-08T18:02:32.804001+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront House in Punta Barco with Ocean Views",
+      "es": "Casa frente al mar en Punta Barco con vistas al océano"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront house of 700 m² on a protected cliff in Punta Barco, with panoramic views of Coronado, Gorgona, and Cerro Chame. It has 5 ensuite bedrooms with walk-in closets, double-height living room, elegant dining area, and a gourmet kitchen. Outdoor spaces include covered and open terraces, balconies, pool, and jacuzzi, with parking for 6 cars.",
+      "es": "Casa frente al mar de 700 m² en un acantilado protegido en Punta Barco, con vistas panorámicas a Coronado, Gorgona y Cerro Chame. Tiene 5 recámaras con baño y walk-in closet, sala de doble altura, comedor elegante y cocina gourmet. Las áreas exteriores incluyen terrazas techadas y abiertas, balcones, piscina y jacuzzi, con estacionamiento para 6 autos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront on protected cliff",
+        "es": "Frente al mar en acantilado protegido"
+      },
+      {
+        "en": "Panoramic ocean and island views",
+        "es": "Vistas panorámicas al mar e islas"
+      },
+      {
+        "en": "5 ensuite bedrooms with walk-in closets",
+        "es": "5 recámaras con baño y walk-in closet"
+      },
+      {
+        "en": "Pool, jacuzzi, and terraces",
+        "es": "Piscina, jacuzzi y terrazas"
+      },
+      {
+        "en": "Parking for 6 cars",
+        "es": "Estacionamiento para 6 autos"
+      }
+    ],
+    "lat": 8.55,
+    "lng": -79.9,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Punta Barco beach area",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 5,
+      "bathrooms": 5.5,
+      "built_area_m2": 700.0,
+      "parking_spaces": 6,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2628,
+    "tokens_out": 588,
+    "cost_usd": 0.00135636,
+    "finish_reason": "stop",
+    "latency_ms": 4434
   }
 }
