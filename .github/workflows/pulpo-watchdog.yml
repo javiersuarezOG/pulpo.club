@@ -1,8 +1,23 @@
 name: pulpo watchdog
 
 # Runs 2 hours after the nightly (0 12 * * * UTC) so the pipeline has time
-# to finish. Opens a GitHub Issue on failure; comments on an existing open
-# issue if one was already created today (suppresses duplicates).
+# to finish.
+#
+# Issue lifecycle — ONE ISSUE PER INCIDENT, not per day (post-2026-08-08):
+#   * On failure, comment on the oldest OPEN watchdog issue if one exists;
+#     only open a new one when there is no open incident. A continuing
+#     freeze escalates on a single thread instead of minting a new issue
+#     every 24h.
+#   * On success, close every open watchdog issue with a resolution
+#     comment. Recovery is the signal that the incident ended.
+#
+# Why: the previous logic deduped only within a calendar day and had no
+# close path, so 75 issues accumulated between 2026-05-04 and 2026-08-08
+# with zero ever closed. The 12-day July freeze alone produced 12
+# separate issues. A permanently-red backlog is indistinguishable from
+# no alerting at all — which is the exact failure mode the
+# never-silent-freeze rule in CLAUDE.md exists to prevent. Slack remains
+# the human-visible trip wire; the issue is the system of record.
 #
 # To silence temporarily: rename this file or set WATCHDOG_SKIP=1 as a
 # repository variable. To trigger manually: gh workflow run pulpo-watchdog.yml
@@ -73,13 +88,17 @@ jobs:
           # Create the label if it doesn't exist
           gh label create "$LABEL" --color "e4e669" --description "Automated pipeline watchdog alert" 2>/dev/null || true
 
-          # Check for an existing open issue with the same title today
+          # Escalate on the OPEN incident rather than opening one per day.
+          # --limit 100 because the default page size is 30; without it a
+          # large backlog could hide the open incident and mint a duplicate.
+          # Oldest-first: a multi-day freeze keeps escalating on the thread
+          # that recorded its first day.
           EXISTING=$(gh issue list \
             --label "$LABEL" \
             --state open \
-            --json number,title \
-            --jq ".[] | select(.title == \"$TITLE\") | .number" \
-            | head -1)
+            --limit 100 \
+            --json number \
+            --jq 'sort_by(.number) | .[0].number // empty')
 
           BODY=$(cat <<EOF
           ## Watchdog failure — $TODAY
@@ -134,3 +153,32 @@ jobs:
             "$SLACK_WEBHOOK_URL" \
             -d "$(printf '{"text":"*Pulpo watchdog FAILED* — %s\\n<%s|view run>"}' "$REASON" "$RUN_URL")" \
             >/dev/null || echo "Slack POST failed (non-blocking)"
+
+      - name: Close open watchdog issues on recovery
+        # The close path the watchdog never had. Without it every failing
+        # day left a permanent issue: 75 open, 0 closed, 2026-05-04 →
+        # 2026-08-08. Recovery is the only reliable signal an incident
+        # ended, so a green run resolves whatever is open.
+        #
+        # Best-effort by design (|| true): a GitHub API hiccup while
+        # closing must never turn a HEALTHY pipeline run red. A missed
+        # close self-heals on the next green run.
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          OPEN=$(gh issue list --label watchdog --state open --limit 100 \
+                   --json number --jq '.[].number' || true)
+          if [ -z "$OPEN" ]; then
+            echo "No open watchdog issues; nothing to close."
+            exit 0
+          fi
+          for N in $OPEN; do
+            echo "Closing #$N (watchdog green)"
+            gh issue close "$N" \
+              --reason completed \
+              --comment "✅ Watchdog green — all checks passed. Closing automatically.
+
+          **Recovery run:** $RUN_URL" || echo "::warning::could not close #$N (non-blocking)"
+          done
