@@ -561,10 +561,11 @@ def main(argv: Optional[list] = None) -> int:
     ranked = json.loads(args.ranked.read_text(encoding="utf-8")) if args.ranked.exists() else []
     ranked_index = _ranked_index(ranked)
 
-    queue = (
-        json.loads(args.queue.read_text(encoding="utf-8"))
-        if args.queue.exists() else {"version": 1, "batch": "autopilot", "items": []}
-    )
+    # Read the queue in EITHER shape (dict or the bare list a manual staging
+    # run left behind) and work on a dict (2026-08-02 fix).
+    from automation import ig_queue_io
+    _items, _meta = ig_queue_io.load(args.queue)
+    queue = ig_queue_io.as_dict(_items, _meta)
 
     # Never-reuse ledger: every photo ever used as a cover.
     used_urls: set = set()
