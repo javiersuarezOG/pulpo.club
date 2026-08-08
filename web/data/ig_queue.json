@@ -1874,10 +1874,12 @@
       "primary_listing_id": "bienesraices__1953",
       "cover_photo_url": "https://assets.easybroker.com/property_images/3265673/52400707/EB-LN5673.jpg?rasterize=true&version=1663774618",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-08-08T15:32:44+00:00"
     },
     {
       "day": 248,
@@ -1906,10 +1908,12 @@
       "primary_listing_id": "bienesraices__2015",
       "cover_photo_url": "https://assets.easybroker.com/property_images/2334133/36169518/EB-HY4133.jpg?rasterize=true&version=1625856121",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-08-08T15:32:44+00:00"
     },
     {
       "day": 249,
@@ -1938,10 +1942,12 @@
       "primary_listing_id": "bienesraices__2007",
       "cover_photo_url": "https://assets.easybroker.com/property_images/2496463/38934160/EB-IO6463.jpg?rasterize=true&version=1632824632",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-08-08T15:32:44+00:00"
     },
     {
       "day": 250,
@@ -1970,10 +1976,12 @@
       "primary_listing_id": "bienesraices__1875",
       "cover_photo_url": "https://assets.easybroker.com/property_images/3750206/61404156/EB-NK0206.jpg?rasterize=true&version=1684361182",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-08-08T15:32:44+00:00"
     },
     {
       "day": 251,
@@ -2002,10 +2010,12 @@
       "primary_listing_id": "bienesraices__2296",
       "cover_photo_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvQkcyRTFCNUZVSS9wSlB6QVI3Y0prL1RlcnJlbm9fZGVfNC5qcGVnIiwgImVkaXRzIjogeyJyZXNpemUiOiB7IndpZHRoIjogMTI4MCwgImhlaWdodCI6IDk2MCwgImZpdCI6ICJpbnNpZGUifSwgInRvRm9ybWF0IjogImpwZWciLCAianBlZyI6IHsicXVhbGl0eSI6IDcwfX19",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-08-08T15:32:44+00:00"
     },
     {
       "day": 252,
@@ -2034,10 +2044,12 @@
       "primary_listing_id": "bienesraices__2030",
       "cover_photo_url": "https://assets.easybroker.com/property_images/712736/10828816/EB-BS2736.JPG?rasterize=true&version=1525815117",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-08-08T15:32:44+00:00"
     },
     {
       "day": 253,
@@ -2066,10 +2078,12 @@
       "primary_listing_id": "bienesraices__1690",
       "cover_photo_url": "https://assets.easybroker.com/property_images/4540000/76143072/EB-QL0000.jpg?rasterize=true&version=1718124035",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-08-08T15:32:44+00:00"
     },
     {
       "day": 254,
@@ -2098,11 +2112,13 @@
       ],
       "primary_listing_id": "bienesraices_1424",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
       "posted_media_id": null,
-      "scheduled_for": "2026-08-01T01:00:00+00:00"
+      "scheduled_for": "2026-08-01T01:00:00+00:00",
+      "skipped": true,
+      "skipped_at": "2026-08-08T15:32:44+00:00"
     },
     {
       "day": 255,
@@ -2131,11 +2147,13 @@
       ],
       "primary_listing_id": "bienesraices_2191",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
       "posted_media_id": null,
-      "scheduled_for": "2026-08-02T01:00:00+00:00"
+      "scheduled_for": "2026-08-02T01:00:00+00:00",
+      "skipped": true,
+      "skipped_at": "2026-08-08T15:32:44+00:00"
     },
     {
       "day": 256,
@@ -2164,11 +2182,13 @@
       ],
       "primary_listing_id": "bienesraices_1875",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
       "posted_media_id": null,
-      "scheduled_for": "2026-08-03T01:00:00+00:00"
+      "scheduled_for": "2026-08-03T01:00:00+00:00",
+      "skipped": true,
+      "skipped_at": "2026-08-08T15:32:44+00:00"
     },
     {
       "day": 257,
@@ -2197,11 +2217,13 @@
       ],
       "primary_listing_id": "bienesraices_1981",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
       "posted_media_id": null,
-      "scheduled_for": "2026-08-04T01:00:00+00:00"
+      "scheduled_for": "2026-08-04T01:00:00+00:00",
+      "skipped": true,
+      "skipped_at": "2026-08-08T15:32:44+00:00"
     },
     {
       "day": 258,
@@ -2230,11 +2252,13 @@
       ],
       "primary_listing_id": "citymax_153112",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
       "posted_media_id": null,
-      "scheduled_for": "2026-08-05T01:00:00+00:00"
+      "scheduled_for": "2026-08-05T01:00:00+00:00",
+      "skipped": true,
+      "skipped_at": "2026-08-08T15:32:44+00:00"
     },
     {
       "day": 259,
@@ -2263,11 +2287,13 @@
       ],
       "primary_listing_id": "vivolatam_62t30q2t7c",
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
       "posted_media_id": null,
-      "scheduled_for": "2026-08-06T01:00:00+00:00"
+      "scheduled_for": "2026-08-06T01:00:00+00:00",
+      "skipped": true,
+      "skipped_at": "2026-08-08T15:32:44+00:00"
     },
     {
       "day": 260,
