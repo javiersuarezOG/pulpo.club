@@ -19,7 +19,6 @@ from automation.ig_learning import (   # noqa: E402
     build_scoreboard,
     engagement_score,
     pick_weight,
-    run,
 )
 from automation.ig_story_series import pick_story, STORIES   # noqa: E402
 
@@ -160,7 +159,16 @@ def test_pick_story_weight_breaks_toward_winner_among_unused():
 # ── run(): writes the artifact ─────────────────────────────────────────
 
 def test_run_writes_scoreboard(tmp_path, monkeypatch):
+    # Resolve BOTH the module and run() from the same live import.
+    # tests/test_first_seen.py nukes every `automation*` entry from
+    # sys.modules, so a `run` bound at collection time can end up
+    # holding the globals of a stale module object while this
+    # `import` returns a fresh one — the monkeypatches below would
+    # then land on a module run() never reads, and it would write the
+    # real web/data/ artifacts. Same reasoning as the `pub` fixture in
+    # tests/test_ig_publish.py.
     import automation.ig_learning as L
+    run = L.run
     ins = tmp_path / "ig_insights.jsonl"
     ins.write_text("\n".join(json.dumps(_row(f"m{i}", "el_mar", M(reach=100, saved=3)))
                              for i in range(MIN_SAMPLES)))
