@@ -1117,6 +1117,17 @@ jobs:
           git add web/data/scraper_failures/ 2>/dev/null || true
           git add web/data/type_classifier_log.jsonl 2>/dev/null || true
           git add web/data/prices_history.json 2>/dev/null || true
+          # 2026-08-08 — THE cross-run persistence files for listing age.
+          # These were written every nightly by automation/run.py but never
+          # staged, so each run checked out a fresh repo, found no history,
+          # and stamped first_seen_at = <this run> on EVERY listing. Result:
+          # days_listed = 0 for ~98% of the catalog, the "New" badge fired
+          # on everything, and the existence ledger never accumulated the
+          # >=3 consecutive-miss state PULPO_RANKER_DROP_STALE needs — so
+          # the stale filter was a permanent no-op. Both files are
+          # load-bearing across runs; keep them staged.
+          git add web/data/listings_history.json 2>/dev/null || true
+          git add web/data/listings_ledger.json 2>/dev/null || true
           # NOTE: web/data/ai_enrichment_cache.json was a dead artifact
           # (2 bytes, untouched since 2026-05-06) — the real enrichment
           # cache is web/data/llm_enrichment.json below. Its git-add

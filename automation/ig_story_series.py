@@ -69,7 +69,7 @@ STORIES: tuple[dict, ...] = (
     {"id": "ya_volvio", "emotion": "orgullo", "eye": "Tu país",
      "line": "El país al que\njurabas volver,\nya volvió.", "accent": "ya volvió",
      "pos": "top", "scrim": "up",
-     "cap": f"El {_COUNTRY} que dejaste no es el que vas a encontrar. La costa está despierta, "
+     "cap": f"{_COUNTRY} que dejaste no es el que vas a encontrar. La costa está despierta, "
             "y todavía hay lugar para vos."},
     {"id": "hora_dorada", "emotion": "lugar", "eye": "La hora dorada", "small": True,
      "line": "A las 6, el cielo se pone\ndel color de tu casa.", "accent": "tu casa",
