@@ -87,7 +87,11 @@ export type Listing = {
   // files + sidecars and sets these flags.
   hero_eligible: boolean;  // <file>.hero.jpg ≥ 1600×1200 + aspect 1.4–1.85 + ≤ 5MB
   card_eligible: boolean;  // <file>.jpg ≥ 800×600
-  first_seen_date: number;     // days ago Pulpo first scraped this listing
+  // Days ago Pulpo first scraped this listing. `null` when
+  // `first_seen_at` was absent or unparseable — distinct from 0
+  // ("first seen today"), same contract as `days_listed` below.
+  // Consumers must null-guard.
+  first_seen_date: number | null;
   // Days since the source published the listing (from the scraper's
   // parse of mod_dt). `null` when the source date was unparseable —
   // distinct from 0 ("posted today"). Consumers must null-guard.
