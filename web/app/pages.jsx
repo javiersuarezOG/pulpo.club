@@ -1068,7 +1068,11 @@ function applyFilters(listings, f, opts) {
     if (f.infra.has("power") && !l.has_power) return false;
     if (f.infra.has("paved") && l.road_access_type !== "paved") return false;
     if (f.infra.has("sewage") && !l.has_sewage) return false;
-    if (f.status.has("new") && l.first_seen_date > 7) return false;
+    // Mirrors the "motivated" guard below: a null first_seen_date must
+    // FAIL the "new" facet, not pass it. `null > 7` is false in JS, so
+    // the bare comparison silently kept unknown-age listings in a
+    // filter the user asked to narrow to fresh ones.
+    if (f.status.has("new") && !(typeof l.first_seen_date === "number" && l.first_seen_date <= 7)) return false;
     if (f.status.has("price_drop") && !l.is_repriced) return false;
     if (f.status.has("off_market") && l.source_type !== "off_market") return false;
     if (f.status.has("motivated") && (typeof l.days_listed !== "number" || l.days_listed < 90)) return false;
@@ -1465,7 +1469,13 @@ function BrowsePage({ app }) {
       return (b.rank_score ?? 0) - (a.rank_score ?? 0);
     };
     const sorters = {
-      recent: (a, b) => a.first_seen_date - b.first_seen_date,
+      // Null first_seen_date sinks to the end — unknown age is not
+      // "most recent". Same treatment as days_asc just below.
+      recent: (a, b) => {
+        const av = typeof a.first_seen_date === "number" ? a.first_seen_date : Number.POSITIVE_INFINITY;
+        const bv = typeof b.first_seen_date === "number" ? b.first_seen_date : Number.POSITIVE_INFINITY;
+        return av - bv;
+      },
       price_asc: (a, b) => (a.price ?? Infinity) - (b.price ?? Infinity),
       price_desc: (a, b) => (b.price ?? -1) - (a.price ?? -1),
       size_desc: (a, b) => (b.size_m2 ?? 0) - (a.size_m2 ?? 0),
@@ -3271,7 +3281,13 @@ function SavedPage({ app }) {
         const bv = typeof b.days_listed === "number" ? b.days_listed : Number.POSITIVE_INFINITY;
         return av - bv;
       }); break;
-      default: arr.sort((a,b) => b.first_seen_date - a.first_seen_date);
+      // Descending, so null sinks to the end as -Infinity (the mirror
+      // of the +Infinity used by the ascending sorts above).
+      default: arr.sort((a,b) => {
+        const av = typeof a.first_seen_date === "number" ? a.first_seen_date : Number.NEGATIVE_INFINITY;
+        const bv = typeof b.first_seen_date === "number" ? b.first_seen_date : Number.NEGATIVE_INFINITY;
+        return bv - av;
+      });
     }
     return arr;
   }, [items, sort]);

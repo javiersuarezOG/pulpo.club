@@ -122,10 +122,18 @@ export function detectListingLang(text: string | null | undefined): "en" | "es" 
   return en > es ? "en" : "es";
 }
 
-function daysSince(iso: string | null | undefined): number {
-  if (!iso) return 0;
+// Days between `iso` and now, or null when the timestamp is absent or
+// unparseable. Returning null rather than 0 is deliberate and mirrors
+// the `days_listed` contract: 0 means "first seen today", and a missing
+// timestamp is NOT that. The old `return 0` made an unknown-age listing
+// indistinguishable from a brand-new one — it fired the "New" badge and
+// landed in the "new this week" shelf. Consumers null-guard via
+// `typeof x === "number"`; sorts push null to the end in both
+// directions so unknown age never masquerades as freshest.
+function daysSince(iso: string | null | undefined): number | null {
+  if (!iso) return null;
   const t = Date.parse(iso);
-  if (Number.isNaN(t)) return 0;
+  if (Number.isNaN(t)) return null;
   const ms = Date.now() - t;
   return Math.max(0, Math.floor(ms / 86_400_000));
 }
