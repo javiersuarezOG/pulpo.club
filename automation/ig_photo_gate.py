@@ -15,7 +15,9 @@ ranked.json already carries:
   - is_incomplete                         not True
   - is_agricultural                       not True   (per the founder brief)
   - validation_status                     not "rejected"
-  - property_type=='land'  if IG_GATE_TERRENOS_ONLY=1 (default for batch 1)
+  - property_type=='land'  only if IG_GATE_TERRENOS_ONLY=1 (default OFF as of
+                           2026-08-08 — houses + condos now admitted for feed
+                           color variety; watermark/overlay gates still apply)
 
 Output: web/data/ig_candidates.json
 {
@@ -85,7 +87,14 @@ def _config_snapshot() -> dict[str, Any]:
         "min_photos":         env_int("IG_GATE_MIN_PHOTOS",  6),
         "min_hero_score":     env_int("IG_GATE_MIN_HERO_SCORE", 80),
         "min_data_quality":   env_float("IG_GATE_MIN_DATA_QUALITY", 0.55),
-        "terrenos_only":      env_bool("IG_GATE_TERRENOS_ONLY", True),
+        # Default False (2026-08-08): admit houses + condos so the feed gets
+        # category-color variety (casas teal, apts amber) instead of all-land
+        # blue/green. Legacy batch-1 default was True (land-only); the pool had
+        # 168 houses + 33 condos passing the watermark/quality gates that were
+        # being dropped purely on property_type. Set IG_GATE_TERRENOS_ONLY=1 to
+        # restore land-only. Brand-safety is unaffected: watermark/overlay
+        # rejection (_check_overlays) runs for every type independently.
+        "terrenos_only":      env_bool("IG_GATE_TERRENOS_ONLY", False),
         "exclude_agricultural": env_bool("IG_GATE_EXCLUDE_AGRICULTURAL", True),
         "max_candidates":     env_int("IG_GATE_MAX_CANDIDATES", 0),  # 0 = no cap
     }

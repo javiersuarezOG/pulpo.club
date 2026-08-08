@@ -386,8 +386,10 @@ def test_main_writes_output_json(tmp_path):
 
     written = json.loads(candidates_out.read_text())
     assert written["stats"]["scanned"] == 2
-    assert written["stats"]["passed"] == 1
-    assert written["candidates"][0]["listing_id"] == "a__1"
+    # Default admits houses as of 2026-08-08 (was land-only) → both pass.
+    assert written["stats"]["passed"] == 2
+    assert {c["listing_id"] for c in written["candidates"]} == {"a__1", "b__2"}
+    assert written["stats"]["by_property_type"] == {"land": 1, "house": 1}
 
 
 def test_main_handles_missing_input(tmp_path):
