@@ -28,6 +28,20 @@ _C = _COUNTRY.replace(" ", "")
 # ES property-type noun for the property card on slide 2.
 _NOUN = {"land": "terreno", "house": "casa", "condo": "apartamento"}
 
+
+def _color_key(candidate: dict) -> str:
+    """Category color so the feed isn't all one blue (Javi, 2026-08-08). Maps
+    property type + beach proximity to a CATEGORY_COLORS hue — beach land is
+    ocean-blue, beach homes teal, apartments amber, inland land green."""
+    pt = (candidate.get("property_type") or "").lower()
+    d = candidate.get("dist_beach_km")
+    coastal = d is not None and d <= 3.0
+    if pt == "condo":
+        return "apartamentos"                 # amber
+    if pt == "house":
+        return "casas_playa" if coastal else "casas_lago"     # teal / sea-green
+    return "terrenos_playa" if coastal else "terrenos_lago"   # ocean blue / green
+
 # ── the story library ─────────────────────────────────────────────────
 #
 # Each story: a stable id, the slide fields (eyebrow, poetic line with an
@@ -248,9 +262,26 @@ def build_post(story: dict, candidate: dict, listing: dict, photos: list[str],
     pct = candidate.get("price_vs_zone_pct")
     disc = abs(round(pct)) if isinstance(pct, (int, float)) else None
 
-    if humor:
-        # Own the bad photo, sell the value. Voseo, one wink, lint-clean.
-        val = f"{disc}% bajo el precio de la zona." if disc else "Un precio de los que no se repiten seguido."
+    style = humor if isinstance(humor, str) else ("apology" if humor else None)
+    val = f"{disc}% bajo el precio de la zona." if disc else "Un precio de los que no se repiten seguido."
+    gem_cap = None
+    if style == "bargain":
+        # GREAT-photo bargain — celebrate the price with a wink (Javi 08-08).
+        cover = {"t": "story", "img": photos[0],
+                 "eye": f"Ojo con esto · {zone}",
+                 "line": "A este precio,\nalguien se equivocó.",
+                 "accent": "se equivocó.",
+                 "sub": f"{disc}% bajo la zona — a tu favor." if disc else "Un precio que no se repite.",
+                 "small": True, "pos": "bottom", "scrim": "down"}
+        gem_cap = (
+            "Miralo dos veces: sí, ese es el precio. "
+            + (f"{disc}% bajo lo que vale la zona. " if disc else "Muy por debajo de la zona. ")
+            + f"No es error — lo agarramos antes que los demás. A este precio, un {noun} así "
+            "no dura.\n\n"
+            f"📍 {zone}. Mirá esta y las demás en pulpo.club — link en bio."
+        )
+    elif style == "apology":
+        # POOR-photo bargain — own the bad photo, sell the value.
         cover = {"t": "story", "img": photos[0],
                  "eye": f"Seamos honestos · {zone}",
                  "line": "La foto no gana premios.\nEl precio, sí.",
@@ -298,7 +329,7 @@ def build_post(story: dict, candidate: dict, listing: dict, photos: list[str],
     cta = {"t": "cta", "big": "Tu pedazo\nde paraíso", "sub": "pulpo.club · link en bio"}
     slides = [cover, price_reveal, *reason_slides[:2], *photo_slides, *reason_slides[2:3], cta]
 
-    caption = gem_cap if humor else f"{story['cap']}\n\n📍 {zone}. Mirá esta y las demás en pulpo.club — link en bio."
+    caption = gem_cap if gem_cap else f"{story['cap']}\n\n📍 {zone}. Mirá esta y las demás en pulpo.club — link en bio."
 
     # The first comment reinforces the details + carries discovery hashtags.
     spec = " · ".join(x for x in (zone, area, price) if x and x != "—")
@@ -307,7 +338,7 @@ def build_post(story: dict, candidate: dict, listing: dict, photos: list[str],
         "Todas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n"
         f"{_hashtags(candidate)}"
     )
-    # color_key drives the closer card's hue (the story cover ignores it —
-    # its accent is a fixed warm coral). Ocean blue keeps the closer calm.
-    return {"story_id": story["id"], "emotion": story["emotion"], "color_key": "terrenos_playa",
+    # color_key drives the design cards' hue — now varies by category so the
+    # feed isn't all one blue (beach blue / lake green / homes teal / apts amber).
+    return {"story_id": story["id"], "emotion": story["emotion"], "color_key": _color_key(candidate),
             "slides": slides, "caption": caption, "comment": comment}
