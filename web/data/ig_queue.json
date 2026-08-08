@@ -2622,10 +2622,12 @@
       "cover_beauty": 56.7,
       "humor": false,
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-08-08T16:58:40+00:00"
     },
     {
       "day": 268,
@@ -2667,10 +2669,12 @@
       "cover_beauty": 79.9,
       "humor": false,
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-08-08T16:58:40+00:00"
     },
     {
       "day": 269,
@@ -2712,10 +2716,12 @@
       "cover_beauty": 68.5,
       "humor": false,
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-08-08T16:58:40+00:00"
     },
     {
       "day": 270,
@@ -2757,10 +2763,12 @@
       "cover_beauty": 100.0,
       "humor": false,
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-08-08T16:58:40+00:00"
     },
     {
       "day": 271,
@@ -2802,10 +2810,12 @@
       "cover_beauty": 90.5,
       "humor": false,
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-08-08T16:58:40+00:00"
     },
     {
       "day": 272,
@@ -2844,10 +2854,12 @@
       "cover_beauty": 72.3,
       "humor": false,
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-08-08T16:58:40+00:00"
     },
     {
       "day": 273,
@@ -2889,10 +2901,12 @@
       "cover_beauty": 97.4,
       "humor": false,
       "status": "scheduled",
-      "approved": true,
+      "approved": false,
       "posted": false,
       "posted_at": null,
-      "posted_media_id": null
+      "posted_media_id": null,
+      "skipped": true,
+      "skipped_at": "2026-08-08T16:58:40+00:00"
     }
   ]
 }
