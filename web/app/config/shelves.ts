@@ -57,7 +57,10 @@ export const SHELVES: readonly ShelfConfig[] = [
       es: "Propiedades que entraron al catálogo en los últimos 7 días.",
     },
     icon: "cat_new",
-    filter: (l) => l.first_seen_date <= 7,
+    // typeof guard, not a bare `<= 7`: null coerces to 0 in a JS
+    // comparison, so an unknown-age listing would silently qualify as
+    // "new this week".
+    filter: (l) => typeof l.first_seen_date === "number" && l.first_seen_date <= 7,
   },
   {
     key: "price_drops",
