@@ -16,7 +16,7 @@ sys.path.insert(0, str(REPO))
 
 from automation.ig_autopilot import (   # noqa: E402
     build_item,
-    select_beautiful_cover,
+    select_beautiful_photos,
     topup,
     _beauty,
     _future_approved_count,
@@ -50,11 +50,11 @@ def _fake_render(spec, color, out):
 
 
 def _fake_selector(listing, assets_dir, slug, *, used_urls=frozenset(), score=80.0, **_):
-    # a unique cover per listing/day (score 80 = great); honours the ledger
+    # a unique photo per listing/day (score 80 = great); honours the ledger
     url = f"http://x/{slug}.jpg"
     if url in used_urls:
         return None
-    return f"web/data/ig_assets/autopilot/{slug}/photo_1.jpg", url, score
+    return [(f"web/data/ig_assets/autopilot/{slug}/photo_1.jpg", url, score)]
 
 
 def _run(queue, lookahead=4, cadence=1, photo_selector=_fake_selector):
@@ -222,7 +222,7 @@ def test_build_item_returns_none_when_no_photo():
 
 
 def _poor_selector(listing, assets_dir, slug, *, used_urls=frozenset(), **_):
-    return f"web/data/ig_assets/autopilot/{slug}/photo_1.jpg", f"http://x/{slug}.jpg", 30.0  # poor
+    return [(f"web/data/ig_assets/autopilot/{slug}/photo_1.jpg", f"http://x/{slug}.jpg", 30.0)]  # poor
 
 
 def test_poor_photo_non_gem_is_skipped():
@@ -293,9 +293,9 @@ def test_ordered_fresh_urls_drops_rejected_and_used():
     assert "http://x/hero.jpg" not in fresh2
 
 
-def test_select_beautiful_cover_picks_best_and_scores(tmp_path):
-    """Returns the MOST beautiful frame + its score (tiering is the caller's
-    job now); None only when there's no usable photo at all."""
+def test_select_beautiful_photos_ranks_best_first(tmp_path):
+    """Returns up to `want` photos as (path,url,score), MOST beautiful first;
+    None only when there's no usable photo. Tiering is the caller's job."""
     from PIL import Image
     from automation.ig_photo_beauty import GORGEOUS_MIN
     imgs = {
@@ -304,12 +304,14 @@ def test_select_beautiful_cover_picks_best_and_scores(tmp_path):
     }
     listing = {"photo_urls": list(imgs), "photos_count": 2,
                "selected_photo_url": "http://x/dull.jpg"}
-    path, url, score = select_beautiful_cover(listing, tmp_path, "d1__el_mar",
-                                              fetcher=lambda u: imgs[u])
-    assert url == "http://x/ocean.jpg" and score >= GORGEOUS_MIN   # beautiful one wins
+    out = select_beautiful_photos(listing, tmp_path, "d1__el_mar", want=2,
+                                  fetcher=lambda u: imgs[u])
+    assert len(out) == 2
+    assert out[0][1] == "http://x/ocean.jpg" and out[0][2] >= GORGEOUS_MIN  # best first
+    assert out[1][1] == "http://x/dull.jpg"                                 # then the dull one
 
     dull_only = {"photo_urls": ["http://x/dull.jpg"], "photos_count": 1,
                  "selected_photo_url": "http://x/dull.jpg"}
-    _p, _u, sc = select_beautiful_cover(dull_only, tmp_path, "d2__el_mar",
-                                        fetcher=lambda u: imgs["http://x/dull.jpg"])
-    assert sc < GORGEOUS_MIN            # returns it, but flagged poor (caller decides)
+    out2 = select_beautiful_photos(dull_only, tmp_path, "d2__el_mar", want=3,
+                                   fetcher=lambda u: imgs["http://x/dull.jpg"])
+    assert out2[0][2] < GORGEOUS_MIN   # returns it, flagged poor (caller decides)

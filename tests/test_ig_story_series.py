@@ -55,19 +55,19 @@ def test_accent_is_a_substring_of_the_line():
             assert acc in s["line"], f"{s['id']}: accent {acc!r} not in line"
 
 
-def test_cover_stays_price_free_but_property_card_and_comment_carry_it():
+def test_cover_stays_price_free_but_reveal_and_comment_carry_it():
     post = S.build_post(S.STORIES[0], _cand(price_usd=225000.0), {}, ["hero.jpg"])
     # the inspirational COVER carries no price (photo + line only)
     cover = post["slides"][0]
     blob = " ".join(str(v) for v in cover.values())
     assert "$" not in blob and "225" not in blob
-    # …but the property card DOES reference the price, and the comment too.
-    card = next(s for s in post["slides"] if s["t"] == "detail")
-    assert card["price"] == "$225,000"
+    # …but the bold price-reveal slide DOES carry the price, and the comment too.
+    reveal = next(s for s in post["slides"] if s["t"] == "reveal")
+    assert reveal["price"] == "$225,000"
     assert "$225,000" in post["comment"]
 
 
-def test_min_four_slides_hero_reasons_property_cta():
+def test_min_four_slides_hero_reveal_reasons_cta():
     listing = {"reasons_to_buy": [{"es": "Vista al mar"}, {"es": "A minutos de El Tunco"},
                                   {"es": "Agua y luz"}]}
     post = S.build_post(S.STORIES[3], _cand(zone="el-zonte", department="La Libertad",
@@ -75,12 +75,12 @@ def test_min_four_slides_hero_reasons_property_cta():
     types = [s["t"] for s in post["slides"]]
     assert len(post["slides"]) >= 4, "minimum 4 slides per post"
     assert types[0] == "story" and types[-1] == "cta"
-    assert "usp" in types and "detail" in types            # reasons + property card
+    assert "usp" in types and "reveal" in types            # reasons + bold price reveal
     # only the hero photo is a real image; every other slide is a design card
+    # (with one hero photo, the reveal reuses the hero, so photo-count is fine)
     assert post["slides"][0]["img"] == "hero.jpg"
-    assert all("img" not in s for s in post["slides"][1:])
-    card = next(s for s in post["slides"] if s["t"] == "detail")
-    assert "El Zonte" in card["loc"] and "La Libertad" in card["loc"]
+    reveal = next(s for s in post["slides"] if s["t"] == "reveal")
+    assert "El Zonte" in reveal["kicker"] and reveal["price"].startswith("$")
 
 
 def test_reasons_come_from_the_listing():

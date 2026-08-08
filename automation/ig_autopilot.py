@@ -298,7 +298,10 @@ def _ordered_fresh_urls(listing: dict, used_urls: frozenset) -> list:
     return [u for u in urls if u not in used_urls]
 
 
-def select_beautiful_cover(
+PHOTOS_PER_POST = 3           # richer format uses up to 3 real photos (Javi 08-08)
+
+
+def select_beautiful_photos(
     listing: dict,
     assets_dir: Path,
     slug: str,
@@ -306,43 +309,59 @@ def select_beautiful_cover(
     used_urls: frozenset = frozenset(),
     fetcher: Callable = _download_image,
     scorer: Callable = None,
+    want: int = PHOTOS_PER_POST,
     cap: int = _COVER_SCAN_CAP,
-) -> Optional[tuple]:
+) -> Optional[list]:
     """Download + score the listing's brand-safe, unused photos; save + return
-    ``(web_relative_path, chosen_url, score)`` for the MOST beautiful one — or
-    None only when the listing has no usable photo at all.
+    the BEST ``want`` as a list of ``(web_relative_path, url, score)`` (best
+    first) — or None only when the listing has no usable photo at all.
 
-    The tier decision lives with the caller (Javi, 2026-08-02): a great photo
-    posts as-is; a poor photo posts ONLY if the listing is a true value gem
-    (with humor copy); otherwise the caller skips it."""
+    The richer format (Javi, 2026-08-08) uses up to 3 real photos so it isn't
+    one photo + five gradient cards. The tier decision stays with the caller
+    and uses the best photo's score: a great cover posts as-is; a poor cover
+    posts ONLY if the listing is a true value gem (with humor copy)."""
     from automation.ig_photo_beauty import score_photo
     scorer = scorer or score_photo
 
-    best = None                                       # (score, img, url)
+    scored = []                                        # (score, img, url)
     for url in _ordered_fresh_urls(listing, used_urls)[:cap]:
         try:
             img = fetcher(url)
-        except Exception as e:                        # noqa: BLE001
-            print(f"[ig_autopilot] cover fetch skip ({e}): {url[:80]}", file=sys.stderr)
+        except Exception as e:                         # noqa: BLE001
+            print(f"[ig_autopilot] photo fetch skip ({e}): {url[:80]}", file=sys.stderr)
             continue
-        sc = scorer(img)
-        if best is None or sc > best[0]:
-            best = (sc, img, url)
-    if best is None:
+        scored.append((scorer(img), img, url))
+    if not scored:
         return None
-    slide = _fit_slide(best[1])
-    if slide is None:
-        return None
+    scored.sort(key=lambda t: -t[0])                   # most beautiful first
     assets_dir.mkdir(parents=True, exist_ok=True)
-    slide.save(assets_dir / "photo_1.jpg", "JPEG", quality=90, optimize=True)
-    print(f"[ig_autopilot] cover beauty={best[0]:.0f} {best[2][:70]}")
-    return f"web/data/ig_assets/autopilot/{slug}/photo_1.jpg", best[2], best[0]
+    out: list = []
+    for sc, img, url in scored[:want]:
+        slide = _fit_slide(img)
+        if slide is None:
+            continue
+        fname = f"photo_{len(out) + 1}.jpg"
+        slide.save(assets_dir / fname, "JPEG", quality=90, optimize=True)
+        out.append((f"web/data/ig_assets/autopilot/{slug}/{fname}", url, sc))
+    if not out:
+        return None
+    print(f"[ig_autopilot] photos={len(out)} beauty={out[0][2]:.0f} {out[0][1][:60]}")
+    return out
+
+
+def _predict_photos(listing, assets_dir, slug, *, used_urls=frozenset(), want=PHOTOS_PER_POST, **_) -> Optional[list]:
+    """Offline stand-in for select_beautiful_photos (no download / no score) —
+    used by --skip-render dry runs and tests. Returns the first fresh brand-safe
+    urls with a nominal 'great' score (80)."""
+    urls = _ordered_fresh_urls(listing, used_urls)[:want]
+    if not urls:
+        return None
+    return [(f"web/data/ig_assets/autopilot/{slug}/photo_{i + 1}.jpg", u, 80.0)
+            for i, u in enumerate(urls)]
 
 
 def _predict_cover(listing, assets_dir, slug, *, used_urls=frozenset(), **_) -> Optional[tuple]:
-    """Offline stand-in for select_beautiful_cover (no download / no score) —
-    used by --skip-render dry runs and tests. Returns the first fresh
-    brand-safe url with a nominal 'great' score (80)."""
+    """Deprecated single-photo offline stub (kept for any external caller)."""
     urls = _ordered_fresh_urls(listing, used_urls)
     if not urls:
         return None
@@ -363,7 +382,7 @@ def build_item(
     used_urls: frozenset = frozenset(),
     allow_poor: bool = True,
     slide_renderer: Callable = _render_slide,
-    photo_selector: Callable = select_beautiful_cover,
+    photo_selector: Callable = select_beautiful_photos,
 ) -> Optional[dict]:
     """Build one approved queue item. EVERY post has a real hero photo (the
     listing's own best, unused, brand-safe frame). Tiering (Javi, 2026-08-02):
@@ -377,15 +396,18 @@ def build_item(
     assets_dir = assets_root / slug
 
     sel = photo_selector(listing, assets_dir, slug, used_urls=used_urls)
-    if sel is None:
+    if not sel:
         print(f"[ig_autopilot] d{day} skip {candidate.get('listing_id')}: no usable photo",
               file=sys.stderr)
         return None
-    cover_path, cover_url, score = sel
+    photos = [p for p, _u, _s in sel]        # up to 3, most-beautiful first
+    cover_url = sel[0][1]
+    score = sel[0][2]                        # tier on the best (cover) photo
+    used_now = [u for _p, u, _s in sel]      # every photo used → ledger
 
     humor = False
     if score < GORGEOUS_MIN:
-        # poor photo → only a true value gem earns a slot, and only within
+        # poor cover → only a true value gem earns a slot, and only within
         # the <20% poor budget; otherwise skip and try a better listing.
         if not is_value_gem(candidate) or not allow_poor:
             print(f"[ig_autopilot] d{day} skip {candidate.get('listing_id')}: "
@@ -393,7 +415,7 @@ def build_item(
             return None
         humor = True
 
-    post = _series.build_post(story, candidate, listing, [cover_path], humor=humor)
+    post = _series.build_post(story, candidate, listing, photos, humor=humor)
     if post is None:
         return None
 
@@ -434,9 +456,10 @@ def build_item(
         "carousel_photo_paths": rendered[1:],
         "listing_ids": [candidate.get("listing_id")],
         "primary_listing_id": candidate.get("listing_id"),
-        # the exact photo used — appended to the no-repeat ledger so it's
-        # never reused as a cover again.
+        # the exact photos used — all appended to the no-repeat ledger so
+        # none is reused again. cover_photo_url = the hero (back-compat).
         "cover_photo_url": cover_url,
+        "cover_photo_urls": used_now,
         # photo tier for the <20%-poor budget + observability.
         "photo_tier": "poor" if humor else "great",
         "cover_beauty": round(score, 1),
@@ -462,7 +485,7 @@ def topup(
     skip_render: bool,
     used_urls: Optional[set] = None,
     slide_renderer: Callable = _render_slide,
-    photo_selector: Callable = select_beautiful_cover,
+    photo_selector: Callable = select_beautiful_photos,
 ) -> list:
     """Append approved items until `lookahead` future posts exist.
     Returns the list of newly-added items (also appended to queue).
@@ -476,10 +499,10 @@ def topup(
     added: list = []
     failed: set = set()
     used_photos: set = set(used_urls or set())
-    # seed the ledger with covers already in the queue (prior runs)
+    # seed the ledger with every photo already used in the queue (prior runs)
     for it in items:
-        if it.get("cover_photo_url"):
-            used_photos.add(it["cover_photo_url"])
+        for u in it.get("cover_photo_urls") or ([it["cover_photo_url"]] if it.get("cover_photo_url") else []):
+            used_photos.add(u)
     guard = 0
     max_iters = lookahead * 6 + 4          # room to skip thin listings
     while _future_approved_count(items + added, now) < lookahead and guard < max_iters:
@@ -514,8 +537,8 @@ def topup(
         if item is None:                    # no gorgeous unused photo → try another
             failed.add(cand.get("listing_id"))
             continue
-        if item.get("cover_photo_url"):     # never reuse this photo again
-            used_photos.add(item["cover_photo_url"])
+        for u in item.get("cover_photo_urls") or []:   # never reuse these photos
+            used_photos.add(u)
         added.append(item)
         print(
             f"[ig_autopilot] queued d{day} story={story['id']} coast={_is_coastal(listing)} "
@@ -580,16 +603,16 @@ def main(argv: Optional[list] = None) -> int:
         now=now, lookahead=args.lookahead, cadence_days=args.cadence_days,
         assets_root=args.assets_root, skip_render=args.skip_render, used_urls=used_urls,
         # --skip-render is an offline mode → don't hit the network for photos.
-        photo_selector=_predict_cover if args.skip_render else select_beautiful_cover,
+        photo_selector=_predict_photos if args.skip_render else select_beautiful_photos,
     )
 
     args.queue.parent.mkdir(parents=True, exist_ok=True)
     args.queue.write_text(json.dumps(queue, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    # Persist the ledger: prior + every cover chosen this run.
+    # Persist the ledger: prior + every photo chosen this run.
     for it in added:
-        if it.get("cover_photo_url"):
-            used_urls.add(it["cover_photo_url"])
+        for u in it.get("cover_photo_urls") or ([it["cover_photo_url"]] if it.get("cover_photo_url") else []):
+            used_urls.add(u)
     args.used_photos.parent.mkdir(parents=True, exist_ok=True)
     args.used_photos.write_text(json.dumps(sorted(used_urls), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
