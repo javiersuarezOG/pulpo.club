@@ -173,6 +173,11 @@ def _read_queue(path: Path) -> dict[str, Any]:
         obj = json.loads(text)
     except json.JSONDecodeError as e:
         raise ValueError(f"queue JSON parse error at {path}: {e}") from e
+    # Accept a bare list (what a manual staging run left behind) as well as
+    # the canonical dict — normalize to a dict so skips work either way.
+    if isinstance(obj, list):
+        from automation.ig_queue_io import as_dict
+        return as_dict(obj)
     if not isinstance(obj, dict):
         raise ValueError(f"queue at {path} is not a JSON object")
     return obj

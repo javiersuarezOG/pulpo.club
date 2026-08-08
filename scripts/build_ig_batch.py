@@ -76,7 +76,11 @@ def main() -> None:
         return
 
     queue += staged
-    QUEUE.write_text(json.dumps(queue, indent=1, ensure_ascii=False))
+    # Write the canonical DICT shape — NOT a bare list. Emitting a top-level
+    # list here is what broke the publisher / generator / skip tool on
+    # 2026-08-02 (all expect a dict).
+    from automation.ig_queue_io import as_dict
+    QUEUE.write_text(json.dumps(as_dict(queue), indent=1, ensure_ascii=False))
     print(f"\nstaged {len(staged)} posts into {QUEUE} (total {len(queue)} items)")
 
 

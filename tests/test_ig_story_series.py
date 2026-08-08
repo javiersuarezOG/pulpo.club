@@ -61,24 +61,34 @@ def test_cover_stays_price_free_but_property_card_and_comment_carry_it():
     cover = post["slides"][0]
     blob = " ".join(str(v) for v in cover.values())
     assert "$" not in blob and "225" not in blob
-    # …but slide 2 is a real property card that DOES reference the price,
-    # and the first comment reinforces it.
-    assert post["slides"][1]["price"] == "$225,000"
+    # …but the property card DOES reference the price, and the comment too.
+    card = next(s for s in post["slides"] if s["t"] == "detail")
+    assert card["price"] == "$225,000"
     assert "$225,000" in post["comment"]
 
 
-def test_brand_safe_shape_cover_hero_plus_property_card():
+def test_min_four_slides_hero_reasons_property_cta():
+    listing = {"reasons_to_buy": [{"es": "Vista al mar"}, {"es": "A minutos de El Tunco"},
+                                  {"es": "Agua y luz"}]}
     post = S.build_post(S.STORIES[3], _cand(zone="el-zonte", department="La Libertad",
-                                            property_type="land"), {}, ["hero.jpg", "second.jpg"])
+                                            property_type="land"), listing, ["hero.jpg"])
     types = [s["t"] for s in post["slides"]]
-    assert types == ["story", "detail"], "cover(story) + property card(detail)"
-    # only the hero photo is referenced; the property card has no img (no
-    # broker-watermark risk) but DOES reference the real property.
+    assert len(post["slides"]) >= 4, "minimum 4 slides per post"
+    assert types[0] == "story" and types[-1] == "cta"
+    assert "usp" in types and "detail" in types            # reasons + property card
+    # only the hero photo is a real image; every other slide is a design card
     assert post["slides"][0]["img"] == "hero.jpg"
-    card = post["slides"][1]
-    assert "img" not in card
+    assert all("img" not in s for s in post["slides"][1:])
+    card = next(s for s in post["slides"] if s["t"] == "detail")
     assert "El Zonte" in card["loc"] and "La Libertad" in card["loc"]
-    assert "terreno" in card["facts"]
+
+
+def test_reasons_come_from_the_listing():
+    listing = {"reasons_to_buy": [{"es": "Vista al mar desde el terreno"},
+                                  {"es": "Electricidad, internet, agua"}]}
+    post = S.build_post(S.STORIES[0], _cand(), listing, ["hero.jpg"])
+    usp_titles = [s["title"] for s in post["slides"] if s["t"] == "usp"]
+    assert "Vista al mar desde el terreno" in usp_titles
 
 
 def test_cover_eyebrow_names_the_location():

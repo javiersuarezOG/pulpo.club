@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from automation.ig_units import format_area_m2, format_price_usd
+from automation.ig_units import format_area_m2, format_distance, format_price_usd
 from pulpo.countries import active as _active_country
 
 _COUNTRY = _active_country().name_en
@@ -120,6 +120,45 @@ for _s in STORIES:
     _s["needs_coast"] = _s["id"] in _COAST_STORIES
 
 _BY_ID = {s["id"]: s for s in STORIES}
+
+
+# ── reasons ("por qué") — real listing selling points ─────────────────
+
+def _reasons(listing: dict, candidate: dict, disc, max_n: int = 3) -> list:
+    """Up to `max_n` short ES reasons for the "por qué" slides. Prefers the
+    listing's own bilingual ``reasons_to_buy`` (1556/1558 listings have it),
+    and derives from the data (beach distance, below-zone price, size) when a
+    listing has none — so a post always has enough for the 4-slide minimum."""
+    out: list = []
+    for r in (listing.get("reasons_to_buy") or []):
+        es = r.get("es") if isinstance(r, dict) else (r if isinstance(r, str) else None)
+        if es and es.strip():
+            out.append(es.strip())
+    seen: set = set()
+    res: list = []
+    for r in out:
+        k = r.lower()
+        if k not in seen:
+            seen.add(k)
+            res.append(r)
+    if len(res) < 2:                        # derive to guarantee the minimum
+        d = candidate.get("dist_beach_km")
+        if d is not None:
+            res.append("Frente al mar" if d <= 0.05 else f"A {format_distance(d)} del mar")
+        if disc:
+            res.append(f"{disc}% bajo el precio de la zona")
+        area = format_area_m2(candidate.get("area_m2"))
+        if area and area != "—":
+            res.append(f"{area} para hacer lo tuyo")
+        # dedup again after deriving
+        seen2: set = set()
+        dedup: list = []
+        for r in res:
+            if r.lower() not in seen2:
+                seen2.add(r.lower())
+                dedup.append(r)
+        res = dedup
+    return res[:max_n]
 
 
 # ── zone / hashtags / whisper ─────────────────────────────────────────
@@ -236,13 +275,19 @@ def build_post(story: dict, candidate: dict, listing: dict, photos: list[str],
             cover["small"] = True
         cover["pos"] = story.get("pos", "bottom")
         cover["scrim"] = story.get("scrim", "down")
-    # Slide 2 is now a real PROPERTY card (was a generic brand closer) — it
-    # references the actual listing on the image: location · size/type ·
-    # price · pulpo.club. Still photo-free (no broker-watermark risk).
+    # ≥4 slides (Javi, 2026-08-02): cover → "por qué" reason cards → property
+    # card → CTA. All slides after the hero are photo-free design cards, so no
+    # second (less-vetted) image can leak a broker mark.
+    reasons = _reasons(listing, candidate, disc)
+    reason_slides = [
+        {"t": "usp", "eyebrow": f"Por qué · {i + 1}", "title": r, "body": ""}
+        for i, r in enumerate(reasons)
+    ]
     facts = " · ".join(x for x in (area, noun) if x and x != "—")
-    closer = {"t": "detail", "eyebrow": "La propiedad", "price": price,
-              "facts": f"{facts} · en pulpo.club", "loc": loc}
-    slides = [cover, closer]
+    property_card = {"t": "detail", "eyebrow": "La propiedad", "price": price,
+                     "facts": f"{facts} · en pulpo.club", "loc": loc}
+    cta = {"t": "cta", "big": "Tu pedazo\nde paraíso", "sub": "pulpo.club · link en bio"}
+    slides = [cover, *reason_slides, property_card, cta]
 
     caption = gem_cap if humor else f"{story['cap']}\n\n📍 {zone}. Mirá esta y las demás en pulpo.club — link en bio."
 

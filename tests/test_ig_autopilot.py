@@ -108,11 +108,11 @@ def test_coverage_spreads_across_listings():
     assert len(set(lids)) == len(lids), "the same listing was re-featured while others qualified"
 
 
-def test_post_is_cover_plus_photofree_closer():
+def test_post_has_at_least_four_slides():
     added = _run({"items": []}, lookahead=1)
     it = added[0]
     slides = [it["poster_path"], *it["carousel_photo_paths"]]
-    assert len(slides) == 2, "story = cover + brand closer"
+    assert len(slides) >= 4, "minimum 4 slides per post"
     assert it["shelf"] == "autopilot_story"
 
 
