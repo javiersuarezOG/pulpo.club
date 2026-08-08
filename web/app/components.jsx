@@ -343,6 +343,12 @@ function Badge({ listing }) {
 // listing could have been posted 10 months ago on the source — but
 // it's all we have when the broker's date is unparseable. Threshold
 // is 7 days, matching the home shelf's "new this week" definition.
+//
+// BOTH fields are nullable, and the `typeof` check below is what makes
+// that safe: when neither date is known, no badge renders. Do not
+// "simplify" it to `ageDays <= 7` — null coerces to 0 in a JS
+// comparison, which is how every unknown-age listing came to be
+// labelled "New".
 function signalForListing(listing) {
   if (!listing) return null;
   if (listing.existence_status === "missing_recently" || listing.existence_status === "stale") {
