@@ -247,8 +247,22 @@ def test_poor_photo_value_gem_posts_with_humor():
         skip_render=True, slide_renderer=_fake_render, photo_selector=_poor_selector,
     )
     assert item is not None
-    assert item["photo_tier"] == "poor" and item["humor"] is True
+    assert item["photo_tier"] == "poor" and item["humor"] == "apology"
     assert "foto no" in item["caption"].lower()             # owns the bad photo
+
+
+def test_great_photo_gem_gets_bargain_humor():
+    # a bargain with a GREAT photo now gets the celebratory wit (not skipped,
+    # not plain storytelling) — this is why the feed had "zero humor" before.
+    cand = {**_cand("src__0"), "price_vs_zone_pct": -40.0}
+    item = build_item(
+        day=101, story=STORIES[0], candidate=cand, listing={},
+        scheduled_for="2026-07-07T01:00:00+00:00", assets_root=Path("/tmp/x"),
+        skip_render=True, slide_renderer=_fake_render, photo_selector=_fake_selector,  # score 80 = great
+    )
+    assert item is not None
+    assert item["photo_tier"] == "great" and item["humor"] == "bargain"
+    assert "se equivocó" in item["caption"] or "ese es el precio" in item["caption"]
 
 
 def test_poor_photo_gem_blocked_when_over_budget():

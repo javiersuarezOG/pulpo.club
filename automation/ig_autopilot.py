@@ -405,15 +405,19 @@ def build_item(
     score = sel[0][2]                        # tier on the best (cover) photo
     used_now = [u for _p, u, _s in sel]      # every photo used → ledger
 
-    humor = False
+    # Humor fires on every genuine BARGAIN, not only bad photos (Javi 08-08):
+    #   great photo + gem → "bargain" (celebrate the price with a wink)
+    #   poor  photo + gem → "apology" (own the bad photo, sell the value)
+    # A poor photo that ISN'T a gem is skipped; the <20% budget caps poor ones.
+    humor = None
     if score < GORGEOUS_MIN:
-        # poor cover → only a true value gem earns a slot, and only within
-        # the <20% poor budget; otherwise skip and try a better listing.
         if not is_value_gem(candidate) or not allow_poor:
             print(f"[ig_autopilot] d{day} skip {candidate.get('listing_id')}: "
                   f"poor photo (beauty={score:.0f}), not a gem/over budget", file=sys.stderr)
             return None
-        humor = True
+        humor = "apology"
+    elif is_value_gem(candidate):
+        humor = "bargain"
 
     post = _series.build_post(story, candidate, listing, photos, humor=humor)
     if post is None:
@@ -461,9 +465,9 @@ def build_item(
         "cover_photo_url": cover_url,
         "cover_photo_urls": used_now,
         # photo tier for the <20%-poor budget + observability.
-        "photo_tier": "poor" if humor else "great",
+        "photo_tier": "poor" if score < GORGEOUS_MIN else "great",
         "cover_beauty": round(score, 1),
-        "humor": humor,
+        "humor": humor,          # "apology" | "bargain" | None
         "status": "scheduled",
         # Auto-approve model: posts publish on schedule; operator only skips.
         "approved": True,
