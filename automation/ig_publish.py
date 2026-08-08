@@ -503,7 +503,11 @@ def run_publish(
     publish attempt (posted or failed) — the CLI persists these to the
     activity-log jsonl.  Default None keeps run_publish side-effect-free
     for tests that don't care about the log."""
-    items = queue_payload.get("items") or []
+    # Accept either queue shape (dict OR bare list) and operate on a dict, so
+    # what we return + persist is always the canonical dict (2026-08-02 fix).
+    from automation.ig_queue_io import normalize, as_dict
+    items, meta = normalize(queue_payload)
+    queue_payload = as_dict(items, meta)   # `items` is the same list → in-place marks persist
     if force_day is not None:
         due = select_forced_item(items, force_day)
         if due is None:
