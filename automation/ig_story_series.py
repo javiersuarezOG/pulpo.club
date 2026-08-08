@@ -211,21 +211,31 @@ def story_for_index(post_index: int) -> dict:
     return STORIES[post_index % len(STORIES)]
 
 
-def pick_story(recent_ids, coastal: bool) -> dict:
+def pick_story(recent_ids, coastal: bool, weights: Optional[dict] = None) -> dict:
     """Choose the next story that FITS this listing's place: coast/sea lines
     only on a coastal listing; place-agnostic lines anywhere. Picks the
     fitting story used LONGEST ago (never-used first), so it cycles through
     the whole fitting set before repeating — even the inland-only set of 7.
 
-    ``recent_ids`` is the recent story-id history, MOST-RECENT-FIRST."""
+    ``recent_ids`` is the recent story-id history, MOST-RECENT-FIRST.
+
+    ``weights`` (Growth Hacker, ig_learning.pick_weight) optionally biases the
+    pick toward proven winners: each story's staleness is scaled by its weight
+    (~[0.5, 2.0], 1.0 = neutral), so a high-engagement story becomes eligible
+    sooner and a weak one waits longer — WITHOUT breaking the anti-repeat cycle
+    (a just-used story has staleness 0, so its weight can't resurface it) and
+    without ever excluding a story (exploration stays alive). ``None`` →
+    exact legacy rotation."""
     fits = [s for s in STORIES if coastal or not s.get("needs_coast")]
     recent = list(recent_ids or [])
+    w = weights or {}
 
     def staleness(s):
         try:
-            return recent.index(s["id"])          # 0 = just used → least stale
+            base = recent.index(s["id"])          # 0 = just used → least stale
         except ValueError:
-            return len(recent) + 1                # never used → most stale
+            base = len(recent) + 1                # never used → most stale
+        return base * w.get(s["id"], 1.0)
     # most stale (or never used); ties break by STORIES order for determinism
     return max(fits, key=lambda s: (staleness(s), -STORIES.index(s)))
 

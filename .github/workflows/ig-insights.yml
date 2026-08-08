@@ -58,14 +58,20 @@ jobs:
       - name: Poll matured posts
         run: python3 -m automation.ig_insights
 
-      - name: Commit insights artifact
+      - name: Rebuild Growth Hacker scoreboard
+        # The Learn half: rejoin engagement→story/emotion/category and rewrite
+        # web/data/ig_learning.json, which the autopilot reads (behind
+        # IG_LEARNING_ENABLED) to bias story selection toward winners.
+        run: python3 -m automation.ig_learning
+
+      - name: Commit insights + scoreboard artifacts
         run: |
-          git add web/data/ig_insights.jsonl
+          git add web/data/ig_insights.jsonl web/data/ig_learning.json
           if git diff --cached --quiet; then
             echo "[ig-insights] no new rows — nothing to commit"
             exit 0
           fi
-          git commit -m "chore(ig): insights poll (per-post metrics)"
+          git commit -m "chore(ig): insights poll + learning scoreboard"
           # main can move under us between checkout and push; rebase our
           # single artifact commit on top, matching the nightly invariant.
           git fetch origin main

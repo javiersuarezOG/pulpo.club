@@ -455,6 +455,12 @@ def _build_log_entry(item: dict, status: str, error: Optional[str] = None) -> di
         "status":          status,   # "posted" | "failed"
         "caption_preview": preview,
         "slides":          1 + len(item.get("carousel_photo_paths") or []),
+        # Content dimensions the Growth Hacker learns on (ig_learning.py).
+        # Stamped at publish time so the engagement→content join survives
+        # the queue item being pruned. Omitted keys default to None downstream.
+        "story_id":        item.get("story_id"),
+        "emotion":         item.get("emotion"),
+        "color_key":       item.get("color_key"),
     }
     if status == "posted":
         entry["media_id"] = item.get("posted_media_id")
