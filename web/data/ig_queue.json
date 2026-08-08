@@ -823,9 +823,11 @@
       "humor": "apology",
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-08-08T17:55:28.165921+00:00",
+      "posted_media_id": "18111802031066608",
+      "comment_posted": true,
+      "comment_id": "18083308550302249"
     },
     {
       "day": 248,
