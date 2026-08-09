@@ -30,6 +30,11 @@ def test_offline_pipeline_produces_ranked_json(tmp_path, monkeypatch):
 
     import automation.run as run_mod  # noqa: E402
 
+    # The purge above discarded conftest's redirects; re-apply so the
+    # self-resolving writers land in tmp_path, not committed web/data.
+    from tests._isolation import isolate_data_writers  # noqa: E402
+    isolate_data_writers(tmp_path)
+
     with mock.patch.object(run_mod, "REPO", tmp_path):
         # run.py uses REPO / "web" / "data" for output paths
         (tmp_path / "web" / "data").mkdir(parents=True, exist_ok=True)
