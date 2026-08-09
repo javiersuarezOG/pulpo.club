@@ -42,9 +42,72 @@ Vercel will auto-generate a preview URL on the PR.
 ```bash
 gh pr merge <NUM> --auto --squash --delete-branch
 ```
-The `--auto` flag queues the merge to fire as soon as required checks pass. Auto-merge is enabled at the repo level. Required checks (`pytest`, `frontend (typecheck + build)`, `Vercel`) typically complete in ~1 minute — `--auto` eliminates the "Expected — Waiting" race that happens if you try to merge immediately after `gh pr create`.
+The `--auto` flag queues the merge to fire as soon as required checks pass. Auto-merge is enabled at the repo level. `--auto` eliminates the "Expected — Waiting" race that happens if you try to merge immediately after `gh pr create`.
 
 **Do NOT use `--admin` to bypass branch protection** unless a check is genuinely stuck or broken. The recurring "Expected, waiting" state is almost always transient (CI hasn't started yet); `--auto` handles it cleanly. Reserve `--admin` for the data-PR fallback path documented in `pulpo-nightly.yml`.
+
+#### `--auto` does NOT fix `BEHIND` (measured 2026-08-08)
+
+Two claims in the paragraph above were wrong, and the correction matters
+because it changes what you do when a PR won't land.
+
+**The required checks are `pytest` and `Vercel`** — read them from
+`gh api repos/javiersuarezOG/pulpo.club/branches/main/protection`, not
+from the checks list on the PR page (which shows many non-required
+runs). **`pytest` takes ~9 minutes**, not the ~1 minute this file used
+to claim. That number is load-bearing for everything below.
+
+**`--auto` waits for a current branch; it does not make one current.**
+Branch protection has `required_status_checks.strict = true` ("require
+branches to be up to date before merging"), so any push to `main` flips
+every open PR to `mergeStateStatus = BEHIND`. An auto-merge-armed PR in
+that state **sits there indefinitely** — observed on #1131 for 13
+consecutive minutes with auto-merge on, never self-updating.
+`gh pr update-branch <NUM>` is what clears `BEHIND`, and it restarts the
+~9-minute `pytest` clock.
+
+**Why that becomes a livelock.** `main` is pushed to more often than the
+checks take to run. Measured over one afternoon (12:00–19:00 UTC
+2026-08-08): **19 pushes, median gap 14.4 min, 6 of 18 gaps under 9
+minutes.** Ten workflows push to `main` (`ig-publish` hourly, plus
+`ig-autopilot`, `ig-queue-apply`, `ig-insights`, `pulpo-nightly`,
+`pulpo-row-count-sentinel`, `pulpo-url-drift`, `pulpo-probe-audit`,
+`repick-heroes`, `scrape-shim`) — **and every merged PR pushes a commit
+too**, so merging PR A knocks PR B back to `BEHIND`. With N open PRs you
+need N sequential update-and-wait cycles, and any push during one
+restarts it. This is why "update the branch" appears to loop forever
+regardless of which PR you start with.
+
+A one-line caption fix (#1131) lost this race three times running —
+killed at 18:32 by another PR's merge, at 18:45 by a second PR's merge,
+at 19:03 by two bot ticks — burning ~27 minutes of CI before finally
+landing hours later in a quiet evening window.
+
+**What to do when a PR is stuck at `BEHIND`:**
+
+1. `gh pr update-branch <NUM>`, keep `--auto` armed, and let it ride.
+   This works whenever nothing else is landing.
+2. **Do not retry in a loop.** Three failed attempts is the signal that
+   the repo is too busy right now; each retry costs ~9 min of Actions
+   minutes at roughly even odds. Stop and say so plainly.
+3. The durable fix is turning `strict` off. `pytest` + `Vercel` still
+   gate every merge; force-push and deletion stay blocked. What you give
+   up is a rule that mostly re-blocks PRs when an unrelated IG queue
+   file changes:
+   ```bash
+   gh api -X PATCH repos/javiersuarezOG/pulpo.club/branches/main/protection/required_status_checks -F strict=false
+   ```
+   **This is Sebastian's/Javi's call, not an agent's** — it loosens
+   protection on `main`. Agents surface the option and the measurement;
+   a human runs it.
+
+**Auto-merge can be switched on from the GitHub UI by mis-click.** The
+"Enable auto-merge" button sits next to "Update branch", and on
+2026-08-08 #1128 — a PR explicitly held for a visual dry-run — was found
+armed. Before holding any PR for a gate, verify with
+`gh pr view <NUM> --json autoMergeRequest` and disarm with
+`gh pr merge <NUM> --disable-auto`. A held PR is only held if auto-merge
+is actually off.
 
 If a local-merge attempt to `main` fails with `protected branch hook declined`, that's the protection rule firing — roll back with `git reset --hard origin/main` and open a PR.
 
