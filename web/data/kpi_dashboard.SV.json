@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-08T17:27:25.593207+00:00",
+  "computed_at": "2026-08-09T04:37:25.730333+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 14,
@@ -13,7 +13,7 @@
         "renders_on_homepage": true
       },
       "beach_land": {
-        "count": 488,
+        "count": 487,
         "renders_on_homepage": true
       },
       "lake_condos": {
@@ -143,8 +143,8 @@
         "target_prd": null
       },
       "santizo": {
-        "coverage_pct_vs_discovered": 60.0,
-        "kept": 90,
+        "coverage_pct_vs_discovered": 59.3,
+        "kept": 89,
         "status": "green",
         "target_discovered": null,
         "target_prd": 150
@@ -168,7 +168,7 @@
     "registered_sources": 19,
     "shelves_rendering": 5,
     "shelves_total": 6,
-    "total_in_dataset": 1861,
+    "total_in_dataset": 1860,
     "total_visible_listings": 1647
   },
   "min_real_listings": 4
