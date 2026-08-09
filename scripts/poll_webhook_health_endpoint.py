@@ -51,7 +51,36 @@ def main() -> int:
     token = env("PULPO_CRON_SECRET")
     slack_url = env("SLACK_WEBHOOK_URL")
     if not token:
-        print("[poll] PULPO_CRON_SECRET unset — cannot authenticate", file=sys.stderr)
+        # A MISCONFIGURED MONITOR IS NOT A WEBHOOK OUTAGE — say so.
+        #
+        # This branch used to `return 1` silently, with no Slack post. The
+        # only alert was the workflow's generic "JOB FAILED — monitor may
+        # be silent", which never named the cause. The result: 299 runs
+        # and ZERO real successes since the workflow was created on
+        # 2026-05-27 — Clerk/Resend webhook liveness has never once been
+        # checked — because every page looked identical and unactionable,
+        # so they became wallpaper. (The single "success", 2026-07-05, was
+        # a `test_slack` dispatch that skips the checks by design.)
+        #
+        # PULPO_CRON_SECRET exists in NEITHER the Vercel project env nor
+        # the GitHub repo secrets, so it must be CREATED in both with the
+        # same value — it is not a copy-across. The endpoint fails closed
+        # on an unset secret (`if not expected: return False`), so the 401
+        # it serves is correct behaviour, not an outage, and there is no
+        # auth-bypass exposure from the gap.
+        msg = (
+            "PULPO_CRON_SECRET is not set, so the webhook-health poll "
+            "cannot authenticate. This is a MONITOR MISCONFIGURATION, not "
+            "a webhook outage — Clerk/Resend liveness is currently "
+            "UNMONITORED. Fix: create PULPO_CRON_SECRET with the same "
+            "value in BOTH the Vercel project env and the GitHub repo "
+            "secrets, then redeploy Vercel so the function picks it up."
+        )
+        print(f"[poll] {msg}", file=sys.stderr)
+        # GitHub annotation so the cause is on the run summary, not
+        # buried in a step log nobody expands.
+        print(f"::error title=webhook-health monitor misconfigured::{msg}")
+        post_slack(slack_url, f":rotating_light: *Pulpo webhook-health MISCONFIGURED* — {msg}")
         return 1
 
     req = urllib.request.Request(
