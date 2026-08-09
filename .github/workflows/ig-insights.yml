@@ -69,14 +69,20 @@ jobs:
         # IG_LEARNING_ENABLED) to bias story selection toward winners.
         run: python3 -m automation.ig_learning
 
-      - name: Commit insights + scoreboard artifacts
+      - name: Rebuild cross-surface priors
+        # Cold-start seed: read on-site listing engagement from PostHog and
+        # write category/zone priors (web/data/ig_priors.json) so the loop
+        # starts smart. No PostHog key → empty priors, no behavior change.
+        run: python3 -m automation.ig_priors
+
+      - name: Commit insights + scoreboard + priors artifacts
         run: |
-          git add web/data/ig_insights.jsonl web/data/ig_learning.json
+          git add web/data/ig_insights.jsonl web/data/ig_learning.json web/data/ig_priors.json
           if git diff --cached --quiet; then
             echo "[ig-insights] no new rows — nothing to commit"
             exit 0
           fi
-          git commit -m "chore(ig): insights poll + learning scoreboard"
+          git commit -m "chore(ig): insights poll + learning scoreboard + priors"
           # main can move under us between checkout and push; rebase our
           # single artifact commit on top, matching the nightly invariant.
           git fetch origin main
