@@ -14,11 +14,11 @@
 //
 // Triggers the `pulpo-newsletter` GitHub Actions workflow with
 // `preview_cohorts=<email>`. The workflow runs the production Python
-// pipeline (automation/newsletter/*) end-to-end and sends three real
-// emails — one per cohort variant (anonymous, free_prefs, pro_prefs) —
-// to the operator-supplied address. Subjects are prefixed
-// `[PULPO PREVIEW · <cohort>]` so they're trivially distinguishable from
-// real audience sends.
+// pipeline (automation/newsletter/*) end-to-end and sends one real
+// Pro-with-preferences preview to the operator-supplied address. The
+// subject is prefixed `[PULPO PREVIEW · pro_prefs]` so it is trivially
+// distinguishable from a real audience send. Free Weekly uses the same
+// synthetic recipient but routes through its own free template.
 //
 // Why a workflow dispatch and not a Node Resend call: the production
 // renderer is Python, and we deliberately do not maintain a parallel
