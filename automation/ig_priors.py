@@ -73,9 +73,11 @@ def _listing_index(ranked_path: Optional[Path] = None) -> dict:
     return out
 
 
-def fetch_listing_intent(*, window_days: int = WINDOW_DAYS) -> dict:
+def fetch_listing_intent(*, window_days: int = WINDOW_DAYS, query_fn=None) -> dict:
     """Per-listing intent from PostHog: {listing_id: {clicks, paywall_hits}}.
-    Empty {} when the read key is absent or the query fails (soft-fail)."""
+    Empty {} when the read key is absent or the query fails (soft-fail).
+    ``query_fn`` is injectable for tests (defaults to the real reader)."""
+    q = query_fn or _pq.query
     hogql = (
         "SELECT properties.listing_id AS lid, "
         "countIf(event = 'card.clicked') AS clicks, "
@@ -86,7 +88,7 @@ def fetch_listing_intent(*, window_days: int = WINDOW_DAYS) -> dict:
         f"AND timestamp > now() - INTERVAL {int(window_days)} DAY "
         "GROUP BY lid"
     )
-    rows = _pq.query(hogql)
+    rows = q(hogql)
     if not rows:
         return {}
     out: dict = {}

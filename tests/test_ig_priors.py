@@ -17,7 +17,6 @@ from automation.ig_priors import (   # noqa: E402
     MIN_LISTINGS,
     build_priors,
     fetch_listing_intent,
-    run,
 )
 
 
@@ -84,19 +83,16 @@ def test_zone_priors_aggregate_independently():
 
 # ── PostHog reader soft-fail ───────────────────────────────────────────
 
-def test_fetch_listing_intent_maps_rows(monkeypatch):
-    import automation.ig_priors as P
+def test_fetch_listing_intent_maps_rows():
+    # inject the query fn (no shared-module monkeypatch → immune to test order)
     rows = [{"lid": "remax__1", "clicks": 4, "paywall_hits": 2},
             {"lid": "", "clicks": 9, "paywall_hits": 9}]   # blank lid ignored
-    monkeypatch.setattr(P._pq, "query", lambda *a, **k: rows)
-    got = fetch_listing_intent()
+    got = fetch_listing_intent(query_fn=lambda *a, **k: rows)
     assert got == {"remax__1": {"clicks": 4, "paywall_hits": 2}}
 
 
-def test_fetch_listing_intent_softfails_to_empty(monkeypatch):
-    import automation.ig_priors as P
-    monkeypatch.setattr(P._pq, "query", lambda *a, **k: None)   # no key
-    assert fetch_listing_intent() == {}
+def test_fetch_listing_intent_softfails_to_empty():
+    assert fetch_listing_intent(query_fn=lambda *a, **k: None) == {}   # no key
 
 
 # ── run(): writes the artifact ─────────────────────────────────────────
@@ -111,10 +107,15 @@ def test_run_writes_priors(tmp_path, monkeypatch):
     out = tmp_path / "ig_priors.json"
     monkeypatch.setattr(P, "RANKED_PATH", ranked)
     monkeypatch.setattr(P, "PRIORS_ARTIFACT", out)
-    monkeypatch.setattr(P._pq, "query", lambda *a, **k:
-                        [{"lid": f"a__{i}", "clicks": 1, "paywall_hits": 3}
-                         for i in range(MIN_LISTINGS)])
-    n = run()
+    # patch the module's OWN function (not the shared _pq module) so this is
+    # immune to test-order pollution under pytest-randomly.
+    monkeypatch.setattr(P, "fetch_listing_intent",
+                        lambda **k: {f"a__{i}": {"clicks": 1, "paywall_hits": 3}
+                                     for i in range(MIN_LISTINGS)})
+    # call P.run (same module object as the patches) — the top-level-imported
+    # run() can belong to a second import identity under pytest, so patching P
+    # wouldn't reach it (the double-import gotcha).
+    n = P.run()
     assert n == MIN_LISTINGS
     board = json.loads(out.read_text())
     # coastal house → casas_playa should be present + trusted
