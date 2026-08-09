@@ -65,12 +65,25 @@ class HTTPCallError(RuntimeError):
         self.detail = detail
 
 
+# Cloudflare fronts api.clerk.com and blocks the default
+# `Python-urllib/3.x` UA with error 1010 BEFORE auth is evaluated — the
+# real cause of the 1010s PR #642 attributed to the GH-Actions runner.
+# Any plain descriptive UA passes the edge; do NOT impersonate a browser.
+# See the measurement table in api/cron/webhook-health.py.
+USER_AGENT = "pulpo-monitor/1.0 (+https://pulpo.club)"
+
+
 def request_json(method: str, url: str, headers: dict[str, str] | None = None, payload: dict | None = None) -> dict:
     data = json.dumps(payload).encode("utf-8") if payload is not None else None
     req = urllib.request.Request(
         url,
         data=data,
-        headers={**(headers or {}), **({"Content-Type": "application/json"} if payload is not None else {})},
+        headers={
+            # First so an explicit caller-supplied UA still wins.
+            "User-Agent": USER_AGENT,
+            **(headers or {}),
+            **({"Content-Type": "application/json"} if payload is not None else {}),
+        },
         method=method,
     )
     try:
