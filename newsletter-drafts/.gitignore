@@ -2,4 +2,10 @@
 # and read live ranked.json, so they'd churn on every pipeline run. Only the
 # hand-authored design reference (pulpo-issue-01-*.html) is tracked.
 dryrun-*.html
+# `real-*.html` is the same renderer output under the newer naming the
+# dry-run script adopted after the free-tier split — they carry an
+# `x-pulpo-template` meta tag and rebuild from the same command. The
+# original `dryrun-*` pattern never followed the rename, so eight of
+# them sat untracked in `git status` for a month before anyone noticed.
+real-*.html
 *.pdf

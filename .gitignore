@@ -79,3 +79,9 @@ stripe-welcometopulpo-discount.png
 # reads today's dir); never served (/photos/:file is one segment) and never needed
 # across runs. Keeping it in git bloated the repo to 11GB / broke deploys.
 web/photos/_archive/
+
+# Per-call LLM spend log, appended by automation/llm_cost_guard.py on every
+# local pipeline run. A working-tree breadcrumb, not shipped data — the
+# nightly's commit step lists every web/data file it wants by name and has
+# never included this one.
+web/data/llm_cost_history.jsonl
