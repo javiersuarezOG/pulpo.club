@@ -62,21 +62,105 @@ def _hermetic_offline_env():
             os.environ[key] = value
 
 
+# ---------------------------------------------------------------------
+# Guardrail: a test run must not mutate committed data files.
+#
+# Found 2026-08-09: `PULPO_OFFLINE=1 pytest -q` left three tracked files
+# dirty — picker_excluded.json, scraper_coverage_history.jsonl,
+# unmapped_beaches_history.jsonl. tests/test_first_seen.py drives the
+# real pipeline, and while it patches `run.REPO` to a tmp dir, those
+# writers re-derived their own paths from `__file__` and escaped the
+# redirect. picker_excluded additionally had its isolation fixture
+# below thrown away by that test's `sys.modules` purge.
+#
+# Nothing failed — the files just showed up modified afterwards, one
+# careless `git add -A` away from a bogus data commit.
+#
+# This compares tracked files under web/data/ before and after the
+# session and fails the run if any NEWLY changed. Pre-existing local
+# dirt is ignored, so a dev mid-edit isn't punished.
+# ---------------------------------------------------------------------
+_WATCHED_DATA_DIR = "web/data"
+
+
+def _dirty_data_files() -> set[str]:
+    """Tracked-but-modified paths under web/data. Returns empty when git
+    is unavailable so the guard degrades to a no-op in a non-git
+    checkout rather than breaking the suite."""
+    import subprocess
+    try:
+        out = subprocess.run(
+            ["git", "status", "--porcelain", "--", _WATCHED_DATA_DIR],
+            cwd=Path(__file__).resolve().parent,
+            capture_output=True, text=True, timeout=30,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return set()
+    if out.returncode != 0:
+        return set()
+    dirty = set()
+    for line in out.stdout.splitlines():
+        # '??' is untracked — pipeline byproducts we deliberately don't
+        # track are not the failure mode this guards against.
+        if line and not line.startswith("??"):
+            path = line[3:].strip()
+            if path:
+                dirty.add(path)
+    return dirty
+
+
+@pytest.fixture(autouse=True, scope="session")
+def _no_committed_data_mutation():
+    before = _dirty_data_files()
+    yield
+    newly = sorted(_dirty_data_files() - before)
+    if newly:
+        raise AssertionError(
+            "Test run modified committed data files under "
+            f"{_WATCHED_DATA_DIR}/:\n  " + "\n  ".join(newly)
+            + "\n\nA test drove production code that wrote to the real repo "
+              "instead of tmp_path. Give the writer a path derived from the "
+              "caller's REPO (see the coverage_logger / unmapped_beach_detector "
+              "calls in automation/run.py), or add an isolation fixture next "
+              "to _isolate_picker_excluded_store below.\n"
+              f"Restore with: git checkout -- {_WATCHED_DATA_DIR}"
+        )
+
+
 @pytest.fixture(autouse=True)
-def _isolate_picker_excluded_store(tmp_path_factory):
-    """Redirect web/data/picker_excluded.json into a per-test tmp file so
-    any test that exercises automation/run.py's _score_candidates_cheap
-    can't pollute the real on-disk store. Test-only file separation, no
-    behavioral change for production code paths."""
+def _isolate_self_resolving_data_writers(tmp_path_factory):
+    """Redirect the modules that build a `web/data` path from their own
+    `__file__` (picker_excluded, aesthetic_vision) into a per-test tmp
+    dir, so any test exercising the pipeline can't pollute the committed
+    stores. Test-only file separation, no behavioral change for
+    production code paths.
+
+    Tests that purge `automation.*` from `sys.modules` defeat this — the
+    re-imported module is a different object. Those call
+    `tests._isolation.isolate_data_writers` again after their import;
+    see that module for the list.
+    """
+    from tests._isolation import isolate_data_writers
+
+    originals = {}
     try:
         from automation import picker_excluded as pe
-    except Exception:
-        yield
-        return
-    original = pe._STORE_PATH
-    tmp_dir = tmp_path_factory.mktemp("picker_excluded")
-    pe._set_store_path_for_testing(tmp_dir / "picker_excluded.json")
+        originals["pe"] = (pe, pe._STORE_PATH)
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        from automation import aesthetic_vision as av
+        originals["av"] = (av, av._REPO_ROOT)
+    except Exception:  # noqa: BLE001
+        pass
+
+    isolate_data_writers(tmp_path_factory.mktemp("data_writers"))
     try:
         yield
     finally:
-        pe._set_store_path_for_testing(original)
+        if "pe" in originals:
+            mod, val = originals["pe"]
+            mod._set_store_path_for_testing(val)
+        if "av" in originals:
+            mod, val = originals["av"]
+            mod._REPO_ROOT = val

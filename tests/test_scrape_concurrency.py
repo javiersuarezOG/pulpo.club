@@ -51,6 +51,12 @@ def _run_offline(run_mod, repo_dir, *, monkeypatch, concurrency,
     (repo_dir / "web" / "data").mkdir(parents=True, exist_ok=True)
     (repo_dir / "samples").mkdir(exist_ok=True)
 
+    # This module purges automation.* from sys.modules before importing
+    # run_mod, which discards conftest's redirects. Re-apply so the
+    # self-resolving writers land in repo_dir, not committed web/data.
+    from tests._isolation import isolate_data_writers
+    isolate_data_writers(repo_dir)
+
     if fail_source is not None:
         class _Boom:
             # No crawl_with_meta attr → takes the plain crawl() path in
