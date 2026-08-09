@@ -39,10 +39,14 @@ from automation.ig_story_series import _color_key
 RANKED_PATH = Path("web/data/ranked.json")
 PRIORS_ARTIFACT = Path("web/data/ig_priors.json")
 
-WINDOW_DAYS = 30
-# A category/zone needs this many distinct signal-bearing listings before
-# its prior is trusted — else neutral, so one hot listing can't swing it.
-MIN_LISTINGS = 4
+# 60d (was 30d): on-site listing-click volume is thin, so widen the window
+# to accumulate more signal-bearing listings per category/zone (2026-08-09).
+WINDOW_DAYS = 60
+# A category/zone needs this many distinct signal-bearing listings before its
+# prior is trusted — else neutral, so one hot listing can't swing it. Dropped
+# 4→3 (2026-08-09) so the thin-but-directional early signal can steer; the
+# ≥2-trusted guard in _normalize still prevents a single bucket dominating.
+MIN_LISTINGS = 3
 
 # Intent weights: a paywall hit (clicked a listing, hit the wall) is strong
 # buying intent; a card click is browsing. Signups are site-level (not tied
