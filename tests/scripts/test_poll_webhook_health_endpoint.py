@@ -31,12 +31,70 @@ def _ok_response(payload: dict):
     return res
 
 
-def test_exits_one_when_token_missing(monkeypatch, capsys):
+def _no_token(monkeypatch):
+    """Unset both so the misconfig path runs without touching the network."""
     monkeypatch.delenv("PULPO_CRON_SECRET", raising=False)
+    monkeypatch.delenv("SLACK_WEBHOOK_URL", raising=False)
+
+
+def test_exits_one_when_token_missing(monkeypatch, capsys):
+    _no_token(monkeypatch)
     rc = poll.main()
     assert rc == 1
-    err = capsys.readouterr().err
-    assert "PULPO_CRON_SECRET unset" in err
+    assert "PULPO_CRON_SECRET" in capsys.readouterr().err
+
+
+# --- misconfiguration must be loud AND distinguishable from an outage ---
+#
+# Regression guard (2026-08-09): this branch used to `return 1` with no
+# Slack post, so the only alert was the workflow's generic "JOB FAILED —
+# monitor may be silent", which never named the cause. The poller then
+# ran 100 consecutive failing runs (at least 2026-07-15 → 2026-08-09,
+# ~25 days) with Clerk/Resend liveness entirely unmonitored, because
+# every page looked identical and unactionable.
+#
+# The bug class is NOT "the secret is missing" — that's an ops fact that
+# changes. It's a misconfigured monitor being indistinguishable from a
+# real outage: both exit 1 and go red, and only the message tells them
+# apart. So these assert on the message, not the exit code.
+
+
+def test_missing_token_pages_slack(monkeypatch):
+    """The silent branch is the actual bug."""
+    _no_token(monkeypatch)
+    sent: list[str] = []
+    monkeypatch.setattr(poll, "post_slack", lambda url, text: sent.append(text))
+    poll.main()
+    assert len(sent) == 1, "misconfiguration must page, not fail silently"
+
+
+def test_missing_token_message_is_actionable(monkeypatch, capsys):
+    """Naming the secret + remediation is what makes the page actionable."""
+    _no_token(monkeypatch)
+    sent: list[str] = []
+    monkeypatch.setattr(poll, "post_slack", lambda url, text: sent.append(text))
+    poll.main()
+    blob = sent[0] + capsys.readouterr().err
+    assert "PULPO_CRON_SECRET" in blob, "the alert must name the missing secret"
+    assert "Vercel" in blob, "the alert must carry the remediation"
+
+
+def test_missing_token_not_reported_as_outage(monkeypatch):
+    """A misconfigured monitor must never read as 'the webhooks are down'."""
+    _no_token(monkeypatch)
+    sent: list[str] = []
+    monkeypatch.setattr(poll, "post_slack", lambda url, text: sent.append(text))
+    poll.main()
+    assert "misconfigur" in sent[0].lower()
+    assert "not a webhook outage" in sent[0].lower()
+
+
+def test_missing_token_emits_github_annotation(monkeypatch, capsys):
+    """Surfaces the cause on the run summary, not a collapsed step log."""
+    _no_token(monkeypatch)
+    monkeypatch.setattr(poll, "post_slack", lambda url, text: None)
+    poll.main()
+    assert "::error title=" in capsys.readouterr().out
 
 
 def test_green_when_both_providers_ok(monkeypatch):
