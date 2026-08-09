@@ -35,6 +35,14 @@ def _run_pipeline_into(tmp_path: Path) -> list[dict]:
 
     (tmp_path / "web" / "data").mkdir(parents=True, exist_ok=True)
     (tmp_path / "samples").mkdir(exist_ok=True)
+
+    # The module purge above discards the module objects conftest's
+    # autouse fixture had already redirected, so the re-import restores
+    # the real committed paths. Re-apply after the re-import — see
+    # tests/_isolation.py for the full explanation.
+    from tests._isolation import isolate_data_writers  # noqa: E402
+    isolate_data_writers(tmp_path)
+
     with mock.patch.object(run_mod, "REPO", tmp_path):
         exit_code = run_mod.main()
     assert exit_code == 0, "pipeline failed"

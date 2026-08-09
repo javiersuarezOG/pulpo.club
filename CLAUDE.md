@@ -148,6 +148,24 @@ pip install --upgrade --force-reinstall Pillow
 ```
 The failure is purely a local-env artifact; do NOT change the photo-pipeline code to "work around" it.
 
+### Local-only pytest failure: `int.bit_count()` on Python 3.9 (post-2026-08-09)
+
+If `PULPO_OFFLINE=1 pytest -q` fails LOCALLY on all 7 tests in
+`tests/test_image_hash.py` with `AttributeError: 'int' object has no
+attribute 'bit_count'` (raised from `automation/image_hash.py`), you are
+running pytest under **Python 3.9**. `int.bit_count()` was added in
+**3.10**, which is what `ci.yml` pins (`python-version: "3.10"`), so CI
+is unaffected.
+
+Check with `python3 -V`. macOS ships 3.9 at
+`/Library/Developer/CommandLineTools/.../Versions/3.9/`, and that's what
+a bare `python3 -m pytest` picks up unless a 3.10+ venv is active. Fix by
+running the suite in a 3.10+ environment.
+
+Same class as the libjpeg mismatch above: **a local-env artifact — do
+NOT add a `bit_count` fallback shim to `image_hash.py` to "fix" it.**
+The floor is 3.10 because CI says so.
+
 ## NEVER ship a /preview crash again — null-safety + smoke test (post-2026-05-07)
 
 **Two crashes shipped in two PRs.** That's twice too many. The pattern was the same both times: a real listing's field was null where the prototype's mock was always populated. Components called `.toFixed()` / `.length` directly without a null guard, ErrorBoundary fired, page blanked.

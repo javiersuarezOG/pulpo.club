@@ -2340,6 +2340,12 @@ def main() -> int:
                 target_prd=_target_prd if isinstance(_target_prd, int) else None,
                 target_discovered=None,  # populated by Phase C scrapers' own
                                          # crawl()-time discover_target call
+                # Pass the path from OUR repo root rather than letting the
+                # callee re-derive it from its own __file__. Same file in
+                # production; the difference is that tests which patch
+                # run.REPO now redirect this write too, instead of
+                # appending to the committed web/data/ copy.
+                path=web_data_dir / "scraper_coverage_history.jsonl",
             )
             if _row.get("status") == "warn":
                 _coverage_warn += 1
@@ -2529,7 +2535,12 @@ def main() -> int:
     # automation/distance_fields.py — see docs/named-beach-reference.md).
     try:
         from automation.unmapped_beach_detector import detect_unmapped_beach_clusters
-        ub = detect_unmapped_beach_clusters(listings)
+        # history_path from OUR repo root — see the coverage_logger call
+        # above for why we don't let the callee re-derive it.
+        ub = detect_unmapped_beach_clusters(
+            listings,
+            history_path=web_data_dir / "unmapped_beaches_history.jsonl",
+        )
         if ub["suspect_count"]:
             print(f"[unmapped_beaches] suspects={ub['suspect_count']} "
                   f"clusters={ub['cluster_count']}")
