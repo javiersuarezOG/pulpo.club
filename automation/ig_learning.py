@@ -33,12 +33,14 @@ returns 0 on any I/O trouble. Offline/CI safe (no network, no token).
 from __future__ import annotations
 
 import json
+import re
 from collections import defaultdict
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
 from automation._atomic import atomic_write_json
+from automation import posthog_query as _pq
 
 INSIGHTS_ARTIFACT = Path("web/data/ig_insights.jsonl")
 QUEUE_PATH = Path("web/data/ig_queue.json")
@@ -56,8 +58,22 @@ _W_SHARES = 3.0
 _W_COMMENTS = 2.0
 _W_LIKES = 1.0
 
+# A signup is the money metric, so it dominates engagement when present:
+# one signup per 100 people reached adds 0.5 to a post's score, dwarfing a
+# typical engagement rate (~0.1). A Pro signup is worth PRO_MULT free ones.
+_W_SIGNUP = 50.0
+_PRO_MULT = 3.0
+
 # The three dimensions the autopilot can steer on.
 DIMENSIONS = ("story_id", "emotion", "color_key")
+
+
+def _reach(metrics: dict) -> float:
+    """The reach denominator for a post: reach, else views (Reels), else 0."""
+    def _n(key: str) -> float:
+        v = metrics.get(key)
+        return float(v) if isinstance(v, (int, float)) else 0.0
+    return _n("reach") or _n("views")
 
 
 def engagement_score(metrics: dict) -> Optional[float]:
@@ -65,21 +81,69 @@ def engagement_score(metrics: dict) -> Optional[float]:
     scored (no metrics / no reach signal). Never raises."""
     if not isinstance(metrics, dict) or not metrics:
         return None
+    reach = _reach(metrics)
+    if reach <= 0:
+        return None
 
     def _n(key: str) -> float:
         v = metrics.get(key)
         return float(v) if isinstance(v, (int, float)) else 0.0
 
-    reach = _n("reach")
-    if reach <= 0:
-        # Without reach we can't normalize; fall back to raw views so a
-        # post with plays but no reach signal isn't silently dropped.
-        reach = _n("views")
-    if reach <= 0:
-        return None
     raw = (_W_SAVED * _n("saved") + _W_SHARES * _n("shares")
            + _W_COMMENTS * _n("comments") + _W_LIKES * _n("likes"))
     return raw / reach
+
+
+def _signup_bonus(day, reach: float, signups_by_day: dict) -> float:
+    """Reach-normalized, Pro-weighted signup term for a post's day. 0 when
+    there's no attribution data for that day (v1 behavior)."""
+    if not signups_by_day or reach <= 0:
+        return 0.0
+    sd = signups_by_day.get(day) or {}
+    weighted = float(sd.get("free", 0)) + _PRO_MULT * float(sd.get("pro", 0))
+    if weighted <= 0:
+        return 0.0
+    return _W_SIGNUP * weighted / reach
+
+
+def parse_code_day(code) -> Optional[int]:
+    """Extract the day from a /go attribution code 'ig-d<day>-<lever>[-pro]'.
+    None if it isn't one of ours (so foreign utm_content is ignored)."""
+    if not isinstance(code, str):
+        return None
+    m = re.match(r"^ig-d(\d{1,4})-", code.strip().lower())
+    return int(m.group(1)) if m else None
+
+
+def fetch_signups_by_day(*, window_days: int = 30) -> dict:
+    """Query PostHog for IG-attributed signups grouped by post day. Free =
+    newsletter.signup, Pro = webhook.checkout_completed, matched on the
+    utm_content the /go router stamps. Returns {day: {'free': n, 'pro': m}};
+    empty {} when the read key is absent or the query fails (soft-fail →
+    engagement-only learning)."""
+    hogql = (
+        "SELECT properties.utm_content AS code, event, count() AS n "
+        "FROM events "
+        "WHERE event IN ('newsletter.signup', 'webhook.checkout_completed') "
+        "AND properties.utm_content LIKE 'ig-d%' "
+        f"AND timestamp > now() - INTERVAL {int(window_days)} DAY "
+        "GROUP BY code, event"
+    )
+    rows = _pq.query(hogql)
+    if not rows:
+        return {}
+    out: dict = {}
+    for r in rows:
+        day = parse_code_day(r.get("code"))
+        if day is None:
+            continue
+        n = int(r.get("n") or 0)
+        bucket = out.setdefault(day, {"free": 0, "pro": 0})
+        if r.get("event") == "webhook.checkout_completed":
+            bucket["pro"] += n
+        else:
+            bucket["free"] += n
+    return out
 
 
 def _load_queue_metadata(queue_path: Path) -> dict:
@@ -146,19 +210,28 @@ def _best_per_media(rows: list[dict]) -> dict:
 
 
 def build_scoreboard(
-    rows: list[dict], queue_meta: Optional[dict] = None, *, now_iso: str = ""
+    rows: list[dict], queue_meta: Optional[dict] = None,
+    signups_by_day: Optional[dict] = None, *, now_iso: str = ""
 ) -> dict:
-    """Pure: turn insights rows + queue metadata into the scoreboard dict.
-    Deterministic; never raises on a bad row (skips it)."""
+    """Pure: turn insights rows + queue metadata (+ optional attributed
+    signups) into the scoreboard dict. Deterministic; never raises on a bad
+    row (skips it). ``signups_by_day`` None/empty → engagement-only (v1)."""
     queue_meta = queue_meta or {}
     scored = _best_per_media(rows)
 
     per_dim: dict = {d: defaultdict(list) for d in DIMENSIONS}
     n_posts = 0
+    total_signups = {"free": 0, "pro": 0}
+    for day_sd in (signups_by_day or {}).values():
+        total_signups["free"] += int(day_sd.get("free", 0))
+        total_signups["pro"] += int(day_sd.get("pro", 0))
     for row in scored.values():
-        score = engagement_score(row.get("metrics"))
-        if score is None:
+        eng = engagement_score(row.get("metrics"))
+        if eng is None:
             continue
+        # Blend the money metric in: engagement + reach-normalized signups.
+        score = eng + _signup_bonus(row.get("day"), _reach(row.get("metrics") or {}),
+                                    signups_by_day or {})
         meta = _resolve_meta(row, queue_meta)
         counted = False
         for dim in DIMENSIONS:
@@ -173,6 +246,8 @@ def build_scoreboard(
         "computed_at": now_iso,
         "n_posts_scored": n_posts,
         "min_samples": MIN_SAMPLES,
+        "signups_attributed": total_signups,
+        "scored_on": "engagement+signups" if signups_by_day else "engagement",
         "dimensions": {},
         "leaders": {},
     }
@@ -218,14 +293,19 @@ def run(*, now: Optional[datetime] = None) -> int:
     now = now or datetime.now(timezone.utc)
     rows = _read_rows(INSIGHTS_ARTIFACT)
     queue_meta = _load_queue_metadata(QUEUE_PATH)
-    board = build_scoreboard(rows, queue_meta, now_iso=now.isoformat())
+    # Money-metric half: attributed signups per post day (empty when the
+    # PostHog read key is absent → engagement-only, exactly like v1).
+    signups_by_day = fetch_signups_by_day()
+    board = build_scoreboard(rows, queue_meta, signups_by_day, now_iso=now.isoformat())
     try:
         atomic_write_json(LEARNING_ARTIFACT, board)
     except OSError as err:  # pragma: no cover - disk trouble
         print(f"[ig_learning] write failed: {err}")
         return 0
     lead = board["leaders"]
-    print(f"[ig_learning] scored {board['n_posts_scored']} post(s) → "
+    su = board["signups_attributed"]
+    print(f"[ig_learning] scored {board['n_posts_scored']} post(s) on "
+          f"{board['scored_on']} (signups free={su['free']} pro={su['pro']}) → "
           f"story={lead.get('story_id')} emotion={lead.get('emotion')} "
           f"category={lead.get('color_key')} → {LEARNING_ARTIFACT}")
     return board["n_posts_scored"]
