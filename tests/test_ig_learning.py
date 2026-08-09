@@ -18,8 +18,11 @@ from automation.ig_learning import (   # noqa: E402
     MIN_SAMPLES,
     build_scoreboard,
     engagement_score,
+    fetch_signups_by_day,
+    parse_code_day,
     pick_weight,
 )
+from automation import posthog_query as pq   # noqa: E402
 from automation.ig_story_series import pick_story, STORIES   # noqa: E402
 
 
@@ -157,6 +160,71 @@ def test_pick_story_weight_breaks_toward_winner_among_unused():
 
 
 # ── run(): writes the artifact ─────────────────────────────────────────
+
+# ── v2: signup attribution ─────────────────────────────────────────────
+
+def test_parse_code_day():
+    assert parse_code_day("ig-d247-scarcity") == 247
+    assert parse_code_day("ig-d5-social_proof-pro") == 5
+    assert parse_code_day("IG-D12-X") == 12          # case-insensitive
+    assert parse_code_day("nope") is None
+    assert parse_code_day(None) is None
+
+
+def test_rows_to_dicts_shapes():
+    assert pq.rows_to_dicts({"columns": ["a", "b"], "results": [[1, 2], [3, 4]]}) == \
+        [{"a": 1, "b": 2}, {"a": 3, "b": 4}]
+    assert pq.rows_to_dicts({"columns": ["a"], "results": [[1, 2]]}) == []  # len mismatch skipped
+    assert pq.rows_to_dicts(None) is None
+    assert pq.rows_to_dicts({"bad": 1}) is None
+
+
+def test_fetch_signups_by_day_maps_events(monkeypatch):
+    import automation.ig_learning as L
+    rows = [
+        {"code": "ig-d247-x", "event": "newsletter.signup", "n": 3},
+        {"code": "ig-d247-x", "event": "webhook.checkout_completed", "n": 1},
+        {"code": "foreign", "event": "newsletter.signup", "n": 9},   # ignored
+    ]
+    monkeypatch.setattr(L._pq, "query", lambda *a, **k: rows)
+    assert L.fetch_signups_by_day() == {247: {"free": 3, "pro": 1}}
+
+
+def test_fetch_signups_by_day_softfails_to_empty(monkeypatch):
+    import automation.ig_learning as L
+    monkeypatch.setattr(L._pq, "query", lambda *a, **k: None)   # no key / failure
+    assert L.fetch_signups_by_day() == {}
+
+
+def test_signups_blend_lifts_the_converting_story():
+    rows = []
+    for i in range(MIN_SAMPLES):
+        rows.append(_row(f"w{i}", "winner", M(reach=100, saved=1), day=100 + i))
+        rows.append(_row(f"l{i}", "loser", M(reach=100, saved=1), day=200 + i))
+    signups = {100 + i: {"free": 2, "pro": 0} for i in range(MIN_SAMPLES)}
+    board = build_scoreboard(rows, None, signups)
+    assert board["leaders"]["story_id"] == "winner"
+    assert board["scored_on"] == "engagement+signups"
+    assert board["signups_attributed"]["free"] == 2 * MIN_SAMPLES
+    # winner's score is dominated by the signup term, not engagement
+    assert board["dimensions"]["story_id"]["winner"]["score"] > \
+        board["dimensions"]["story_id"]["loser"]["score"]
+
+
+def test_pro_signup_weighted_above_free():
+    rows_free = [_row(f"f{i}", "s", M(reach=100, saved=0), day=10 + i) for i in range(MIN_SAMPLES)]
+    rows_pro = [_row(f"p{i}", "s", M(reach=100, saved=0), day=10 + i) for i in range(MIN_SAMPLES)]
+    free_board = build_scoreboard(rows_free, None, {10 + i: {"free": 1, "pro": 0} for i in range(MIN_SAMPLES)})
+    pro_board = build_scoreboard(rows_pro, None, {10 + i: {"free": 0, "pro": 1} for i in range(MIN_SAMPLES)})
+    assert pro_board["dimensions"]["story_id"]["s"]["score"] > \
+        free_board["dimensions"]["story_id"]["s"]["score"]
+
+
+def test_signups_none_is_backward_compatible():
+    rows = [_row(f"m{i}", "el_mar", M(reach=100, saved=3)) for i in range(MIN_SAMPLES)]
+    assert build_scoreboard(rows)["dimensions"] == build_scoreboard(rows, None, None)["dimensions"]
+    assert build_scoreboard(rows)["scored_on"] == "engagement"
+
 
 def test_run_writes_scoreboard(tmp_path, monkeypatch):
     # Resolve BOTH the module and run() from the same live import.

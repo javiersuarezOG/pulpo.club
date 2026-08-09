@@ -31,6 +31,11 @@ jobs:
     env:
       IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
       IG_USER_ID:      ${{ secrets.IG_USER_ID }}
+      # PostHog read (HogQL) for the Growth Hacker's signup attribution.
+      # Absent → ig_learning soft-fails to engagement-only (v1) — no break.
+      POSTHOG_HOST:             ${{ secrets.POSTHOG_HOST }}
+      POSTHOG_PROJECT_ID:       ${{ secrets.POSTHOG_PROJECT_ID }}
+      POSTHOG_PERSONAL_API_KEY: ${{ secrets.POSTHOG_PERSONAL_API_KEY }}
 
     steps:
       - name: Checkout main
