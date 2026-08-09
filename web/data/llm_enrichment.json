@@ -136052,5 +136052,160 @@
     "cost_usd": 0.00135636,
     "finish_reason": "stop",
     "latency_ms": 4434
+  },
+  "citymax_sc|oportunidad-venta-casa-en-colonia-alcaine-2-san-marcos": {
+    "ts": "2026-08-09T04:29:06.607159+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in San Marcos, San Salvador",
+      "es": "Casa en Venta en San Marcos, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "House for sale in San Marcos, San Salvador. The listing provides no details on size, bedrooms, or amenities. Price is $85,000.",
+      "es": "Casa en venta en San Marcos, San Salvador. El anuncio no proporciona detalles sobre tamaño, habitaciones o comodidades. Precio: $85,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Listed at $85,000",
+        "es": "Precio de $85,000"
+      },
+      {
+        "en": "Located in San Marcos",
+        "es": "Ubicada en San Marcos"
+      },
+      {
+        "en": "Near San Salvador",
+        "es": "Cerca de San Salvador"
+      }
+    ],
+    "lat": 13.6583,
+    "lng": -89.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Marcos, San Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3062,
+    "tokens_out": 354,
+    "cost_usd": 0.00121614,
+    "finish_reason": "stop",
+    "latency_ms": 2602
+  },
+  "realestate_au_sv|canton-alvarez-s-n-santa-tecla-la-libertad-santa-tecla-la-union-department-310106360254": {
+    "ts": "2026-08-09T04:29:07.125456+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Santa Tecla, La Libertad",
+      "es": "Terreno en Venta en Santa Tecla, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Cantón Alvarez, Santa Tecla, La Libertad. Offered for sale at USD 595,000. No further details on size or features are provided.",
+      "es": "Terreno en Cantón Alvarez, Santa Tecla, La Libertad. Se ofrece en venta por USD 595,000. No se proporcionan más detalles sobre tamaño o características."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Santa Tecla, La Libertad",
+        "es": "Ubicado en Santa Tecla, La Libertad"
+      },
+      {
+        "en": "Listed by RE/MAX TERRA 503",
+        "es": "Publicado por RE/MAX TERRA 503"
+      },
+      {
+        "en": "Asking price USD 595,000",
+        "es": "Precio de venta USD 595,000"
+      }
+    ],
+    "lat": 13.6739,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3082,
+    "tokens_out": 390,
+    "cost_usd": 0.00126114,
+    "finish_reason": "stop",
+    "latency_ms": 3119
+  },
+  "encuentra24|32819672": {
+    "ts": "2026-08-09T05:13:25.045317+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Modern 2-Story Villa with Pool at BijaO Beach Club",
+      "es": "Moderna villa de 2 pisos con piscina en BijaO Beach Club"
+    },
+    "short_description_canonical": {
+      "en": "Modern two-story villa of 227 m² in BijaO Beach Club & Residence, a beachfront complex. Features 4 bedrooms, 4.5 bathrooms, pool, golf view, and covered parking for four vehicles. Ground floor includes main suite, second room with two full beds, third with two twins, and full bath. Ideal for family living.",
+      "es": "Moderna villa de dos pisos de 227 m² en BijaO Beach Club & Residence, complejo frente a la playa. Cuenta con 4 habitaciones, 4.5 baños, piscina, vista al golf y estacionamiento techado para cuatro vehículos. Planta baja incluye suite principal, segunda habitación con dos camas full, tercera con dos twin y baño completo. Ideal para vivir en familia."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront complex with pool",
+        "es": "Complejo frente a la playa con piscina"
+      },
+      {
+        "en": "Golf view from villa",
+        "es": "Vista al golf desde la villa"
+      },
+      {
+        "en": "Covered parking for four vehicles",
+        "es": "Estacionamiento techado para cuatro vehículos"
+      },
+      {
+        "en": "Modern kitchen with island",
+        "es": "Cocina moderna con isla"
+      },
+      {
+        "en": "227 m², 4 bedrooms, 4.5 baths",
+        "es": "227 m², 4 habitaciones, 4.5 baños"
+      }
+    ],
+    "lat": 8.0,
+    "lng": -80.0,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playas, Panama (country centroid)",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.5,
+      "built_area_m2": 227.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2352,
+    "tokens_out": 559,
+    "cost_usd": 0.00124994,
+    "finish_reason": "stop",
+    "latency_ms": 4976
   }
 }

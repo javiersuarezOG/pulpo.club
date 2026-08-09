@@ -1092,6 +1092,51 @@
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
+    },
+    {
+      "day": 254,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "tiempo_tuyo",
+      "emotion": "tiempo",
+      "selector": "autopilot",
+      "color_key": "terrenos_lago",
+      "poster_type": "tiempo_tuyo",
+      "palette": "terrenos_lago",
+      "scheduled_for": "2026-08-16T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d254__tiempo_tuyo",
+      "poster_path": "web/data/ig_assets/autopilot/d254__tiempo_tuyo/slide_1.jpg",
+      "poster_overrides": {},
+      "caption": "Seamos honestos: la foto no le hace justicia (y el que la tomó, menos 😅). Pero mirá los números — 98% bajo el precio de la zona. Un terreno así, a ese precio, no se queda mucho. Vos sabés lo que vale.\n\n📍 Chalchuapa. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "Chalchuapa · 77,000 m² · $308,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #Chalchuapa #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d254__tiempo_tuyo/slide_2.jpg",
+        "web/data/ig_assets/autopilot/d254__tiempo_tuyo/slide_3.jpg",
+        "web/data/ig_assets/autopilot/d254__tiempo_tuyo/slide_4.jpg",
+        "web/data/ig_assets/autopilot/d254__tiempo_tuyo/slide_5.jpg",
+        "web/data/ig_assets/autopilot/d254__tiempo_tuyo/slide_6.jpg",
+        "web/data/ig_assets/autopilot/d254__tiempo_tuyo/slide_7.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__1586"
+      ],
+      "primary_listing_id": "bienesraices__1586",
+      "cover_photo_url": "https://assets.easybroker.com/property_images/4804998/81426332/EB-RL4998.jpeg?rasterize=true&version=1729263510",
+      "cover_photo_urls": [
+        "https://assets.easybroker.com/property_images/4804998/81426332/EB-RL4998.jpeg?rasterize=true&version=1729263510",
+        "https://assets.easybroker.com/property_images/4804998/81426331/EB-RL4998.jpeg?rasterize=true&version=1729263509",
+        "https://assets.easybroker.com/property_images/4804998/81426329/EB-RL4998.jpeg?rasterize=true&version=1729263509"
+      ],
+      "photo_tier": "poor",
+      "cover_beauty": 53.3,
+      "humor": "apology",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
