@@ -1,9 +1,9 @@
 {
-  "last_updated": "2026-08-08T17:27:25.969639+00:00",
-  "started_at": "2026-08-08T16:25:10.289125+00:00",
-  "duration_seconds": 3735.68,
-  "total_listings": 1861,
-  "dropped": 254,
+  "last_updated": "2026-08-09T04:37:26.090021+00:00",
+  "started_at": "2026-08-09T03:42:39.544751+00:00",
+  "duration_seconds": 3286.55,
+  "total_listings": 1860,
+  "dropped": 255,
   "per_source_raw": {
     "bienesraices": 579,
     "century21": 0,
@@ -118,14 +118,14 @@
   "derived_field_population": {
     "source_type_off_market": 0.0,
     "source_type_on_market": 1.0,
-    "previous_price": 0.043,
-    "beachfront_tier_on_beach": 0.0709,
+    "previous_price": 0.0441,
+    "beachfront_tier_on_beach": 0.071,
     "beachfront_tier_walk_to_beach": 0.0081,
     "beachfront_tier_near_beach": 0.0204,
-    "land_type_commercial": 0.0537,
-    "land_type_tourist": 0.0779,
-    "land_type_residential": 0.8684,
-    "is_motivated": 0.0865
+    "land_type_commercial": 0.0538,
+    "land_type_tourist": 0.078,
+    "land_type_residential": 0.8683,
+    "is_motivated": 0.0866
   },
   "field_completeness": {
     "bienesraices": {
@@ -404,13 +404,13 @@
       }
     },
     "santizo": {
-      "n_listings": 90,
+      "n_listings": 89,
       "fields": {
         "price_usd": 1.0,
-        "area_m2": 0.23,
-        "zone": 0.54,
-        "municipality": 0.54,
-        "department": 0.59,
+        "area_m2": 0.24,
+        "zone": 0.55,
+        "municipality": 0.55,
+        "department": 0.6,
         "location_text": 0.0,
         "lat": 0.98,
         "lng": 0.98,
@@ -480,8 +480,8 @@
     }
   },
   "property_type_counts": {
+    "house": 328,
     "land": 1454,
-    "house": 329,
     "condo": 78
   },
   "validation_by_type": {
@@ -492,8 +492,8 @@
     },
     "house": {
       "pass": 246,
-      "flag": 83,
-      "drop": 55
+      "flag": 82,
+      "drop": 56
     },
     "condo": {
       "pass": 61,
@@ -501,7 +501,7 @@
       "drop": 6
     }
   },
-  "v_fallback_no_price": 865,
+  "v_fallback_no_price": 864,
   "v_fallback_no_comps": 0,
   "sources": [
     "bienesraices",
