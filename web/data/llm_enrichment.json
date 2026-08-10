@@ -136207,5 +136207,119 @@
     "cost_usd": 0.00124994,
     "finish_reason": "stop",
     "latency_ms": 4976
+  },
+  "santizo|10261770": {
+    "ts": "2026-08-10T04:42:15.038278+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Villas Near New International Airport",
+      "es": "Villas frente al mar cerca del nuevo aeropuerto internacional"
+    },
+    "short_description_canonical": {
+      "en": "Two beachfront villas, each 105.30 m², located near the new international airport in La Unión. Each villa includes living room, dining room, open kitchen, two bedrooms, two bathrooms, terrace, pool, A/C throughout, and parking. The lot has space for two additional villas, totaling four, with strong Airbnb return potential and appraisal available.",
+      "es": "Dos villas frente al mar, cada una de 105.30 m², ubicadas cerca del nuevo aeropuerto internacional en La Unión. Cada villa incluye sala, comedor, cocina abierta, dos habitaciones, dos baños, terraza, piscina, A/C en todos los ambientes y estacionamiento. El terreno tiene espacio para dos villas adicionales, llegando a cuatro en total, con excelente retorno de inversión en Airbnb y avalúo disponible."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Two villas, each 105.30 m²",
+        "es": "Dos villas, cada una de 105.30 m²"
+      },
+      {
+        "en": "Each villa has private pool",
+        "es": "Cada villa tiene piscina privada"
+      },
+      {
+        "en": "Minutes from new international airport",
+        "es": "Minutos del nuevo aeropuerto internacional"
+      },
+      {
+        "en": "Space for two more villas",
+        "es": "Espacio para dos villas más"
+      },
+      {
+        "en": "Appraisal available",
+        "es": "Avalúo disponible"
+      }
+    ],
+    "lat": 13.334,
+    "lng": -87.843,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Unión bay",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 2,
+      "bathrooms": 2.0,
+      "built_area_m2": 105.3,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3286,
+    "tokens_out": 552,
+    "cost_usd": 0.00149442,
+    "finish_reason": "stop",
+    "latency_ms": 4409
+  },
+  "santizo|10261881": {
+    "ts": "2026-08-10T04:42:15.364866+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Ayana 9 House in El Zonte, La Libertad",
+      "es": "Casa Ayana 9 en El Zonte, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "House in the exclusive El Zonte area of La Libertad, part of the Ayana 9 complex. The property includes a modern design with underground wiring, native gardens, and amenities such as tennis courts, a soccer field, a clubhouse, picnic areas, and mountain bike trails. Priced at $1,150,000.",
+      "es": "Casa en la zona exclusiva de El Zonte, La Libertad, parte del complejo Ayana 9. La propiedad incluye diseño moderno con cableado subterráneo, jardines autóctonos y comodidades como canchas de tenis, campo de fútbol, casa club, zonas de picnic y rutas para bicicleta de montaña. Precio: $1,150,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Exclusive location in El Zonte",
+        "es": "Ubicación exclusiva en El Zonte"
+      },
+      {
+        "en": "Amenities: tennis, soccer, clubhouse",
+        "es": "Comodidades: tenis, fútbol, casa club"
+      },
+      {
+        "en": "Underground wiring for clean aesthetics",
+        "es": "Cableado subterráneo para estética limpia"
+      },
+      {
+        "en": "Native gardens, low maintenance",
+        "es": "Jardines autóctonos, bajo mantenimiento"
+      },
+      {
+        "en": "Mountain bike trails on property",
+        "es": "Rutas de montaña en la propiedad"
+      }
+    ],
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Zonte beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 4393,
+    "tokens_out": 536,
+    "cost_usd": 0.00177571,
+    "finish_reason": "stop",
+    "latency_ms": 4735
   }
 }
