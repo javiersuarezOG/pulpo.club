@@ -1,53 +1,53 @@
 {
   "active_level": "moderate",
   "aggregate": {
-    "eligible_lenient": 1536,
-    "eligible_moderate": 1365,
-    "eligible_strict": 829,
+    "eligible_lenient": 1829,
+    "eligible_moderate": 1650,
+    "eligible_strict": 826,
     "hidden_by_is_agricultural": 4,
-    "hidden_by_no_area": 455,
-    "hidden_by_no_photos": 81,
+    "hidden_by_no_area": 742,
+    "hidden_by_no_photos": 82,
     "hidden_by_no_price": 24,
     "hidden_by_no_type": 0,
-    "hidden_by_no_zone": 173
+    "hidden_by_no_zone": 181
   },
-  "computed_at": "2026-08-10T04:52:05.903472+00:00",
+  "computed_at": "2026-08-11T04:46:09.728292+00:00",
   "shelves": {
     "beach_condos": {
-      "eligible_lenient": 24,
-      "eligible_moderate": 21,
+      "eligible_lenient": 26,
+      "eligible_moderate": 23,
       "eligible_strict": 10,
       "hidden_by_is_agricultural": 0,
-      "hidden_by_no_area": 10,
+      "hidden_by_no_area": 12,
       "hidden_by_no_photos": 1,
       "hidden_by_no_price": 2,
       "hidden_by_no_type": 0,
       "hidden_by_no_zone": 3,
-      "total_in_cohort": 26
+      "total_in_cohort": 28
     },
     "beach_homes": {
-      "eligible_lenient": 167,
-      "eligible_moderate": 150,
-      "eligible_strict": 89,
+      "eligible_lenient": 168,
+      "eligible_moderate": 151,
+      "eligible_strict": 88,
       "hidden_by_is_agricultural": 4,
-      "hidden_by_no_area": 58,
+      "hidden_by_no_area": 60,
       "hidden_by_no_photos": 3,
       "hidden_by_no_price": 1,
       "hidden_by_no_type": 0,
       "hidden_by_no_zone": 17,
-      "total_in_cohort": 168
+      "total_in_cohort": 169
     },
     "beach_land": {
-      "eligible_lenient": 445,
-      "eligible_moderate": 421,
-      "eligible_strict": 288,
+      "eligible_lenient": 512,
+      "eligible_moderate": 488,
+      "eligible_strict": 287,
       "hidden_by_is_agricultural": 0,
-      "hidden_by_no_area": 106,
+      "hidden_by_no_area": 174,
       "hidden_by_no_photos": 27,
       "hidden_by_no_price": 5,
       "hidden_by_no_type": 0,
       "hidden_by_no_zone": 24,
-      "total_in_cohort": 450
+      "total_in_cohort": 517
     },
     "lake_condos": {
       "eligible_lenient": 0,
@@ -86,5 +86,5 @@
       "total_in_cohort": 19
     }
   },
-  "total_in_dataset": 1562
+  "total_in_dataset": 1855
 }

@@ -1,22 +1,22 @@
 {
   "en": {
     "candidates_seen": 1,
-    "llm_cost_usd": 0.00023681,
-    "paragraph": "The Red Cross reported about 40 assists at Apulo recreational center during August vacations, highlighting the area's popularity. For you as a property buyer, this signals strong demand for lakefront recreation. Expect busy weekends and consider proximity to amenities. Check safety measures and access when evaluating properties near Apulo.",
-    "picked_at": "2026-08-05",
-    "source_date": "5 Aug 2026",
+    "llm_cost_usd": 0.00024972000000000004,
+    "paragraph": "El Salvador's Plan Vacación 2026 saw fewer accidents and deaths, but injuries increased. For property buyers, this signals safer travel to coastal areas, yet road risks remain. Check your commute routes and consider proximity to emergency services. Stay informed on local safety trends to make confident decisions.",
+    "picked_at": "2026-08-11",
+    "source_date": "11 Aug 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/nacionales/cruz-roja-salvadorena-brinda-cerca-de-40-asistencias-en-apulo-durante-las-vacaciones-agostinas/?utm_source=rss&utm_medium=rss&utm_campaign=cruz-roja-salvadorena-brinda-cerca-de-40-asistencias-en-apulo-durante-las-vacaciones-agostinas",
-    "title": "Apulo lifeguards busy during August holidays"
+    "source_url": "https://lapagina.com.sv/general/plan-vacacion-2026-cierra-con-menos-accidentes-y-fallecidos-pero-aumentan-los-lesionados-en-carreteras/?utm_source=rss&utm_medium=rss&utm_campaign=plan-vacacion-2026-cierra-con-menos-accidentes-y-fallecidos-pero-aumentan-los-lesionados-en-carreteras",
+    "title": "Road Safety Improves, But Injuries Rise"
   },
   "es": {
     "candidates_seen": 1,
-    "llm_cost_usd": 0.00030894000000000006,
-    "paragraph": "Esta semana, la Cruz Roja atendió cerca de 40 emergencias en el lago de Apulo, un destino popular para compradores de propiedad lacustre. Aunque no es una noticia de mercado, te indica que la zona tiene actividad turística y servicios de emergencia, lo que puede influir en tu decisión de compra. Considera la cercanía a estos servicios y la afluencia de visitantes al evaluar propiedades en Apulo.",
-    "picked_at": "2026-08-05",
-    "source_date": "5 ago 2026",
+    "llm_cost_usd": 0.00034495000000000006,
+    "paragraph": "El Plan Vacación 2026 reportó menos accidentes y fallecidos, pero más lesionados en carreteras. Para vos, que estás considerando comprar propiedad costera o de lago, esto indica que las rutas hacia las playas y lagos siguen siendo riesgosas. Aunque la seguridad mejoró, los lesionados aumentaron, así que planificá tus viajes con precaución, especialmente en temporada alta. Considerá la accesibilidad y el estado de las vías al elegir tu propiedad, y verificá los tiempos de traslado desde tu lugar de residencia.",
+    "picked_at": "2026-08-11",
+    "source_date": "11 ago 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/nacionales/cruz-roja-salvadorena-brinda-cerca-de-40-asistencias-en-apulo-durante-las-vacaciones-agostinas/?utm_source=rss&utm_medium=rss&utm_campaign=cruz-roja-salvadorena-brinda-cerca-de-40-asistencias-en-apulo-durante-las-vacaciones-agostinas",
-    "title": "Cruz Roja Salvadoreña brinda cerca de 40 asistencias en Apulo durante las vacaciones agostinas"
+    "source_url": "https://lapagina.com.sv/general/plan-vacacion-2026-cierra-con-menos-accidentes-y-fallecidos-pero-aumentan-los-lesionados-en-carreteras/?utm_source=rss&utm_medium=rss&utm_campaign=plan-vacacion-2026-cierra-con-menos-accidentes-y-fallecidos-pero-aumentan-los-lesionados-en-carreteras",
+    "title": "Plan Vacación 2026 cierra con menos accidentes y fallecidos, pero aumentan los lesionados en carreteras"
   }
 }
