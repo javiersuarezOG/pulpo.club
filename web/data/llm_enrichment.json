@@ -136321,5 +136321,458 @@
     "cost_usd": 0.00177571,
     "finish_reason": "stop",
     "latency_ms": 4735
+  },
+  "csbr|venta-terreno-santa-ana-ideal-desarrollo-inmobiliario": {
+    "ts": "2026-08-11T04:35:37.039173+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Santa Ana for Development",
+      "es": "Terreno en Venta en Santa Ana para Desarrollo"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Santa Ana, El Salvador, listed for sale. Suitable for real estate development. Price: USD 9,000,000.",
+      "es": "Terreno en Santa Ana, El Salvador, en venta. Adecuado para desarrollo inmobiliario. Precio: USD 9,000,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Listed on Salvadoran Real Estate Chamber",
+        "es": "Listado en Cámara Salvadoreña de Bienes Raíces"
+      },
+      {
+        "en": "Ideal for real estate development",
+        "es": "Ideal para desarrollo inmobiliario"
+      },
+      {
+        "en": "Located in Santa Ana department",
+        "es": "Ubicado en departamento de Santa Ana"
+      }
+    ],
+    "lat": 13.9947,
+    "lng": -89.5598,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3073,
+    "tokens_out": 366,
+    "cost_usd": 0.00123231,
+    "finish_reason": "stop",
+    "latency_ms": 2787
+  },
+  "csbr|venta-terreno-calle-a-comasagua-santa-tecla-la-libertad": {
+    "ts": "2026-08-11T04:35:37.464351+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale on Comasagua Road, Santa Tecla",
+      "es": "Terreno en Venta en Calle a Comasagua, Santa Tecla"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 11,139.04 m² for sale on the Comasagua road in Santa Tecla, La Libertad. The property is listed with the Salvadoran Chamber of Real Estate. Price is USD 800,000.",
+      "es": "Terreno de 11,139.04 m² en venta en la calle a Comasagua, Santa Tecla, La Libertad. La propiedad está listada en la Cámara Salvadoreña de Bienes Raíces. Precio: USD 800,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "11,139 m² land parcel",
+        "es": "Terreno de 11,139 m²"
+      },
+      {
+        "en": "Listed with Salvadoran Chamber",
+        "es": "Listado en Cámara Salvadoreña"
+      },
+      {
+        "en": "On Comasagua road",
+        "es": "Sobre calle a Comasagua"
+      }
+    ],
+    "lat": 13.6739,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3085,
+    "tokens_out": 423,
+    "cost_usd": 0.00129825,
+    "finish_reason": "stop",
+    "latency_ms": 3212
+  },
+  "csbr|venta-terreno-de-playa-la-libertad-izcacuyo": {
+    "ts": "2026-08-11T04:35:37.479872+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beach Land for Sale in La Libertad, Izcacuyo",
+      "es": "Terreno de Playa en Venta en La Libertad, Izcacuyo"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront land for sale in Izcacuyo, La Libertad. The property is located on the coast, offering direct beach access. No further details are provided in the listing.",
+      "es": "Terreno frente al mar en venta en Izcacuyo, La Libertad. La propiedad está ubicada en la costa, ofreciendo acceso directo a la playa. No se proporcionan más detalles en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in Izcacuyo",
+        "es": "Ubicación frente al mar en Izcacuyo"
+      },
+      {
+        "en": "Direct beach access",
+        "es": "Acceso directo a la playa"
+      },
+      {
+        "en": "Listed at $1,400,000",
+        "es": "Listado en $1,400,000"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3071,
+    "tokens_out": 408,
+    "cost_usd": 0.00127797,
+    "finish_reason": "stop",
+    "latency_ms": 3227
+  },
+  "csbr|venta-hacienda-ganadera-acajutla-sonsonate": {
+    "ts": "2026-08-11T04:35:37.530800+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Cattle Ranch for Sale in Acajutla, Sonsonate",
+      "es": "Hacienda Ganadera en Venta en Acajutla, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Cattle ranch for sale in Acajutla, Sonsonate, listed on the Salvadoran Chamber of Real Estate. The property is offered at USD 1,200,000. No further details on size, improvements, or infrastructure are provided in the listing.",
+      "es": "Hacienda ganadera en venta en Acajutla, Sonsonate, publicada en la Cámara Salvadoreña de Bienes Raíces. La propiedad se ofrece en USD 1,200,000. No se proporcionan más detalles sobre tamaño, mejoras o infraestructura en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Listed at USD 1,200,000",
+        "es": "Publicada en USD 1,200,000"
+      },
+      {
+        "en": "Cattle ranch in Acajutla",
+        "es": "Hacienda ganadera en Acajutla"
+      },
+      {
+        "en": "Listed on official chamber",
+        "es": "Publicada en cámara oficial"
+      }
+    ],
+    "lat": 13.5928,
+    "lng": -89.8275,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Acajutla, Sonsonate",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3070,
+    "tokens_out": 439,
+    "cost_usd": 0.0013118,
+    "finish_reason": "stop",
+    "latency_ms": 3278
+  },
+  "encuentra24|32825266": {
+    "ts": "2026-08-11T04:35:38.350159+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Ocean-view house near El Tunco, La Libertad",
+      "es": "Casa con vista al mar cerca de El Tunco, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "House with ocean views on a 1,398 v2 (12,582 sq ft) lot in Tamanique, La Libertad, near El Tunco and commercial areas. Built area of 350 m² (3,767 sq ft) with 3 bedrooms, 2 bathrooms, pool, garden, and parking for 4 vehicles. Modern finishes and open spaces, ideal for beach house or short-term rental income.",
+      "es": "Casa con vista al mar en un terreno de 1,398 v2 (12,582 sq ft) en Tamanique, La Libertad, cerca de El Tunco y zonas comerciales. Área construida de 350 m² (3,767 sq ft) con 3 habitaciones, 2 baños, piscina, jardín y estacionamiento para 4 vehículos. Acabados modernos y espacios abiertos, ideal para casa de playa o generar ingresos por rentas cortas."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Ocean views from main areas",
+        "es": "Vistas al mar desde áreas principales"
+      },
+      {
+        "en": "Near El Tunco and commercial zones",
+        "es": "Cerca de El Tunco y zonas comerciales"
+      },
+      {
+        "en": "Pool with ocean view",
+        "es": "Piscina con vista al mar"
+      },
+      {
+        "en": "Parking for 4 vehicles",
+        "es": "Estacionamiento para 4 vehículos"
+      },
+      {
+        "en": "Ideal for short-term rentals",
+        "es": "Ideal para rentas cortas"
+      }
+    ],
+    "lat": 13.487,
+    "lng": -89.6133,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Tunco beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 350.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3288,
+    "tokens_out": 567,
+    "cost_usd": 0.00151146,
+    "finish_reason": "stop",
+    "latency_ms": 4096
+  },
+  "realestate_au_sv|lote-7-poligono-e-urb-villa-bosque-santa-tecla-la-libertad-santa-tecla-san-miguel-310107498211": {
+    "ts": "2026-08-11T04:35:40.213085+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Villa Bosque, Santa Tecla",
+      "es": "Terreno en Villa Bosque, Santa Tecla"
+    },
+    "short_description_canonical": {
+      "en": "Lot #7, polygon E, in Villa Bosque, Santa Tecla, La Libertad. This land is offered for sale at $365,000. The property is located in a residential area.",
+      "es": "Lote #7, polígono E, en Villa Bosque, Santa Tecla, La Libertad. Este terreno se ofrece en venta por $365,000. La propiedad está ubicada en una zona residencial."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Villa Bosque, Santa Tecla",
+        "es": "Ubicado en Villa Bosque, Santa Tecla"
+      },
+      {
+        "en": "Residential lot in polygon E",
+        "es": "Lote residencial en polígono E"
+      },
+      {
+        "en": "Listed at $365,000",
+        "es": "Listado en $365,000"
+      }
+    ],
+    "lat": 13.6739,
+    "lng": -89.2878,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3086,
+    "tokens_out": 392,
+    "cost_usd": 0.00126442,
+    "finish_reason": "stop",
+    "latency_ms": 2748
+  },
+  "realestate_au_sv|caserio-la-cumbre-canton-las-granadillas-porcion-2-y-3-la-palma-chalatenango-la-palma-cuscatlan-department-310104284436": {
+    "ts": "2026-08-11T04:35:40.620120+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in La Palma, Chalatenango for Sale",
+      "es": "Terreno en La Palma, Chalatenango en Venta"
+    },
+    "short_description_canonical": {
+      "en": "Land in Caserío La Cumbre, canton Las Granadillas, La Palma, Chalatenango. This parcel is offered for sale at $500,000. No further details are provided in the listing.",
+      "es": "Terreno en Caserío La Cumbre, cantón Las Granadillas, La Palma, Chalatenango. Esta parcela se ofrece en venta por $500,000. No se proporcionan más detalles en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in La Palma, Chalatenango",
+        "es": "Ubicado en La Palma, Chalatenango"
+      },
+      {
+        "en": "Listed at $500,000",
+        "es": "Precio de $500,000"
+      },
+      {
+        "en": "Offered by RE/MAX Central",
+        "es": "Ofrecido por RE/MAX Central"
+      }
+    ],
+    "lat": 14.3333,
+    "lng": -89.1667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Palma, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3090,
+    "tokens_out": 397,
+    "cost_usd": 0.001271,
+    "finish_reason": "stop",
+    "latency_ms": 3140
+  },
+  "realestate_au_sv|canton-la-puerta-caserio-cantora-la-puerta-san-miguel-la-puerta-la-union-department-310107565386": {
+    "ts": "2026-08-11T04:35:40.647972+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in La Puerta, La Unión",
+      "es": "Terreno en Venta en La Puerta, La Unión"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Canton La Puerta, caserio Cantora, La Puerta, San Miguel, La Unión Department. No built area, bedrooms, or bathrooms specified. Offered for sale at USD 3,835,000.",
+      "es": "Terreno en Cantón La Puerta, caserío Cantora, La Puerta, San Miguel, departamento de La Unión. No se especifican área construida, dormitorios ni baños. Se ofrece en venta por USD 3,835,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in La Puerta, La Unión",
+        "es": "Ubicado en La Puerta, La Unión"
+      },
+      {
+        "en": "Listed by RE/MAX ELEVA",
+        "es": "Publicado por RE/MAX ELEVA"
+      },
+      {
+        "en": "Price: USD 3,835,000",
+        "es": "Precio: USD 3,835,000"
+      }
+    ],
+    "lat": 13.3367,
+    "lng": -87.843,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Unión department centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3085,
+    "tokens_out": 422,
+    "cost_usd": 0.00129715,
+    "finish_reason": "stop",
+    "latency_ms": 3364
+  },
+  "remax|002684464006": {
+    "ts": "2026-08-11T04:35:40.876685+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "320 m² Rural Land Near Santa Ana Highway",
+      "es": "Terreno rural de 320 m² cerca de carretera a Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Rural land of 320 m² located 500 meters off the highway to Santa Ana, near the entrance from San Salvador. Gentle slope, suitable for agricultural use. Priced at $21,000.",
+      "es": "Terreno rural de 320 m² ubicado a 500 metros de la carretera hacia Santa Ana, cerca de la entrada desde San Salvador. Pendiente suave, apto para uso agrícola. Precio: $21,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "500 m from highway to Santa Ana",
+        "es": "A 500 m de la carretera a Santa Ana"
+      },
+      {
+        "en": "Gentle slope for easy use",
+        "es": "Pendiente suave para fácil uso"
+      },
+      {
+        "en": "Agricultural zoning potential",
+        "es": "Potencial de zonificación agrícola"
+      },
+      {
+        "en": "Priced at $21,000 for 320 m²",
+        "es": "Precio de $21,000 por 320 m²"
+      }
+    ],
+    "lat": 13.69294,
+    "lng": -89.21819,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Salvador municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3104,
+    "tokens_out": 435,
+    "cost_usd": 0.00131658,
+    "finish_reason": "stop",
+    "latency_ms": 3345
   }
 }
