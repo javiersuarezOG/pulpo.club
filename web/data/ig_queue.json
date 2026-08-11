@@ -1186,6 +1186,51 @@
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
+    },
+    {
+      "day": 256,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "raices",
+      "emotion": "legado",
+      "selector": "autopilot",
+      "color_key": "terrenos_lago",
+      "poster_type": "raices",
+      "palette": "terrenos_lago",
+      "scheduled_for": "2026-08-18T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d256__raices",
+      "poster_path": "web/data/ig_assets/autopilot/d256__raices/slide_1.jpg",
+      "poster_overrides": {},
+      "caption": "Un árbol que plantás hoy da sombra a quien todavía no conocés. Eso es tener tierra: sembrar para los que vienen.\n\n📍 Ahuachapan. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "Ahuachapan · 160,000 m² · $5.8M.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #Ahuachapan #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d256__raices/slide_2.jpg",
+        "web/data/ig_assets/autopilot/d256__raices/slide_3.jpg",
+        "web/data/ig_assets/autopilot/d256__raices/slide_4.jpg",
+        "web/data/ig_assets/autopilot/d256__raices/slide_5.jpg",
+        "web/data/ig_assets/autopilot/d256__raices/slide_6.jpg",
+        "web/data/ig_assets/autopilot/d256__raices/slide_7.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__2179"
+      ],
+      "primary_listing_id": "bienesraices__2179",
+      "cover_photo_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvSEc4TUpPU1lETS84MkRjM3BEUFZLL1ZlbnRhX2RlX1RlcnJlbm9fZW5fQWh1YWNoYXBcdTAwZTFuXzIzX01hbnphbmFzX2FfT3JpbGxhX2RlX0NhcnJldGVyYV9MYXNfQ2hpbmFtYXMuanBlZyIsICJlZGl0cyI6IHsicmVzaXplIjogeyJ3aWR0aCI6IDEwMjQsICJoZWlnaHQiOiA3NjgsICJmaXQiOiAiaW5zaWRlIn0sICJ0b0Zvcm1hdCI6ICJqcGVnIiwgImpwZWciOiB7InF1YWxpdHkiOiA3MH19fQ==",
+      "cover_photo_urls": [
+        "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvSEc4TUpPU1lETS84MkRjM3BEUFZLL1ZlbnRhX2RlX1RlcnJlbm9fZW5fQWh1YWNoYXBcdTAwZTFuXzIzX01hbnphbmFzX2FfT3JpbGxhX2RlX0NhcnJldGVyYV9MYXNfQ2hpbmFtYXMuanBlZyIsICJlZGl0cyI6IHsicmVzaXplIjogeyJ3aWR0aCI6IDEwMjQsICJoZWlnaHQiOiA3NjgsICJmaXQiOiAiaW5zaWRlIn0sICJ0b0Zvcm1hdCI6ICJqcGVnIiwgImpwZWciOiB7InF1YWxpdHkiOiA3MH19fQ==",
+        "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvWUFOVk9HMDNBRC9nVHVWOUxzeTQ4L1ZlbnRhX2RlX1RlcnJlbm9fZW5fQWh1YWNoYXBcdTAwZTFuXzIzX01hbnphbmFzX2FfT3JpbGxhX2RlX0NhcnJldGVyYV9MYXNfQ2hpbmFtYXNfOC5qcGVnIiwgImVkaXRzIjogeyJyZXNpemUiOiB7IndpZHRoIjogMTI4MCwgImhlaWdodCI6IDk2MCwgImZpdCI6ICJpbnNpZGUifSwgInRvRm9ybWF0IjogImpwZWciLCAianBlZyI6IHsicXVhbGl0eSI6IDcwfX19",
+        "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvU0NUMEEzVTFFSC9EVWM3c0tLR1BuL1ZlbnRhX2RlX1RlcnJlbm9fZW5fQWh1YWNoYXBcdTAwZTFuXzIzX01hbnphbmFzX2FfT3JpbGxhX2RlX0NhcnJldGVyYV9MYXNfQ2hpbmFtYXNfNS5qcGVnIiwgImVkaXRzIjogeyJyZXNpemUiOiB7IndpZHRoIjogMTI4MCwgImhlaWdodCI6IDk2MCwgImZpdCI6ICJpbnNpZGUifSwgInRvRm9ybWF0IjogImpwZWciLCAianBlZyI6IHsicXVhbGl0eSI6IDcwfX19"
+      ],
+      "photo_tier": "great",
+      "cover_beauty": 93.1,
+      "humor": null,
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
