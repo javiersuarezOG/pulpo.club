@@ -1,14 +1,14 @@
 {
   "source": "oceanside",
-  "drift_state": "ok",
-  "reason": "matches_baseline",
-  "probed_at": "2026-08-11T13:47:03.976514+00:00",
+  "drift_state": "unreachable",
+  "reason": "http_status=429",
+  "probed_at": "2026-08-11T19:28:51.939621+00:00",
   "last_probe": {
     "probed_url": "https://oceansideelsalvador.com/",
-    "status_code": 200,
+    "status_code": 429,
     "final_url": "https://oceansideelsalvador.com/",
-    "response_size_bytes": null,
-    "duration_ms": 131,
+    "response_size_bytes": 960,
+    "duration_ms": 60,
     "error": null
   },
   "baseline": {
