@@ -913,9 +913,11 @@
       "humor": null,
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-08-11T02:23:42.026546+00:00",
+      "posted_media_id": "18138470188599199",
+      "comment_posted": true,
+      "comment_id": "17903631330494944"
     },
     {
       "day": 250,
