@@ -136774,5 +136774,164 @@
     "cost_usd": 0.00131658,
     "finish_reason": "stop",
     "latency_ms": 3345
+  },
+  "realestate_au_sv|lotificacion-villas-de-el-pedregal-el-rosario-la-paz-el-rosario-morazan-department-310107865006": {
+    "ts": "2026-08-12T04:59:34.214876+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in Villas de El Pedregal, El Rosario",
+      "es": "Casa en Venta en Villas de El Pedregal, El Rosario"
+    },
+    "short_description_canonical": {
+      "en": "A house in the Villas de El Pedregal development, El Rosario, Morazán Department. The property is listed for sale at $75,000. Specific details on size, bedrooms, and amenities are not provided in the listing.",
+      "es": "Una casa en el desarrollo Villas de El Pedregal, El Rosario, departamento de Morazán. La propiedad está a la venta por $75,000. No se proporcionan detalles específicos sobre tamaño, dormitorios y comodidades en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Listed at $75,000",
+        "es": "Precio de $75,000"
+      },
+      {
+        "en": "Located in Villas de El Pedregal",
+        "es": "Ubicada en Villas de El Pedregal"
+      },
+      {
+        "en": "In El Rosario, Morazán",
+        "es": "En El Rosario, Morazán"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -88.0833,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Rosario, Morazán Department centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3078,
+    "tokens_out": 430,
+    "cost_usd": 0.00130406,
+    "finish_reason": "stop",
+    "latency_ms": 3506
+  },
+  "bienesraices|2447": {
+    "ts": "2026-08-12T04:59:34.303133+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Land in San Diego, La Libertad",
+      "es": "Terreno frente al mar en San Diego, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront land in Playa San Diego, La Libertad, with 24 meters of frontage and 7,688 m² (1.1 manzanas). Located on the Litoral highway, 10 minutes from Puerto La Libertad, 30 minutes from Comalapa Airport, and 50 minutes from San Salvador. Price: $700,000.",
+      "es": "Terreno frente al mar en Playa San Diego, La Libertad, con 24 metros de frente y 7,688 m² (1.1 manzanas). Ubicado sobre la calle Litoral, a 10 minutos del Puerto La Libertad, a 30 minutos del Aeropuerto de Comalapa y a 50 minutos de San Salvador. Precio: $700,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront on Playa San Diego",
+        "es": "Frente al mar en Playa San Diego"
+      },
+      {
+        "en": "24 meters of road frontage",
+        "es": "24 metros de frente"
+      },
+      {
+        "en": "On Litoral highway, easy access",
+        "es": "Sobre calle Litoral, fácil acceso"
+      },
+      {
+        "en": "10 minutes from Puerto La Libertad",
+        "es": "A 10 minutos del Puerto La Libertad"
+      },
+      {
+        "en": "30 minutes from Comalapa Airport",
+        "es": "A 30 minutos del Aeropuerto de Comalapa"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bocana San Diego",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3158,
+    "tokens_out": 534,
+    "cost_usd": 0.00144006,
+    "finish_reason": "stop",
+    "latency_ms": 3596
+  },
+  "remax|002472129102": {
+    "ts": "2026-08-12T04:59:34.477523+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land 150m from Agua Fría Beach, Punta Mango",
+      "es": "Terreno a 150m de Playa Agua Fría, Punta Mango"
+    },
+    "short_description_canonical": {
+      "en": "Land plot of 2,289 sq yd (approx. 1,914 m²) in Punta Mango, Jucuarán, Usulután East. Located 150 meters from Agua Fría Beach and 800 meters from Surf City 2, with semi-flat topography. Water and electricity available, access via a recently built tourist road. Ideal for a tourism project or vacation property.",
+      "es": "Terreno de 2,289 yardas cuadradas (aprox. 1,914 m²) en Punta Mango, Jucuarán, Usulután Oriente. Ubicado a 150 metros de la Playa Agua Fría y a 800 metros de Surf City 2, con topografía semiplana. Disponibilidad de agua y electricidad, acceso por carretera turística recién construida. Ideal para proyecto turístico o propiedad vacacional."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "150m from Agua Fría Beach",
+        "es": "A 150m de la Playa Agua Fría"
+      },
+      {
+        "en": "800m from Surf City 2",
+        "es": "A 800m de Surf City 2"
+      },
+      {
+        "en": "Water and electricity available",
+        "es": "Agua y electricidad disponibles"
+      },
+      {
+        "en": "Access via new tourist road",
+        "es": "Acceso por carretera turística nueva"
+      }
+    ],
+    "lat": 13.1894,
+    "lng": -88.3858,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Cuco",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3426,
+    "tokens_out": 531,
+    "cost_usd": 0.00150912,
+    "finish_reason": "stop",
+    "latency_ms": 3769
   }
 }

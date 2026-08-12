@@ -204,52 +204,6 @@
   {
     "count": 4,
     "cross_source": false,
-    "fingerprint": "d7c862965143e5bc53c0c215d758a8c0f3007df6",
-    "samples": [
-      {
-        "area_m2": 336.55,
-        "price_usd": 108349.0,
-        "source": "remax",
-        "source_id": "001464217036",
-        "title": "FOR SALE SAN CARLOS COUNTRY PROJECT IN SANTA ANA",
-        "url": "https://www.remax-elsalvador.com/001464217036",
-        "zone": "santa-ana"
-      },
-      {
-        "area_m2": 335.47,
-        "price_usd": 107999.0,
-        "source": "remax",
-        "source_id": "001464217031",
-        "title": "FOR SALE SAN CARLOS COUNTRY PROJECT IN SANTA ANA",
-        "url": "https://www.remax-elsalvador.com/001464217031",
-        "zone": "santa-ana"
-      },
-      {
-        "area_m2": 335.88,
-        "price_usd": 108131.0,
-        "source": "remax",
-        "source_id": "001464217030",
-        "title": "FOR SALE SAN CARLOS COUNTRY PROJECT IN SANTA ANA",
-        "url": "https://www.remax-elsalvador.com/001464217030",
-        "zone": "santa-ana"
-      },
-      {
-        "area_m2": 335.47,
-        "price_usd": 107999.0,
-        "source": "remax",
-        "source_id": "001464217023",
-        "title": "FOR SALE SAN CARLOS COUNTRY PROJECT IN SANTA ANA",
-        "url": "https://www.remax-elsalvador.com/001464217023",
-        "zone": "santa-ana"
-      }
-    ],
-    "sources": [
-      "remax"
-    ]
-  },
-  {
-    "count": 4,
-    "cross_source": false,
     "fingerprint": "eb1b0b1225c4307e0c98913d56e17ef5705736f3",
     "samples": [
       {
@@ -328,43 +282,6 @@
     ],
     "sources": [
       "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 3,
-    "cross_source": false,
-    "fingerprint": "8d81038dfd1f31e943738a51bbf3d7a166cc18e5",
-    "samples": [
-      {
-        "area_m2": 348.99,
-        "price_usd": 112354.0,
-        "source": "remax",
-        "source_id": "001464217026",
-        "title": "FOR SALE SAN CARLOS COUNTRY PROJECT IN SANTA ANA",
-        "url": "https://www.remax-elsalvador.com/001464217026",
-        "zone": "santa-ana"
-      },
-      {
-        "area_m2": 349.45,
-        "price_usd": 112499.0,
-        "source": "remax",
-        "source_id": "001464217025",
-        "title": "FOR SALE SAN CARLOS COUNTRY PROJECT IN SANTA ANA",
-        "url": "https://www.remax-elsalvador.com/001464217025",
-        "zone": "santa-ana"
-      },
-      {
-        "area_m2": 349.45,
-        "price_usd": 112499.0,
-        "source": "remax",
-        "source_id": "001464217024",
-        "title": "FOR SALE SAN CARLOS COUNTRY PROJECT IN SANTA ANA",
-        "url": "https://www.remax-elsalvador.com/001464217024",
-        "zone": "santa-ana"
-      }
-    ],
-    "sources": [
-      "remax"
     ]
   },
   {

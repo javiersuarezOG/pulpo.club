@@ -18,8 +18,8 @@
       "pick_count": 3
     }
   },
-  "picked_at": "2026-08-11T04:46:20.382809+00:00",
-  "expires_at": "2026-08-12T00:00:00+00:00",
+  "picked_at": "2026-08-12T05:11:53.553257+00:00",
+  "expires_at": "2026-08-13T00:00:00+00:00",
   "tier": "soft",
   "listing_id": "encuentra24|32691999",
   "rank_score": 78.75,
@@ -34,21 +34,12 @@
     },
     {
       "listing_id": "encuentra24|29592387",
-      "rank_score": 77.45,
+      "rank_score": 78.41,
       "hero_photo_quality_score": 50,
       "photos_count": 20
     }
   ],
   "picks_for_proof_row": [
-    {
-      "listing_id": "oceanside|15561",
-      "rank_score": 75.94,
-      "master_category": "beach",
-      "subcategory": "homes",
-      "star_rating": 4.0,
-      "hero_eligible": true,
-      "card_eligible": true
-    },
     {
       "listing_id": "remax|002684209008",
       "rank_score": 75.07,
@@ -60,9 +51,18 @@
     },
     {
       "listing_id": "bienesraices|2390",
-      "rank_score": 69.32,
+      "rank_score": 68.92,
       "master_category": "beach",
       "subcategory": "land",
+      "star_rating": 3.5,
+      "hero_eligible": true,
+      "card_eligible": true
+    },
+    {
+      "listing_id": "oceanside|12451",
+      "rank_score": 65.85,
+      "master_category": "beach",
+      "subcategory": "homes",
       "star_rating": 3.5,
       "hero_eligible": true,
       "card_eligible": true
