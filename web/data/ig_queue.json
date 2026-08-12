@@ -1233,6 +1233,49 @@
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
+    },
+    {
+      "day": 257,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "ya_volvio",
+      "emotion": "orgullo",
+      "selector": "autopilot",
+      "color_key": "terrenos_lago",
+      "poster_type": "ya_volvio",
+      "palette": "terrenos_lago",
+      "scheduled_for": "2026-08-19T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d257__ya_volvio",
+      "poster_path": "web/data/ig_assets/autopilot/d257__ya_volvio/slide_1.jpg",
+      "poster_overrides": {},
+      "caption": "El Salvador que dejaste no es el que vas a encontrar. La costa está despierta, y todavía hay lugar para vos.\n\n📍 Santa Tecla. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "Santa Tecla · 4,666 m² · $834,500.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #SantaTecla #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d257__ya_volvio/slide_2.jpg",
+        "web/data/ig_assets/autopilot/d257__ya_volvio/slide_3.jpg",
+        "web/data/ig_assets/autopilot/d257__ya_volvio/slide_4.jpg",
+        "web/data/ig_assets/autopilot/d257__ya_volvio/slide_5.jpg",
+        "web/data/ig_assets/autopilot/d257__ya_volvio/slide_6.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__1908"
+      ],
+      "primary_listing_id": "bienesraices__1908",
+      "cover_photo_url": "https://assets.easybroker.com/property_images/3569275/58073449/EB-MR9275.JPG?rasterize=true&version=1676992963",
+      "cover_photo_urls": [
+        "https://assets.easybroker.com/property_images/3569275/58073449/EB-MR9275.JPG?rasterize=true&version=1676992963",
+        "https://assets.easybroker.com/property_images/3569275/58073464/EB-MR9275.png?rasterize=true&version=1676992963"
+      ],
+      "photo_tier": "great",
+      "cover_beauty": 84.5,
+      "humor": null,
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
