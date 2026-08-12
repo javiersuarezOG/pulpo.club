@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-11T04:35:33.165420+00:00",
+  "computed_at": "2026-08-12T04:59:29.662867+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -206,52 +206,6 @@
     {
       "count": 4,
       "cross_source": false,
-      "fingerprint": "d7c862965143e5bc53c0c215d758a8c0f3007df6",
-      "samples": [
-        {
-          "area_m2": 336.55,
-          "price_usd": 108349.0,
-          "source": "remax",
-          "source_id": "001464217036",
-          "title": "FOR SALE SAN CARLOS COUNTRY PROJECT IN SANTA ANA",
-          "url": "https://www.remax-elsalvador.com/001464217036",
-          "zone": "santa-ana"
-        },
-        {
-          "area_m2": 335.47,
-          "price_usd": 107999.0,
-          "source": "remax",
-          "source_id": "001464217031",
-          "title": "FOR SALE SAN CARLOS COUNTRY PROJECT IN SANTA ANA",
-          "url": "https://www.remax-elsalvador.com/001464217031",
-          "zone": "santa-ana"
-        },
-        {
-          "area_m2": 335.88,
-          "price_usd": 108131.0,
-          "source": "remax",
-          "source_id": "001464217030",
-          "title": "FOR SALE SAN CARLOS COUNTRY PROJECT IN SANTA ANA",
-          "url": "https://www.remax-elsalvador.com/001464217030",
-          "zone": "santa-ana"
-        },
-        {
-          "area_m2": 335.47,
-          "price_usd": 107999.0,
-          "source": "remax",
-          "source_id": "001464217023",
-          "title": "FOR SALE SAN CARLOS COUNTRY PROJECT IN SANTA ANA",
-          "url": "https://www.remax-elsalvador.com/001464217023",
-          "zone": "santa-ana"
-        }
-      ],
-      "sources": [
-        "remax"
-      ]
-    },
-    {
-      "count": 4,
-      "cross_source": false,
       "fingerprint": "eb1b0b1225c4307e0c98913d56e17ef5705736f3",
       "samples": [
         {
@@ -330,43 +284,6 @@
       ],
       "sources": [
         "realestate_au_sv"
-      ]
-    },
-    {
-      "count": 3,
-      "cross_source": false,
-      "fingerprint": "8d81038dfd1f31e943738a51bbf3d7a166cc18e5",
-      "samples": [
-        {
-          "area_m2": 348.99,
-          "price_usd": 112354.0,
-          "source": "remax",
-          "source_id": "001464217026",
-          "title": "FOR SALE SAN CARLOS COUNTRY PROJECT IN SANTA ANA",
-          "url": "https://www.remax-elsalvador.com/001464217026",
-          "zone": "santa-ana"
-        },
-        {
-          "area_m2": 349.45,
-          "price_usd": 112499.0,
-          "source": "remax",
-          "source_id": "001464217025",
-          "title": "FOR SALE SAN CARLOS COUNTRY PROJECT IN SANTA ANA",
-          "url": "https://www.remax-elsalvador.com/001464217025",
-          "zone": "santa-ana"
-        },
-        {
-          "area_m2": 349.45,
-          "price_usd": 112499.0,
-          "source": "remax",
-          "source_id": "001464217024",
-          "title": "FOR SALE SAN CARLOS COUNTRY PROJECT IN SANTA ANA",
-          "url": "https://www.remax-elsalvador.com/001464217024",
-          "zone": "santa-ana"
-        }
-      ],
-      "sources": [
-        "remax"
       ]
     },
     {
@@ -1688,10 +1605,10 @@
   "overlap_matrix": {},
   "per_source": {
     "bienesraices": {
-      "kept_as_unique": 506,
-      "raw": 507,
+      "kept_as_unique": 507,
+      "raw": 508,
       "shared_with_others": 0,
-      "unique_in_source": 506
+      "unique_in_source": 507
     },
     "citymax": {
       "kept_as_unique": 34,
@@ -1700,10 +1617,10 @@
       "unique_in_source": 34
     },
     "citymax_sc": {
-      "kept_as_unique": 147,
-      "raw": 147,
+      "kept_as_unique": 150,
+      "raw": 150,
       "shared_with_others": 0,
-      "unique_in_source": 147
+      "unique_in_source": 150
     },
     "csbr": {
       "kept_as_unique": 283,
@@ -1712,10 +1629,10 @@
       "unique_in_source": 283
     },
     "encuentra24": {
-      "kept_as_unique": 24,
-      "raw": 24,
+      "kept_as_unique": 25,
+      "raw": 25,
       "shared_with_others": 0,
-      "unique_in_source": 24
+      "unique_in_source": 25
     },
     "essurf": {
       "kept_as_unique": 33,
@@ -1724,10 +1641,10 @@
       "unique_in_source": 33
     },
     "goodlife": {
-      "kept_as_unique": 34,
-      "raw": 34,
+      "kept_as_unique": 32,
+      "raw": 32,
       "shared_with_others": 0,
-      "unique_in_source": 34
+      "unique_in_source": 32
     },
     "nexo": {
       "kept_as_unique": 9,
@@ -1748,16 +1665,16 @@
       "unique_in_source": 283
     },
     "remax": {
-      "kept_as_unique": 313,
-      "raw": 332,
+      "kept_as_unique": 303,
+      "raw": 317,
       "shared_with_others": 0,
-      "unique_in_source": 313
+      "unique_in_source": 303
     },
     "santizo": {
-      "kept_as_unique": 85,
-      "raw": 85,
+      "kept_as_unique": 83,
+      "raw": 83,
       "shared_with_others": 0,
-      "unique_in_source": 85
+      "unique_in_source": 83
     },
     "vivolatam": {
       "kept_as_unique": 157,
@@ -1772,6 +1689,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2037,
-  "total_unique_fingerprints": 1962
+  "total_in_dataset": 2023,
+  "total_unique_fingerprints": 1953
 }
