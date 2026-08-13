@@ -136933,5 +136933,315 @@
     "cost_usd": 0.00150912,
     "finish_reason": "stop",
     "latency_ms": 3769
+  },
+  "csbr|venta-de-terrenos-en-los-suenos-2": {
+    "ts": "2026-08-13T05:02:16.469113+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Los Sueños, Santa Tecla",
+      "es": "Terreno en Venta en Los Sueños, Santa Tecla"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Los Sueños, Santa Tecla, La Libertad. The listing does not specify size, zoning, or utilities. Price is $300,000. Located in a residential area of Santa Tecla.",
+      "es": "Terreno en Los Sueños, Santa Tecla, La Libertad. El anuncio no especifica tamaño, zonificación ni servicios. Precio de $300,000. Ubicado en una zona residencial de Santa Tecla."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Santa Tecla, La Libertad",
+        "es": "Ubicado en Santa Tecla, La Libertad"
+      },
+      {
+        "en": "Asking price $300,000",
+        "es": "Precio de venta $300,000"
+      },
+      {
+        "en": "Residential area of Los Sueños",
+        "es": "Zona residencial de Los Sueños"
+      }
+    ],
+    "lat": 13.6739,
+    "lng": -89.2797,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3069,
+    "tokens_out": 403,
+    "cost_usd": 0.00127193,
+    "finish_reason": "stop",
+    "latency_ms": 3794
+  },
+  "realestate_au_sv|lote-12-pol-i-canton-primavera-santa-ana-santa-ana-lotificacion-el-carmen-ii-carretera-que-de-san-salvador-conduce-a-santa-ana-primavera-santa-ana-primavera-santa-ana-310119544855": {
+    "ts": "2026-08-13T05:02:16.603477+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land Lot 12, El Carmen II, Santa Ana",
+      "es": "Lote 12, El Carmen II, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Land lot 12 in Pol. I, Canton Primavera, Santa Ana, on the highway from San Salvador to Santa Ana. Part of Lotificación El Carmen II. Priced at USD 21,000.",
+      "es": "Lote de terreno 12, Pol. I, Cantón Primavera, Santa Ana, sobre la carretera de San Salvador a Santa Ana. Parte de la Lotificación El Carmen II. Precio de USD 21,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "On highway from San Salvador to Santa Ana",
+        "es": "Sobre carretera de San Salvador a Santa Ana"
+      },
+      {
+        "en": "Located in Lotificación El Carmen II",
+        "es": "Ubicado en Lotificación El Carmen II"
+      },
+      {
+        "en": "Priced at USD 21,000",
+        "es": "Precio de USD 21,000"
+      }
+    ],
+    "lat": 13.9942,
+    "lng": -89.5598,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3110,
+    "tokens_out": 399,
+    "cost_usd": 0.0012786,
+    "finish_reason": "stop",
+    "latency_ms": 3928
+  },
+  "santizo|10273861": {
+    "ts": "2026-08-13T05:02:17.186374+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "New House in Lomas de Casa del Bosque II",
+      "es": "Casa a estrenar en Lomas de Casa del Bosque II"
+    },
+    "short_description_canonical": {
+      "en": "Brand-new house in exclusive Residencial Lomas de Casa del Bosque II, Cuscatlán. Features foyer, flex room, storage, social bath, kitchen, dining, living, garden, laundry, full service area, terrace, family room, master bedroom with walk-in closet and full bath, and two junior bedrooms each with closet and full bath. 24/7 security.",
+      "es": "Casa a estrenar en exclusiva Residencial Lomas de Casa del Bosque II, Cuscatlán. Cuenta con vestíbulo, habitación flex, bodega, baño social, cocina, comedor, sala, jardín, lavandería, área de servicio completa, terraza, sala familiar, habitación master con walking closet y baño completo, y dos habitaciones junior con closet y baño completo cada una. Seguridad 24/7."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Brand-new, never lived in",
+        "es": "A estrenar, nunca habitada"
+      },
+      {
+        "en": "24/7 gated security",
+        "es": "Seguridad 24/7 en residencial"
+      },
+      {
+        "en": "Master suite with walk-in closet",
+        "es": "Suite master con walking closet"
+      },
+      {
+        "en": "Full service area and terrace",
+        "es": "Área de servicio completa y terraza"
+      }
+    ],
+    "lat": 13.8667,
+    "lng": -88.9167,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Cuscatlán department centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3225,
+    "tokens_out": 517,
+    "cost_usd": 0.00143945,
+    "finish_reason": "stop",
+    "latency_ms": 4510
+  },
+  "oceanside|15752": {
+    "ts": "2026-08-13T05:02:17.236456+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "595 m² Lot in Xanadú, Private Beach Access",
+      "es": "Lote de 595 m² en Xanadú, Acceso a Playa Privada"
+    },
+    "short_description_canonical": {
+      "en": "Premium 595.3 m² lot in Residencial Xanadú, a gated community on the Salvadoran coast with 24/7 security and private beach access. The land is surrounded by mature tropical vegetation and offers ocean views. It is a short walk or golf-cart ride to a private beach cove reserved for residents.",
+      "es": "Lote premium de 595.3 m² en Residencial Xanadú, comunidad cerrada en la costa salvadoreña con seguridad 24/7 y acceso a playa privada. El terreno está rodeado de vegetación tropical madura y ofrece vistas al océano. Está a un corto paseo o en carrito de golf de una cala de playa privada reservada para residentes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private beach access for residents",
+        "es": "Acceso a playa privada para residentes"
+      },
+      {
+        "en": "24/7 security in gated enclave",
+        "es": "Seguridad 24/7 en enclave cerrado"
+      },
+      {
+        "en": "Mature jungle canopy preserved",
+        "es": "Dosel de selva madura preservado"
+      },
+      {
+        "en": "High nightly rates for rentals",
+        "es": "Altas tarifas nocturnas para alquiler"
+      }
+    ],
+    "lat": 13.487,
+    "lng": -89.6133,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Tunco beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3355,
+    "tokens_out": 510,
+    "cost_usd": 0.00146685,
+    "finish_reason": "stop",
+    "latency_ms": 4561
+  },
+  "santizo|10273761": {
+    "ts": "2026-08-13T05:02:17.242268+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "New House in Lomas de Casa del Bosque II",
+      "es": "Casa a estrenar en Lomas de Casa del Bosque II"
+    },
+    "short_description_canonical": {
+      "en": "Brand-new house in exclusive Residencial Lomas de Casa del Bosque II, Cuscatlán. Features vestibule, flex room, storage, social bathroom, kitchen, dining, living room, garden, laundry, full service area, terrace, family room, master bedroom with walk-in closet and full bath, and two junior bedrooms each with walk-in closet and full bath. 24/7 security.",
+      "es": "Casa a estrenar en exclusiva Residencial Lomas de Casa del Bosque II, Cuscatlán. Cuenta con vestíbulo, habitación flex, bodega, baño social, cocina, comedor, sala, jardín, lavandería, área de servicio completa, terraza, sala familiar, habitación master con walking closet y baño completo, y dos habitaciones Jr. con walking closet y baño completo cada una. Seguridad 24/7."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Brand-new, never lived in",
+        "es": "A estrenar, nunca habitada"
+      },
+      {
+        "en": "24/7 security in gated community",
+        "es": "Seguridad 24/7 en residencial cerrado"
+      },
+      {
+        "en": "Master and junior bedrooms with walk-in closets",
+        "es": "Habitaciones master y Jr. con walking closet"
+      },
+      {
+        "en": "Full service area and family room",
+        "es": "Área de servicio completa y sala familiar"
+      }
+    ],
+    "lat": 13.8667,
+    "lng": -88.9167,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Cuscatlán department centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3228,
+    "tokens_out": 532,
+    "cost_usd": 0.00145676,
+    "finish_reason": "stop",
+    "latency_ms": 4566
+  },
+  "encuentra24|32757714": {
+    "ts": "2026-08-13T05:47:30.174075+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beach Villa in Punta Chame with Pool",
+      "es": "Villa en Punta Chame con Piscina"
+    },
+    "short_description_canonical": {
+      "en": "House of 248 m² in Punta Chame, minutes from the beach and 3 minutes from the main road. It has 3 bedrooms, 2 full baths and 1 exterior half bath, plus a pool with jacuzzi and waterfall. Includes a barbecue area, event ranch, and private parking for up to 10 vehicles. Ideal as a beach home or investment.",
+      "es": "Casa de 248 m² en Punta Chame, a minutos de la playa y a 3 minutos de la vía principal. Cuenta con 3 recámaras, 2 baños completos y 1 medio baño exterior, además de piscina con jacuzzi y cascada. Incluye área de barbacoa, rancho para eventos y estacionamiento privado para hasta 10 vehículos. Ideal como casa de playa o inversión."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Pool with jacuzzi and waterfall",
+        "es": "Piscina con jacuzzi y cascada"
+      },
+      {
+        "en": "3 minutes from main road",
+        "es": "A 3 minutos de la vía principal"
+      },
+      {
+        "en": "Parking for up to 10 vehicles",
+        "es": "Estacionamiento para hasta 10 vehículos"
+      },
+      {
+        "en": "Close to Coronado commercial center",
+        "es": "Cerca del centro comercial de Coronado"
+      }
+    ],
+    "lat": 8.6667,
+    "lng": -79.8667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Punta Chame, Chame, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 248.0,
+      "parking_spaces": 10,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2476,
+    "tokens_out": 528,
+    "cost_usd": 0.00124932,
+    "finish_reason": "stop",
+    "latency_ms": 4764
   }
 }

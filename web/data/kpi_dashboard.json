@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-12T05:11:42.899989+00:00",
+  "computed_at": "2026-08-13T05:10:53.430090+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 14,
@@ -9,7 +9,7 @@
         "renders_on_homepage": true
       },
       "beach_homes": {
-        "count": 148,
+        "count": 145,
         "renders_on_homepage": true
       },
       "beach_land": {
@@ -59,8 +59,8 @@
         "target_prd": null
       },
       "citymax_sc": {
-        "coverage_pct_vs_discovered": 48.0,
-        "kept": 144,
+        "coverage_pct_vs_discovered": 48.3,
+        "kept": 145,
         "status": "green",
         "target_discovered": null,
         "target_prd": 300
@@ -81,14 +81,14 @@
       },
       "encuentra24": {
         "coverage_pct_vs_discovered": 0.8,
-        "kept": 25,
+        "kept": 23,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
       },
       "essurf": {
         "coverage_pct_vs_discovered": null,
-        "kept": 33,
+        "kept": 35,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -116,7 +116,7 @@
       },
       "oceanside": {
         "coverage_pct_vs_discovered": null,
-        "kept": 25,
+        "kept": 26,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -143,8 +143,8 @@
         "target_prd": null
       },
       "santizo": {
-        "coverage_pct_vs_discovered": 55.3,
-        "kept": 83,
+        "coverage_pct_vs_discovered": 56.7,
+        "kept": 85,
         "status": "green",
         "target_discovered": null,
         "target_prd": 150
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 5,
     "shelves_total": 6,
-    "total_in_dataset": 1840,
-    "total_visible_listings": 1630
+    "total_in_dataset": 1844,
+    "total_visible_listings": 1629
   },
   "min_real_listings": 4
 }
