@@ -1278,6 +1278,51 @@
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
+    },
+    {
+      "day": 258,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "algun_dia",
+      "emotion": "empuje",
+      "selector": "autopilot",
+      "color_key": "terrenos_lago",
+      "poster_type": "algun_dia",
+      "palette": "terrenos_lago",
+      "scheduled_for": "2026-08-20T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d258__algun_dia",
+      "poster_path": "web/data/ig_assets/autopilot/d258__algun_dia/slide_1.jpg",
+      "poster_overrides": {},
+      "caption": "Siempre es 'algún día'. Algún día el mar, algún día la casa, algún día volver. Ese día no llega solo.\n\n📍 La Libertad. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "La Libertad · 1,013 m² · $1.2M.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #LaLibertad #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d258__algun_dia/slide_2.jpg",
+        "web/data/ig_assets/autopilot/d258__algun_dia/slide_3.jpg",
+        "web/data/ig_assets/autopilot/d258__algun_dia/slide_4.jpg",
+        "web/data/ig_assets/autopilot/d258__algun_dia/slide_5.jpg",
+        "web/data/ig_assets/autopilot/d258__algun_dia/slide_6.jpg",
+        "web/data/ig_assets/autopilot/d258__algun_dia/slide_7.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__2129"
+      ],
+      "primary_listing_id": "bienesraices__2129",
+      "cover_photo_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvUlo1M0VDUjdFTy93Z2F2OXdrVUg5L1ZlbnRhX2RlX3RlcnJlbm9fZXhjbHVzaXZvX2VuX1Jlc2lkZW5jaWFsX0xvc19TdWVcdTAwZjFvc181LmpwZWciLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiAxMjgwLCAiaGVpZ2h0IjogOTYwLCAiZml0IjogImluc2lkZSJ9LCAidG9Gb3JtYXQiOiAianBlZyIsICJqcGVnIjogeyJxdWFsaXR5IjogNzB9fX0=",
+      "cover_photo_urls": [
+        "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvUlo1M0VDUjdFTy93Z2F2OXdrVUg5L1ZlbnRhX2RlX3RlcnJlbm9fZXhjbHVzaXZvX2VuX1Jlc2lkZW5jaWFsX0xvc19TdWVcdTAwZjFvc181LmpwZWciLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiAxMjgwLCAiaGVpZ2h0IjogOTYwLCAiZml0IjogImluc2lkZSJ9LCAidG9Gb3JtYXQiOiAianBlZyIsICJqcGVnIjogeyJxdWFsaXR5IjogNzB9fX0=",
+        "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvMklJOEJRWVFIUS9lNVRrTUhLR21QL1ZlbnRhX2RlX3RlcnJlbm9fZXhjbHVzaXZvX2VuX1Jlc2lkZW5jaWFsX0xvc19TdWVcdTAwZjFvc180LmpwZWciLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiAxMjgwLCAiaGVpZ2h0IjogOTYwLCAiZml0IjogImluc2lkZSJ9LCAidG9Gb3JtYXQiOiAianBlZyIsICJqcGVnIjogeyJxdWFsaXR5IjogNzB9fX0=",
+        "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvTlRHQ0lYOVIxMS9WYm96VlVTY3BtL1ZlbnRhX2RlX3RlcnJlbm9fZXhjbHVzaXZvX2VuX1Jlc2lkZW5jaWFsX0xvc19TdWVcdTAwZjFvc184LmpwZWciLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiAxMjgwLCAiaGVpZ2h0IjogOTYwLCAiZml0IjogImluc2lkZSJ9LCAidG9Gb3JtYXQiOiAianBlZyIsICJqcGVnIjogeyJxdWFsaXR5IjogNzB9fX0="
+      ],
+      "photo_tier": "great",
+      "cover_beauty": 91.8,
+      "humor": null,
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
