@@ -1,22 +1,22 @@
 {
   "en": {
     "candidates_seen": 1,
-    "llm_cost_usd": 0.00024972000000000004,
-    "paragraph": "El Salvador's Plan Vacación 2026 saw fewer accidents and deaths, but injuries increased. For property buyers, this signals safer travel to coastal areas, yet road risks remain. Check your commute routes and consider proximity to emergency services. Stay informed on local safety trends to make confident decisions.",
-    "picked_at": "2026-08-11",
-    "source_date": "11 Aug 2026",
+    "llm_cost_usd": 0.00025813999999999996,
+    "paragraph": "A 5.7-magnitude earthquake struck off Usulután's coast, felt across El Salvador. For coastal property buyers, this underscores seismic risk. Ensure any home you're considering meets building codes and consider earthquake insurance. Check the MARN for aftershocks and local hazard maps. Don't let this deter you, but be prepared.",
+    "picked_at": "2026-08-13",
+    "source_date": "13 Aug 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/general/plan-vacacion-2026-cierra-con-menos-accidentes-y-fallecidos-pero-aumentan-los-lesionados-en-carreteras/?utm_source=rss&utm_medium=rss&utm_campaign=plan-vacacion-2026-cierra-con-menos-accidentes-y-fallecidos-pero-aumentan-los-lesionados-en-carreteras",
-    "title": "Road Safety Improves, But Injuries Rise"
+    "source_url": "https://lapagina.com.sv/nacionales/sismo-de-5-7-sacude-la-zona-costera-de-usulutan/?utm_source=rss&utm_medium=rss&utm_campaign=sismo-de-5-7-sacude-la-zona-costera-de-usulutan",
+    "title": "5.7 Quake Hits Usulután Coast"
   },
   "es": {
     "candidates_seen": 1,
-    "llm_cost_usd": 0.00034495000000000006,
-    "paragraph": "El Plan Vacación 2026 reportó menos accidentes y fallecidos, pero más lesionados en carreteras. Para vos, que estás considerando comprar propiedad costera o de lago, esto indica que las rutas hacia las playas y lagos siguen siendo riesgosas. Aunque la seguridad mejoró, los lesionados aumentaron, así que planificá tus viajes con precaución, especialmente en temporada alta. Considerá la accesibilidad y el estado de las vías al elegir tu propiedad, y verificá los tiempos de traslado desde tu lugar de residencia.",
-    "picked_at": "2026-08-11",
-    "source_date": "11 ago 2026",
+    "llm_cost_usd": 0.00029507000000000003,
+    "paragraph": "Un sismo de 5.7 sacudió la costa de Usulután, recordándote que la actividad sísmica es parte de vivir en El Salvador. Para tu compra de propiedad costera, verifica que la construcción cumpla con normas antisísmicas y revisa el historial de sismos de la zona. No es motivo de alarma, pero sí un llamado a informarte y prepararte.",
+    "picked_at": "2026-08-13",
+    "source_date": "13 ago 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/general/plan-vacacion-2026-cierra-con-menos-accidentes-y-fallecidos-pero-aumentan-los-lesionados-en-carreteras/?utm_source=rss&utm_medium=rss&utm_campaign=plan-vacacion-2026-cierra-con-menos-accidentes-y-fallecidos-pero-aumentan-los-lesionados-en-carreteras",
-    "title": "Plan Vacación 2026 cierra con menos accidentes y fallecidos, pero aumentan los lesionados en carreteras"
+    "source_url": "https://lapagina.com.sv/nacionales/sismo-de-5-7-sacude-la-zona-costera-de-usulutan/?utm_source=rss&utm_medium=rss&utm_campaign=sismo-de-5-7-sacude-la-zona-costera-de-usulutan",
+    "title": "Sismo de 5.7 sacude la zona costera de Usulután"
   }
 }
