@@ -158,52 +158,6 @@
   {
     "count": 4,
     "cross_source": false,
-    "fingerprint": "af1c47b381fa8dcc7f7222d6e2cfd9d5eee33fa8",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 108131.0,
-        "source": "realestate_au_sv",
-        "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705298",
-        "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705298/",
-        "zone": "santa-ana"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 107999.0,
-        "source": "realestate_au_sv",
-        "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705288",
-        "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705288/",
-        "zone": "santa-ana"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 108349.0,
-        "source": "realestate_au_sv",
-        "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705271",
-        "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705271/",
-        "zone": "santa-ana"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 107999.0,
-        "source": "realestate_au_sv",
-        "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705262",
-        "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705262/",
-        "zone": "santa-ana"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 4,
-    "cross_source": false,
     "fingerprint": "eb1b0b1225c4307e0c98913d56e17ef5705736f3",
     "samples": [
       {
@@ -241,43 +195,6 @@
         "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
         "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650148/",
         "zone": "suchitoto"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 3,
-    "cross_source": false,
-    "fingerprint": "5ac1715b27660425918c957d315f912f2c8c37d2",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 112354.0,
-        "source": "realestate_au_sv",
-        "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705263",
-        "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705263/",
-        "zone": "santa-ana"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 112499.0,
-        "source": "realestate_au_sv",
-        "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705253",
-        "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705253/",
-        "zone": "santa-ana"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 112499.0,
-        "source": "realestate_au_sv",
-        "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705242",
-        "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705242/",
-        "zone": "santa-ana"
       }
     ],
     "sources": [
@@ -1285,6 +1202,34 @@
         "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
         "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287046/",
         "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "af1c47b381fa8dcc7f7222d6e2cfd9d5eee33fa8",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 108131.0,
+        "source": "realestate_au_sv",
+        "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705298",
+        "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705298/",
+        "zone": "santa-ana"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 107999.0,
+        "source": "realestate_au_sv",
+        "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705288",
+        "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705288/",
+        "zone": "santa-ana"
       }
     ],
     "sources": [
