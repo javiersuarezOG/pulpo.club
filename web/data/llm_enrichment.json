@@ -137243,5 +137243,119 @@
     "cost_usd": 0.00124932,
     "finish_reason": "stop",
     "latency_ms": 4764
+  },
+  "bienesraices|2448": {
+    "ts": "2026-08-14T04:59:45.196805+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Coffee Farm for Sale in Comasagua, La Libertad",
+      "es": "Finca de Café en Venta en Comasagua, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 7.3 manzanas (51,026.13 m²) in Comasagua, La Libertad, at 1,240 meters above sea level. Terrain: 29% semi-flat (21,462 v²) and 71% rugged/agricultural (51,546 v²). Fronts paved Comasagua-Teotepeque road, 358 m from main turnoff; utilities feasible. Near gastronomic route and eco-projects.",
+      "es": "Terreno de 7.3 manzanas (51,026.13 m²) en Comasagua, La Libertad, a 1,240 metros sobre el nivel del mar. Topografía: 29% semiplana (21,462 v²) y 71% quebrada/agrícola (51,546 v²). Frente a carretera pavimentada Comasagua-Teotepeque, a 358 m del desvío principal; servicios factibles. Cerca de ruta gastronómica y proyectos ecológicos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "7.3 manzanas, 51,026 m² total area",
+        "es": "7.3 manzanas, 51,026 m² de área total"
+      },
+      {
+        "en": "Fronts paved road, 358 m from turnoff",
+        "es": "Frente a carretera pavimentada, a 358 m del desvío"
+      },
+      {
+        "en": "1,240 m altitude, cool climate year-round",
+        "es": "1,240 m de altitud, clima fresco todo el año"
+      },
+      {
+        "en": "29% semi-flat for development",
+        "es": "29% semiplana para desarrollo"
+      },
+      {
+        "en": "Utilities feasible: water, power, internet",
+        "es": "Servicios factibles: agua, luz, internet"
+      }
+    ],
+    "lat": 13.6333,
+    "lng": -89.3833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Comasagua, La Libertad, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3511,
+    "tokens_out": 643,
+    "cost_usd": 0.00165527,
+    "finish_reason": "stop",
+    "latency_ms": 4819
+  },
+  "encuentra24|32763295": {
+    "ts": "2026-08-14T05:44:37.404027+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Luxury Home in Pedasí with Pool",
+      "es": "Casa de lujo frente al mar en Pedasí con piscina"
+    },
+    "short_description_canonical": {
+      "en": "Casa Del Amor is a beachfront residence in a private community, 5 minutes from Pedasí. It features 1,018 m² of construction on a 1,506 m² titled lot, with 5 bedrooms, a separate guest casita, and 5 bathrooms. The property includes an infinity pool, gourmet kitchen, direct beach access, and is fully furnished. It is turnkey with parking for 6, a power plant, and private well.",
+      "es": "Casa Del Amor es una residencia frente al mar en una comunidad privada, a 5 minutos de Pedasí. Cuenta con 1,018 m² de construcción en un terreno titulado de 1,506 m², con 5 recámaras, una casita independiente para invitados y 5 baños. Incluye piscina infinita, cocina gourmet, acceso directo a la playa y está totalmente amueblada. Lista para habitar con estacionamiento para 6, planta eléctrica y pozo privado."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct beach access in private community",
+        "es": "Acceso directo a la playa en comunidad privada"
+      },
+      {
+        "en": "Fully furnished with guest casita",
+        "es": "Totalmente amueblada con casita de invitados"
+      },
+      {
+        "en": "Infinity pool with ocean view",
+        "es": "Piscina infinita con vista al mar"
+      },
+      {
+        "en": "5 minutes from Pedasí town",
+        "es": "A 5 minutos del pueblo de Pedasí"
+      },
+      {
+        "en": "Titled land, 1,506 m²",
+        "es": "Terreno titulado, 1,506 m²"
+      }
+    ],
+    "lat": 7.4625,
+    "lng": -80.0333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Pedasí, Los Santos, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 5,
+      "bathrooms": 5.0,
+      "built_area_m2": 1018.0,
+      "parking_spaces": 6,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2609,
+    "tokens_out": 613,
+    "cost_usd": 0.00137873,
+    "finish_reason": "stop",
+    "latency_ms": 5095
   }
 }

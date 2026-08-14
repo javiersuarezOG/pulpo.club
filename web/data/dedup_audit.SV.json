@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-13T05:02:11.498879+00:00",
+  "computed_at": "2026-08-14T04:59:39.327887+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -160,52 +160,6 @@
     {
       "count": 4,
       "cross_source": false,
-      "fingerprint": "af1c47b381fa8dcc7f7222d6e2cfd9d5eee33fa8",
-      "samples": [
-        {
-          "area_m2": null,
-          "price_usd": 108131.0,
-          "source": "realestate_au_sv",
-          "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705298",
-          "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705298/",
-          "zone": "santa-ana"
-        },
-        {
-          "area_m2": null,
-          "price_usd": 107999.0,
-          "source": "realestate_au_sv",
-          "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705288",
-          "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705288/",
-          "zone": "santa-ana"
-        },
-        {
-          "area_m2": null,
-          "price_usd": 108349.0,
-          "source": "realestate_au_sv",
-          "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705271",
-          "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705271/",
-          "zone": "santa-ana"
-        },
-        {
-          "area_m2": null,
-          "price_usd": 107999.0,
-          "source": "realestate_au_sv",
-          "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705262",
-          "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705262/",
-          "zone": "santa-ana"
-        }
-      ],
-      "sources": [
-        "realestate_au_sv"
-      ]
-    },
-    {
-      "count": 4,
-      "cross_source": false,
       "fingerprint": "eb1b0b1225c4307e0c98913d56e17ef5705736f3",
       "samples": [
         {
@@ -243,43 +197,6 @@
           "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
           "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650148/",
           "zone": "suchitoto"
-        }
-      ],
-      "sources": [
-        "realestate_au_sv"
-      ]
-    },
-    {
-      "count": 3,
-      "cross_source": false,
-      "fingerprint": "5ac1715b27660425918c957d315f912f2c8c37d2",
-      "samples": [
-        {
-          "area_m2": null,
-          "price_usd": 112354.0,
-          "source": "realestate_au_sv",
-          "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705263",
-          "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705263/",
-          "zone": "santa-ana"
-        },
-        {
-          "area_m2": null,
-          "price_usd": 112499.0,
-          "source": "realestate_au_sv",
-          "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705253",
-          "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705253/",
-          "zone": "santa-ana"
-        },
-        {
-          "area_m2": null,
-          "price_usd": 112499.0,
-          "source": "realestate_au_sv",
-          "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705242",
-          "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
-          "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705242/",
-          "zone": "santa-ana"
         }
       ],
       "sources": [
@@ -1296,6 +1213,34 @@
     {
       "count": 2,
       "cross_source": false,
+      "fingerprint": "af1c47b381fa8dcc7f7222d6e2cfd9d5eee33fa8",
+      "samples": [
+        {
+          "area_m2": null,
+          "price_usd": 108131.0,
+          "source": "realestate_au_sv",
+          "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705298",
+          "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705298/",
+          "zone": "santa-ana"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 107999.0,
+          "source": "realestate_au_sv",
+          "source_id": "condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705288",
+          "title": "Condominio Condado San Carlos, distrito de santa ana, Santa Ana, Santa Ana, Santa Ana, Santa Ana Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/condominio-condado-san-carlos-distrito-de-santa-ana-santa-ana-santa-ana-santa-ana-santa-ana-310107705288/",
+          "zone": "santa-ana"
+        }
+      ],
+      "sources": [
+        "realestate_au_sv"
+      ]
+    },
+    {
+      "count": 2,
+      "cross_source": false,
       "fingerprint": "bd93293dcefd94a6f862800e8cfa9f8ca0b58437",
       "samples": [
         {
@@ -1617,10 +1562,10 @@
       "unique_in_source": 34
     },
     "citymax_sc": {
-      "kept_as_unique": 151,
-      "raw": 151,
+      "kept_as_unique": 150,
+      "raw": 150,
       "shared_with_others": 0,
-      "unique_in_source": 151
+      "unique_in_source": 150
     },
     "csbr": {
       "kept_as_unique": 283,
@@ -1629,10 +1574,10 @@
       "unique_in_source": 283
     },
     "encuentra24": {
-      "kept_as_unique": 23,
-      "raw": 23,
+      "kept_as_unique": 22,
+      "raw": 22,
       "shared_with_others": 0,
-      "unique_in_source": 23
+      "unique_in_source": 22
     },
     "essurf": {
       "kept_as_unique": 35,
@@ -1659,10 +1604,10 @@
       "unique_in_source": 26
     },
     "realestate_au_sv": {
-      "kept_as_unique": 283,
-      "raw": 329,
+      "kept_as_unique": 280,
+      "raw": 322,
       "shared_with_others": 0,
-      "unique_in_source": 283
+      "unique_in_source": 280
     },
     "remax": {
       "kept_as_unique": 303,
@@ -1689,6 +1634,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2027,
-  "total_unique_fingerprints": 1957
+  "total_in_dataset": 2018,
+  "total_unique_fingerprints": 1952
 }
