@@ -1325,6 +1325,51 @@
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
+    },
+    {
+      "day": 259,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "olor_lluvia",
+      "emotion": "pertenencia",
+      "selector": "autopilot",
+      "color_key": "terrenos_lago",
+      "poster_type": "olor_lluvia",
+      "palette": "terrenos_lago",
+      "scheduled_for": "2026-08-21T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d259__olor_lluvia",
+      "poster_path": "web/data/ig_assets/autopilot/d259__olor_lluvia/slide_1.jpg",
+      "poster_overrides": {},
+      "caption": "El primer aguacero sobre tierra que es tuya huele distinto. A principio, a raíz, a que por fin llegaste.\n\n📍 Chalatenango. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "Chalatenango · 1,120 m² · $105,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #Chalatenango #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d259__olor_lluvia/slide_2.jpg",
+        "web/data/ig_assets/autopilot/d259__olor_lluvia/slide_3.jpg",
+        "web/data/ig_assets/autopilot/d259__olor_lluvia/slide_4.jpg",
+        "web/data/ig_assets/autopilot/d259__olor_lluvia/slide_5.jpg",
+        "web/data/ig_assets/autopilot/d259__olor_lluvia/slide_6.jpg",
+        "web/data/ig_assets/autopilot/d259__olor_lluvia/slide_7.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__2338"
+      ],
+      "primary_listing_id": "bienesraices__2338",
+      "cover_photo_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/5P1BE0Q7OH/kMmy7pw478/Venta_de_Terreno_con_Casa_en_Troncal_del_Norte_Chalatenango__Ideal_para_Comercio_o_Vivienda.jpeg",
+      "cover_photo_urls": [
+        "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/5P1BE0Q7OH/kMmy7pw478/Venta_de_Terreno_con_Casa_en_Troncal_del_Norte_Chalatenango__Ideal_para_Comercio_o_Vivienda.jpeg",
+        "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvNVAxQkUwUTdPSC9rTW15N3B3NDc4L1ZlbnRhX2RlX1RlcnJlbm9fY29uX0Nhc2FfZW5fVHJvbmNhbF9kZWxfTm9ydGVfQ2hhbGF0ZW5hbmdvX19JZGVhbF9wYXJhX0NvbWVyY2lvX29fVml2aWVuZGEuanBlZyIsICJlZGl0cyI6IHsicmVzaXplIjogeyJ3aWR0aCI6IDEwMjQsICJoZWlnaHQiOiA3NjgsICJmaXQiOiAiaW5zaWRlIn0sICJ0b0Zvcm1hdCI6ICJqcGVnIiwgImpwZWciOiB7InF1YWxpdHkiOiA3MH19fQ==",
+        "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvWkg0T1FFRVlIUy9ldkFaNnhGd25jL1ZlbnRhX2RlX1RlcnJlbm9fY29uX0Nhc2FfZW5fVHJvbmNhbF9kZWxfTm9ydGVfQ2hhbGF0ZW5hbmdvX19JZGVhbF9wYXJhX0NvbWVyY2lvX29fVml2aWVuZGFfMS5qcGVnIiwgImVkaXRzIjogeyJyZXNpemUiOiB7IndpZHRoIjogMTI4MCwgImhlaWdodCI6IDk2MCwgImZpdCI6ICJpbnNpZGUifSwgInRvRm9ybWF0IjogImpwZWciLCAianBlZyI6IHsicXVhbGl0eSI6IDcwfX19"
+      ],
+      "photo_tier": "great",
+      "cover_beauty": 61.8,
+      "humor": null,
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
