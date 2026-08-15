@@ -137357,5 +137357,164 @@
     "cost_usd": 0.00137873,
     "finish_reason": "stop",
     "latency_ms": 5095
+  },
+  "realestate_au_sv|marcado-como-segundo-canton-san-jose-sacare-la-palma-chalatenango-norte-chalatenango-la-palma-chalatenango-la-palma-cuscatlan-department-310109126938": {
+    "ts": "2026-08-15T03:42:30.164787+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in La Palma, Chalatenango",
+      "es": "Terreno en Venta en La Palma, Chalatenango"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Segundo Cantón San José Sacare, La Palma, Chalatenango. Offered at USD 115,000. Details on size and features not specified in the listing.",
+      "es": "Parcela de terreno en Segundo Cantón San José Sacare, La Palma, Chalatenango. Ofrecida en USD 115,000. Detalles sobre tamaño y características no especificados en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Priced at USD 115,000",
+        "es": "Preciado en USD 115,000"
+      },
+      {
+        "en": "Located in La Palma, Chalatenango",
+        "es": "Ubicado en La Palma, Chalatenango"
+      },
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Listado por RE/MAX Central"
+      }
+    ],
+    "lat": 14.2833,
+    "lng": -89.1667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Palma, Chalatenango, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3093,
+    "tokens_out": 392,
+    "cost_usd": 0.00126631,
+    "finish_reason": "stop",
+    "latency_ms": 3360
+  },
+  "encuentra24|32848250": {
+    "ts": "2026-08-15T04:30:19.044691+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Elegant 2-Story House Near Playa El Toro, Pedasí",
+      "es": "Elegante casa de 2 niveles cerca de Playa El Toro, Pedasí"
+    },
+    "short_description_canonical": {
+      "en": "Elegant two-level residence in Pedasí, steps from Playa El Toro. 210 m² built on a 600 m² lot with 3 bedrooms and 2 bathrooms. Features private water well and solar panels for energy efficiency. Includes free immigration assistance for foreign buyers.",
+      "es": "Elegante residencia de dos niveles en Pedasí, a pasos de Playa El Toro. 210 m² construidos en un lote de 600 m² con 3 habitaciones y 2 baños. Incluye pozo de agua propio y paneles solares para eficiencia energética. Incluye asesoría migratoria gratuita para compradores extranjeros."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Steps from Playa El Toro",
+        "es": "A pasos de Playa El Toro"
+      },
+      {
+        "en": "Private water well and solar panels",
+        "es": "Pozo de agua propio y paneles solares"
+      },
+      {
+        "en": "210 m² built on 600 m² lot",
+        "es": "210 m² construidos en lote de 600 m²"
+      },
+      {
+        "en": "Free immigration assistance for foreigners",
+        "es": "Asesoría migratoria gratuita para extranjeros"
+      }
+    ],
+    "lat": 7.4667,
+    "lng": -80.0333,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Toro, Pedasí",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 210.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2497,
+    "tokens_out": 517,
+    "cost_usd": 0.00124289,
+    "finish_reason": "stop",
+    "latency_ms": 4345
+  },
+  "encuentra24|32777436": {
+    "ts": "2026-08-15T04:30:19.952957+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront House in Playa Dorada, Vacamonte",
+      "es": "Casa frente al mar en Playa Dorada, Vacamonte"
+    },
+    "short_description_canonical": {
+      "en": "House in Playa Dorada, Vacamonte, with 110 m² built on a 200 m² lot. It has 3 bedrooms, 2 bathrooms, living-dining room, terrace, laundry, and 2 covered parking spaces. Sold furnished with air conditioning. The gated community offers a pool, social areas, parks, sports courts, kayak lake, beach club, gym, and restaurants.",
+      "es": "Casa en Playa Dorada, Vacamonte, con 110 m² construidos en un terreno de 200 m². Tiene 3 habitaciones, 2 baños, sala-comedor, terraza, lavandería y 2 estacionamientos bajo techo. Se vende amoblada y con aires acondicionados. El residencial cuenta con piscina, áreas sociales, parques, canchas deportivas, lago para kayak, club de playa, gimnasio y restaurantes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront community with beach club",
+        "es": "Comunidad frente al mar con club de playa"
+      },
+      {
+        "en": "Sold furnished with air conditioning",
+        "es": "Se vende amoblada y con aires"
+      },
+      {
+        "en": "Gated cluster with pool and security",
+        "es": "Cluster con garita y piscina"
+      },
+      {
+        "en": "On-site commercial area with supermarket",
+        "es": "Área comercial con supermercado"
+      },
+      {
+        "en": "Recreational amenities: kayak lake, gym",
+        "es": "Amenidades: lago para kayak, gimnasio"
+      }
+    ],
+    "lat": 8.5833,
+    "lng": -79.8667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Dorada, Vacamonte",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 110.0,
+      "parking_spaces": 2,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2380,
+    "tokens_out": 584,
+    "cost_usd": 0.001285,
+    "finish_reason": "stop",
+    "latency_ms": 5253
   }
 }

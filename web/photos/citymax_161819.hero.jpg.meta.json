@@ -1,0 +1,20 @@
+{
+  "width": 1424,
+  "height": 747,
+  "aspect_ratio": 1.906,
+  "file_size_kb": 358.1,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-08-15T03:49:37.657049+00:00",
+  "derivative_width": 1424,
+  "derivative_height": 747,
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://api.obriencrm.com/assets/images/fotos-destacados/acdf818d2de09beef7570c59e2ec3b33.jpg",
+  "candidate_count": 5,
+  "content_sha1": "dfe303154449d72a",
+  "dhash": 7161640139940885403,
+  "duplicates_dropped": 0
+}
