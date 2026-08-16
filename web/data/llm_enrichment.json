@@ -137516,5 +137516,111 @@
     "cost_usd": 0.001285,
     "finish_reason": "stop",
     "latency_ms": 5253
+  },
+  "remax|002524485005": {
+    "ts": "2026-08-16T03:52:07.743910+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "360 m² Lot in Lolotique, San Miguel",
+      "es": "Lote de 360 m² en Lolotique, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "A 360 m² residential lot in Lolotique, San Miguel. The flat terrain offers ample space for a family home with garden and outdoor areas. No construction exists on the lot; utilities and zoning details are not specified.",
+      "es": "Lote residencial de 360 m² en Lolotique, San Miguel. El terreno plano ofrece amplio espacio para una casa familiar con jardín y áreas al aire libre. No hay construcción existente; no se especifican servicios ni zonificación."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "360 m² flat lot",
+        "es": "Lote plano de 360 m²"
+      },
+      {
+        "en": "Located in Lolotique, San Miguel",
+        "es": "Ubicado en Lolotique, San Miguel"
+      },
+      {
+        "en": "Price: $35,000",
+        "es": "Precio: $35,000"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Lolotique, San Miguel",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3190,
+    "tokens_out": 411,
+    "cost_usd": 0.0013134,
+    "finish_reason": "stop",
+    "latency_ms": 3290
+  },
+  "encuentra24|32850866": {
+    "ts": "2026-08-16T04:49:59.908069+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Spacious Duplex in The Woods, Santa María",
+      "es": "Amplio Dúplex en The Woods, Santa María"
+    },
+    "short_description_canonical": {
+      "en": "Duplex residence of approximately 400 m² in The Woods, within Santa María Golf & Country Club, minutes from Costa del Este. It features 3 bedrooms each with private bath, 3.5 bathrooms, den, family room, Italian kitchen with island, service quarters, covered terrace, and private garden. Premium finishes include marble floors, double-glazed windows, and block construction. Community offers 24/7 security, parks, paddle courts, and more.",
+      "es": "Residencia dúplex de aproximadamente 400 m² en The Woods, dentro de Santa María Golf & Country Club, a minutos de Costa del Este. Cuenta con 3 recámaras cada una con baño privado, 3.5 baños, den, sala familiar, cocina italiana con isla, cuarto de servicio, terraza techada y jardín privado. Acabados premium incluyen pisos de mármol, ventanas de doble vidrio y construcción de bloque. La comunidad ofrece seguridad 24/7, parques, canchas de pádel y más."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "399 m² duplex, largest model",
+        "es": "Dúplex de 399 m², modelo más amplio"
+      },
+      {
+        "en": "3 bedrooms, each with private bath",
+        "es": "3 recámaras, cada una con baño privado"
+      },
+      {
+        "en": "Inside Santa María Golf & Country Club",
+        "es": "Dentro de Santa María Golf & Country Club"
+      },
+      {
+        "en": "24/7 security and gated community",
+        "es": "Seguridad 24/7 y comunidad cerrada"
+      },
+      {
+        "en": "Private garden with pool potential",
+        "es": "Jardín privado con potencial de piscina"
+      }
+    ],
+    "lat": 8.9833,
+    "lng": -79.5167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa María Golf & Country Club, Panama City",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.5,
+      "built_area_m2": 399.0,
+      "parking_spaces": 3,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2650,
+    "tokens_out": 609,
+    "cost_usd": 0.0013854,
+    "finish_reason": "stop",
+    "latency_ms": 4679
   }
 }

@@ -18,8 +18,8 @@
       "pick_count": 3
     }
   },
-  "picked_at": "2026-08-15T03:54:44.346012+00:00",
-  "expires_at": "2026-08-16T00:00:00+00:00",
+  "picked_at": "2026-08-16T04:03:38.970358+00:00",
+  "expires_at": "2026-08-17T00:00:00+00:00",
   "tier": "soft",
   "listing_id": "encuentra24|32691999",
   "rank_score": 78.75,
@@ -34,7 +34,7 @@
     },
     {
       "listing_id": "encuentra24|29592387",
-      "rank_score": 74.14,
+      "rank_score": 75.78,
       "hero_photo_quality_score": 50,
       "photos_count": 20
     }
@@ -59,8 +59,8 @@
       "card_eligible": true
     },
     {
-      "listing_id": "citymax_sc|terreno-con-vista-al-mar-en-surf-city-la-libertad",
-      "rank_score": 53.45,
+      "listing_id": "oceanside|15752",
+      "rank_score": 58.44,
       "master_category": "beach",
       "subcategory": "land",
       "star_rating": 3.0,
