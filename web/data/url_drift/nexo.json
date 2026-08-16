@@ -2,13 +2,13 @@
   "source": "nexo",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-08-16T13:04:01.849408+00:00",
+  "probed_at": "2026-08-16T18:49:40.093465+00:00",
   "last_probe": {
     "probed_url": "https://nexo.com.sv",
     "status_code": 200,
     "final_url": "https://nexo.com.sv",
     "response_size_bytes": null,
-    "duration_ms": 255,
+    "duration_ms": 335,
     "error": null
   },
   "baseline": {
@@ -17,6 +17,6 @@
     "final_url": "https://nexo.com.sv",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-08-16T13:04:01.849427+00:00"
+    "last_ok_at": "2026-08-16T18:49:40.093495+00:00"
   }
 }
