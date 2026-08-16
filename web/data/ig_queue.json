@@ -1419,6 +1419,51 @@
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
+    },
+    {
+      "day": 261,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "tiempo_tuyo",
+      "emotion": "tiempo",
+      "selector": "autopilot",
+      "color_key": "terrenos_lago",
+      "poster_type": "tiempo_tuyo",
+      "palette": "terrenos_lago",
+      "scheduled_for": "2026-08-23T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d261__tiempo_tuyo",
+      "poster_path": "web/data/ig_assets/autopilot/d261__tiempo_tuyo/slide_1.jpg",
+      "poster_overrides": {},
+      "caption": "Comprar tiempo no se puede, dicen. Aquí casi. Un lugar donde las horas por fin te pertenecen.\n\n📍 Nejapa. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "Nejapa · 6,989 m² · $650,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #Nejapa #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d261__tiempo_tuyo/slide_2.jpg",
+        "web/data/ig_assets/autopilot/d261__tiempo_tuyo/slide_3.jpg",
+        "web/data/ig_assets/autopilot/d261__tiempo_tuyo/slide_4.jpg",
+        "web/data/ig_assets/autopilot/d261__tiempo_tuyo/slide_5.jpg",
+        "web/data/ig_assets/autopilot/d261__tiempo_tuyo/slide_6.jpg",
+        "web/data/ig_assets/autopilot/d261__tiempo_tuyo/slide_7.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__1880"
+      ],
+      "primary_listing_id": "bienesraices__1880",
+      "cover_photo_url": "https://assets.easybroker.com/property_images/3716234/60770929/EB-NG6234.jpg?rasterize=true&version=1683062776",
+      "cover_photo_urls": [
+        "https://assets.easybroker.com/property_images/3716234/60770929/EB-NG6234.jpg?rasterize=true&version=1683062776",
+        "https://assets.easybroker.com/property_images/3716234/60770930/EB-NG6234.jpg?rasterize=true&version=1683062776",
+        "https://assets.easybroker.com/property_images/3716234/60770932/EB-NG6234.jpg?rasterize=true&version=1683062776"
+      ],
+      "photo_tier": "great",
+      "cover_beauty": 78.1,
+      "humor": null,
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
