@@ -1146,9 +1146,11 @@
       "humor": "apology",
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-08-16T01:55:01.123135+00:00",
+      "posted_media_id": "17882622762616367",
+      "comment_posted": true,
+      "comment_id": "18126899053748497"
     },
     {
       "day": 255,
