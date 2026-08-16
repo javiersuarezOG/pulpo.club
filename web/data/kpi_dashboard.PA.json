@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-15T04:33:07.413842+00:00",
+  "computed_at": "2026-08-16T04:51:06.338888+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 1,
@@ -169,7 +169,7 @@
     "shelves_rendering": 0,
     "shelves_total": 6,
     "total_in_dataset": 36,
-    "total_visible_listings": 5
+    "total_visible_listings": 7
   },
   "min_real_listings": 4
 }
