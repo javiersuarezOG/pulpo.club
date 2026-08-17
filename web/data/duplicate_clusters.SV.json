@@ -623,6 +623,34 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "49c96d85f2453203d46f7ff4523bdc6f3327ad35",
+    "samples": [
+      {
+        "area_m2": 2550.08,
+        "price_usd": 291898.4,
+        "source": "remax",
+        "source_id": "003093706021",
+        "title": "Ocean-View Land in Taquillo, La Libertad – Surf City Corridor",
+        "url": "https://www.remax-elsalvador.com/003093706021",
+        "zone": "san-diego"
+      },
+      {
+        "area_m2": 2550.08,
+        "price_usd": 291898.4,
+        "source": "remax",
+        "source_id": "003093706020",
+        "title": "Ocean-View Land in Taquillo, La Libertad – Surf City Corridor",
+        "url": "https://www.remax-elsalvador.com/003093706020",
+        "zone": "san-diego"
+      }
+    ],
+    "sources": [
+      "remax"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "4bb12eb935248b1f80e22793f4d9763725f06ff1",
     "samples": [
       {

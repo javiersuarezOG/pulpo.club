@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-16T03:52:03.727407+00:00",
+  "computed_at": "2026-08-17T03:51:36.417367+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -620,6 +620,34 @@
       ],
       "sources": [
         "realestate_au_sv"
+      ]
+    },
+    {
+      "count": 2,
+      "cross_source": false,
+      "fingerprint": "49c96d85f2453203d46f7ff4523bdc6f3327ad35",
+      "samples": [
+        {
+          "area_m2": 2550.08,
+          "price_usd": 291898.4,
+          "source": "remax",
+          "source_id": "003093706021",
+          "title": "Ocean-View Land in Taquillo, La Libertad – Surf City Corridor",
+          "url": "https://www.remax-elsalvador.com/003093706021",
+          "zone": "san-diego"
+        },
+        {
+          "area_m2": 2550.08,
+          "price_usd": 291898.4,
+          "source": "remax",
+          "source_id": "003093706020",
+          "title": "Ocean-View Land in Taquillo, La Libertad – Surf City Corridor",
+          "url": "https://www.remax-elsalvador.com/003093706020",
+          "zone": "san-diego"
+        }
+      ],
+      "sources": [
+        "remax"
       ]
     },
     {
@@ -1556,10 +1584,10 @@
       "unique_in_source": 507
     },
     "citymax": {
-      "kept_as_unique": 33,
-      "raw": 33,
+      "kept_as_unique": 37,
+      "raw": 37,
       "shared_with_others": 0,
-      "unique_in_source": 33
+      "unique_in_source": 37
     },
     "citymax_sc": {
       "kept_as_unique": 150,
@@ -1574,10 +1602,10 @@
       "unique_in_source": 283
     },
     "encuentra24": {
-      "kept_as_unique": 26,
-      "raw": 26,
+      "kept_as_unique": 23,
+      "raw": 23,
       "shared_with_others": 0,
-      "unique_in_source": 26
+      "unique_in_source": 23
     },
     "essurf": {
       "kept_as_unique": 35,
@@ -1604,16 +1632,16 @@
       "unique_in_source": 26
     },
     "realestate_au_sv": {
-      "kept_as_unique": 280,
-      "raw": 322,
+      "kept_as_unique": 279,
+      "raw": 321,
       "shared_with_others": 0,
-      "unique_in_source": 280
+      "unique_in_source": 279
     },
     "remax": {
-      "kept_as_unique": 303,
-      "raw": 317,
+      "kept_as_unique": 305,
+      "raw": 320,
       "shared_with_others": 0,
-      "unique_in_source": 303
+      "unique_in_source": 305
     },
     "santizo": {
       "kept_as_unique": 85,
@@ -1634,6 +1662,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2021,
-  "total_unique_fingerprints": 1955
+  "total_in_dataset": 2024,
+  "total_unique_fingerprints": 1957
 }

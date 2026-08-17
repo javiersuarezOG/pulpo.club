@@ -137622,5 +137622,282 @@
     "cost_usd": 0.0013854,
     "finish_reason": "stop",
     "latency_ms": 4679
+  },
+  "citymax_sc|casa-en-venta-con-uso-comercial-en-santa-ana": {
+    "ts": "2026-08-17T03:51:40.817955+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Commercial House for Sale in Santa Ana",
+      "es": "Casa Comercial en Venta en Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "Commercial house for sale in Santa Ana, El Salvador. The property is located in the city of Santa Ana, department of Santa Ana. Specific details such as size, bedrooms, and bathrooms are not provided in the listing. Price is $150,000.",
+      "es": "Casa comercial en venta en Santa Ana, El Salvador. La propiedad está ubicada en la ciudad de Santa Ana, departamento de Santa Ana. No se proporcionan detalles específicos como tamaño, habitaciones y baños en el anuncio. Precio: $150,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Commercial zoning in Santa Ana",
+        "es": "Zonificación comercial en Santa Ana"
+      },
+      {
+        "en": "Listed at $150,000",
+        "es": "Precio de $150,000"
+      },
+      {
+        "en": "Located in Santa Ana city",
+        "es": "Ubicada en la ciudad de Santa Ana"
+      }
+    ],
+    "lat": 13.9949,
+    "lng": -89.5596,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3069,
+    "tokens_out": 402,
+    "cost_usd": 0.00127083,
+    "finish_reason": "stop",
+    "latency_ms": 3385
+  },
+  "remax|003093706020": {
+    "ts": "2026-08-17T03:51:41.905885+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Ocean-View Land in Taquillo, Surf City Corridor",
+      "es": "Terreno con vista al mar en Taquillo, corredor Surf City"
+    },
+    "short_description_canonical": {
+      "en": "Land parcels in Taquillo, La Libertad, within the Surf City corridor, with panoramic Pacific views from Playa KM59 to Playa Shalpa. Lots range from 3,648.73 to 3,859.897 square varas (approx. 2,550 m²), at 150–171 m elevation. Access is 650 m from the Litoral Highway via concrete road; electricity and water feasible. Price: $80 per square vara.",
+      "es": "Terrenos en Taquillo, La Libertad, dentro del corredor Surf City, con vistas panorámicas del Pacífico desde Playa KM59 hasta Playa Shalpa. Los lotes van de 3,648.73 a 3,859.897 varas cuadradas (aprox. 2,550 m²), a 150–171 m de elevación. Acceso a 650 m de la carretera Litoral por camino de concreto; electricidad y agua factibles. Precio: $80 por vara cuadrada."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Panoramic ocean views from KM59 to Shalpa",
+        "es": "Vistas panorámicas al mar desde KM59 hasta Shalpa"
+      },
+      {
+        "en": "650 m from Litoral Highway, concrete access",
+        "es": "A 650 m de la carretera Litoral, acceso de concreto"
+      },
+      {
+        "en": "Electricity feasible, pole 145 m away",
+        "es": "Electricidad factible, poste a 145 m"
+      },
+      {
+        "en": "7 minutes from Playa KM59 point break",
+        "es": "A 7 minutos de la rompiente de Playa KM59"
+      },
+      {
+        "en": "Elevated lots at 150–171 m for privacy",
+        "es": "Lotes elevados a 150–171 m para privacidad"
+      }
+    ],
+    "lat": 13.487,
+    "lng": -89.595,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Taquillo",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3322,
+    "tokens_out": 633,
+    "cost_usd": 0.00159324,
+    "finish_reason": "stop",
+    "latency_ms": 4471
+  },
+  "remax|003093706022": {
+    "ts": "2026-08-17T03:51:41.932449+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Ocean-View Land in Taquillo, Surf City Corridor",
+      "es": "Terreno con vista al mar en Taquillo, corredor Surf City"
+    },
+    "short_description_canonical": {
+      "en": "Four elevated lots in Taquillo, La Libertad, within the Surf City corridor, with panoramic Pacific views from Playa KM59 to Playa Shalpa. Lots range from 3,648.73 to 3,859.897 square varas (approx. 2,644.18 m²), at 150–171 m above sea level. Access is 650 m from the Litoral Highway via hydraulic concrete road; electricity and potable water are feasible. Priced at $80 per square vara.",
+      "es": "Cuatro lotes elevados en Taquillo, La Libertad, dentro del corredor Surf City, con vistas panorámicas del Pacífico desde Playa KM59 hasta Playa Shalpa. Los lotes van de 3,648.73 a 3,859.897 varas cuadradas (aprox. 2,644.18 m²), a 150–171 m sobre el nivel del mar. Acceso a 650 m de la carretera Litoral vía calle de concreto hidráulico; electricidad y agua potable factibles. Precio: $80 por vara cuadrada."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Panoramic ocean views from KM59 to Shalpa",
+        "es": "Vistas panorámicas al mar desde KM59 hasta Shalpa"
+      },
+      {
+        "en": "650 m from Litoral Highway, concrete road",
+        "es": "A 650 m de la carretera Litoral, calle de concreto"
+      },
+      {
+        "en": "Electricity feasible, pole 145 m away",
+        "es": "Electricidad factible, poste a 145 m"
+      },
+      {
+        "en": "7 minutes from Playa KM59 point break",
+        "es": "A 7 minutos de la rompiente de Playa KM59"
+      },
+      {
+        "en": "Lots sold individually or combined",
+        "es": "Lotes se venden individuales o combinados"
+      }
+    ],
+    "lat": 13.487,
+    "lng": -89.595,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Taquillo",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3322,
+    "tokens_out": 650,
+    "cost_usd": 0.00161194,
+    "finish_reason": "stop",
+    "latency_ms": 4499
+  },
+  "remax|003093706023": {
+    "ts": "2026-08-17T03:51:42.022426+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Ocean-View Land in Taquillo, Surf City Corridor",
+      "es": "Terreno con vista al mar en Taquillo, corredor Surf City"
+    },
+    "short_description_canonical": {
+      "en": "Land parcels in Taquillo, La Libertad, within the Surf City corridor, ranging from 3,648.73 to 3,859.897 square varas (approx. 2,697.72 m²). Elevated lots between 150 and 171 meters above sea level with panoramic Pacific views from Playa KM59 to Playa Shalpa. Access is 650 meters from the Litoral Highway via hydraulic concrete road; electricity and potable water are feasible. Price: $80 per square vara.",
+      "es": "Terrenos en Taquillo, La Libertad, dentro del corredor Surf City, con tamaños de 3,648.73 a 3,859.897 varas cuadradas (aprox. 2,697.72 m²). Lotes elevados entre 150 y 171 metros sobre el nivel del mar con vistas panorámicas al Pacífico desde Playa KM59 hasta Playa Shalpa. Acceso a 650 metros de la carretera Litoral vía calle de concreto hidráulico; electricidad y agua potable factibles. Precio: $80 por vara cuadrada."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Panoramic ocean views from KM59 to Shalpa",
+        "es": "Vistas panorámicas al mar desde KM59 hasta Shalpa"
+      },
+      {
+        "en": "650m from Litoral Highway, concrete road",
+        "es": "A 650m de la carretera Litoral, calle de concreto"
+      },
+      {
+        "en": "Electricity feasible, pole 145m away",
+        "es": "Electricidad factible, poste a 145m"
+      },
+      {
+        "en": "7 minutes from Playa KM59 point break",
+        "es": "A 7 minutos de la rompiente de Playa KM59"
+      },
+      {
+        "en": "Multiple lots, individual or combined purchase",
+        "es": "Varios lotes, compra individual o combinada"
+      }
+    ],
+    "lat": 13.487,
+    "lng": -89.595,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Taquillo",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3322,
+    "tokens_out": 651,
+    "cost_usd": 0.00161304,
+    "finish_reason": "stop",
+    "latency_ms": 4589
+  },
+  "remax|003093706021": {
+    "ts": "2026-08-17T03:51:42.045500+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Ocean-View Land in Taquillo, Surf City Corridor",
+      "es": "Terreno con vista al mar en Taquillo, corredor Surf City"
+    },
+    "short_description_canonical": {
+      "en": "Four elevated lots in Taquillo, La Libertad, within the Surf City corridor, with panoramic Pacific views from Playa KM59 to Playa Shalpa. Lots range from 3,648.73 to 3,859.897 square varas (approx. 2,550 m² each), at 150–171 m above sea level. Access is 650 m from the Litoral Highway via hydraulic concrete road; electricity and potable water are feasible. Price: $80 per square vara.",
+      "es": "Cuatro lotes elevados en Taquillo, La Libertad, dentro del corredor Surf City, con vistas panorámicas del Pacífico desde Playa KM59 hasta Playa Shalpa. Los lotes van de 3,648.73 a 3,859.897 varas cuadradas (aprox. 2,550 m² cada uno), a 150–171 m sobre el nivel del mar. Acceso a 650 m de la carretera del Litoral por calle de concreto hidráulico; electricidad y agua potable factibles. Precio: $80 por vara cuadrada."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Panoramic ocean views from KM59 to Shalpa",
+        "es": "Vistas panorámicas al mar desde KM59 hasta Shalpa"
+      },
+      {
+        "en": "650 m from Litoral Highway, concrete road",
+        "es": "A 650 m de la carretera del Litoral, calle de concreto"
+      },
+      {
+        "en": "Electricity and water feasible on site",
+        "es": "Electricidad y agua factibles en el lugar"
+      },
+      {
+        "en": "7 minutes from Playa KM59 point break",
+        "es": "A 7 minutos de la rompiente de Playa KM59"
+      },
+      {
+        "en": "Lots from 3,648.73 sq varas, $80/sq vara",
+        "es": "Lotes desde 3,648.73 varas cuadradas, $80/vara"
+      }
+    ],
+    "lat": 13.487,
+    "lng": -89.595,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Taquillo",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3322,
+    "tokens_out": 664,
+    "cost_usd": 0.00162734,
+    "finish_reason": "stop",
+    "latency_ms": 4612
   }
 }

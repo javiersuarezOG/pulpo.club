@@ -1,0 +1,26 @@
+{
+  "width": 6400,
+  "height": 3600,
+  "aspect_ratio": 1.778,
+  "file_size_kb": 6108.0,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-08-17T03:56:47.210454+00:00",
+  "source_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003093706013/v3/HDPhotos/El-Morral-Ubicacion_0f51f65ee8be40548a0870bbec5cbfdc.jpg",
+  "original_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003093706013/v3/HDPhotos/El-Morral-Ubicacion_0f51f65ee8be40548a0870bbec5cbfdc.jpg",
+  "transform_used": "none",
+  "fetched_at": "2026-08-17T03:56:48.332891+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": null,
+  "resdet_detected_height": null,
+  "resdet_upscaled": null,
+  "quarantined": false,
+  "aesthetic": {
+    "visual_appeal": 6.6,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.199 color_entropy=0.515"
+  }
+}
