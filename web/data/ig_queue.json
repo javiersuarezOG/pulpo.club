@@ -1466,6 +1466,51 @@
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
+    },
+    {
+      "day": 262,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "semaforo_marea",
+      "emotion": "cambio",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "semaforo_marea",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-08-24T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d262__semaforo_marea",
+      "poster_path": "web/data/ig_assets/autopilot/d262__semaforo_marea/slide_1.jpg",
+      "poster_overrides": {},
+      "caption": "Miralo dos veces: sí, ese es el precio. 91% bajo lo que vale la zona. No es error — lo agarramos antes que los demás. A este precio, un terreno así no dura.\n\n📍 Conchagua. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "Conchagua · 77,000 m² · $1.1M.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #Conchagua #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d262__semaforo_marea/slide_2.jpg",
+        "web/data/ig_assets/autopilot/d262__semaforo_marea/slide_3.jpg",
+        "web/data/ig_assets/autopilot/d262__semaforo_marea/slide_4.jpg",
+        "web/data/ig_assets/autopilot/d262__semaforo_marea/slide_5.jpg",
+        "web/data/ig_assets/autopilot/d262__semaforo_marea/slide_6.jpg",
+        "web/data/ig_assets/autopilot/d262__semaforo_marea/slide_7.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__1132"
+      ],
+      "primary_listing_id": "bienesraices__1132",
+      "cover_photo_url": "https://assets.easybroker.com/property_images/5519193/95812749/EB-UE9193.jpeg?rasterize=true&version=1757945559",
+      "cover_photo_urls": [
+        "https://assets.easybroker.com/property_images/5519193/95812749/EB-UE9193.jpeg?rasterize=true&version=1757945559",
+        "https://assets.easybroker.com/property_images/5519193/95812750/EB-UE9193.jpeg?rasterize=true&version=1757945559",
+        "https://assets.easybroker.com/property_images/5519193/95812753/EB-UE9193.jpeg?rasterize=true&version=1757945560"
+      ],
+      "photo_tier": "great",
+      "cover_beauty": 56.1,
+      "humor": "bargain",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
