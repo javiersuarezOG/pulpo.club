@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-17T03:51:36.417367+00:00",
+  "computed_at": "2026-08-18T03:47:54.624365+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -1584,22 +1584,22 @@
       "unique_in_source": 507
     },
     "citymax": {
-      "kept_as_unique": 37,
-      "raw": 37,
+      "kept_as_unique": 36,
+      "raw": 36,
       "shared_with_others": 0,
-      "unique_in_source": 37
+      "unique_in_source": 36
     },
     "citymax_sc": {
-      "kept_as_unique": 150,
-      "raw": 150,
+      "kept_as_unique": 149,
+      "raw": 149,
       "shared_with_others": 0,
-      "unique_in_source": 150
+      "unique_in_source": 149
     },
     "csbr": {
-      "kept_as_unique": 283,
-      "raw": 289,
+      "kept_as_unique": 285,
+      "raw": 291,
       "shared_with_others": 0,
-      "unique_in_source": 283
+      "unique_in_source": 285
     },
     "encuentra24": {
       "kept_as_unique": 23,
@@ -1632,22 +1632,22 @@
       "unique_in_source": 26
     },
     "realestate_au_sv": {
-      "kept_as_unique": 279,
-      "raw": 321,
+      "kept_as_unique": 281,
+      "raw": 323,
       "shared_with_others": 0,
-      "unique_in_source": 279
+      "unique_in_source": 281
     },
     "remax": {
-      "kept_as_unique": 305,
-      "raw": 320,
+      "kept_as_unique": 308,
+      "raw": 323,
       "shared_with_others": 0,
-      "unique_in_source": 305
+      "unique_in_source": 308
     },
     "santizo": {
-      "kept_as_unique": 85,
-      "raw": 85,
+      "kept_as_unique": 50,
+      "raw": 50,
       "shared_with_others": 0,
-      "unique_in_source": 85
+      "unique_in_source": 50
     },
     "vivolatam": {
       "kept_as_unique": 157,
@@ -1662,6 +1662,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2024,
-  "total_unique_fingerprints": 1957
+  "total_in_dataset": 1994,
+  "total_unique_fingerprints": 1927
 }
