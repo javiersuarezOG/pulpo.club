@@ -1,15 +1,15 @@
 {
   "source": "encuentra24",
-  "drift_state": "ok",
-  "reason": "matches_baseline",
-  "probed_at": "2026-08-18T13:12:20.022641+00:00",
+  "drift_state": "unreachable",
+  "reason": "http_error: ReadTimeout: The read operation timed out",
+  "probed_at": "2026-08-18T19:00:32.364020+00:00",
   "last_probe": {
     "probed_url": "https://www.encuentra24.com/el-salvador-es/bienes-raices",
-    "status_code": 200,
-    "final_url": "https://www.encuentra24.com/el-salvador-es/bienes-raices",
+    "status_code": null,
+    "final_url": null,
     "response_size_bytes": null,
-    "duration_ms": 1615,
-    "error": null
+    "duration_ms": 10115,
+    "error": "ReadTimeout: The read operation timed out"
   },
   "baseline": {
     "source": "encuentra24",
