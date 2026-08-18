@@ -137899,5 +137899,751 @@
     "cost_usd": 0.00162734,
     "finish_reason": "stop",
     "latency_ms": 4612
+  },
+  "csbr|metalio-vendo-casa-tipo-de-campo-con-piscina-a-5-minutos-de-la-playa": {
+    "ts": "2026-08-18T03:47:58.591209+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Country-style house with pool near Metalío beach",
+      "es": "Casa tipo campo con piscina cerca de playa Metalío"
+    },
+    "short_description_canonical": {
+      "en": "Country-style house with pool in Metalío, 5 minutes from the beach. Price: $260,000. The property offers a rural setting with easy access to the coast.",
+      "es": "Casa tipo campo con piscina en Metalío, a 5 minutos de la playa. Precio: $260,000. La propiedad ofrece un entorno rural con fácil acceso a la costa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "5 minutes from the beach",
+        "es": "A 5 minutos de la playa"
+      },
+      {
+        "en": "Includes private pool",
+        "es": "Incluye piscina privada"
+      },
+      {
+        "en": "Country-style house in Metalío",
+        "es": "Casa tipo campo en Metalío"
+      }
+    ],
+    "lat": 13.58,
+    "lng": -89.77,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Metalío beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3066,
+    "tokens_out": 368,
+    "cost_usd": 0.00123262,
+    "finish_reason": "stop",
+    "latency_ms": 3268
+  },
+  "realestate_au_sv|cementerio-de-lolotique-lolotique-san-miguel-lolotique-san-miguel-310119575204": {
+    "ts": "2026-08-18T03:47:58.761760+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale near Lolotique Cemetery, San Miguel",
+      "es": "Terreno en Venta cerca del Cementerio de Lolotique, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel for sale near the cemetery in Lolotique, San Miguel. The property is located in the municipality of Lolotique, department of San Miguel. No further details on size or features are provided.",
+      "es": "Terreno en venta cerca del cementerio en Lolotique, San Miguel. La propiedad está ubicada en el municipio de Lolotique, departamento de San Miguel. No se proporcionan más detalles sobre tamaño o características."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Near Lolotique cemetery",
+        "es": "Cerca del cementerio de Lolotique"
+      },
+      {
+        "en": "Listed at $35,000",
+        "es": "Precio de $35,000"
+      },
+      {
+        "en": "In San Miguel department",
+        "es": "En el departamento de San Miguel"
+      }
+    ],
+    "lat": 13.5667,
+    "lng": -88.35,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Lolotique municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3081,
+    "tokens_out": 402,
+    "cost_usd": 0.00127407,
+    "finish_reason": "stop",
+    "latency_ms": 3439
+  },
+  "realestate_au_sv|lote-34-zona-b-poligono-agua-fria-hacienda-la-piragua-punta-mango-surf-city-2-jucuaran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310109784522": {
+    "ts": "2026-08-18T03:47:58.898242+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Land Lot in Punta Mango, Surf City 2",
+      "es": "Lote frente al mar en Punta Mango, Surf City 2"
+    },
+    "short_description_canonical": {
+      "en": "Land lot 34 in Zona B, Polígono Agua Fría, Hacienda La Piragua, Punta Mango, Surf City 2, Jucuarán, Usulután. Offered at USD 200,000. This is a land parcel in a coastal development area.",
+      "es": "Lote 34 en Zona B, Polígono Agua Fría, Hacienda La Piragua, Punta Mango, Surf City 2, Jucuarán, Usulután. Ofrecido en USD 200,000. Es una parcela en una zona de desarrollo costero."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Surf City 2 development",
+        "es": "Ubicado en el desarrollo Surf City 2"
+      },
+      {
+        "en": "Coastal area of Punta Mango",
+        "es": "Zona costera de Punta Mango"
+      },
+      {
+        "en": "Price: USD 200,000",
+        "es": "Precio: USD 200,000"
+      }
+    ],
+    "lat": 13.181,
+    "lng": -88.355,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Las Flores",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3122,
+    "tokens_out": 442,
+    "cost_usd": 0.00132914,
+    "finish_reason": "stop",
+    "latency_ms": 3575
+  },
+  "csbr|terreno-playa-malibu": {
+    "ts": "2026-08-18T03:47:58.919538+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Malibu Beach Land, 529.87 m², $90,000",
+      "es": "Terreno Playa Malibu, 529.87 m², $90,000"
+    },
+    "short_description_canonical": {
+      "en": "Land plot of 529.87 m² at Playa Malibu, listed on the Salvadoran Chamber of Real Estate. Price is $90,000. No further details on terrain, access, utilities, or zoning are provided.",
+      "es": "Terreno de 529.87 m² en Playa Malibu, publicado en la Cámara Salvadoreña de Bienes Raíces. Precio de $90,000. No se proporcionan más detalles sobre terreno, acceso, servicios o zonificación."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "529.87 m² beachfront land",
+        "es": "Terreno frente al mar de 529.87 m²"
+      },
+      {
+        "en": "Listed at $90,000",
+        "es": "Publicado en $90,000"
+      },
+      {
+        "en": "Located at Playa Malibu",
+        "es": "Ubicado en Playa Malibu"
+      }
+    ],
+    "lat": 13.205,
+    "lng": -87.842,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Malibu (El Tamarindo/Maculís)",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3054,
+    "tokens_out": 425,
+    "cost_usd": 0.00129208,
+    "finish_reason": "stop",
+    "latency_ms": 3597
+  },
+  "remax|003063506025": {
+    "ts": "2026-08-18T03:47:58.999358+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "725 m² Land for Sale in Tamanique, La Libertad",
+      "es": "Terreno de 725 m² en Venta en Tamanique, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Flat 725.85 m² residential lot in the subdivision area of Tamanique, La Libertad. The land is offered at $200,000 and is located in a nature-surrounded setting. It is suitable for building a custom project.",
+      "es": "Terreno residencial plano de 725.85 m² en la zona de subdivisiones de Tamanique, La Libertad. El terreno se ofrece en $200,000 y se ubica en un entorno rodeado de naturaleza. Es apto para construir un proyecto personalizado."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "725.85 m² lot in Tamanique",
+        "es": "Lote de 725.85 m² en Tamanique"
+      },
+      {
+        "en": "Priced at $200,000",
+        "es": "Precio de $200,000"
+      },
+      {
+        "en": "Subdivision area with growth potential",
+        "es": "Zona de subdivisiones con potencial de crecimiento"
+      },
+      {
+        "en": "Surrounded by nature",
+        "es": "Rodeado de naturaleza"
+      }
+    ],
+    "lat": 13.4897,
+    "lng": -89.3927,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Tamanique, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3208,
+    "tokens_out": 454,
+    "cost_usd": 0.00136556,
+    "finish_reason": "stop",
+    "latency_ms": 3676
+  },
+  "remax|003284514014": {
+    "ts": "2026-08-18T03:47:59.011704+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "297 m² Lot in Riverside Garden, San Miguel",
+      "es": "Lote de 297 m² en Riverside Garden, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Residential lot of approximately 297 m² (3,197 sq ft) in Riverside Garden, a private community in San Miguel. Dimensions are 9 m frontage by 33 m depth. The community offers swimming pools, sports courts, and green areas. Price: $80,000.",
+      "es": "Lote residencial de aproximadamente 297 m² (3,197 pies cuadrados) en Riverside Garden, una comunidad privada en San Miguel. Las dimensiones son 9 m de frente por 33 m de fondo. La comunidad ofrece piscinas, canchas deportivas y áreas verdes. Precio: $80,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private gated community",
+        "es": "Comunidad privada con acceso controlado"
+      },
+      {
+        "en": "Swimming pools and sports courts",
+        "es": "Piscinas y canchas deportivas"
+      },
+      {
+        "en": "297 m², 9m x 33m lot",
+        "es": "Lote de 297 m², 9m x 33m"
+      },
+      {
+        "en": "Price $80,000",
+        "es": "Precio $80,000"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel department centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3292,
+    "tokens_out": 468,
+    "cost_usd": 0.00140364,
+    "finish_reason": "stop",
+    "latency_ms": 3688
+  },
+  "remax|003284449012": {
+    "ts": "2026-08-18T03:48:02.565927+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Rural Lots in Moncagua, Near Las Ramblas Mall",
+      "es": "Lotes rurales en Moncagua, cerca de Las Ramblas Mall"
+    },
+    "short_description_canonical": {
+      "en": "Two 617.85 m² lots in Caserío La Estancia, Moncagua, San Miguel, 200 m from the Moncagua–Chapeltique–Ciudad Barrios highway. Private subdivision with internal streets, electricity, and water via well. Close to Universidad de Oriente, Las Ramblas Mall, and the El Volcán tourist route. Financing available: 6 months interest-free.",
+      "es": "Dos lotes de 617.85 m² en Caserío La Estancia, Moncagua, San Miguel, a 200 m de la carretera Moncagua–Chapeltique–Ciudad Barrios. Subdivisión privada con calles internas, electricidad y agua por pozo. Cerca de la Universidad de Oriente, Las Ramblas Mall y la ruta turística El Volcán. Financiamiento disponible: 6 meses sin intereses."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "200 m from main highway",
+        "es": "A 200 m de la carretera principal"
+      },
+      {
+        "en": "Electricity and well water available",
+        "es": "Electricidad y agua por pozo disponibles"
+      },
+      {
+        "en": "Near Las Ramblas Mall and university",
+        "es": "Cerca de Las Ramblas Mall y universidad"
+      },
+      {
+        "en": "6-month interest-free financing",
+        "es": "Financiamiento a 6 meses sin intereses"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Moncagua, San Miguel, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3446,
+    "tokens_out": 538,
+    "cost_usd": 0.00152222,
+    "finish_reason": "stop",
+    "latency_ms": 3646
+  },
+  "remax|002472129103": {
+    "ts": "2026-08-18T03:48:02.646002+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots in La Ceiba, Nueva Concepción",
+      "es": "Lotes residenciales planos en La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Each lot includes water connection and meter, with electricity and gravel streets throughout. Individual deeds, verified titles, and bank financing available.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas en la Urbanización La Ceiba, Nueva Concepción, Chalatenango. Cada lote incluye conexión de agua y medidor, con electricidad y calles de grava en todo el desarrollo. Escrituras individuales, títulos verificados y financiamiento bancario disponible."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1 km from Central Park",
+        "es": "1 km del Parque Central"
+      },
+      {
+        "en": "700 m from Blvd. Arturo Gutiérrez",
+        "es": "700 m del Blvd. Arturo Gutiérrez"
+      },
+      {
+        "en": "Individual deeds, verified titles",
+        "es": "Escrituras individuales, títulos verificados"
+      },
+      {
+        "en": "Bank financing available",
+        "es": "Financiamiento bancario disponible"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.3,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3444,
+    "tokens_out": 464,
+    "cost_usd": 0.00144028,
+    "finish_reason": "stop",
+    "latency_ms": 3747
+  },
+  "remax|002472129105": {
+    "ts": "2026-08-18T03:48:02.751019+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots in La Ceiba, Nueva Concepción",
+      "es": "Lotes residenciales planos en La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Each lot includes water connection and individual meter; electricity poles and wiring throughout. Gravel streets with curb and gutter, completion estimated March 2026. Individual deeds, verified in Land Registry, with bank financing available.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas en Residencial La Ceiba, Nueva Concepción, Chalatenango. Cada lote incluye conexión de agua y medidor individual; postes y cableado eléctrico en todo el desarrollo. Calles de grava con cordón y cuneta, finalización estimada marzo 2026. Escrituras individuales, verificadas en el Registro, con financiamiento bancario disponible."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Individual deeds, verified in registry",
+        "es": "Escrituras individuales, verificadas en registro"
+      },
+      {
+        "en": "1 km from Central Park",
+        "es": "A 1 km del Parque Central"
+      },
+      {
+        "en": "700 m from Blvd. Arturo Gutiérrez",
+        "es": "A 700 m del Blvd. Arturo Gutiérrez"
+      },
+      {
+        "en": "Flat topography, 280 sq varas up",
+        "es": "Topografía plana, desde 280 varas²"
+      },
+      {
+        "en": "Bank financing available",
+        "es": "Financiamiento bancario disponible"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.3,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3444,
+    "tokens_out": 545,
+    "cost_usd": 0.00152938,
+    "finish_reason": "stop",
+    "latency_ms": 4159
+  },
+  "remax|002472129104": {
+    "ts": "2026-08-18T03:48:03.068964+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots in La Ceiba Subdivision, Nueva Concepción",
+      "es": "Lotes residenciales planos en Residencial La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas (approx. 246 m²) in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Located 1 km from Central Park and 700 m from Blvd. Arturo Gutiérrez, with direct street access. Each lot includes water connection and individual meter; electricity poles and wiring throughout. Individual deeds, verified in Land Registry, with financing options available.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas (aprox. 246 m²) en Residencial La Ceiba, Nueva Concepción, Chalatenango. Ubicados a 1 km del Parque Central y a 700 m del Blvd. Arturo Gutiérrez, con acceso directo a calle. Cada lote incluye conexión de agua y medidor individual; postes y cableado eléctrico en todo el desarrollo. Escrituras individuales, verificadas en el Registro, con opciones de financiamiento."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Individual deeds, verified in Land Registry",
+        "es": "Escrituras individuales, verificadas en el Registro"
+      },
+      {
+        "en": "1 km from Central Park, 700 m from Blvd.",
+        "es": "A 1 km del Parque Central, 700 m del Blvd."
+      },
+      {
+        "en": "Water connection and meter included per lot",
+        "es": "Conexión de agua y medidor incluidos por lote"
+      },
+      {
+        "en": "Flat topography, semi-urban residential zoning",
+        "es": "Topografía plana, uso residencial semi-urbano"
+      },
+      {
+        "en": "Bank financing available (BFA, FEDECREDITO, ACACYPAC)",
+        "es": "Financiamiento bancario disponible (BFA, FEDECREDITO, ACACYPAC)"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -88.95,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3444,
+    "tokens_out": 631,
+    "cost_usd": 0.00162398,
+    "finish_reason": "stop",
+    "latency_ms": 4306
+  },
+  "encuentra24|32857047": {
+    "ts": "2026-08-18T04:34:50.731735+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Buenaventura House with Pool, 380 m², 5 Bedrooms",
+      "es": "Casa en Buenaventura con Piscina, 380 m², 5 Recámaras"
+    },
+    "short_description_canonical": {
+      "en": "House with pool in Buenaventura, Pacific coast of Panama, on a 2,050 m² lot with 380 m² built. 5 bedrooms, 5.5 baths, service room and bath, 4 parking spaces. Buenaventura is an exclusive beach community with golf, marina, and white sand beach.",
+      "es": "Casa con piscina en Buenaventura, costa pacífica de Panamá, en lote de 2,050 m² con 380 m² construidos. 5 recámaras, 5.5 baños, cuarto y baño de servicio, 4 estacionamientos. Buenaventura es una comunidad de playa exclusiva con golf, marina y playa de arena blanca."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private pool on 2,050 m² lot",
+        "es": "Piscina privada en lote de 2,050 m²"
+      },
+      {
+        "en": "5 bedrooms, 5.5 baths, service quarters",
+        "es": "5 recámaras, 5.5 baños, cuarto de servicio"
+      },
+      {
+        "en": "Exclusive beach community with golf and marina",
+        "es": "Comunidad de playa exclusiva con golf y marina"
+      },
+      {
+        "en": "4 parking spaces including visitor parking",
+        "es": "4 estacionamientos incluyendo visitas"
+      }
+    ],
+    "lat": 8.2,
+    "lng": -80.0,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Buenaventura, Pacific coast, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 5,
+      "bathrooms": 5.5,
+      "built_area_m2": 380.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2479,
+    "tokens_out": 550,
+    "cost_usd": 0.00127433,
+    "finish_reason": "stop",
+    "latency_ms": 3695
+  },
+  "encuentra24|32786765": {
+    "ts": "2026-08-18T04:34:50.856865+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3BR House Near Playa Dorada, Gated Community",
+      "es": "Casa 3 Hab. Cerca de Playa Dorada, Residencial"
+    },
+    "short_description_canonical": {
+      "en": "House in Playa Dorada, PH Las Olas Marina model, with 3 bedrooms and 2 bathrooms. Built area of 2,016 m², includes 2 parking spaces. Community offers security booth, social area, children's park, green areas, walking trails, and game courts. Close to the beach.",
+      "es": "Casa en Playa Dorada, PH Las Olas modelo Marina, con 3 recámaras y 2 baños. Área construida de 2,016 m², incluye 2 estacionamientos. El residencial cuenta con garita de seguridad, área social, parque de niños, áreas verdes, senderos para caminar y canchas de juego. Muy cerca de la playa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Close to the beach",
+        "es": "Muy cerca de la playa"
+      },
+      {
+        "en": "Gated community with security booth",
+        "es": "Residencial con garita de seguridad"
+      },
+      {
+        "en": "Includes social area and parks",
+        "es": "Incluye área social y parques"
+      },
+      {
+        "en": "3 bedrooms, 2 bathrooms",
+        "es": "3 recámaras, 2 baños"
+      },
+      {
+        "en": "2 parking spaces included",
+        "es": "2 estacionamientos incluidos"
+      }
+    ],
+    "lat": 8.8833,
+    "lng": -79.5667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Dorada, Arraiján",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 2016.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2308,
+    "tokens_out": 527,
+    "cost_usd": 0.00120286,
+    "finish_reason": "stop",
+    "latency_ms": 3820
+  },
+  "encuentra24|32857696": {
+    "ts": "2026-08-18T04:34:50.945236+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Equestrian Estate in Punta Barco, Coronado",
+      "es": "Finca ecuestre frente al mar en Punta Barco, Coronado"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront equestrian estate in Punta Barco, Coronado, with 410 m² main residence and 750 m² total construction. Features 4 bedrooms, 4.5 bathrooms, 3 parking spaces, fully furnished, private pool, stable, riding arena, and river access. Priced at $3,250,000.",
+      "es": "Finca ecuestre frente al mar en Punta Barco, Coronado, con residencia principal de 410 m² y 750 m² de construcción total. Cuenta con 4 habitaciones, 4.5 baños, 3 estacionamientos, completamente amueblada, piscina privada, establo, arena ecuestre y acceso al río. Precio: $3,250,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront with direct river access",
+        "es": "Frente al mar con acceso directo al río"
+      },
+      {
+        "en": "Private stable and riding arena",
+        "es": "Establo privado y arena ecuestre"
+      },
+      {
+        "en": "Fully furnished, turnkey ready",
+        "es": "Completamente amueblada, lista para habitar"
+      },
+      {
+        "en": "410 m² main residence, 750 m² total",
+        "es": "410 m² residencia principal, 750 m² total"
+      },
+      {
+        "en": "4 bedrooms, 4.5 bathrooms, 3 parking",
+        "es": "4 habitaciones, 4.5 baños, 3 estacionamientos"
+      }
+    ],
+    "lat": 8.5,
+    "lng": -79.8667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Punta Barco, Coronado, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.5,
+      "built_area_m2": 410.0,
+      "parking_spaces": 3,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2630,
+    "tokens_out": 572,
+    "cost_usd": 0.0013393,
+    "finish_reason": "stop",
+    "latency_ms": 3909
+  },
+  "encuentra24|32852701": {
+    "ts": "2026-08-18T04:34:51.130316+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Villa in Punta Pacífica, 605 m²",
+      "es": "Villa frente al mar en Punta Pacífica, 605 m²"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront villa in Punta Pacífica, Panama City, with 605 m² of construction across three levels. It has 3 bedrooms, 6.5 bathrooms, parking for 3 cars, a service room, and a private elevator. Fully furnished, including art valued over $50,000, with marble and wood floors, custom lighting, and automated systems.",
+      "es": "Villa frente al mar en Punta Pacífica, Ciudad de Panamá, con 605 m² de construcción en tres niveles. Cuenta con 3 recámaras, 6.5 baños, estacionamiento para 3 autos, cuarto de servicio y elevador privado. Totalmente amueblada, incluyendo arte valorado en más de $50,000, con pisos de mármol y madera, iluminación personalizada y sistemas automatizados."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct ocean views from main rooms",
+        "es": "Vistas directas al mar desde ambientes principales"
+      },
+      {
+        "en": "Fully furnished with art valued $50k+",
+        "es": "Totalmente amueblada con arte valorado en $50k+"
+      },
+      {
+        "en": "Private elevator connects all levels",
+        "es": "Elevador privado conecta todos los niveles"
+      },
+      {
+        "en": "Smart home automation and sound system",
+        "es": "Automatización inteligente y sistema de sonido"
+      },
+      {
+        "en": "Three parking spaces and service quarters",
+        "es": "Tres estacionamientos y cuarto de servicio"
+      }
+    ],
+    "lat": 8.9785,
+    "lng": -79.5167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Punta Pacífica, Panama City",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 6.5,
+      "built_area_m2": 605.0,
+      "parking_spaces": 3,
+      "furnished": true,
+      "has_pool": null
+    },
+    "tokens_in": 2612,
+    "tokens_out": 577,
+    "cost_usd": 0.00133994,
+    "finish_reason": "stop",
+    "latency_ms": 4094
   }
 }

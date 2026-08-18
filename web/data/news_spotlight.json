@@ -1,22 +1,22 @@
 {
   "en": {
     "candidates_seen": 1,
-    "llm_cost_usd": 0.00025813999999999996,
-    "paragraph": "A 5.7-magnitude earthquake struck off Usulután's coast, felt across El Salvador. For coastal property buyers, this underscores seismic risk. Ensure any home you're considering meets building codes and consider earthquake insurance. Check the MARN for aftershocks and local hazard maps. Don't let this deter you, but be prepared.",
-    "picked_at": "2026-08-13",
-    "source_date": "13 Aug 2026",
+    "llm_cost_usd": 0.00023546000000000003,
+    "paragraph": "The Panamericana at Los Chorros closes fully this weekend for controlled blasting. If you're traveling to the coast or lake, plan alternate routes or delay trips. This affects access to western beaches and lake areas. Check MOP updates and leave extra time. Your property visits or inspections may need rescheduling.",
+    "picked_at": "2026-08-18",
+    "source_date": "17 Aug 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/nacionales/sismo-de-5-7-sacude-la-zona-costera-de-usulutan/?utm_source=rss&utm_medium=rss&utm_campaign=sismo-de-5-7-sacude-la-zona-costera-de-usulutan",
-    "title": "5.7 Quake Hits Usulután Coast"
+    "source_url": "https://lapagina.com.sv/nacionales/anuncian-cierre-total-de-los-chorros-por-voladuras-en-talud-este-fin-de-semana/?utm_source=rss&utm_medium=rss&utm_campaign=anuncian-cierre-total-de-los-chorros-por-voladuras-en-talud-este-fin-de-semana",
+    "title": "Los Chorros Highway Closure This Weekend"
   },
   "es": {
     "candidates_seen": 1,
-    "llm_cost_usd": 0.00029507000000000003,
-    "paragraph": "Un sismo de 5.7 sacudió la costa de Usulután, recordándote que la actividad sísmica es parte de vivir en El Salvador. Para tu compra de propiedad costera, verifica que la construcción cumpla con normas antisísmicas y revisa el historial de sismos de la zona. No es motivo de alarma, pero sí un llamado a informarte y prepararte.",
-    "picked_at": "2026-08-13",
-    "source_date": "13 ago 2026",
+    "llm_cost_usd": 0.00031639000000000005,
+    "paragraph": "Este fin de semana, la carretera Panamericana en Los Chorros estará cerrada por voladuras controladas. Si estás comprando propiedad costera o de lago, esto puede afectar tus viajes de inspección o visitas. Planifica rutas alternativas o reprograma tus visitas para evitar retrasos. Mantente informado sobre futuros cierres, ya que la zona es clave para conectar con destinos turísticos.",
+    "picked_at": "2026-08-18",
+    "source_date": "17 ago 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/nacionales/sismo-de-5-7-sacude-la-zona-costera-de-usulutan/?utm_source=rss&utm_medium=rss&utm_campaign=sismo-de-5-7-sacude-la-zona-costera-de-usulutan",
-    "title": "Sismo de 5.7 sacude la zona costera de Usulután"
+    "source_url": "https://lapagina.com.sv/nacionales/anuncian-cierre-total-de-los-chorros-por-voladuras-en-talud-este-fin-de-semana/?utm_source=rss&utm_medium=rss&utm_campaign=anuncian-cierre-total-de-los-chorros-por-voladuras-en-talud-este-fin-de-semana",
+    "title": "Anuncian cierre total de Los Chorros por voladuras en talud este fin de semana"
   }
 }
