@@ -1513,6 +1513,51 @@
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
+    },
+    {
+      "day": 263,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "horizonte",
+      "emotion": "amplitud",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "horizonte",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-08-25T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d263__horizonte",
+      "poster_path": "web/data/ig_assets/autopilot/d263__horizonte/slide_1.jpg",
+      "poster_overrides": {},
+      "caption": "Miralo dos veces: sí, ese es el precio. 28% bajo lo que vale la zona. No es error — lo agarramos antes que los demás. A este precio, un terreno así no dura.\n\n📍 Punta Mango. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "Punta Mango · 1,830 m² · $300,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #PuntaMango #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d263__horizonte/slide_2.jpg",
+        "web/data/ig_assets/autopilot/d263__horizonte/slide_3.jpg",
+        "web/data/ig_assets/autopilot/d263__horizonte/slide_4.jpg",
+        "web/data/ig_assets/autopilot/d263__horizonte/slide_5.jpg",
+        "web/data/ig_assets/autopilot/d263__horizonte/slide_6.jpg",
+        "web/data/ig_assets/autopilot/d263__horizonte/slide_7.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__1580"
+      ],
+      "primary_listing_id": "bienesraices__1580",
+      "cover_photo_url": "https://assets.easybroker.com/property_images/4815921/81639239/EB-RM5921.jpg?rasterize=true&version=1729733335",
+      "cover_photo_urls": [
+        "https://assets.easybroker.com/property_images/4815921/81639239/EB-RM5921.jpg?rasterize=true&version=1729733335",
+        "https://assets.easybroker.com/property_images/4815921/81639242/EB-RM5921.jpg?rasterize=true&version=1729733374",
+        "https://assets.easybroker.com/property_images/4815921/81639164/EB-RM5921.jpg?rasterize=true&version=1729733141"
+      ],
+      "photo_tier": "great",
+      "cover_beauty": 82.1,
+      "humor": "bargain",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
