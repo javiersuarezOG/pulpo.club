@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-18T04:36:06.953087+00:00",
+  "computed_at": "2026-08-20T04:35:40.811916+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 1,
@@ -9,7 +9,7 @@
         "renders_on_homepage": false
       },
       "beach_homes": {
-        "count": 2,
+        "count": 1,
         "renders_on_homepage": false
       },
       "beach_land": {
@@ -80,8 +80,8 @@
         "target_prd": null
       },
       "encuentra24": {
-        "coverage_pct_vs_discovered": 1.4,
-        "kept": 42,
+        "coverage_pct_vs_discovered": 1.2,
+        "kept": 35,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 0,
     "shelves_total": 6,
-    "total_in_dataset": 42,
-    "total_visible_listings": 7
+    "total_in_dataset": 35,
+    "total_visible_listings": 6
   },
   "min_real_listings": 4
 }

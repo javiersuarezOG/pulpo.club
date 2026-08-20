@@ -276,43 +276,6 @@
     ]
   },
   {
-    "count": 3,
-    "cross_source": false,
-    "fingerprint": "d22995138e01c8dafd983e5d27718f8594a12e0d",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 19975.0,
-        "source": "realestate_au_sv",
-        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310108217901",
-        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310108217901/",
-        "zone": "chalatenango"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 20099.0,
-        "source": "realestate_au_sv",
-        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310107705305",
-        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310107705305/",
-        "zone": "chalatenango"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 20140.0,
-        "source": "realestate_au_sv",
-        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371",
-        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371/",
-        "zone": "chalatenango"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
     "count": 2,
     "cross_source": false,
     "fingerprint": "01d91f4016293e8f2805d1e44d87fd398f2d525d",
@@ -371,34 +334,6 @@
   {
     "count": 2,
     "cross_source": false,
-    "fingerprint": "0d6b8b66dd6a87142a811633bac75fc783ea6048",
-    "samples": [
-      {
-        "area_m2": 11515.77,
-        "price_usd": 3625000.0,
-        "source": "remax",
-        "source_id": "001461962093",
-        "title": "FOR SALE PROPERTY AT EL ZONTE  (Ideal for Investors)",
-        "url": "https://www.remax-elsalvador.com/001461962093",
-        "zone": "el-zonte"
-      },
-      {
-        "area_m2": 11515.77,
-        "price_usd": 3625000.0,
-        "source": "remax",
-        "source_id": "001461962092",
-        "title": "FOR SALE PROPERTY AT EL ZONTE  (Ideal for Investors)",
-        "url": "https://www.remax-elsalvador.com/001461962092",
-        "zone": "el-zonte"
-      }
-    ],
-    "sources": [
-      "remax"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
     "fingerprint": "10b41cc4ee33e62d556f15b0e40ef9b101bce5f8",
     "samples": [
       {
@@ -450,6 +385,34 @@
     ],
     "sources": [
       "vivolatam"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "28d3d53fd0bd77ea5a56f2079a5a04157117fac3",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 291898.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850310",
+        "title": "Cantón La Perla, Polígono 4, Número 13, de la Hacienda Taquillo, Jicalapa, La Libertad, Jicalapa, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850310/",
+        "zone": "la-libertad"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 291898.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850309",
+        "title": "Cantón La Perla, Polígono 4, Número 13, de la Hacienda Taquillo, Jicalapa, La Libertad, Jicalapa, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850309/",
+        "zone": "la-libertad"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
     ]
   },
   {
@@ -987,6 +950,34 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "7ec64774dec6526990a2e0a18e9388528722d1a4",
+    "samples": [
+      {
+        "area_m2": 1039.96,
+        "price_usd": 153000.0,
+        "source": "remax",
+        "source_id": "001462845098",
+        "title": "CONVENIENT 3 PLOTS OF LAND TOGETHER FOR SALE IN CANGREJERA, LA LIBERTAD",
+        "url": "https://www.remax-elsalvador.com/001462845098",
+        "zone": "la-libertad"
+      },
+      {
+        "area_m2": 1039.96,
+        "price_usd": 153000.0,
+        "source": "remax",
+        "source_id": "001462845091",
+        "title": "CONVENIENT 3 PLOTS OF LAND TOGETHER FOR SALE IN CANGREJERA, LA LIBERTAD",
+        "url": "https://www.remax-elsalvador.com/001462845091",
+        "zone": "la-libertad"
+      }
+    ],
+    "sources": [
+      "remax"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "811bc2eb529d9c246ca32133fd8b42acaf3a704e",
     "samples": [
       {
@@ -1351,6 +1342,34 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "d22995138e01c8dafd983e5d27718f8594a12e0d",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 20099.0,
+        "source": "realestate_au_sv",
+        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310107705305",
+        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310107705305/",
+        "zone": "chalatenango"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 20140.0,
+        "source": "realestate_au_sv",
+        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371",
+        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371/",
+        "zone": "chalatenango"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "d5b0d52d133374ef1574de6ba5cd127534441a53",
     "samples": [
       {
@@ -1458,34 +1477,6 @@
     ],
     "sources": [
       "remax"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "e9298aa949d411c4a8936dd5466f267d83d1e7b5",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 120000.0,
-        "source": "realestate_au_sv",
-        "source_id": "los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-santa-ana-310108329908",
-        "title": "Los Naranjos, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-santa-ana-310108329908/",
-        "zone": "chalchuapa"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 120000.0,
-        "source": "realestate_au_sv",
-        "source_id": "los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-santa-ana-310108329892",
-        "title": "Los Naranjos, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-santa-ana-310108329892/",
-        "zone": "chalchuapa"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
     ]
   },
   {
