@@ -138645,5 +138645,1086 @@
     "cost_usd": 0.00133994,
     "finish_reason": "stop",
     "latency_ms": 4094
+  },
+  "citymax_sc|terreno-en-venta-sobre-carretera-panamericana-en-colon": {
+    "ts": "2026-08-20T03:48:46.741191+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Lourdes, Colón",
+      "es": "Terreno en venta en Lourdes, Colón"
+    },
+    "short_description_canonical": {
+      "en": "Land plot for sale in Lourdes, Colón, La Libertad. The property is located in the Campos Verdes area. Price is $29,500.",
+      "es": "Terreno en venta en Lourdes, Colón, La Libertad. La propiedad se ubica en la zona de Campos Verdes. Precio: $29,500."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Lourdes, Colón",
+        "es": "Ubicado en Lourdes, Colón"
+      },
+      {
+        "en": "In Campos Verdes area",
+        "es": "En zona Campos Verdes"
+      },
+      {
+        "en": "Price $29,500",
+        "es": "Precio $29,500"
+      }
+    ],
+    "lat": 13.7167,
+    "lng": -89.3667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Colón, La Libertad, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3084,
+    "tokens_out": 372,
+    "cost_usd": 0.00124188,
+    "finish_reason": "stop",
+    "latency_ms": 2766
+  },
+  "csbr|terreno-en-golden-lake-costa-del-sol": {
+    "ts": "2026-08-20T03:48:47.001703+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "349.5 m² Land in Golden Lake, Costa del Sol",
+      "es": "Terreno de 349.5 m² en Golden Lake, Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 349.5 m² in Golden Lake, Costa del Sol, San Luis La Herradura, La Paz. Listed at $85,000. Located in a residential development near the beach.",
+      "es": "Terreno de 349.5 m² en Golden Lake, Costa del Sol, San Luis La Herradura, La Paz. Precio de $85,000. Ubicado en un desarrollo residencial cerca de la playa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "349.5 m² lot in Costa del Sol",
+        "es": "Lote de 349.5 m² en Costa del Sol"
+      },
+      {
+        "en": "Listed at $85,000",
+        "es": "Precio de $85,000"
+      },
+      {
+        "en": "In Golden Lake development",
+        "es": "En desarrollo Golden Lake"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3079,
+    "tokens_out": 401,
+    "cost_usd": 0.00127243,
+    "finish_reason": "stop",
+    "latency_ms": 3026
+  },
+  "citymax_sc|lote-en-residencial-villas-de-salinitas-iii-sonsonate": {
+    "ts": "2026-08-20T03:48:47.079864+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in Residencial Salinitas, Sonsonate",
+      "es": "Casa en Venta en Residencial Salinitas, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "House for sale in Residencial Salinitas, Villas de Salinitas, El Salvador. Located in the municipality of Sonsonate, this property is part of a residential development. Price: $70,000.",
+      "es": "Casa en venta en Residencial Salinitas, Villas de Salinitas, El Salvador. Ubicada en el municipio de Sonsonate, esta propiedad forma parte de un desarrollo residencial. Precio: $70,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Residential development in Salinitas",
+        "es": "Desarrollo residencial en Salinitas"
+      },
+      {
+        "en": "Priced at $70,000",
+        "es": "Precio de $70,000"
+      },
+      {
+        "en": "Located in Sonsonate municipality",
+        "es": "Ubicada en el municipio de Sonsonate"
+      }
+    ],
+    "lat": 13.7184,
+    "lng": -89.7273,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Sonsonate municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3082,
+    "tokens_out": 404,
+    "cost_usd": 0.00127654,
+    "finish_reason": "stop",
+    "latency_ms": 3105
+  },
+  "citymax_sc|apartamento-amueblado-con-vista-al-mar-en-mizata": {
+    "ts": "2026-08-20T03:48:47.413939+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Furnished Oceanfront Condo for Sale in Mizata",
+      "es": "Apartamento amueblado frente al mar en venta en Mizata"
+    },
+    "short_description_canonical": {
+      "en": "Furnished oceanfront condo for sale in Mizata, La Libertad, within the Surf City Ocean Breeze development. This beachfront unit offers direct access to the sand and is priced at $665,000. Ideal for coastal living in El Salvador's Surf City corridor.",
+      "es": "Apartamento amueblado frente al mar en venta en Mizata, La Libertad, dentro del desarrollo Surf City Ocean Breeze. Esta unidad frente a la playa ofrece acceso directo a la arena y está valorada en $665,000. Ideal para vivir en la costa del corredor Surf City de El Salvador."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront unit in Mizata",
+        "es": "Unidad frente al mar en Mizata"
+      },
+      {
+        "en": "Furnished, ready to move in",
+        "es": "Amueblado, listo para mudarse"
+      },
+      {
+        "en": "Located in Surf City Ocean Breeze",
+        "es": "Ubicado en Surf City Ocean Breeze"
+      },
+      {
+        "en": "Priced at $665,000",
+        "es": "Precio de $665,000"
+      }
+    ],
+    "lat": 13.53,
+    "lng": -89.7,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Mizata beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": true,
+      "has_pool": null
+    },
+    "tokens_in": 3074,
+    "tokens_out": 460,
+    "cost_usd": 0.00133598,
+    "finish_reason": "stop",
+    "latency_ms": 3438
+  },
+  "encuentra24|32835187": {
+    "ts": "2026-08-20T03:48:47.728510+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront 400m² Condo, Plaza Costa Azul, Sonsonate",
+      "es": "Condominio frente al mar 400m², Plaza Costa Azul, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront condo in Plaza Costa Azul, Sonsonate, with 400 m² built area on a 2,600 m² lot. It has 5 bedrooms with private baths, kitchen, dining room, terrace, gazebo, pool with slide, and large green area. Includes 80 coconut palms and parking for 25 vehicles.",
+      "es": "Condominio frente al mar en Plaza Costa Azul, Sonsonate, con 400 m² de construcción en un terreno de 2,600 m². Tiene 5 habitaciones con baño privado, cocina, comedor, terraza, glorieta, piscina con deslizadero y amplia área verde. Incluye 80 palos de coco y parqueo para 25 vehículos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront first row",
+        "es": "Primera fila frente al mar"
+      },
+      {
+        "en": "5 bedrooms with private baths",
+        "es": "5 habitaciones con baño privado"
+      },
+      {
+        "en": "Pool with slide and gazebo",
+        "es": "Piscina con deslizadero y glorieta"
+      },
+      {
+        "en": "Parking for 25 vehicles",
+        "es": "Parqueo para 25 vehículos"
+      },
+      {
+        "en": "80 coconut palms on site",
+        "es": "80 palos de coco en el terreno"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 5,
+      "bathrooms": 3.0,
+      "built_area_m2": 400.0,
+      "parking_spaces": 25,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3198,
+    "tokens_out": 545,
+    "cost_usd": 0.00146296,
+    "finish_reason": "stop",
+    "latency_ms": 3752
+  },
+  "encuentra24|32867540": {
+    "ts": "2026-08-20T03:48:48.193362+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Spacious 2-Level House in Las Rosas, San Salvador",
+      "es": "Amplia casa de 2 niveles en Las Rosas, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Two-level house on Avenida Las Flores, Urbanización Las Rosas 1, San Salvador, minutes from Centro Comercial San Luis. Built area 239 m² on a 194.47 m² lot. Ground floor has living, dining, kitchen, service area with full bath, laundry space, patio, covered terrace, and parking for 2–3 vehicles. Upper floor has 3 bedrooms and 1 full bath. Price $230,000 negotiable.",
+      "es": "Casa de dos niveles sobre Avenida Las Flores, Urbanización Las Rosas 1, San Salvador, a minutos del Centro Comercial San Luis. Área construida de 239 m² en un terreno de 194.47 m². Planta baja con sala, comedor, cocina, área de servicio con baño completo, espacio de lavandería, patio, terraza techada y parqueo para 2–3 vehículos. Planta alta con 3 habitaciones y 1 baño completo. Precio $230,000 negociable."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Minutes from Centro Comercial San Luis",
+        "es": "A minutos del Centro Comercial San Luis"
+      },
+      {
+        "en": "239 m² built on 194 m² lot",
+        "es": "239 m² construidos en terreno de 194 m²"
+      },
+      {
+        "en": "Parking for 2–3 vehicles",
+        "es": "Parqueo para 2–3 vehículos"
+      },
+      {
+        "en": "Flexible spaces for home or office",
+        "es": "Espacios flexibles para vivienda u oficina"
+      }
+    ],
+    "lat": 13.701,
+    "lng": -89.218,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Salvador municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": 239.0,
+      "parking_spaces": 3,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3452,
+    "tokens_out": 579,
+    "cost_usd": 0.00156894,
+    "finish_reason": "stop",
+    "latency_ms": 4217
+  },
+  "realestate_au_sv|residencial-riverside-garden-san-miguel-san-miguel-san-miguel-san-miguel-310109859172": {
+    "ts": "2026-08-20T03:48:49.399439+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Riverside Garden, San Miguel",
+      "es": "Terreno en Venta en Riverside Garden, San Miguel"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Residencial Riverside Garden, San Miguel, San Miguel. Offered at USD 80,000. No further details provided.",
+      "es": "Terreno en Residencial Riverside Garden, San Miguel, San Miguel. Ofrecido en USD 80,000. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in San Miguel city",
+        "es": "Ubicado en la ciudad de San Miguel"
+      },
+      {
+        "en": "Price: USD 80,000",
+        "es": "Precio: USD 80,000"
+      },
+      {
+        "en": "Residential development area",
+        "es": "Zona de desarrollo residencial"
+      }
+    ],
+    "lat": 13.4833,
+    "lng": -88.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Miguel municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3072,
+    "tokens_out": 353,
+    "cost_usd": 0.00121774,
+    "finish_reason": "stop",
+    "latency_ms": 2397
+  },
+  "realestate_au_sv|caserio-el-limon-canton-el-volcan-5-minutos-de-restaurante-el-limon-y-aventuras-delicias-de-concepcion-morazan-delicias-de-concepcion-morazan-department-310109859180": {
+    "ts": "2026-08-20T03:48:49.768457+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Delicias de Concepción, Morazán",
+      "es": "Terreno en Delicias de Concepción, Morazán"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Caserío El Limón, Cantón El Volcán, Delicias de Concepción, Morazán. Located 5 minutes from Restaurante El Limón y Aventuras. Offered for sale by RE/MAX ELEVA.",
+      "es": "Terreno en Caserío El Limón, Cantón El Volcán, Delicias de Concepción, Morazán. Ubicado a 5 minutos del Restaurante El Limón y Aventuras. En venta por RE/MAX ELEVA."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "5 minutes from El Limón restaurant",
+        "es": "5 minutos del restaurante El Limón"
+      },
+      {
+        "en": "Located in Delicias de Concepción",
+        "es": "Ubicado en Delicias de Concepción"
+      },
+      {
+        "en": "For sale by RE/MAX ELEVA",
+        "es": "En venta por RE/MAX ELEVA"
+      }
+    ],
+    "lat": 13.7333,
+    "lng": -88.0667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Delicias de Concepción, Morazán",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3100,
+    "tokens_out": 429,
+    "cost_usd": 0.0013089,
+    "finish_reason": "stop",
+    "latency_ms": 2688
+  },
+  "goodlife|3-bedroom-house-in-el-zonte-750000": {
+    "ts": "2026-08-20T03:48:50.044554+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "El Zonte House with Private Apartment, Near Beach",
+      "es": "Casa en El Zonte con Apartamento Privado, Cerca de la Playa"
+    },
+    "short_description_canonical": {
+      "en": "House in El Zonte (Bitcoin Beach), two minutes from a private beach, surrounded by vegetation and mature trees. Includes a private independent apartment with kitchen and bathroom, pool and garden views, and separate staff quarters. Flexible layout for shared ownership, residence with guest space, or rental investment.",
+      "es": "Casa en El Zonte (Bitcoin Beach), a dos minutos de una playa privada, rodeada de vegetación y árboles maduros. Incluye un apartamento independiente con cocina y baño, vistas a la piscina y jardín, y cuartos de servicio separados. Distribución flexible para copropiedad, residencia con espacio para invitados o inversión de alquiler."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Two minutes from private beach",
+        "es": "A dos minutos de playa privada"
+      },
+      {
+        "en": "Independent apartment with pool views",
+        "es": "Apartamento independiente con vistas a piscina"
+      },
+      {
+        "en": "Separate staff quarters included",
+        "es": "Cuartos de servicio separados incluidos"
+      },
+      {
+        "en": "Flexible for rental or shared ownership",
+        "es": "Flexible para alquiler o copropiedad"
+      }
+    ],
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Zonte beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3212,
+    "tokens_out": 489,
+    "cost_usd": 0.00140514,
+    "finish_reason": "stop",
+    "latency_ms": 3302
+  },
+  "realestate_au_sv|lotificacion-buenos-aires-block-b-lote-nueve-municipio-de-tamanique-tamanique-la-libertad-tamanique-la-libertad-department-310109859168": {
+    "ts": "2026-08-20T03:48:50.184051+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Tamanique, La Libertad for Sale",
+      "es": "Terreno en Tamanique, La Libertad en Venta"
+    },
+    "short_description_canonical": {
+      "en": "Lot 9, Block B, Buenos Aires subdivision, Tamanique, La Libertad. This land is offered for sale at USD 200,000. No further details are provided.",
+      "es": "Lote 9, Block B, Lotificación Buenos Aires, Tamanique, La Libertad. Este terreno se ofrece en venta por USD 200,000. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Tamanique, La Libertad",
+        "es": "Ubicado en Tamanique, La Libertad"
+      },
+      {
+        "en": "Price: USD 200,000",
+        "es": "Precio: USD 200,000"
+      },
+      {
+        "en": "Lot 9, Block B, Buenos Aires",
+        "es": "Lote 9, Block B, Buenos Aires"
+      }
+    ],
+    "lat": 13.5833,
+    "lng": -89.4167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Tamanique, La Libertad, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3094,
+    "tokens_out": 398,
+    "cost_usd": 0.00127318,
+    "finish_reason": "stop",
+    "latency_ms": 2769
+  },
+  "realestate_au_sv|canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310119580803": {
+    "ts": "2026-08-20T03:48:50.219291+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in La Perla, Jicalapa, La Libertad",
+      "es": "Terreno en La Perla, Jicalapa, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Cantón La Perla, Polígono 4, Hacienda Taquillo, Jicalapa, La Libertad. Offered for sale at USD 308,798. No further details provided.",
+      "es": "Terreno en Cantón La Perla, Polígono 4, Hacienda Taquillo, Jicalapa, La Libertad. Se ofrece en venta por USD 308,798. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in La Perla, Jicalapa",
+        "es": "Ubicado en La Perla, Jicalapa"
+      },
+      {
+        "en": "Near Playa Taquillo",
+        "es": "Cerca de Playa Taquillo"
+      },
+      {
+        "en": "Listed by RE/MAX TERRA 503",
+        "es": "Listado por RE/MAX TERRA 503"
+      }
+    ],
+    "lat": 13.487,
+    "lng": -89.595,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Taquillo",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3101,
+    "tokens_out": 407,
+    "cost_usd": 0.00128497,
+    "finish_reason": "stop",
+    "latency_ms": 2469
+  },
+  "realestate_au_sv|canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850310": {
+    "ts": "2026-08-20T03:48:50.909022+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Jicalapa, La Libertad for Sale",
+      "es": "Terreno en Jicalapa, La Libertad en Venta"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Cantón La Perla, Polígono 4, Hacienda Taquillo, Jicalapa, La Libertad. The listing provides no details on size, utilities, or zoning. Price is USD 291,898.",
+      "es": "Terreno en Cantón La Perla, Polígono 4, Hacienda Taquillo, Jicalapa, La Libertad. El anuncio no proporciona detalles sobre tamaño, servicios ni zonificación. Precio: USD 291,898."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in La Libertad department",
+        "es": "Ubicado en el departamento de La Libertad"
+      },
+      {
+        "en": "Near Playa Taquillo area",
+        "es": "Cerca de la zona de Playa Taquillo"
+      },
+      {
+        "en": "Listed by RE/MAX TERRA 503",
+        "es": "Anunciado por RE/MAX TERRA 503"
+      }
+    ],
+    "lat": 13.487,
+    "lng": -89.595,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Taquillo",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3101,
+    "tokens_out": 417,
+    "cost_usd": 0.00129597,
+    "finish_reason": "stop",
+    "latency_ms": 2715
+  },
+  "realestate_au_sv|canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850309": {
+    "ts": "2026-08-20T03:48:52.230737+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in La Perla, Jicalapa, La Libertad",
+      "es": "Terreno en La Perla, Jicalapa, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Cantón La Perla, Polígono 4, Número 13, Hacienda Taquillo, Jicalapa, La Libertad. Offered for sale by RE/MAX TERRA 503. Price: USD 291,898.",
+      "es": "Terreno en Cantón La Perla, Polígono 4, Número 13, Hacienda Taquillo, Jicalapa, La Libertad. En venta por RE/MAX TERRA 503. Precio: USD 291,898."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in La Perla, Jicalapa",
+        "es": "Ubicado en La Perla, Jicalapa"
+      },
+      {
+        "en": "Listed by RE/MAX TERRA 503",
+        "es": "Publicado por RE/MAX TERRA 503"
+      },
+      {
+        "en": "Price USD 291,898",
+        "es": "Precio USD 291,898"
+      }
+    ],
+    "lat": 13.487,
+    "lng": -89.595,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Taquillo",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3101,
+    "tokens_out": 424,
+    "cost_usd": 0.00130367,
+    "finish_reason": "stop",
+    "latency_ms": 2830
+  },
+  "realestate_au_sv|cantones-san-jose-y-el-rosario-el-rosario-metapan-santa-ana-norte-metapan-santa-ana-metapan-morazan-department-310108595120": {
+    "ts": "2026-08-20T03:48:52.751335+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Metapan, Santa Ana for Sale",
+      "es": "Terreno en Metapán, Santa Ana en Venta"
+    },
+    "short_description_canonical": {
+      "en": "Land in cantons San José and El Rosario, El Rosario, Metapán, Santa Ana Norte. This property is for sale through RE/MAX Capital. No further details are provided in the listing.",
+      "es": "Terreno en cantones San José y El Rosario, El Rosario, Metapán, Santa Ana Norte. Esta propiedad está en venta a través de RE/MAX Capital. No se proporcionan más detalles en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Listed by RE/MAX Capital",
+        "es": "Listado por RE/MAX Capital"
+      },
+      {
+        "en": "Located in Santa Ana Norte",
+        "es": "Ubicado en Santa Ana Norte"
+      },
+      {
+        "en": "Price: $4,500,000",
+        "es": "Precio: $4,500,000"
+      }
+    ],
+    "lat": 14.3333,
+    "lng": -89.45,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Metapán, Santa Ana, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3103,
+    "tokens_out": 394,
+    "cost_usd": 0.00127121,
+    "finish_reason": "stop",
+    "latency_ms": 2982
+  },
+  "realestate_au_sv|los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329908": {
+    "ts": "2026-08-20T03:48:52.821273+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Los Naranjos, Chalchuapa",
+      "es": "Terreno en Venta en Los Naranjos, Chalchuapa"
+    },
+    "short_description_canonical": {
+      "en": "Land for sale in Los Naranjos, Chalchuapa, Santa Ana. The property is located in a residential area of Chalchuapa. No further details are provided in the listing.",
+      "es": "Terreno en venta en Los Naranjos, Chalchuapa, Santa Ana. La propiedad se encuentra en una zona residencial de Chalchuapa. No se proporcionan más detalles en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Chalchuapa, Santa Ana",
+        "es": "Ubicado en Chalchuapa, Santa Ana"
+      },
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Anunciado por RE/MAX Central"
+      },
+      {
+        "en": "Price: USD 120,000",
+        "es": "Precio: USD 120,000"
+      }
+    ],
+    "lat": 13.9833,
+    "lng": -89.6833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Chalchuapa, Santa Ana",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3080,
+    "tokens_out": 392,
+    "cost_usd": 0.0012628,
+    "finish_reason": "stop",
+    "latency_ms": 2776
+  },
+  "santizo|10292329": {
+    "ts": "2026-08-20T03:48:53.204354+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Elegant House in Portales del Bosque, Cuscatlán",
+      "es": "Elegante casa en Portales del Bosque, Cuscatlán"
+    },
+    "short_description_canonical": {
+      "en": "House in exclusive Residencial Portales del Bosque, Cuscatlán. Features living room, dining room, open kitchen, flex area, terrace with garden, master bedroom with walk-in closet and full bath, and two junior bedrooms sharing a bath. Price: $475,000.",
+      "es": "Casa en exclusiva Residencial Portales del Bosque, Cuscatlán. Cuenta con sala, comedor, cocina abierta, área flex, terraza con jardín, habitación master con walking closet y baño completo, y dos habitaciones junior con closet y baño compartido. Precio: $475,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Exclusive gated community",
+        "es": "Residencial exclusivo"
+      },
+      {
+        "en": "Master suite with walk-in closet",
+        "es": "Suite master con walking closet"
+      },
+      {
+        "en": "Open kitchen and flex area",
+        "es": "Cocina abierta y área flex"
+      },
+      {
+        "en": "Terrace with garden",
+        "es": "Terraza con jardín"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -88.9167,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Cuscatlán department centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3145,
+    "tokens_out": 463,
+    "cost_usd": 0.00135845,
+    "finish_reason": "stop",
+    "latency_ms": 2925
+  },
+  "remax|003284290016": {
+    "ts": "2026-08-20T03:48:53.695614+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "483 m² Lot in Portal del Roble, Morazán",
+      "es": "Lote de 483 m² en Portal del Roble, Morazán"
+    },
+    "short_description_canonical": {
+      "en": "483.63 m² residential lot in Portal del Roble, El Limón, Delicias de Concepción, Morazán. The eco-friendly development offers cool climate, mountain views, and coffee plantations. Utilities available: electricity and potable water. Amenities include soccer field, picnic area, viewpoints, natural pool, and hiking trails.",
+      "es": "Lote residencial de 483.63 m² en Portal del Roble, El Limón, Delicias de Concepción, Morazán. El desarrollo ecológico ofrece clima fresco, vistas a la montaña y cafetales. Servicios disponibles: electricidad y agua potable. Comodidades incluyen campo de fútbol, área de picnic, miradores, piscina natural y senderos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "483.63 m² lot, $70/m²",
+        "es": "Lote de 483.63 m², $70/m²"
+      },
+      {
+        "en": "Eco-friendly development with amenities",
+        "es": "Desarrollo ecológico con comodidades"
+      },
+      {
+        "en": "Electricity and potable water available",
+        "es": "Electricidad y agua potable disponibles"
+      },
+      {
+        "en": "Cool climate, mountain views",
+        "es": "Clima fresco, vistas a la montaña"
+      }
+    ],
+    "lat": 13.7333,
+    "lng": -88.0667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Delicias de Concepción, Morazán",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3409,
+    "tokens_out": 513,
+    "cost_usd": 0.00148473,
+    "finish_reason": "stop",
+    "latency_ms": 3511
+  },
+  "santizo|10296378": {
+    "ts": "2026-08-20T03:48:53.722969+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront House in Costa del Sol Gated Community",
+      "es": "Casa de Playa en Comunidad Cerrada Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "House in a gated community at Costa del Sol beach, Mundo Villa Vitale. Includes living room, dining room, kitchen, foyer, full social bathroom, complete service area, family room, two junior bedrooms with closets and full bathrooms, master bedroom with closet and full bathroom, pool, and garden. Priced at $595,000.",
+      "es": "Casa en comunidad cerrada en playa Costa del Sol, Mundo Villa Vitale. Incluye sala, comedor, cocina, vestíbulo, baño social completo, área de servicio completa, sala familiar, dos habitaciones junior con closet y baño completo, habitación master con closet y baño completo, piscina y jardín. Precio: $595,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront gated community at Costa del Sol",
+        "es": "Comunidad cerrada frente al mar en Costa del Sol"
+      },
+      {
+        "en": "Private pool and garden included",
+        "es": "Piscina y jardín privados incluidos"
+      },
+      {
+        "en": "Three bedrooms, each with full bath",
+        "es": "Tres habitaciones, cada una con baño completo"
+      },
+      {
+        "en": "Complete service area and family room",
+        "es": "Área de servicio completa y sala familiar"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 4.0,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3203,
+    "tokens_out": 500,
+    "cost_usd": 0.00141481,
+    "finish_reason": "stop",
+    "latency_ms": 3503
+  },
+  "remax|001462845098": {
+    "ts": "2026-08-20T03:48:53.986837+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3 Flat Urbanized Lots, Cangrejera, La Libertad",
+      "es": "3 Lotes Planos Urbanizados, Cangrejera, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Three flat urbanized lots totaling 1,050 m² (1,488 v²) in Lotificación Estancias Vistas del Mar, Cangrejera, La Libertad. Located on El Litoral Road at km 46.5, with double access, water, light, and main road. Ready to build in a quiet, safe neighborhood near beaches and Cangrejera village.",
+      "es": "Tres lotes planos urbanizados que suman 1,050 m² (1,488 v²) en Lotificación Estancias Vistas del Mar, Cangrejera, La Libertad. Ubicados sobre la Carretera El Litoral en el km 46.5, con doble acceso, agua, luz y calle principal. Listos para construir en un vecindario tranquilo y seguro cerca de playas y el pueblo de Cangrejera."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Double access for flexible design",
+        "es": "Doble acceso para diseño flexible"
+      },
+      {
+        "en": "Urbanized with water and light",
+        "es": "Urbanizado con agua y luz"
+      },
+      {
+        "en": "On El Litoral Road, km 46.5",
+        "es": "Sobre Carretera El Litoral, km 46.5"
+      },
+      {
+        "en": "Near beaches and Cangrejera village",
+        "es": "Cerca de playas y pueblo de Cangrejera"
+      },
+      {
+        "en": "Next to 80-home development with mall",
+        "es": "Junto a desarrollo de 80 casas con centro comercial"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bocana San Diego",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3379,
+    "tokens_out": 578,
+    "cost_usd": 0.00154813,
+    "finish_reason": "stop",
+    "latency_ms": 3811
+  },
+  "santizo|10290442": {
+    "ts": "2026-08-20T03:48:54.818884+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Coffee Farm House, 16 mz, Roadside, Ciudad Arce",
+      "es": "Casa de campo, 16 mz, finca de café, orilla de carretera, Ciudad Arce"
+    },
+    "short_description_canonical": {
+      "en": "Country house on a 16-manzana coffee farm in Ciudad Arce, La Libertad, with premium roadside location. Property includes water, electricity, and telephone services. Title is free of liens.",
+      "es": "Casa de campo en finca de café de 16 manzanas en Ciudad Arce, La Libertad, con ubicación premium a orilla de carretera. La propiedad cuenta con agua, energía eléctrica y telefonía. Título completamente libre de gravamen."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "16 mz coffee farm with house",
+        "es": "16 mz de finca de café con casa"
+      },
+      {
+        "en": "Roadside premium location in Ciudad Arce",
+        "es": "Ubicación premium a orilla de carretera en Ciudad Arce"
+      },
+      {
+        "en": "Water, electricity, and telephone available",
+        "es": "Cuenta con agua, energía eléctrica y telefonía"
+      },
+      {
+        "en": "Title free of liens",
+        "es": "Título libre de gravamen"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -89.45,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ciudad Arce, La Libertad, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3136,
+    "tokens_out": 461,
+    "cost_usd": 0.00135382,
+    "finish_reason": "stop",
+    "latency_ms": 3909
+  },
+  "encuentra24|31931296": {
+    "ts": "2026-08-20T04:34:38.276080+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront House in Playa Bijao, 6 Bedrooms",
+      "es": "Casa frente al mar en Playa Bijao, 6 habitaciones"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront house on a 1,105 m² lot in Playa Bijao, Miraflores, Coclé. Built area of 600 m² across two floors with 6 bedrooms and 4 bathrooms. Features include a living-dining room, large kitchen, terrace, pool, front and back yards, and parking for 2 cars.",
+      "es": "Casa frente al mar en un terreno de 1,105 m² en Playa Bijao, Miraflores, Coclé. Área construida de 600 m² en dos plantas con 6 habitaciones y 4 baños. Incluye sala-comedor, amplia cocina, terraza, piscina, patio delantero y trasero, y estacionamiento para 2 autos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront lot in Playa Bijao",
+        "es": "Terreno frente al mar en Playa Bijao"
+      },
+      {
+        "en": "Large 1,105 m² lot",
+        "es": "Gran terreno de 1,105 m²"
+      },
+      {
+        "en": "600 m² built, two floors",
+        "es": "600 m² construidos, dos plantas"
+      },
+      {
+        "en": "6 bedrooms, 4 bathrooms",
+        "es": "6 habitaciones, 4 baños"
+      },
+      {
+        "en": "Pool and ample terraces",
+        "es": "Piscina y amplias terrazas"
+      }
+    ],
+    "lat": 8.3833,
+    "lng": -80.0667,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Bijao, Coclé, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 6,
+      "bathrooms": 4.0,
+      "built_area_m2": 600.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2315,
+    "tokens_out": 546,
+    "cost_usd": 0.00122565,
+    "finish_reason": "stop",
+    "latency_ms": 4371
   }
 }

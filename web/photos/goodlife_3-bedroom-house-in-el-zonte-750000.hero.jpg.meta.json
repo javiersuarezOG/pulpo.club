@@ -1,0 +1,20 @@
+{
+  "width": 800,
+  "height": 600,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 307.3,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-08-20T03:54:30.014291+00:00",
+  "derivative_width": 800,
+  "derivative_height": 600,
+  "hero_photo_quality_score": 70,
+  "has_text_overlay": false,
+  "has_marketing_overlay": false,
+  "winning_url": "https://goodlifeelsalvador.com/wp-content/uploads/2026/02/Set-featured-image-2.jpg",
+  "candidate_count": 5,
+  "content_sha1": "7f1378b569625e96",
+  "dhash": 14004185416671181017,
+  "duplicates_dropped": 1
+}
