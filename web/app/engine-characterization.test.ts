@@ -165,6 +165,66 @@ describe("applyFilters — price and size", () => {
     const rows = [listing({ id: "small", size_m2: 500 }), listing({ id: "big", size_m2: 5000 })];
     expect(ids(applyFilters(rows, filters({ size_min: 5000 })))).toEqual(["big"]);
   });
+
+  it("applies size_max as an inclusive ceiling, null = uncapped", () => {
+    const rows = [listing({ id: "small", size_m2: 500 }), listing({ id: "big", size_m2: 5000 })];
+    expect(ids(applyFilters(rows, filters({ size_max: null })))).toEqual(["small", "big"]);
+    expect(ids(applyFilters(rows, filters({ size_max: 5000 })))).toEqual(["small", "big"]);
+    expect(ids(applyFilters(rows, filters({ size_max: 4999 })))).toEqual(["small"]);
+  });
+
+  it("keeps null-sized listings under a max-only cap, mirroring price", () => {
+    // Same shape as the price quirk above: `null > n` is false, so a
+    // ceiling alone keeps unknown-size rows, while any positive floor
+    // removes them. Existing behaviour; locked, not fixed.
+    const rows = [listing({ id: "nullsize", size_m2: null })];
+    expect(ids(applyFilters(rows, filters({ size_max: 1000 })))).toEqual(["nullsize"]);
+    expect(applyFilters(rows, filters({ size_min: 1 }))).toEqual([]);
+  });
+});
+
+describe("applyFilters — faceting via opts.skip", () => {
+  // Facet histograms must reflect every OTHER filter but not their own
+  // dimension, so that dragging a control can never move its own bars
+  // (the Airbnb/Amazon convention). opts.skip drops exactly one
+  // dimension's predicate.
+
+  it("skip:'price' ignores the price bounds but honours everything else", () => {
+    const rows = [
+      listing({ id: "cheap-oceanview", price: 10_000, has_ocean_view: true }),
+      listing({ id: "pricey-oceanview", price: 900_000, has_ocean_view: true }),
+      listing({ id: "cheap-inland", price: 10_000 }),
+    ];
+    const f = filters({ price_max: 50_000, features: new Set(["ocean_view"]) });
+    expect(ids(applyFilters(rows, f, { skip: "price" }))).toEqual([
+      "cheap-oceanview",
+      "pricey-oceanview",
+    ]);
+  });
+
+  it("skip:'size' ignores the size bounds but still honours price", () => {
+    const rows = [
+      listing({ id: "big-cheap", size_m2: 90_000, price: 10_000 }),
+      listing({ id: "big-pricey", size_m2: 90_000, price: 900_000 }),
+    ];
+    const f = filters({ size_max: 1000, price_max: 50_000 });
+    expect(ids(applyFilters(rows, f, { skip: "size" }))).toEqual(["big-cheap"]);
+  });
+
+  it("skip never relaxes the sold or incomplete gates", () => {
+    const rows = [
+      listing({ id: "sold", price: 10_000, is_sold: true }),
+      listing({ id: "partial", price: 10_000, is_incomplete: true }),
+    ];
+    expect(applyFilters(rows, filters({ price_max: 5 }), { skip: "price" })).toEqual([]);
+  });
+
+  it("stays backward compatible with 2-arg callers", () => {
+    // account.jsx calls applyFilters(listings, f) with no opts.
+    const rows = [listing({ id: "a", price: 900_000 })];
+    expect(applyFilters(rows, filters({ price_max: 1000 }))).toEqual([]);
+    expect(applyFilters(rows, filters({ price_max: 1000 }), undefined)).toEqual([]);
+  });
 });
 
 // ── Feature / infrastructure flags ──────────────────────────────────
