@@ -33,7 +33,11 @@ const PRODUCER_FILES = [
   "api/social/card.js",
   "automation/newsletter/build_issue.py",
   "automation/ig_photo_gate.py",
-  "web/app/data/listings.ts",
+  // The web adapter's photo assembly moved to shared/adapt/listing.ts
+  // so the API, the MCP tools and the bot pick the same primary image
+  // the website does. web/app/data/listings.ts now only fetches and
+  // caches, so the literal lives here.
+  "shared/adapt/listing.ts",
 ];
 
 const LITERAL = "selected_photo_url";

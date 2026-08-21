@@ -1,0 +1,225 @@
+// shared/engine/params.ts — the query dialect, shared by every channel.
+//
+// Moved verbatim from web/app/data/filter-url.ts (read side only).
+//
+// Why this belongs in shared/: /api/v1/listings parses its query string
+// with the SAME codec the website uses for share links, so a URL like
+//   /browse?sub=land&pmax=250000&features=ocean_view
+// and the API call
+//   /api/v1/listings?sub=land&pmax=250000&features=ocean_view
+// mean exactly the same thing, by construction rather than by careful
+// maintenance. A second param parser on the API side is how the two
+// would quietly diverge.
+//
+// The WRITE side (writeFilterToURL, writeBboxToURL) stays in web: it
+// touches window.history, which has no meaning off the browser.
+//
+// URLSearchParams is a web standard available in Node 18+, so this file
+// stays platform-neutral.
+//
+// The original header follows.
+//
+// Filter ↔ URL serializer. Round-trips the BrowsePage filter shape
+// through URLSearchParams so the browser back button, refresh, and
+// shared links all reproduce the same view.
+//
+// Keys (legacy):
+//   cat              — pill / category (drives the rest)
+//   zones            — comma-separated zone names
+//   types            — comma-separated land types
+//   features         — comma-separated key features (beachfront,…)
+//   infra            — comma-separated infrastructure (water,…)
+//   status           — comma-separated listing status (new,…)
+//   pmin / pmax      — price bounds (numeric)
+//   smin             — size minimum (numeric)
+//   ready            — readiness floor (0–4)
+//   score_min        — score floor (0–100)
+//   wv / wl / wm     — Value / Location / Momentum weight (0–100)
+//   sort             — sort key
+//
+// Keys (rewrite Phase 5B — new IA axes):
+//   master           — "beach" | "lake" (single-select)
+//   sub              — "homes" | "condos" | "land" (single-select)
+//   tag              — comma-separated discovery tags
+//                      (top_rated, under_250k, gated, waterfront)
+
+import type { DiscoveryTag, MasterCategory, Subcategory } from "../listing";
+
+const VALID_MASTER: ReadonlySet<MasterCategory>  = new Set(["beach", "lake"]);
+const VALID_SUB:    ReadonlySet<Subcategory>     = new Set(["homes", "condos", "land"]);
+const VALID_TAGS:   ReadonlySet<DiscoveryTag>    = new Set([
+  "top_rated", "under_250k", "gated", "waterfront",
+]);
+
+export type FilterShape = {
+  zones: Set<string>;
+  land_types: Set<string>;
+  features: Set<string>;
+  infra: Set<string>;
+  status: Set<string>;
+  price_min: number;
+  price_max: number | null;   // null = no upper cap (default; was 1,000,000 — hid ~20% of catalog)
+  size_min: number;
+  size_max: number | null;    // null = no upper cap (mirrors price_max)
+  readiness: number;
+  score_min?: number;
+  weights?: { value: number; location: number; momentum: number };
+  // Position-rank cap. When set, only listings with `rank <= rank_max`
+  // pass. Used by the "Top 10" pill rail chip.
+  rank_max: number | null;
+  // Rewrite Phase 5B — new IA filter axes. null = "all" for the
+  // single-selects. discovery_tags is multi-select.
+  master_category: MasterCategory | null;
+  subcategory: Subcategory | null;
+  discovery_tags: Set<DiscoveryTag>;
+  // Quality-gate inverse toggle. Default false → incomplete listings
+  // are hidden. URL key: `inc=1` to opt in. The 0/absent value is
+  // intentionally the same so /browse without any query maintains
+  // the default-hide semantic.
+  include_incomplete: boolean;
+  // Free-text search query. Default "". URL key: `q=…`. Tokenized
+  // and matched as case-insensitive substrings against id /
+  // source_id / original_url / zone_name / title / source_label /
+  // province_state — see web/app/lib/search-match.ts. Empty string
+  // (or whitespace-only) is a no-op.
+  query: string;
+};
+
+// Visual scale for the price histogram. Listings above this still pass
+// the filter (when price_max is null) — they just cluster in the
+// rightmost bucket of the bar chart.
+export const PRICE_HISTO_MAX = 1_000_000;
+
+function parseSet(value: string | null): Set<string> {
+  if (!value) return new Set();
+  return new Set(value.split(",").map((s) => s.trim()).filter(Boolean));
+}
+
+function parseInt0(value: string | null, fallback: number): number {
+  if (value == null) return fallback;
+  const n = parseInt(value, 10);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+// Nullable upper-cap parser for pmax/smax. Absent OR malformed → null
+// ("no cap"). Using parseInt0(x, 0) here would turn a garbage shared
+// link (?smax=abc) into "max 0" and silently empty the results — the
+// wrong failure mode for a cap.
+function parseCapOrNull(value: string | null): number | null {
+  if (value == null) return null;
+  const n = parseInt(value, 10);
+  return Number.isFinite(n) ? n : null;
+}
+
+function parseMaster(value: string | null): MasterCategory | null {
+  if (!value) return null;
+  return VALID_MASTER.has(value as MasterCategory) ? (value as MasterCategory) : null;
+}
+
+function parseSub(value: string | null): Subcategory | null {
+  if (!value) return null;
+  return VALID_SUB.has(value as Subcategory) ? (value as Subcategory) : null;
+}
+
+function parseTags(value: string | null): Set<DiscoveryTag> {
+  const raw = parseSet(value);
+  const out = new Set<DiscoveryTag>();
+  raw.forEach((t) => {
+    if (VALID_TAGS.has(t as DiscoveryTag)) out.add(t as DiscoveryTag);
+  });
+  return out;
+}
+
+// Filter-URL keys that represent persisted "what to find" axes. Used
+// by the discover-filter hydration logic (web/app/lib/use-discover-filter.ts)
+// to decide whether to apply a Clerk-persisted filter as the BrowsePage
+// seed — when ANY of these is present in the URL, the URL wins (so
+// shared links stay shareable). Tuning knobs (wv/wl/wm/score_min/inc)
+// are intentionally excluded — they live on /browse for "how I read
+// the catalogue" only.
+export const FILTER_URL_KEYS: readonly string[] = [
+  "zones",
+  "types",
+  "features",
+  "infra",
+  "status",
+  "pmin",
+  "pmax",
+  "smin",
+  "smax",
+  "ready",
+  "master",
+  "sub",
+  "tag",
+  "rmax",
+] as const;
+
+export function hasFilterParamsInURL(search: string): boolean {
+  const p = new URLSearchParams(search);
+  return FILTER_URL_KEYS.some((k) => p.has(k));
+}
+
+export function readFilterFromURL(search: string, baseDefaults: FilterShape): FilterShape {
+  const p = new URLSearchParams(search);
+  // master/sub/tag from URL win over the baseDefaults values when
+  // present. The baseDefaults already carry any preset injected by
+  // buildFiltersForCategory (legacy cat= slug expansion), so we OR
+  // them in: explicit URL wins, otherwise the preset stands.
+  const masterFromUrl = parseMaster(p.get("master"));
+  const subFromUrl    = parseSub(p.get("sub"));
+  const tagsFromUrl   = parseTags(p.get("tag"));
+  const out: FilterShape = {
+    ...baseDefaults,
+    zones: parseSet(p.get("zones")),
+    land_types: parseSet(p.get("types")),
+    features: parseSet(p.get("features")),
+    infra: parseSet(p.get("infra")),
+    status: parseSet(p.get("status")),
+    price_min: parseInt0(p.get("pmin"), 0),
+    price_max: parseCapOrNull(p.get("pmax")),
+    size_min: parseInt0(p.get("smin"), 0),
+    size_max: parseCapOrNull(p.get("smax")),
+    readiness: parseInt0(p.get("ready"), 0),
+    master_category: masterFromUrl ?? baseDefaults.master_category,
+    subcategory:     subFromUrl    ?? baseDefaults.subcategory,
+    discovery_tags:  tagsFromUrl.size > 0 ? tagsFromUrl : baseDefaults.discovery_tags,
+    rank_max: p.get("rmax") != null ? parseInt0(p.get("rmax"), 0) : baseDefaults.rank_max,
+    include_incomplete: p.get("inc") === "1" ? true : baseDefaults.include_incomplete,
+    query: (p.get("q") ?? baseDefaults.query ?? "").slice(0, 200),
+  };
+  const sm = p.get("score_min");
+  if (sm != null) out.score_min = parseInt0(sm, 0);
+  const wv = p.get("wv");
+  const wl = p.get("wl");
+  const wm = p.get("wm");
+  if (wv && wl && wm) {
+    out.weights = {
+      value: parseInt0(wv, 40),
+      location: parseInt0(wl, 35),
+      momentum: parseInt0(wm, 25),
+    };
+  }
+  return out;
+}
+
+export function readSortFromURL(search: string, fallback: string): string {
+  const p = new URLSearchParams(search);
+  return p.get("sort") || fallback;
+}
+
+// View state (cards | table | map) lives in the URL so `?view=map` is
+// shareable and survives back/forward. Deliberately kept OUT of
+// FILTER_URL_KEYS so a bare `?view=map` does NOT suppress the
+// Clerk-persisted filter seed — view is orthogonal to "what to find".
+const VALID_VIEWS: ReadonlySet<string> = new Set(["cards", "table", "map"]);
+
+export function readViewFromURL(search: string, fallback: string): string {
+  const p = new URLSearchParams(search);
+  const v = p.get("view");
+  return v && VALID_VIEWS.has(v) ? v : fallback;
+}
+
+// Map viewport bbox — "minLat,minLng,maxLat,maxLng" (4 dp). Only set in
+// map view with "search as I move" on, so the viewport is shareable.
+// Like `view`, kept out of FILTER_URL_KEYS (it's not a "what to find"
+// axis). Malformed values parse to null rather than throwing.
