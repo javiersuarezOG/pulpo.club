@@ -19,6 +19,7 @@
 import type { DiscoveryTag, Listing, MasterCategory, Subcategory } from "./types";
 import { decodeHtmlEntities } from "./decode-html";
 import { ACTIVE_COUNTRY } from "../config/countries";
+import { ZONE_NAMES, pretty } from "../../../shared/zones";
 
 const VALID_MASTER_CATEGORIES: ReadonlySet<MasterCategory> = new Set(["beach", "lake"]);
 const VALID_SUBCATEGORIES:     ReadonlySet<Subcategory>    = new Set(["homes", "condos", "land"]);
@@ -56,35 +57,12 @@ const SOURCE_LABELS: Record<string, string> = {
   realtyelsalvador: "Realty El Salvador",
 };
 
-// Pretty zone names. Slugs come from `pulpo/normalize.py:ZONE_PATTERNS`.
-// Missing slugs fall back to Title-Cased pretty name.
-const ZONE_NAMES: Record<string, string> = {
-  "el-cuco": "Playa El Cuco",
-  "las-flores": "Las Flores",
-  "punta-mango": "Punta Mango",
-  "el-espino": "El Espino",
-  "el-tunco": "El Tunco",
-  "el-sunzal": "El Sunzal",
-  "el-zonte": "El Zonte",
-  "san-diego": "San Diego (K59)",
-  "mizata": "Mizata",
-  "conchagua": "Conchagua",
-  "jiquilisco": "Jiquilisco",
-  "puerto-la-libertad": "Puerto La Libertad",
-  "la-libertad": "La Libertad",
-  "la-union": "La Unión",
-  "lago-coatepeque": "Lago de Coatepeque",
-  "lago-ilopango": "Lago de Ilopango",
-  "costa-del-sol": "Costa del Sol",
-};
-
-function pretty(slug: string | null | undefined, lookup: Record<string, string>): string {
-  if (!slug) return "—";
-  if (lookup[slug]) return lookup[slug];
-  return slug
-    .replace(/-/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-}
+// Zone pretty-names + the slug fallback now live in shared/zones.ts:
+// /api/v1/meta and the MCP tools label zones for chat channels, and a
+// second copy of this table is exactly the drift the shared core exists
+// to prevent. Re-exported below so this module's existing consumers and
+// tests keep their import path.
+export { ZONE_NAMES, pretty };
 
 function deriveSourceType(source: string): "on_market" | "off_market" {
   return OFF_MARKET_SOURCES.has(source) ? "off_market" : "on_market";
