@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-20T04:01:49.427958+00:00",
+  "computed_at": "2026-08-21T04:04:31.736629+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 14,
@@ -9,7 +9,7 @@
         "renders_on_homepage": true
       },
       "beach_homes": {
-        "count": 143,
+        "count": 144,
         "renders_on_homepage": true
       },
       "beach_land": {
@@ -59,15 +59,15 @@
         "target_prd": null
       },
       "citymax_sc": {
-        "coverage_pct_vs_discovered": 48.0,
-        "kept": 144,
+        "coverage_pct_vs_discovered": 47.7,
+        "kept": 143,
         "status": "green",
         "target_discovered": null,
         "target_prd": 300
       },
       "csbr": {
-        "coverage_pct_vs_discovered": 272.0,
-        "kept": 272,
+        "coverage_pct_vs_discovered": 273.0,
+        "kept": 273,
         "status": "green",
         "target_discovered": null,
         "target_prd": 100
@@ -81,7 +81,7 @@
       },
       "encuentra24": {
         "coverage_pct_vs_discovered": 0.7,
-        "kept": 20,
+        "kept": 22,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 5,
     "shelves_total": 6,
-    "total_in_dataset": 1847,
-    "total_visible_listings": 1628
+    "total_in_dataset": 1849,
+    "total_visible_listings": 1630
   },
   "min_real_listings": 4
 }

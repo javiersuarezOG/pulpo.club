@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-20T03:48:42.978273+00:00",
+  "computed_at": "2026-08-21T03:54:18.817787+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -359,6 +359,34 @@
       ],
       "sources": [
         "remax"
+      ]
+    },
+    {
+      "count": 2,
+      "cross_source": false,
+      "fingerprint": "145e73819b71245b4d1c088b487d40f4f4b8a10f",
+      "samples": [
+        {
+          "area_m2": null,
+          "price_usd": 153000.0,
+          "source": "realestate_au_sv",
+          "source_id": "parcelacion-estancias-vistas-del-mar-lotes-9-10-y-11-poligono-b-km-46-5-carretera-del-litoral-la-libertad-costa-l-l-la-libertad-la-libertad-la-libertad-la-libertad-department-310109867599",
+          "title": "PARCELACION ESTANCIAS VISTAS DEL MAR LOTES 9, 10 Y 11 POLIGONO B KM. 46.5 CARRETERA DEL LITORAL, LA LIBERTAD COSTA. L.L., La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/parcelacion-estancias-vistas-del-mar-lotes-9-10-y-11-poligono-b-km-46-5-carretera-del-litoral-la-libertad-costa-l-l-la-libertad-la-libertad-la-libertad-la-libertad-department-310109867599/",
+          "zone": "la-libertad"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 153000.0,
+          "source": "realestate_au_sv",
+          "source_id": "parcelacion-estancias-vistas-del-mar-lotes-9-10-y-11-poligono-b-km-46-5-carretera-del-litoral-la-libertad-costa-l-l-la-libertad-la-libertad-la-libertad-la-libertad-department-310108163913",
+          "title": "PARCELACION ESTANCIAS VISTAS DEL MAR LOTES 9, 10 Y 11 POLIGONO B KM. 46.5 CARRETERA DEL LITORAL, LA LIBERTAD COSTA. L.L., La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/parcelacion-estancias-vistas-del-mar-lotes-9-10-y-11-poligono-b-km-46-5-carretera-del-litoral-la-libertad-costa-l-l-la-libertad-la-libertad-la-libertad-la-libertad-department-310108163913/",
+          "zone": "la-libertad"
+        }
+      ],
+      "sources": [
+        "realestate_au_sv"
       ]
     },
     {
@@ -1148,6 +1176,34 @@
     {
       "count": 2,
       "cross_source": false,
+      "fingerprint": "8c184211875cac2bc2a0adc3584d2a42729853ad",
+      "samples": [
+        {
+          "area_m2": null,
+          "price_usd": 120000.0,
+          "source": "realestate_au_sv",
+          "source_id": "los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329908",
+          "title": "Los Naranjos, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana, Chalchuapa, Sonsonate Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329908/",
+          "zone": "chalchuapa"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 120000.0,
+          "source": "realestate_au_sv",
+          "source_id": "los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329892",
+          "title": "Los Naranjos, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana, Chalchuapa, Sonsonate Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329892/",
+          "zone": "chalchuapa"
+        }
+      ],
+      "sources": [
+        "realestate_au_sv"
+      ]
+    },
+    {
+      "count": 2,
+      "cross_source": false,
       "fingerprint": "a2239abf184705466f0a047da292a34dbfa01dd9",
       "samples": [
         {
@@ -1581,22 +1637,22 @@
       "unique_in_source": 35
     },
     "citymax_sc": {
-      "kept_as_unique": 149,
-      "raw": 149,
+      "kept_as_unique": 148,
+      "raw": 148,
       "shared_with_others": 0,
-      "unique_in_source": 149
+      "unique_in_source": 148
     },
     "csbr": {
-      "kept_as_unique": 286,
-      "raw": 292,
+      "kept_as_unique": 287,
+      "raw": 293,
       "shared_with_others": 0,
-      "unique_in_source": 286
+      "unique_in_source": 287
     },
     "encuentra24": {
-      "kept_as_unique": 20,
-      "raw": 20,
+      "kept_as_unique": 22,
+      "raw": 22,
       "shared_with_others": 0,
-      "unique_in_source": 20
+      "unique_in_source": 22
     },
     "essurf": {
       "kept_as_unique": 35,
@@ -1623,16 +1679,16 @@
       "unique_in_source": 26
     },
     "realestate_au_sv": {
-      "kept_as_unique": 287,
+      "kept_as_unique": 285,
       "raw": 328,
       "shared_with_others": 0,
-      "unique_in_source": 287
+      "unique_in_source": 285
     },
     "remax": {
-      "kept_as_unique": 303,
-      "raw": 318,
+      "kept_as_unique": 306,
+      "raw": 321,
       "shared_with_others": 0,
-      "unique_in_source": 303
+      "unique_in_source": 306
     },
     "santizo": {
       "kept_as_unique": 87,
@@ -1653,6 +1709,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2029,
-  "total_unique_fingerprints": 1963
+  "total_in_dataset": 2034,
+  "total_unique_fingerprints": 1966
 }

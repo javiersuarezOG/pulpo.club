@@ -18,31 +18,25 @@
       "pick_count": 3
     }
   },
-  "picked_at": "2026-08-20T04:02:00.101463+00:00",
-  "expires_at": "2026-08-21T00:00:00+00:00",
+  "picked_at": "2026-08-21T04:04:42.215525+00:00",
+  "expires_at": "2026-08-22T00:00:00+00:00",
   "tier": "soft",
   "listing_id": "encuentra24|32691999",
-  "rank_score": 78.99,
+  "rank_score": 77.09,
   "hero_photo_quality_score": 60,
   "fallback": true,
   "pool": [
     {
       "listing_id": "encuentra24|32691999",
-      "rank_score": 78.99,
+      "rank_score": 77.09,
       "hero_photo_quality_score": 60,
       "photos_count": 11
     },
     {
       "listing_id": "encuentra24|29592387",
-      "rank_score": 74.54,
+      "rank_score": 71.58,
       "hero_photo_quality_score": 50,
       "photos_count": 20
-    },
-    {
-      "listing_id": "encuentra24|32867540",
-      "rank_score": 73.04,
-      "hero_photo_quality_score": 60,
-      "photos_count": 15
     }
   ],
   "picks_for_proof_row": [

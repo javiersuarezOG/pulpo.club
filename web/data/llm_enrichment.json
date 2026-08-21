@@ -139726,5 +139726,531 @@
     "cost_usd": 0.00122565,
     "finish_reason": "stop",
     "latency_ms": 4371
+  },
+  "realestate_au_sv|los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329892": {
+    "ts": "2026-08-21T03:54:22.718130+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Los Naranjos, Chalchuapa",
+      "es": "Terreno en Venta en Los Naranjos, Chalchuapa"
+    },
+    "short_description_canonical": {
+      "en": "Land for sale in Los Naranjos, Chalchuapa, Santa Ana. The property is located in a residential area of Chalchuapa. Price: USD 120,000.",
+      "es": "Terreno en venta en Los Naranjos, Chalchuapa, Santa Ana. La propiedad está ubicada en una zona residencial de Chalchuapa. Precio: USD 120,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Chalchuapa, Santa Ana",
+        "es": "Ubicado en Chalchuapa, Santa Ana"
+      },
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Publicado por RE/MAX Central"
+      },
+      {
+        "en": "Price USD 120,000",
+        "es": "Precio USD 120,000"
+      }
+    ],
+    "lat": 13.9944,
+    "lng": -89.6811,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Chalchuapa, Santa Ana",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3080,
+    "tokens_out": 387,
+    "cost_usd": 0.0012573,
+    "finish_reason": "stop",
+    "latency_ms": 2977
+  },
+  "remax|001461694384": {
+    "ts": "2026-08-21T03:54:22.959160+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "1,809 m² Coffee Forest Land, Atiluya",
+      "es": "Terreno de 1,809 m² en bosque de café, Atiluya"
+    },
+    "short_description_canonical": {
+      "en": "1,809 m² land in the Atiluya forest, planted with coffee and balsam trees. Easy access for any vehicle; electricity and water available. 45 minutes to Sonsonate, 30 to Playa Dorada, one hour to Santa Tecla.",
+      "es": "Terreno de 1,809 m² en el bosque de Atiluya, plantado con café y árboles de bálsamo. Fácil acceso para cualquier vehículo; electricidad y agua disponibles. A 45 minutos de Sonsonate, 30 de Playa Dorada y una hora de Santa Tecla."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Coffee and balsam trees planted",
+        "es": "Plantado con café y bálsamo"
+      },
+      {
+        "en": "Easy access for any vehicle",
+        "es": "Fácil acceso para cualquier vehículo"
+      },
+      {
+        "en": "Electricity and water available",
+        "es": "Electricidad y agua disponibles"
+      },
+      {
+        "en": "Bitcoin accepted as payment",
+        "es": "Bitcoin aceptado como pago"
+      }
+    ],
+    "lat": 13.6741,
+    "lng": -89.2478,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3214,
+    "tokens_out": 459,
+    "cost_usd": 0.00137268,
+    "finish_reason": "stop",
+    "latency_ms": 3218
+  },
+  "realestate_au_sv|la-estancia-moncagua-san-miguel-agua-salada-san-miguel-agua-salada-san-miguel-310109850326": {
+    "ts": "2026-08-21T03:54:22.973014+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in La Estancia, Moncagua",
+      "es": "Terreno en Venta en La Estancia, Moncagua"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in La Estancia, Moncagua, San Miguel department, listed at $40,000. The listing provides no details on size, utilities, or zoning. Located in the Agua Salada area of San Miguel.",
+      "es": "Terreno en La Estancia, Moncagua, departamento de San Miguel, listado en $40,000. El anuncio no proporciona detalles sobre tamaño, servicios o zonificación. Ubicado en la zona de Agua Salada de San Miguel."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Listed at $40,000",
+        "es": "Listado en $40,000"
+      },
+      {
+        "en": "Located in La Estancia, Moncagua",
+        "es": "Ubicado en La Estancia, Moncagua"
+      },
+      {
+        "en": "In San Miguel department",
+        "es": "En el departamento de San Miguel"
+      }
+    ],
+    "lat": 13.4333,
+    "lng": -88.05,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Moncagua, San Miguel, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3084,
+    "tokens_out": 415,
+    "cost_usd": 0.00128918,
+    "finish_reason": "stop",
+    "latency_ms": 3233
+  },
+  "realestate_au_sv|canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310119580802": {
+    "ts": "2026-08-21T03:54:23.086663+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in La Perla, Jicalapa, La Libertad",
+      "es": "Terreno en La Perla, Jicalapa, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Cantón La Perla, Polígono 4, Hacienda Taquillo, Jicalapa, La Libertad. Offered for sale at USD 302,669. No further details on size or features are provided.",
+      "es": "Terreno en Cantón La Perla, Polígono 4, Hacienda Taquillo, Jicalapa, La Libertad. Se ofrece en venta por USD 302,669. No se proporcionan más detalles sobre tamaño o características."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in La Perla, Jicalapa",
+        "es": "Ubicado en La Perla, Jicalapa"
+      },
+      {
+        "en": "Part of Hacienda Taquillo",
+        "es": "Parte de Hacienda Taquillo"
+      },
+      {
+        "en": "Listed by RE/MAX TERRA 503",
+        "es": "Listado por RE/MAX TERRA 503"
+      }
+    ],
+    "lat": 13.487,
+    "lng": -89.595,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Taquillo",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3101,
+    "tokens_out": 419,
+    "cost_usd": 0.00129817,
+    "finish_reason": "stop",
+    "latency_ms": 3346
+  },
+  "csbr|terreno-premium-en-el-volcan-plano-y-de-gran-potencial-1713-v%c2%b2-sobre-la-carretera": {
+    "ts": "2026-08-21T03:54:23.173524+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Premium Flat Land on the Volcano Road, 1,713 v²",
+      "es": "Terreno Premium Plano en Carretera del Volcán, 1,713 v²"
+    },
+    "short_description_canonical": {
+      "en": "Flat 1,713 v² land parcel on the main road in the Volcano area, El Salvador. The lot is level and offers high development potential. Located along the highway, it provides easy access and visibility.",
+      "es": "Parcela de terreno plano de 1,713 v² sobre la carretera principal en la zona del Volcán, El Salvador. El lote es nivelado y ofrece alto potencial de desarrollo. Ubicado a lo largo de la carretera, proporciona fácil acceso y visibilidad."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat terrain, 1,713 v²",
+        "es": "Terreno plano, 1,713 v²"
+      },
+      {
+        "en": "Direct highway frontage",
+        "es": "Frente directo a carretera"
+      },
+      {
+        "en": "High development potential",
+        "es": "Alto potencial de desarrollo"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -89.2833,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Salvador centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3076,
+    "tokens_out": 411,
+    "cost_usd": 0.00128262,
+    "finish_reason": "stop",
+    "latency_ms": 3433
+  },
+  "realestate_au_sv|parcelacion-estancias-vistas-del-mar-lotes-9-10-y-11-poligono-b-km-46-5-carretera-del-litoral-la-libertad-costa-l-l-la-libertad-la-libertad-la-libertad-la-libertad-department-310109867599": {
+    "ts": "2026-08-21T03:54:23.620281+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3 Beach Lots, Km 46.5 Coastal Highway",
+      "es": "3 Lotes frente a playa, Km 46.5 Carretera del Litoral"
+    },
+    "short_description_canonical": {
+      "en": "Three land lots (9, 10, 11) in Estancias Vistas del Mar, Polígono B, at Km 46.5 of the Coastal Highway, La Libertad. This beachfront parcel is offered for sale at USD 153,000. The lots are located in the La Libertad coastal area, ideal for development.",
+      "es": "Tres lotes (9, 10, 11) en Estancias Vistas del Mar, Polígono B, en el Km 46.5 de la Carretera del Litoral, La Libertad. Este terreno frente a la playa se ofrece en venta por USD 153,000. Los lotes se ubican en la zona costera de La Libertad, ideales para desarrollo."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location on Coastal Highway",
+        "es": "Ubicación frente a la playa en Carretera del Litoral"
+      },
+      {
+        "en": "Three contiguous lots (9, 10, 11)",
+        "es": "Tres lotes contiguos (9, 10, 11)"
+      },
+      {
+        "en": "Km 46.5, La Libertad coast",
+        "es": "Km 46.5, costa de La Libertad"
+      },
+      {
+        "en": "Priced at USD 153,000",
+        "es": "Precio de USD 153,000"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3125,
+    "tokens_out": 527,
+    "cost_usd": 0.00142345,
+    "finish_reason": "stop",
+    "latency_ms": 3880
+  },
+  "remax|001461694383": {
+    "ts": "2026-08-21T03:54:26.252114+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3,025 m² Coffee Land in Atiluya Forest",
+      "es": "Terreno de 3,025 m² con café en bosque Atiluya"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 3,025 m² in the Atiluya forest, planted with coffee and some balsam trees. Access is easy for any vehicle; electricity and water are immediately available. Located 45 minutes from Sonsonate, 30 minutes from Playa Dorada, and one hour from Santa Tecla.",
+      "es": "Parcela de terreno de 3,025 m² en el bosque Atiluya, sembrada con café y algunos árboles de bálsamo. Acceso fácil para cualquier vehículo; electricidad y agua disponibles de inmediato. Ubicado a 45 minutos de Sonsonate, 30 minutos de Playa Dorada y una hora de Santa Tecla."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Easy access for any vehicle",
+        "es": "Acceso fácil para cualquier vehículo"
+      },
+      {
+        "en": "Electricity and water immediately available",
+        "es": "Electricidad y agua disponibles de inmediato"
+      },
+      {
+        "en": "Coffee plantation with balsam trees",
+        "es": "Plantación de café con árboles de bálsamo"
+      },
+      {
+        "en": "45 min to Sonsonate, 30 min to Playa Dorada",
+        "es": "45 min a Sonsonate, 30 min a Playa Dorada"
+      },
+      {
+        "en": "Bitcoin accepted as payment",
+        "es": "Bitcoin aceptado como pago"
+      }
+    ],
+    "lat": 13.6739,
+    "lng": -89.2883,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3213,
+    "tokens_out": 527,
+    "cost_usd": 0.00144721,
+    "finish_reason": "stop",
+    "latency_ms": 3533
+  },
+  "remax|001461694382": {
+    "ts": "2026-08-21T03:54:26.466144+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Coffee Plantation Land in Atiluya Forest",
+      "es": "Terreno con cafetal en bosque de Atiluya"
+    },
+    "short_description_canonical": {
+      "en": "Land plot of 3,025 m² in the Atiluya forest, planted with coffee and some balsam trees. Easy access for any vehicle; electricity and water available. Forested area with pleasant climate. 45 minutes to Sonsonate, 30 to Playa Dorada, one hour to Santa Tecla.",
+      "es": "Terreno de 3,025 m² en el bosque de Atiluya, sembrado con café y algunos árboles de bálsamo. Acceso fácil para cualquier vehículo; electricidad y agua disponibles. Zona boscosa con clima agradable. A 45 minutos de Sonsonate, 30 de Playa Dorada y una hora de Santa Tecla."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3,025 m² coffee plantation",
+        "es": "Cafetal de 3,025 m²"
+      },
+      {
+        "en": "Easy access for any vehicle",
+        "es": "Acceso fácil para cualquier vehículo"
+      },
+      {
+        "en": "Electricity and water available",
+        "es": "Electricidad y agua disponibles"
+      },
+      {
+        "en": "45 min to Sonsonate",
+        "es": "45 min a Sonsonate"
+      },
+      {
+        "en": "Bitcoin accepted as payment",
+        "es": "Bitcoin aceptado como pago"
+      }
+    ],
+    "lat": 13.6741,
+    "lng": -89.2882,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Tecla, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3215,
+    "tokens_out": 497,
+    "cost_usd": 0.00141475,
+    "finish_reason": "stop",
+    "latency_ms": 3506
+  },
+  "encuentra24|19552313": {
+    "ts": "2026-08-21T04:40:57.885601+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Ocean-view house, Isla Contadora, 5 beds, 332 m²",
+      "es": "Casa con vista al mar, Isla Contadora, 5 hab, 332 m²"
+    },
+    "short_description_canonical": {
+      "en": "Two-story house on Isla Contadora, Las Perlas, with 332 m² of construction on a 640 m² lot. It has 5 bedrooms, 5 bathrooms, balcony, living-dining room, equipped kitchen, laundry, and 2 parking spaces. Sold furnished and equipped, with ocean-view terrace, BBQ area, front garden, and backyard space for a pool. The island is 20 minutes by plane or 1.5 hours by ferry from Panama City.",
+      "es": "Casa de dos niveles en Isla Contadora, Las Perlas, con 332 m² de construcción en un terreno de 640 m². Tiene 5 recámaras, 5 baños, balcón, sala-comedor, cocina equipada, lavandería y 2 estacionamientos. Se vende amoblada y equipada, con terraza con vista al mar, área de BBQ, jardín frontal y patio trasero con espacio para piscina. La isla está a 20 minutos en avión o 1.5 horas en ferry desde la Ciudad de Panamá."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Ocean-view terrace and BBQ area",
+        "es": "Terraza con vista al mar y área de BBQ"
+      },
+      {
+        "en": "Sold furnished and equipped",
+        "es": "Se vende amoblada y equipada"
+      },
+      {
+        "en": "Space to build a pool",
+        "es": "Espacio para construir piscina"
+      },
+      {
+        "en": "20 min flight from Panama City",
+        "es": "20 min en avión desde Ciudad de Panamá"
+      }
+    ],
+    "lat": 8.6279,
+    "lng": -79.0347,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Isla Contadora, Archipiélago de Las Perlas",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 5,
+      "bathrooms": 5.0,
+      "built_area_m2": 332.0,
+      "parking_spaces": 2,
+      "furnished": true,
+      "has_pool": false
+    },
+    "tokens_in": 2538,
+    "tokens_out": 592,
+    "cost_usd": 0.00133646,
+    "finish_reason": "stop",
+    "latency_ms": 4666
+  },
+  "encuentra24|31614240": {
+    "ts": "2026-08-21T04:40:58.668694+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Modern Luxury Residence, 5 Bedrooms, Pool, El Chirú",
+      "es": "Residencia moderna de lujo, 5 recámaras, piscina, El Chirú"
+    },
+    "short_description_canonical": {
+      "en": "Contemporary luxury house on a 1,334.57 m² lot with 761.55 m² of construction in El Chirú, Panama. Built 3 years ago, it features 5 bedrooms each with full bath, family room, balcony, plus a ground floor with living, dining, modern marble kitchen, den, terrace, patio, pool, laundry, and service quarters. Includes 2 guest baths, 3 covered parking spaces, video surveillance, jacuzzi on the master suite balcony, and is sold furnished with specified furniture.",
+      "es": "Casa contemporánea de lujo en lote de 1,334.57 m² con 761.55 m² de construcción en El Chirú, Panamá. Construida hace 3 años, cuenta con 5 recámaras cada una con baño completo, sala familiar, balcón, y planta baja con sala, comedor, cocina moderna con mármol, den, terraza, patio, piscina, lavandería y cuarto de servicio. Incluye 2 baños de visita, 3 estacionamientos techados, videovigilancia, jacuzzi en el balcón de la suite principal, y se vende amueblada con muebles específicos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Built only 3 years ago",
+        "es": "Construida hace solo 3 años"
+      },
+      {
+        "en": "5 bedrooms, each with private bath",
+        "es": "5 recámaras, cada una con baño privado"
+      },
+      {
+        "en": "Large pool with two children's areas",
+        "es": "Gran piscina con dos zonas infantiles"
+      },
+      {
+        "en": "Sold furnished with specified furniture",
+        "es": "Se vende amueblada con muebles especificados"
+      },
+      {
+        "en": "Video surveillance system included",
+        "es": "Sistema de videovigilancia incluido"
+      }
+    ],
+    "lat": 8.0,
+    "lng": -80.5,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Chirú, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 5,
+      "bathrooms": 5.0,
+      "built_area_m2": 761.55,
+      "parking_spaces": 3,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2541,
+    "tokens_out": 655,
+    "cost_usd": 0.00140657,
+    "finish_reason": "stop",
+    "latency_ms": 5449
   }
 }

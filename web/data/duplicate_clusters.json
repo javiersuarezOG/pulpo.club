@@ -362,6 +362,34 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "145e73819b71245b4d1c088b487d40f4f4b8a10f",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 153000.0,
+        "source": "realestate_au_sv",
+        "source_id": "parcelacion-estancias-vistas-del-mar-lotes-9-10-y-11-poligono-b-km-46-5-carretera-del-litoral-la-libertad-costa-l-l-la-libertad-la-libertad-la-libertad-la-libertad-department-310109867599",
+        "title": "PARCELACION ESTANCIAS VISTAS DEL MAR LOTES 9, 10 Y 11 POLIGONO B KM. 46.5 CARRETERA DEL LITORAL, LA LIBERTAD COSTA. L.L., La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/parcelacion-estancias-vistas-del-mar-lotes-9-10-y-11-poligono-b-km-46-5-carretera-del-litoral-la-libertad-costa-l-l-la-libertad-la-libertad-la-libertad-la-libertad-department-310109867599/",
+        "zone": "la-libertad"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 153000.0,
+        "source": "realestate_au_sv",
+        "source_id": "parcelacion-estancias-vistas-del-mar-lotes-9-10-y-11-poligono-b-km-46-5-carretera-del-litoral-la-libertad-costa-l-l-la-libertad-la-libertad-la-libertad-la-libertad-department-310108163913",
+        "title": "PARCELACION ESTANCIAS VISTAS DEL MAR LOTES 9, 10 Y 11 POLIGONO B KM. 46.5 CARRETERA DEL LITORAL, LA LIBERTAD COSTA. L.L., La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/parcelacion-estancias-vistas-del-mar-lotes-9-10-y-11-poligono-b-km-46-5-carretera-del-litoral-la-libertad-costa-l-l-la-libertad-la-libertad-la-libertad-la-libertad-department-310108163913/",
+        "zone": "la-libertad"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "2219e5242b117f34c602369561c809a91d306026",
     "samples": [
       {
@@ -1137,6 +1165,34 @@
         "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
         "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287050/",
         "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "8c184211875cac2bc2a0adc3584d2a42729853ad",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 120000.0,
+        "source": "realestate_au_sv",
+        "source_id": "los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329908",
+        "title": "Los Naranjos, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana, Chalchuapa, Sonsonate Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329908/",
+        "zone": "chalchuapa"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 120000.0,
+        "source": "realestate_au_sv",
+        "source_id": "los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329892",
+        "title": "Los Naranjos, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana, Chalchuapa, Sonsonate Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329892/",
+        "zone": "chalchuapa"
       }
     ],
     "sources": [
