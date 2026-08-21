@@ -25,13 +25,20 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
-const v1Dir = path.join(repoRoot, "api", "v1");
+// Every tree that serves the catalog publicly. api/mcp is here for the
+// same reason api/v1 is: it reads the same files and answers anonymous
+// callers, so the same boundary has to hold.
+const SERVING_DIRS = ["api/v1", "api/mcp"];
 
 function v1SourceFiles() {
-  return fs
-    .readdirSync(v1Dir, { recursive: true, withFileTypes: true })
-    .filter((e) => e.isFile() && /\.(ts|js|mjs)$/.test(e.name))
-    .map((e) => path.join(e.parentPath ?? e.path, e.name));
+  return SERVING_DIRS.flatMap((dir) => {
+    const abs = path.join(repoRoot, dir);
+    if (!fs.existsSync(abs)) return [];
+    return fs
+      .readdirSync(abs, { recursive: true, withFileTypes: true })
+      .filter((e) => e.isFile() && /\.(ts|js|mjs)$/.test(e.name))
+      .map((e) => path.join(e.parentPath ?? e.path, e.name));
+  });
 }
 
 /**
@@ -56,7 +63,7 @@ function globToRegExp(glob) {
   return new RegExp(`^${escaped}$`);
 }
 
-describe("v1 source never reaches for the PII catalog", () => {
+describe("public serving code never reaches for the PII catalog", () => {
   it("finds v1 handlers to check (guards against a vacuous pass)", () => {
     expect(v1SourceFiles().length).toBeGreaterThan(0);
   });
@@ -80,17 +87,17 @@ describe("v1 source never reaches for the PII catalog", () => {
   });
 
   it("has no fallback chain from the slim catalog to the full one", () => {
-    const src = fs.readFileSync(path.join(v1Dir, "_catalog.ts"), "utf8");
+    const src = fs.readFileSync(path.join(repoRoot, "api", "v1", "_catalog.ts"), "utf8");
     const code = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
     // Exactly one catalog filename is constructed, in catalogFilename().
     expect(code.match(/ranked\.list/g) ?? []).toHaveLength(2);
   });
 });
 
-describe("vercel.json keeps ranked.json out of v1 function bundles", () => {
+describe("vercel.json keeps ranked.json out of every serving bundle", () => {
   const config = JSON.parse(fs.readFileSync(path.join(repoRoot, "vercel.json"), "utf8"));
   const v1Entries = Object.entries(config.functions ?? {}).filter(([k]) =>
-    k.startsWith("api/v1/"),
+    SERVING_DIRS.some((d) => k.startsWith(`${d}/`)),
   );
 
   it("configures every v1 function that reads the catalog", () => {

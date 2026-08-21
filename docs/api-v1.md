@@ -128,7 +128,8 @@ exactly the same thing:
 
 | key | meaning |
 |---|---|
-| `zones` `types` `features` `infra` `status` `tag` | comma-separated sets |
+| `zones` | comma-separated zone **display names** (`El Tunco`), as returned in `meta.zones[].name` — this matches the website's own share links. The MCP tools additionally accept slugs and translate. |
+| `types` `features` `infra` `status` `tag` | comma-separated sets |
 | `pmin` `pmax` `smin` `smax` | price / size bounds (`pmax` absent = uncapped) |
 | `master` `sub` | `beach\|lake` / `homes\|condos\|land` |
 | `ready` `score_min` `rmax` | readiness floor, score floor, rank cap |
@@ -155,6 +156,6 @@ One listing by canonical ID. Unknown ID → `404 not_found`.
 | Consumer | How it reaches the core | Ships in |
 |---|---|---|
 | Website | imports `shared/` in-process | PR-4 |
-| MCP server (`/api/mcp`) | imports `shared/` in-process | PR-6 |
+| MCP server (`/api/mcp`) | imports `shared/` in-process — see [mcp.md](mcp.md) | PR-6 |
 | Telegram bot | HTTP, over `/api/v1/*` | PR-7 |
 | WhatsApp | HTTP, over `/api/v1/*` | later |
