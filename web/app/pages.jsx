@@ -5059,5 +5059,12 @@ export {
   // first to seed in-memory state, the second to compute the live count.
   FilterPanel,
   makeDefaultFilters, applyFilters,
+  // Exported for the engine characterization suite
+  // (web/app/engine-characterization.test.ts), which locks the current
+  // behaviour of these pure functions so the extraction into shared/
+  // can be proven to change nothing. They are also the functions the
+  // /api/v1 handlers and the MCP tools will call, via shared/.
+  applyRankCap, recomputeComposite, buildTopRankMap, buildFiltersForCategory,
+  WEIGHT_DEFAULTS,
   ConsentBanner, DiscoverSkeleton, BrowseSkeleton, DataFetchFailed,
 };
