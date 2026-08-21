@@ -13,8 +13,13 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "isolatedModules": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    // Pinned empty so adding @types/node for the server project
+    // (tsconfig.api.json) cannot leak Node globals into the browser
+    // build. Package-scoped types (react, leaflet) still resolve
+    // through normal module resolution and are unaffected.
+    "types": []
   },
-  "include": ["web/app/**/*", "web/index.html"],
+  "include": ["web/app/**/*", "web/index.html", "shared/**/*"],
   "exclude": ["node_modules", "new_ux", "web/assets", "automation", "pulpo"]
 }
