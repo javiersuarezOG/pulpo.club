@@ -113,6 +113,23 @@ FAMILIES = {
         "where": "event = 'newsletter.free_welcome_reconcile_completed'",
         "max_age_hours": 2.0,
     },
+    # Telegram bot webhook. Deliberately loose at 7 days: unlike the
+    # billing webhooks, this one is driven purely by organic user
+    # traffic, and a brand-new bot legitimately sees none for days. A
+    # tight window here would page on "nobody messaged us", which is a
+    # growth fact, not an outage — and an alert that cries wolf is an
+    # alert people learn to ignore.
+    #
+    # The real failure modes (webhook deregistered, URL drifted after a
+    # deploy, secret rotated, Telegram-side delivery errors) are covered
+    # by the ACTIVE getWebhookInfo probe in pulpo-webhook-health.yml,
+    # which does not depend on traffic at all. This family is the
+    # backstop for "deliveries were flowing and then stopped".
+    "telegram": {
+        "label": "Telegram bot webhook (telegram.webhook_received)",
+        "where": "event = 'telegram.webhook_received'",
+        "max_age_hours": 168.0,
+    },
 }
 
 
