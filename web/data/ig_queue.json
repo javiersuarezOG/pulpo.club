@@ -1426,9 +1426,11 @@
       "humor": null,
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-08-22T01:47:18.420516+00:00",
+      "posted_media_id": "18123648100867491",
+      "comment_posted": true,
+      "comment_id": "18119760136896452"
     },
     {
       "day": 261,
