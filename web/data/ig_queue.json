@@ -1701,6 +1701,51 @@
       "posted": false,
       "posted_at": null,
       "posted_media_id": null
+    },
+    {
+      "day": 267,
+      "shelf": "autopilot_story",
+      "format": "story",
+      "story_id": "queda_paraiso",
+      "emotion": "escasez",
+      "selector": "autopilot",
+      "color_key": "terrenos_playa",
+      "poster_type": "queda_paraiso",
+      "palette": "terrenos_playa",
+      "scheduled_for": "2026-08-29T01:00:00+00:00",
+      "assets_dir": "web/data/ig_assets/autopilot/d267__queda_paraiso",
+      "poster_path": "web/data/ig_assets/autopilot/d267__queda_paraiso/slide_1.jpg",
+      "poster_overrides": {},
+      "caption": "Miralo dos veces: sí, ese es el precio. 34% bajo lo que vale la zona. No es error — lo agarramos antes que los demás. A este precio, un terreno así no dura.\n\n📍 El Tunco. Mirá esta y las demás en pulpo.club — link en bio.",
+      "comment": "El Tunco · 1,581 m² · $225,000.\n\nTodas las propiedades del país, rankeadas por valor, en un solo lugar 👉 pulpo.club\n\n#ElSalvador #BienesRaices #SurfCity #ElTunco #PlayasDeElSalvador #SalvadorenosPorElMundo #TuPedazoDeParaiso",
+      "lint_violations": [],
+      "caption_status": "clean",
+      "carousel_photo_paths": [
+        "web/data/ig_assets/autopilot/d267__queda_paraiso/slide_2.jpg",
+        "web/data/ig_assets/autopilot/d267__queda_paraiso/slide_3.jpg",
+        "web/data/ig_assets/autopilot/d267__queda_paraiso/slide_4.jpg",
+        "web/data/ig_assets/autopilot/d267__queda_paraiso/slide_5.jpg",
+        "web/data/ig_assets/autopilot/d267__queda_paraiso/slide_6.jpg",
+        "web/data/ig_assets/autopilot/d267__queda_paraiso/slide_7.jpg"
+      ],
+      "listing_ids": [
+        "bienesraices__1529"
+      ],
+      "primary_listing_id": "bienesraices__1529",
+      "cover_photo_url": "https://assets.easybroker.com/property_images/4922798/83879470/EB-RX2798.jpg?rasterize=true&version=1734712380",
+      "cover_photo_urls": [
+        "https://assets.easybroker.com/property_images/4922798/83879470/EB-RX2798.jpg?rasterize=true&version=1734712380",
+        "https://assets.easybroker.com/property_images/4922798/83879474/EB-RX2798.jpg?rasterize=true&version=1734712380",
+        "https://assets.easybroker.com/property_images/4922798/83879471/EB-RX2798.jpg?rasterize=true&version=1734712380"
+      ],
+      "photo_tier": "great",
+      "cover_beauty": 89.9,
+      "humor": "bargain",
+      "status": "scheduled",
+      "approved": true,
+      "posted": false,
+      "posted_at": null,
+      "posted_media_id": null
     }
   ]
 }
