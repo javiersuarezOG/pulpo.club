@@ -140252,5 +140252,274 @@
     "cost_usd": 0.00140657,
     "finish_reason": "stop",
     "latency_ms": 5449
+  },
+  "citymax_sc|venta-de-apartamento-en-zunzet-surf-residences-el-zonte": {
+    "ts": "2026-08-22T03:49:53.457618+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Condo for Sale in El Zonte",
+      "es": "Apartamento frente al mar en venta en El Zonte"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront condo for sale in El Zonte, Surf City, El Salvador. This apartment offers ocean views and is located in the popular surf town of El Zonte. Price: $445,694.",
+      "es": "Apartamento frente al mar en venta en El Zonte, Surf City, El Salvador. Este apartamento ofrece vistas al océano y está ubicado en el popular pueblo de surf de El Zonte. Precio: $445,694."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in El Zonte",
+        "es": "Ubicación frente al mar en El Zonte"
+      },
+      {
+        "en": "Ocean views from the apartment",
+        "es": "Vistas al océano desde el apartamento"
+      },
+      {
+        "en": "Surf City, El Salvador hotspot",
+        "es": "Punto clave de Surf City, El Salvador"
+      }
+    ],
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Zonte beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3077,
+    "tokens_out": 398,
+    "cost_usd": 0.00126859,
+    "finish_reason": "stop",
+    "latency_ms": 3250
+  },
+  "bienesraices|2456": {
+    "ts": "2026-08-22T03:49:53.831258+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale on Airport Highway, Maseca Zone",
+      "es": "Terreno en Venta en Carretera al Aeropuerto, Zona Maseca"
+    },
+    "short_description_canonical": {
+      "en": "Flat 54,000 m² land parcel on the Airport Highway near the Maseca zone, Olocuilta, La Paz. Located 300 meters from the highway with paved road access and services available. Priced at $2,000,000.",
+      "es": "Terreno plano de 54,000 m² sobre la Carretera al Aeropuerto, cerca de la zona Maseca, Olocuilta, La Paz. Ubicado a 300 metros de la carretera con acceso pavimentado y servicios disponibles. Precio de venta: $2,000,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "300m from Airport Highway",
+        "es": "A 300m de la Carretera al Aeropuerto"
+      },
+      {
+        "en": "Paved road access",
+        "es": "Acceso pavimentado"
+      },
+      {
+        "en": "Flat terrain, 54,000 m²",
+        "es": "Terreno plano, 54,000 m²"
+      },
+      {
+        "en": "Utilities available",
+        "es": "Servicios disponibles"
+      }
+    ],
+    "lat": 13.5697,
+    "lng": -89.1173,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Olocuilta, La Paz, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3223,
+    "tokens_out": 462,
+    "cost_usd": 0.00137841,
+    "finish_reason": "stop",
+    "latency_ms": 3625
+  },
+  "bienesraices|2457": {
+    "ts": "2026-08-22T03:49:54.209204+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Rent 3,216 m² lot near Surf City 1",
+      "es": "Alquiler terreno 3,216 m² cerca de Surf City 1"
+    },
+    "short_description_canonical": {
+      "en": "Rent a 3,216 m² (4,601 varas²) lot near Surf City 1, El Cocal, La Libertad. Located by the roundabout, street-side, with 58 meters frontage and 65 meters depth. Monthly rent is $10,000, slightly negotiable.",
+      "es": "Alquiler de terreno de 3,216 m² (4,601 varas²) cerca de Surf City 1, El Cocal, La Libertad. Ubicado cerca del redondel, orilla de calle, con 58 metros de frente y 65 de fondo. Renta mensual de $10,000, poco negociable."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Street-side lot near roundabout",
+        "es": "Terreno orilla de calle cerca del redondel"
+      },
+      {
+        "en": "58 m frontage, 65 m depth",
+        "es": "58 m de frente, 65 m de fondo"
+      },
+      {
+        "en": "3,216 m² (4,601 varas²) area",
+        "es": "3,216 m² (4,601 varas²) de área"
+      },
+      {
+        "en": "Near Surf City 1, El Cocal",
+        "es": "Cerca de Surf City 1, El Cocal"
+      }
+    ],
+    "lat": 13.32,
+    "lng": -87.84,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Cocal",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3214,
+    "tokens_out": 505,
+    "cost_usd": 0.00142328,
+    "finish_reason": "stop",
+    "latency_ms": 4003
+  },
+  "encuentra24|32867886": {
+    "ts": "2026-08-22T03:49:54.512890+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "New House in Comasagua with Ocean Views",
+      "es": "Casa Nueva en Comasagua con Vista al Mar"
+    },
+    "short_description_canonical": {
+      "en": "New 286 m² house on 1,789 v² lot at Km 7 ½, Comasagua road, 10 minutes from La Joya mall. 3 bedrooms, 5 bathrooms, parking for 6, cistern, premium finishes. Main and junior bedrooms have terraces with panoramic ocean and mountain views. Direct owner, negotiable price.",
+      "es": "Casa nueva de 286 m² en lote de 1,789 v² en Km 7 ½, carretera a Comasagua, a 10 minutos del centro comercial La Joya. 3 habitaciones, 5 baños, parqueo para 6, cisterna, acabados premium. La habitación principal y una junior tienen terrazas con vista panorámica al mar y montaña. Propietario directo, precio negociable."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Panoramic ocean and mountain views",
+        "es": "Vistas panorámicas al mar y montaña"
+      },
+      {
+        "en": "10 minutes from La Joya mall",
+        "es": "A 10 minutos del centro comercial La Joya"
+      },
+      {
+        "en": "Parking for 6 vehicles",
+        "es": "Parqueo para 6 vehículos"
+      },
+      {
+        "en": "Direct owner, negotiable price",
+        "es": "Propietario directo, precio negociable"
+      },
+      {
+        "en": "Large lot ready for pool or expansion",
+        "es": "Lote grande listo para piscina o ampliación"
+      }
+    ],
+    "lat": 13.5833,
+    "lng": -89.3833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Comasagua, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 5.0,
+      "built_area_m2": 286.0,
+      "parking_spaces": 6,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3549,
+    "tokens_out": 562,
+    "cost_usd": 0.00157643,
+    "finish_reason": "stop",
+    "latency_ms": 4259
+  },
+  "encuentra24|32806483": {
+    "ts": "2026-08-22T04:35:12.871178+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront 5-Bed Home in Buenaventura, Panama",
+      "es": "Casa frente al mar de 5 habitaciones en Buenaventura, Panamá"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront residence in Buenaventura Golf & Beach Resort, built 3 years ago. 761.55 m² construction on 1,334.57 m² lot, 5 bedrooms, 5 full baths plus 2 guest baths. Includes pool, jacuzzi, video surveillance, and is sold fully furnished. Exclusive location with no other lots available.",
+      "es": "Residencia frente al mar en Buenaventura Golf & Beach Resort, construida hace 3 años. 761.55 m² de construcción en lote de 1,334.57 m², 5 recámaras, 5 baños completos y 2 baños de visita. Incluye piscina, jacuzzi, videovigilancia y se vende completamente amueblada. Ubicación exclusiva sin otros lotes disponibles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront in exclusive Buenaventura resort",
+        "es": "Frente al mar en exclusivo resort Buenaventura"
+      },
+      {
+        "en": "Built 3 years ago, contemporary design",
+        "es": "Construida hace 3 años, diseño contemporáneo"
+      },
+      {
+        "en": "Sold fully furnished, turnkey",
+        "es": "Se vende completamente amueblada, lista para habitar"
+      },
+      {
+        "en": "Private pool, jacuzzi, video surveillance",
+        "es": "Piscina privada, jacuzzi, videovigilancia"
+      },
+      {
+        "en": "Only lot in this exclusive location",
+        "es": "Único lote en esta ubicación exclusiva"
+      }
+    ],
+    "lat": 8.2167,
+    "lng": -80.1667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Río Hato, Coclé, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 5,
+      "bathrooms": 5.0,
+      "built_area_m2": 761.55,
+      "parking_spaces": 3,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2618,
+    "tokens_out": 588,
+    "cost_usd": 0.00135366,
+    "finish_reason": "stop",
+    "latency_ms": 4599
   }
 }

@@ -1,6 +1,6 @@
 # PRD WS2 — Feasibility Probe
 
-_Generated: 2026-08-21T04:42:41.627153+00:00_  
+_Generated: 2026-08-22T04:36:05.320558+00:00_  
 _Catalog size: **35 listings**_  
 _UI filter gate: ≥ 15% population (per PRD §OQ-1)_
 
@@ -23,11 +23,11 @@ This report measures whether the PRD's proposed fields can actually be populated
 | `days_listed` | 35 | 100.0% |
 | `lat` | 29 | 82.9% |
 | `lng` | 29 | 82.9% |
-| `is_in_development` | 15 | 42.9% |
-| `is_beachfront` | 9 | 25.7% |
+| `is_in_development` | 14 | 40.0% |
+| `is_beachfront` | 11 | 31.4% |
 | `zone` | 6 | 17.1% |
 | `department` | 6 | 17.1% |
-| `is_repriced` | 1 | 2.9% |
+| `is_repriced` | 2 | 5.7% |
 | `area_m2` | 0 | 0.0% |
 | `price_per_m2` | 0 | 0.0% |
 | `zone_specific` | 0 | 0.0% |
@@ -39,25 +39,25 @@ This report measures whether the PRD's proposed fields can actually be populated
 | Field | Hits | % | PRD Target | Verdict |
 |---|---:|---:|---:|---|
 | `has_mountain_view` | 0 | 0.0% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
-| `has_ocean_view` | 8 | 22.9% | ≥ 15% (gate) | 🟢 surface-eligible |
-| `has_paved_access` | 1 | 2.9% | ≥ 40% | 🔴 below 5% — needs scraper depth |
-| `has_power` | 3 | 8.6% | ≥ 40% | 🟡 computed only, below UI gate |
+| `has_ocean_view` | 7 | 20.0% | ≥ 15% (gate) | 🟢 surface-eligible |
+| `has_paved_access` | 0 | 0.0% | ≥ 40% | 🔴 below 5% — needs scraper depth |
+| `has_power` | 2 | 5.7% | ≥ 40% | 🟡 computed only, below UI gate |
 | `has_water` | 7 | 20.0% | ≥ 40% | 🟡 above 15% gate, below PRD target |
-| `has_water_body` | 12 | 34.3% | ≥ 15% (gate) | 🟢 surface-eligible |
-| `is_agricultural` | 4 | 11.4% | ≥ 15% (gate) | 🟡 computed only, below UI gate |
-| `is_beachfront` | 9 | 25.7% | ≥ 15% | 🟢 meets PRD target |
-| `is_commercial` | 4 | 11.4% | ≥ 15% (gate) | 🟡 computed only, below UI gate |
-| `is_flat` | 10 | 28.6% | ≥ 15% (gate) | 🟢 surface-eligible |
-| `is_motivated` | 2 | 5.7% | ≥ 15% (gate) | 🟡 computed only, below UI gate |
-| `is_on_beach` | 9 | 25.7% | ≥ 15% (gate) | 🟢 surface-eligible |
-| `is_on_lake` | 0 | 0.0% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
-| `is_tourist` | 8 | 22.9% | ≥ 15% (gate) | 🟢 surface-eligible |
-| `is_walk_to_beach` | 2 | 5.7% | ≥ 15% (gate) | 🟡 computed only, below UI gate |
+| `has_water_body` | 13 | 37.1% | ≥ 15% (gate) | 🟢 surface-eligible |
+| `is_agricultural` | 2 | 5.7% | ≥ 15% (gate) | 🟡 computed only, below UI gate |
+| `is_beachfront` | 11 | 31.4% | ≥ 15% | 🟢 meets PRD target |
+| `is_commercial` | 2 | 5.7% | ≥ 15% (gate) | 🟡 computed only, below UI gate |
+| `is_flat` | 9 | 25.7% | ≥ 15% (gate) | 🟢 surface-eligible |
+| `is_motivated` | 3 | 8.6% | ≥ 15% (gate) | 🟡 computed only, below UI gate |
+| `is_on_beach` | 11 | 31.4% | ≥ 15% (gate) | 🟢 surface-eligible |
+| `is_on_lake` | 1 | 2.9% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
+| `is_tourist` | 6 | 17.1% | ≥ 15% (gate) | 🟢 surface-eligible |
+| `is_walk_to_beach` | 3 | 8.6% | ≥ 15% (gate) | 🟡 computed only, below UI gate |
 | `has_sewage` | 0 | 0.0% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
 | `is_repriced_text` | 0 | 0.0% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
 | `zoning_residential` | 8 | 22.9% | ≥ 15% (gate) | 🟢 surface-eligible |
 | `zoning_tourist` | 1 | 2.9% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
-| `land_commercial` | 5 | 14.3% | ≥ 15% (gate) | 🟡 computed only, below UI gate |
+| `land_commercial` | 3 | 8.6% | ≥ 15% (gate) | 🟡 computed only, below UI gate |
 | `land_recreational` | 1 | 2.9% | ≥ 15% (gate) | 🔴 below 5% — needs scraper depth |
 
 ## 3. Description quality (gates NLP + AI feasibility downstream)
@@ -76,7 +76,7 @@ This report measures whether the PRD's proposed fields can actually be populated
 
 | Source | n | Avg chars | % short (<50) |
 |---|---:|---:|---:|
-| `encuentra24` | 35 | 1158 | 0.0% |
+| `encuentra24` | 35 | 1149 | 0.0% |
 
 ## 4. US-01 flagship filter — "water + power + paved road"
 
@@ -84,7 +84,7 @@ This is the PRD's most-load-bearing user story. The cohort size determines wheth
 
 | Definition | Hits | % |
 |---|---:|---:|
-| ANY 1 of 3 utility signals (relaxed) | 9 | 25.7% |
+| ANY 1 of 3 utility signals (relaxed) | 8 | 22.9% |
 | ALL 3 of 3 utility signals (PRD spec) | 0 | 0.0% |
 
 ---
