@@ -1,19 +1,19 @@
 {
-  "computed_at": "2026-08-21T04:04:31.736629+00:00",
+  "computed_at": "2026-08-22T03:58:44.517008+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 14,
     "per_shelf_visible": {
       "beach_condos": {
-        "count": 25,
+        "count": 26,
         "renders_on_homepage": true
       },
       "beach_homes": {
-        "count": 144,
+        "count": 122,
         "renders_on_homepage": true
       },
       "beach_land": {
-        "count": 497,
+        "count": 493,
         "renders_on_homepage": true
       },
       "lake_condos": {
@@ -21,7 +21,7 @@
         "renders_on_homepage": false
       },
       "lake_homes": {
-        "count": 9,
+        "count": 8,
         "renders_on_homepage": true
       },
       "lake_land": {
@@ -39,7 +39,7 @@
       },
       "bienesraices": {
         "coverage_pct_vs_discovered": null,
-        "kept": 426,
+        "kept": 427,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -53,14 +53,14 @@
       },
       "citymax": {
         "coverage_pct_vs_discovered": null,
-        "kept": 35,
+        "kept": 38,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
       },
       "citymax_sc": {
-        "coverage_pct_vs_discovered": 47.7,
-        "kept": 143,
+        "coverage_pct_vs_discovered": 48.3,
+        "kept": 145,
         "status": "green",
         "target_discovered": null,
         "target_prd": 300
@@ -81,7 +81,7 @@
       },
       "encuentra24": {
         "coverage_pct_vs_discovered": 0.7,
-        "kept": 22,
+        "kept": 20,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -123,7 +123,7 @@
       },
       "realestate_au_sv": {
         "coverage_pct_vs_discovered": null,
-        "kept": 318,
+        "kept": 315,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -143,8 +143,8 @@
         "target_prd": null
       },
       "santizo": {
-        "coverage_pct_vs_discovered": 58.0,
-        "kept": 87,
+        "coverage_pct_vs_discovered": 2.0,
+        "kept": 3,
         "status": "green",
         "target_discovered": null,
         "target_prd": 150
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 5,
     "shelves_total": 6,
-    "total_in_dataset": 1849,
-    "total_visible_listings": 1630
+    "total_in_dataset": 1766,
+    "total_visible_listings": 1585
   },
   "min_real_listings": 4
 }
