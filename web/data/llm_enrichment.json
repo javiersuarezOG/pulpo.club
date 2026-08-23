@@ -140521,5 +140521,262 @@
     "cost_usd": 0.00135366,
     "finish_reason": "stop",
     "latency_ms": 4599
+  },
+  "realestate_au_sv|finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899554": {
+    "ts": "2026-08-23T03:57:49.339592+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Finca Atiluya Land for Sale in Santa Isabel Ishuatan",
+      "es": "Finca Atiluya Terreno en Venta en Santa Isabel Ishuatan"
+    },
+    "short_description_canonical": {
+      "en": "Finca Atiluya is a land property for sale in Santa Isabel Ishuatan, Sonsonate. The listing does not specify size, features, or utilities. Price is $59,000 USD.",
+      "es": "Finca Atiluya es un terreno en venta en Santa Isabel Ishuatan, Sonsonate. El anuncio no especifica tamaño, características ni servicios. Precio: $59,000 USD."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Listado por RE/MAX Central"
+      },
+      {
+        "en": "Located in Santa Isabel Ishuatan",
+        "es": "Ubicado en Santa Isabel Ishuatan"
+      },
+      {
+        "en": "Price: $59,000 USD",
+        "es": "Precio: $59,000 USD"
+      }
+    ],
+    "lat": 13.6333,
+    "lng": -89.7833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Sonsonate municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3089,
+    "tokens_out": 397,
+    "cost_usd": 0.00127073,
+    "finish_reason": "stop",
+    "latency_ms": 2900
+  },
+  "realestate_au_sv|finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899551": {
+    "ts": "2026-08-23T03:57:49.468326+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Finca Atiluya Land for Sale in Santa Isabel Ishuatan",
+      "es": "Finca Atiluya Terreno en Venta en Santa Isabel Ishuatan"
+    },
+    "short_description_canonical": {
+      "en": "Finca Atiluya is a land property for sale in Santa Isabel Ishuatan, Sonsonate. The listing does not specify size, zoning, or utilities. Price is USD 99,000.",
+      "es": "Finca Atiluya es un terreno en venta en Santa Isabel Ishuatan, Sonsonate. El anuncio no especifica tamaño, zonificación ni servicios. Precio: USD 99,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Santa Isabel Ishuatan, Sonsonate",
+        "es": "Ubicado en Santa Isabel Ishuatan, Sonsonate"
+      },
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Publicado por RE/MAX Central"
+      },
+      {
+        "en": "Price USD 99,000",
+        "es": "Precio USD 99,000"
+      }
+    ],
+    "lat": 13.6333,
+    "lng": -89.7833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Sonsonate municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3089,
+    "tokens_out": 402,
+    "cost_usd": 0.00127623,
+    "finish_reason": "stop",
+    "latency_ms": 3029
+  },
+  "realestate_au_sv|finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899563": {
+    "ts": "2026-08-23T03:57:49.606477+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Finca Atiluya Land for Sale in Santa Isabel Ishuatan",
+      "es": "Terreno Finca Atiluya en Venta en Santa Isabel Ishuatan"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel known as Finca Atiluya in Santa Isabel Ishuatan, Sonsonate. Offered for sale at USD 99,000. No further details on size or features are provided.",
+      "es": "Terreno conocido como Finca Atiluya en Santa Isabel Ishuatan, Sonsonate. Se ofrece en venta por USD 99,000. No se proporcionan más detalles sobre tamaño o características."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Santa Isabel Ishuatan, Sonsonate",
+        "es": "Ubicado en Santa Isabel Ishuatan, Sonsonate"
+      },
+      {
+        "en": "Price: USD 99,000",
+        "es": "Precio: USD 99,000"
+      },
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Publicado por RE/MAX Central"
+      }
+    ],
+    "lat": 13.6333,
+    "lng": -89.7833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Sonsonate municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3089,
+    "tokens_out": 401,
+    "cost_usd": 0.00127513,
+    "finish_reason": "stop",
+    "latency_ms": 3168
+  },
+  "encuentra24|32409274": {
+    "ts": "2026-08-23T04:58:07.306309+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury Villa in Playa Escondida, Colón",
+      "es": "Villa de lujo en Playa Escondida, Colón"
+    },
+    "short_description_canonical": {
+      "en": "Exclusive villa in Playa Escondida, Colón, with 432 m² built area, 3 bedrooms and 4 bathrooms. Features a private pool, luxury finishes, and parking for 2 vehicles. Surrounded by natural environment with modern design.",
+      "es": "Villa exclusiva en Playa Escondida, Colón, con 432 m² construidos, 3 habitaciones y 4 baños. Cuenta con piscina privada, acabados de lujo y estacionamiento para 2 vehículos. Rodeada de entorno natural con diseño moderno."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private pool and luxury finishes",
+        "es": "Piscina privada y acabados de lujo"
+      },
+      {
+        "en": "432 m² built, 3 bedrooms, 4 baths",
+        "es": "432 m² construidos, 3 habitaciones, 4 baños"
+      },
+      {
+        "en": "Parking for 2 vehicles",
+        "es": "Estacionamiento para 2 vehículos"
+      },
+      {
+        "en": "Located in Playa Escondida, Colón",
+        "es": "Ubicada en Playa Escondida, Colón"
+      }
+    ],
+    "lat": 9.3592,
+    "lng": -79.9014,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Escondida, Colón, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 4.0,
+      "built_area_m2": 432.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2345,
+    "tokens_out": 491,
+    "cost_usd": 0.00117325,
+    "finish_reason": "stop",
+    "latency_ms": 3360
+  },
+  "encuentra24|30567032": {
+    "ts": "2026-08-23T04:58:08.900478+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "3-Bed House on Portobelo Bay, Sea Access Only",
+      "es": "Casa de 3 habs. en Bahía de Portobelo, acceso por mar"
+    },
+    "short_description_canonical": {
+      "en": "Single-story house on a 1,819 m² lot across Portobelo Bay, near El Otro Lado hotel. Built area of 175 m² with a 45 m² covered terrace, 3 bedrooms, 2 bathrooms, and a large kitchen-living-dining room. Access is by sea only, about 3 minutes from the public dock. Features ENSA electricity, natural spring water, septic tank, and shared small dock.",
+      "es": "Casa de una planta en lote de 1,819 m² al otro lado de la Bahía de Portobelo, cerca del hotel El Otro Lado. Área construida de 175 m² con terraza techada de 45 m², 3 recámaras, 2 baños y amplia cocina-salón-comedor. Acceso solo por mar, a unos 3 minutos del muelle público. Cuenta con electricidad ENSA, agua de captación natural, pozo séptico y pequeño muelle compartido."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Only 4 houses in the area",
+        "es": "Solo 4 casas en la zona"
+      },
+      {
+        "en": "Access by sea, 3 min from dock",
+        "es": "Acceso por mar, 3 min del muelle"
+      },
+      {
+        "en": "1,819 m² lot, 175 m² built",
+        "es": "Lote de 1,819 m², 175 m² construidos"
+      },
+      {
+        "en": "No water bill (natural spring)",
+        "es": "Sin pago de agua (captación natural)"
+      },
+      {
+        "en": "Second line beachfront, private",
+        "es": "Segunda línea frente al mar, privado"
+      }
+    ],
+    "lat": 9.5543,
+    "lng": -79.6554,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Portobelo Bay, Portobelo, Colón",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 175.0,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2663,
+    "tokens_out": 615,
+    "cost_usd": 0.00139551,
+    "finish_reason": "stop",
+    "latency_ms": 4953
   }
 }
