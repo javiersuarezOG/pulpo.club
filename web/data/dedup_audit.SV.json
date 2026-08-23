@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-22T03:49:49.231962+00:00",
+  "computed_at": "2026-08-23T03:57:45.408021+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -383,6 +383,34 @@
           "title": "PARCELACION ESTANCIAS VISTAS DEL MAR LOTES 9, 10 Y 11 POLIGONO B KM. 46.5 CARRETERA DEL LITORAL, LA LIBERTAD COSTA. L.L., La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
           "url": "https://www.realestate.com.au/international/sv/parcelacion-estancias-vistas-del-mar-lotes-9-10-y-11-poligono-b-km-46-5-carretera-del-litoral-la-libertad-costa-l-l-la-libertad-la-libertad-la-libertad-la-libertad-department-310108163913/",
           "zone": "la-libertad"
+        }
+      ],
+      "sources": [
+        "realestate_au_sv"
+      ]
+    },
+    {
+      "count": 2,
+      "cross_source": false,
+      "fingerprint": "1d530c8ada30673bac77a1f48aefd1032c41160a",
+      "samples": [
+        {
+          "area_m2": null,
+          "price_usd": 99000.0,
+          "source": "realestate_au_sv",
+          "source_id": "finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899563",
+          "title": "finca atiluya, santa isabel ishuatan, sonsonate, Santa Isabel Ishuatan, Sonsonate, Santa Isabel Ishuatan, Sonsonate Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899563/",
+          "zone": "sonsonate"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 99000.0,
+          "source": "realestate_au_sv",
+          "source_id": "finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899551",
+          "title": "finca atiluya, santa isabel ishuatan, sonsonate, Santa Isabel Ishuatan, Sonsonate, Santa Isabel Ishuatan, Sonsonate Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899551/",
+          "zone": "sonsonate"
         }
       ],
       "sources": [
@@ -1609,10 +1637,10 @@
       "unique_in_source": 38
     },
     "citymax_sc": {
-      "kept_as_unique": 151,
-      "raw": 151,
+      "kept_as_unique": 149,
+      "raw": 149,
       "shared_with_others": 0,
-      "unique_in_source": 151
+      "unique_in_source": 149
     },
     "csbr": {
       "kept_as_unique": 287,
@@ -1621,10 +1649,10 @@
       "unique_in_source": 287
     },
     "encuentra24": {
-      "kept_as_unique": 20,
-      "raw": 20,
+      "kept_as_unique": 22,
+      "raw": 22,
       "shared_with_others": 0,
-      "unique_in_source": 20
+      "unique_in_source": 22
     },
     "essurf": {
       "kept_as_unique": 35,
@@ -1651,22 +1679,22 @@
       "unique_in_source": 26
     },
     "realestate_au_sv": {
-      "kept_as_unique": 283,
-      "raw": 325,
+      "kept_as_unique": 285,
+      "raw": 328,
       "shared_with_others": 0,
-      "unique_in_source": 283
+      "unique_in_source": 285
     },
     "remax": {
-      "kept_as_unique": 306,
-      "raw": 321,
+      "kept_as_unique": 305,
+      "raw": 320,
       "shared_with_others": 0,
-      "unique_in_source": 306
+      "unique_in_source": 305
     },
     "santizo": {
-      "kept_as_unique": 3,
-      "raw": 3,
+      "kept_as_unique": 86,
+      "raw": 86,
       "shared_with_others": 0,
-      "unique_in_source": 3
+      "unique_in_source": 86
     },
     "vivolatam": {
       "kept_as_unique": 157,
@@ -1681,6 +1709,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 1952,
-  "total_unique_fingerprints": 1885
+  "total_in_dataset": 2037,
+  "total_unique_fingerprints": 1969
 }

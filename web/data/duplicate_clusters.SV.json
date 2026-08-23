@@ -390,6 +390,34 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "1d530c8ada30673bac77a1f48aefd1032c41160a",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 99000.0,
+        "source": "realestate_au_sv",
+        "source_id": "finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899563",
+        "title": "finca atiluya, santa isabel ishuatan, sonsonate, Santa Isabel Ishuatan, Sonsonate, Santa Isabel Ishuatan, Sonsonate Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899563/",
+        "zone": "sonsonate"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 99000.0,
+        "source": "realestate_au_sv",
+        "source_id": "finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899551",
+        "title": "finca atiluya, santa isabel ishuatan, sonsonate, Santa Isabel Ishuatan, Sonsonate, Santa Isabel Ishuatan, Sonsonate Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899551/",
+        "zone": "sonsonate"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "2219e5242b117f34c602369561c809a91d306026",
     "samples": [
       {

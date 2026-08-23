@@ -1,19 +1,19 @@
 {
-  "computed_at": "2026-08-22T03:58:44.517008+00:00",
+  "computed_at": "2026-08-23T04:11:31.601951+00:00",
   "filter_strictness": "moderate",
   "kpi": {
     "active_sources": 14,
     "per_shelf_visible": {
       "beach_condos": {
-        "count": 26,
+        "count": 27,
         "renders_on_homepage": true
       },
       "beach_homes": {
-        "count": 122,
+        "count": 142,
         "renders_on_homepage": true
       },
       "beach_land": {
-        "count": 493,
+        "count": 491,
         "renders_on_homepage": true
       },
       "lake_condos": {
@@ -21,7 +21,7 @@
         "renders_on_homepage": false
       },
       "lake_homes": {
-        "count": 8,
+        "count": 10,
         "renders_on_homepage": true
       },
       "lake_land": {
@@ -59,8 +59,8 @@
         "target_prd": null
       },
       "citymax_sc": {
-        "coverage_pct_vs_discovered": 48.3,
-        "kept": 145,
+        "coverage_pct_vs_discovered": 47.7,
+        "kept": 143,
         "status": "green",
         "target_discovered": null,
         "target_prd": 300
@@ -81,7 +81,7 @@
       },
       "encuentra24": {
         "coverage_pct_vs_discovered": 0.7,
-        "kept": 20,
+        "kept": 22,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -137,14 +137,14 @@
       },
       "remax": {
         "coverage_pct_vs_discovered": null,
-        "kept": 262,
+        "kept": 261,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
       },
       "santizo": {
-        "coverage_pct_vs_discovered": 2.0,
-        "kept": 3,
+        "coverage_pct_vs_discovered": 57.3,
+        "kept": 86,
         "status": "green",
         "target_discovered": null,
         "target_prd": 150
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 5,
     "shelves_total": 6,
-    "total_in_dataset": 1766,
-    "total_visible_listings": 1585
+    "total_in_dataset": 1848,
+    "total_visible_listings": 1627
   },
   "min_real_listings": 4
 }
