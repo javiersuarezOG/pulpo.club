@@ -140778,5 +140778,262 @@
     "cost_usd": 0.00139551,
     "finish_reason": "stop",
     "latency_ms": 4953
+  },
+  "citymax_sc|terreno-exclusivo-con-vista-al-mar-en-la-libertad": {
+    "ts": "2026-08-24T03:55:51.906922+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Surf City, La Libertad",
+      "es": "Terrenos en venta en Surf City, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land for sale in Surf City, La Libertad department, El Salvador. The listing includes apartments, land, and houses in the Surf City area, specifically in San Blas. Price is $418,279.81.",
+      "es": "Terrenos en venta en Surf City, departamento de La Libertad, El Salvador. El anuncio incluye apartamentos, terrenos y casas en la zona de Surf City, específicamente en San Blas. Precio: $418,279.81."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Surf City, La Libertad",
+        "es": "Ubicado en Surf City, La Libertad"
+      },
+      {
+        "en": "Includes land, houses, apartments",
+        "es": "Incluye terrenos, casas, apartamentos"
+      },
+      {
+        "en": "San Blas beach area",
+        "es": "Zona de playa San Blas"
+      }
+    ],
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Blas beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3080,
+    "tokens_out": 408,
+    "cost_usd": 0.0012804,
+    "finish_reason": "stop",
+    "latency_ms": 2925
+  },
+  "citymax_sc|terreno-en-venta-en-el-centro-de-salcoatitan": {
+    "ts": "2026-08-24T03:55:52.125896+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Ruta Las Flores, Sonsonate",
+      "es": "Terreno en venta en Ruta Las Flores, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Land for sale in Ruta Las Flores, Sonsonate. The property is located in a scenic route known for tourism. Price is $78,000. No further details provided.",
+      "es": "Terreno en venta en Ruta Las Flores, Sonsonate. La propiedad se ubica en una ruta escénica conocida por el turismo. Precio: $78,000. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located on scenic Ruta Las Flores",
+        "es": "Ubicado en la pintoresca Ruta Las Flores"
+      },
+      {
+        "en": "Price $78,000",
+        "es": "Precio $78,000"
+      },
+      {
+        "en": "In Sonsonate department",
+        "es": "En el departamento de Sonsonate"
+      }
+    ],
+    "lat": 13.1733,
+    "lng": -87.9589,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Intipucá, La Unión",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3076,
+    "tokens_out": 387,
+    "cost_usd": 0.00125622,
+    "finish_reason": "stop",
+    "latency_ms": 3143
+  },
+  "citymax_sc|terreno-con-vista-al-mar-en-surf-city-el-salvador": {
+    "ts": "2026-08-24T03:55:52.195544+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in La Libertad, San Blas",
+      "es": "Terrenos en venta en La Libertad, San Blas"
+    },
+    "short_description_canonical": {
+      "en": "Land parcels for sale in La Libertad, near San Blas and San Diego, within the Surf City development zone. The listing covers multiple lots and apartments in the area. Price for the land is USD 314,071.82.",
+      "es": "Terrenos en venta en La Libertad, cerca de San Blas y San Diego, dentro de la zona de desarrollo Surf City. El anuncio cubre varios lotes y apartamentos en la zona. El precio del terreno es USD 314,071.82."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Surf City development zone",
+        "es": "Ubicado en la zona de desarrollo Surf City"
+      },
+      {
+        "en": "Near San Blas and San Diego beaches",
+        "es": "Cerca de las playas San Blas y San Diego"
+      },
+      {
+        "en": "Multiple land parcels available",
+        "es": "Múltiples terrenos disponibles"
+      },
+      {
+        "en": "Price USD 314,071.82 for land",
+        "es": "Precio USD 314,071.82 por el terreno"
+      }
+    ],
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Blas beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3080,
+    "tokens_out": 450,
+    "cost_usd": 0.0013266,
+    "finish_reason": "stop",
+    "latency_ms": 3213
+  },
+  "bienesraices|2460": {
+    "ts": "2026-08-24T03:55:52.471284+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "167.78 m² Land in Ilobasco, Cabañas",
+      "es": "Terreno de 167.78 m² en Ilobasco, Cabañas"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 167.78 m² (perimeter 61.92 m) with 6.86 m frontage on Calle 1 Oriente, Barrio Los Desamparados, Ilobasco, Cabañas Oeste. Zoned for mixed residential/commercial use, near Parroquia Nuestra Señora de los Desamparados and Parque Los Desamparados. Asking price $400,000 USD, negotiable.",
+      "es": "Terreno de 167.78 m² (perímetro 61.92 m) con 6.86 m de frente sobre Calle 1 Oriente, Barrio Los Desamparados, Ilobasco, Cabañas Oeste. Uso mixto habitacional/comercial, cerca de la Parroquia Nuestra Señora de los Desamparados y el Parque Los Desamparados. Precio de venta $400,000 USD, negociable."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "6.86 m frontage on Calle 1 Oriente",
+        "es": "6.86 m de frente sobre Calle 1 Oriente"
+      },
+      {
+        "en": "Mixed residential/commercial zoning",
+        "es": "Zonificación mixta habitacional/comercial"
+      },
+      {
+        "en": "Near church, park, and transit",
+        "es": "Cerca de iglesia, parque y transporte"
+      },
+      {
+        "en": "High foot and vehicle traffic",
+        "es": "Alta afluencia peatonal y vehicular"
+      }
+    ],
+    "lat": 13.8492,
+    "lng": -88.8575,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ilobasco, Cabañas",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3507,
+    "tokens_out": 554,
+    "cost_usd": 0.00155629,
+    "finish_reason": "stop",
+    "latency_ms": 3490
+  },
+  "encuentra24|25564061": {
+    "ts": "2026-08-24T05:08:53.747555+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Repossessed House in Playa Leona, Valle Bonito",
+      "es": "Casa Reposeída en Playa Leona, Valle Bonito"
+    },
+    "short_description_canonical": {
+      "en": "Repossessed house in Playa Leona, Residencial Valle Bonito, at Calle el Nance and Calle Los Pinos. Built area of 224 m² with 3 bedrooms, 1 bathroom, and 2 parking spaces. Listed at $46,759.",
+      "es": "Casa reposeída en Playa Leona, Residencial Valle Bonito, en Calle el Nance y Calle Los Pinos. Área construida de 224 m² con 3 dormitorios, 1 baño y 2 estacionamientos. Precio de $46,759."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Repossessed price at $46,759",
+        "es": "Precio reposeído de $46,759"
+      },
+      {
+        "en": "224 m² built area",
+        "es": "224 m² de área construida"
+      },
+      {
+        "en": "3 bedrooms, 1 bathroom",
+        "es": "3 dormitorios, 1 baño"
+      },
+      {
+        "en": "2 parking spaces included",
+        "es": "Incluye 2 estacionamientos"
+      }
+    ],
+    "lat": 8.9833,
+    "lng": -79.5167,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Obarrio, Panama City",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 1.0,
+      "built_area_m2": 224.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2264,
+    "tokens_out": 468,
+    "cost_usd": 0.00112608,
+    "finish_reason": "stop",
+    "latency_ms": 3457
   }
 }
