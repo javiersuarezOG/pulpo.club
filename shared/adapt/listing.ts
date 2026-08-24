@@ -1,0 +1,500 @@
+// shared/adapt/listing.ts — pipeline row -> Listing.
+//
+// Moved verbatim from web/app/data/listings.ts. The API must run this
+// before it can filter at all: applyFilters reads the ADAPTED shape
+// (l.price, l.size_m2, l.zone_name, l.beachfront_tier), while the
+// pipeline emits price_usd / area_m2 / zone and no id field. Two
+// adapters would mean the bot and the website disagree about what a
+// listing even is.
+//
+// One deliberate change from the original: the active country is now a
+// PARAMETER rather than a module import. The web version read
+// ACTIVE_COUNTRY, which resolves through Vite's import.meta.env at
+// build time and does not exist in Node. web/app/data/listings.ts wraps
+// this and passes ACTIVE_COUNTRY, so its own call sites are unchanged.
+
+// Live-data adapter — fetches /data/ranked.json and reshapes each
+// record into the Listing schema the rest of the app expects.
+//
+// This is the single seam between the backend's ranked.json and the
+// React components. If WS2 ever moves to a real /api/listings endpoint,
+// swap this file's implementation; nothing else changes.
+//
+// Field mapping table lives in the plan
+// (~/.claude/plans/use-the-ux-fluffy-cocke.md). Highlights:
+//   - title/description/usps wrap as { en } until PR-7.5 adds ES.
+//   - description has its HTML entities decoded (raw scrape preserves them).
+//   - source_type derives from `source` per the off-market rule
+//     (whatsapp/facebook/private → off_market). Until PR-7 there are no
+//     such sources in the data.
+//   - beachfront_tier falls back to is_beachfront ? "near_beach" : null
+//     (PR-8 ships the full enum).
+//   - land_type is a placeholder until PR-8's classifier.
+
+import type { DiscoveryTag, Listing, MasterCategory, Subcategory } from "../listing";
+import { decodeHtmlEntities } from "../decode-html";
+import { ZONE_NAMES, pretty } from "../zones";
+
+/** The two country manifest fields this adapter needs. Injected because
+ *  the web build resolves them from import.meta.env (Vite), which has no
+ *  meaning in a serverless function. */
+export type CountryRef = { code: string; name_en: string };
+
+const VALID_MASTER_CATEGORIES: ReadonlySet<MasterCategory> = new Set(["beach", "lake"]);
+const VALID_SUBCATEGORIES:     ReadonlySet<Subcategory>    = new Set(["homes", "condos", "land"]);
+const VALID_DISCOVERY_TAGS:    ReadonlySet<DiscoveryTag>   = new Set([
+  "top_rated", "under_250k", "gated", "waterfront",
+]);
+
+function adaptDiscoveryTags(raw: unknown): DiscoveryTag[] {
+  // Always returns an array (possibly empty) — never null/undefined.
+  // The backend writes a deterministic list; this filter rejects any
+  // unknown literal that might sneak in during a schema rollout.
+  if (!Array.isArray(raw)) return [];
+  const out: DiscoveryTag[] = [];
+  for (const t of raw) {
+    if (typeof t === "string" && VALID_DISCOVERY_TAGS.has(t as DiscoveryTag)) {
+      out.push(t as DiscoveryTag);
+    }
+  }
+  return out;
+}
+
+// Off-market sources per the user's rule. The literal labels never
+// reach the UI for these — we emit "Off-market" instead.
+const OFF_MARKET_SOURCES = new Set(["whatsapp", "facebook", "private"]);
+
+// Pretty source names. Anything missing falls back to a Title-Cased
+// version of the source key.
+const SOURCE_LABELS: Record<string, string> = {
+  goodlife: "Goodlife",
+  oceanside: "Oceanside",
+  century21: "Century 21",
+  bienesraices: "Bienes Raíces",
+  remax: "RE/MAX",
+  nexo: "Nexo",
+  realtyelsalvador: "Realty El Salvador",
+};
+
+// Zone pretty-names + the slug fallback now live in shared/zones.ts:
+// /api/v1/meta and the MCP tools label zones for chat channels, and a
+// second copy of this table is exactly the drift the shared core exists
+// to prevent. Re-exported below so this module's existing consumers and
+// tests keep their import path.
+export { ZONE_NAMES, pretty };
+
+function deriveSourceType(source: string): "on_market" | "off_market" {
+  return OFF_MARKET_SOURCES.has(source) ? "off_market" : "on_market";
+}
+
+// Cheap source-language heuristic for a short broker string, mirroring
+// automation/ensure_bilingual.py:detect_lang so the frontend and pipeline
+// agree on placement. Spanish diacritics are decisive; otherwise a Spanish-
+// vs-English stopword tally, ties → "es" (LATAM broker default). The
+// definite articles el/la/los/las are intentionally NOT Spanish signals —
+// nearly every place name here starts with one ("El Zonte", "La Libertad").
+const _ES_DIACRITICS = /[áéíóúñ¿¡ü]/i;
+const _ES_STOP = new Set([
+  "de", "en", "con", "para", "por", "del", "una", "un", "y", "se", "su", "al",
+  "casa", "terreno", "playa", "mar", "vista", "venta", "frente", "cerca",
+  "lote", "lujo", "apartamento", "sobre",
+]);
+const _EN_STOP = new Set([
+  "the", "for", "with", "and", "sale", "lot", "house", "home", "beach",
+  "beachfront", "ocean", "oceanfront", "view", "near", "front", "land", "of",
+  "in", "on", "to", "luxury", "apartment", "condo",
+]);
+
+export function detectListingLang(text: string | null | undefined): "en" | "es" {
+  if (!text || !text.trim()) return "es";
+  if (_ES_DIACRITICS.test(text)) return "es";
+  const words = (text.toLowerCase().match(/[a-záéíóúñü]+/gi) || []);
+  if (words.length === 0) return "es";
+  let es = 0;
+  let en = 0;
+  for (const w of words) {
+    if (_ES_STOP.has(w)) es++;
+    if (_EN_STOP.has(w)) en++;
+  }
+  return en > es ? "en" : "es";
+}
+
+// Days between `iso` and now, or null when the timestamp is absent or
+// unparseable. Returning null rather than 0 is deliberate and mirrors
+// the `days_listed` contract: 0 means "first seen today", and a missing
+// timestamp is NOT that. The old `return 0` made an unknown-age listing
+// indistinguishable from a brand-new one — it fired the "New" badge and
+// landed in the "new this week" shelf. Consumers null-guard via
+// `typeof x === "number"`; sorts push null to the end in both
+// directions so unknown age never masquerades as freshest.
+function daysSince(iso: string | null | undefined): number | null {
+  if (!iso) return null;
+  const t = Date.parse(iso);
+  if (Number.isNaN(t)) return null;
+  const ms = Date.now() - t;
+  return Math.max(0, Math.floor(ms / 86_400_000));
+}
+
+// PR-8 — backend now derives land_type (pulpo/derived_rules.derive_land_type)
+// from NLP-extracted booleans + property_type. Pass through when present;
+// fall back to "residential" for any property_type ∈ {land,house,condo,apartment}
+// and null otherwise.
+function deriveLandType(
+  raw: any,
+  propertyType: string | null,
+): Listing["land_type"] {
+  const v = raw?.land_type;
+  if (v === "commercial" || v === "tourist" || v === "residential") {
+    return v;
+  }
+  if (propertyType === "land" || propertyType === "house" ||
+      propertyType === "condo" || propertyType === "apartment") {
+    return "residential";
+  }
+  return null;
+}
+
+function deriveBeachfrontTier(
+  isBeachfront: boolean,
+  tier: string | null | undefined,
+): Listing["beachfront_tier"] {
+  // PR-8 — backend now emits one of "on_beach" | "walk_to_beach" |
+  // "near_beach". Map the prototype's "oceanfront" string defensively
+  // so legacy snapshots still render.
+  if (tier === "on_beach" || tier === "walk_to_beach" || tier === "near_beach") {
+    return tier;
+  }
+  if (tier === "oceanfront") return "on_beach";   // legacy alias
+  return isBeachfront ? "near_beach" : null;
+}
+
+function deriveRoadAccess(
+  hasPaved: boolean,
+  type: string | null | undefined
+): Listing["road_access_type"] {
+  if (type === "paved" || type === "gravel" || type === "dirt") return type;
+  if (hasPaved) return "paved";
+  return "unknown";
+}
+
+function buildPhotos(raw: any): string[] {
+  // Gallery is broker URLs only. The local /photos/<id>.jpg derivative
+  // is a 600×400 thumbnail (drives card paint via `thumbnail_url`); when
+  // we used to prepend it here the carousel rendered slot 0 as that
+  // upscaled thumb right next to the same image at broker-native
+  // resolution — the visible "low+high quality dupe."
+  const urls = Array.isArray(raw.photo_urls) ? raw.photo_urls : [];
+  // Per-photo picker verdicts (plan 004): broker URLs the hero picker
+  // downloaded, scored, and rejected (below the cheap-score floor or a
+  // text overlay). Skip them so a rejected flyer/logo/thumbnail never
+  // renders as photo 2..N. Absence (pre-field record) → null → no-op,
+  // identical to today's order. Producer: automation/run.py +
+  // automation/repick_heroes.py (`photo_urls_rejected`).
+  const rejected =
+    Array.isArray(raw.photo_urls_rejected)
+      ? new Set(raw.photo_urls_rejected.filter((u: any) => typeof u === "string"))
+      : null;
+  const out: string[] = [];
+  for (const u of urls) {
+    if (typeof u !== "string") continue;
+    if (rejected && rejected.has(u)) continue;
+    if (out.length === 0 || u !== out[out.length - 1]) out.push(u);
+  }
+  // P2 — surface the hero picker's SELECTED image first so the detail
+  // gallery's primary photo matches the card thumbnail (which paints the
+  // same winning image via thumbnail_url). The picker writes the chosen
+  // broker URL to `selected_photo_url` (ranked.json); reorder so it's
+  // photos[0]. Null-safe no-op when absent (pre-P2 records) or not found
+  // among photo_urls — older records keep today's order and still render.
+  const selected =
+    typeof raw.selected_photo_url === "string" && raw.selected_photo_url.length > 0
+      ? raw.selected_photo_url
+      : null;
+  // Survival guard: the picker APPROVED selected_photo_url by definition,
+  // so it must never be filtered out — even if it was (incorrectly) also
+  // listed as rejected, or if rejection emptied the gallery entirely. Keep
+  // it as photos[0] so the detail page always has at least the hero shot.
+  if (selected) {
+    const idx = out.indexOf(selected);
+    if (idx > 0) {
+      out.splice(idx, 1);
+      out.unshift(selected);
+    } else if (idx < 0 && urls.includes(selected)) {
+      out.unshift(selected);
+    }
+  }
+  return out;
+}
+
+export function adaptListing(raw: any, country: CountryRef): Listing {
+  const sourceKey = String(raw.source ?? "unknown");
+  const sourceId = String(raw.source_id ?? "");
+  // ID format must match what `/api/social/listings` exposes (see
+  // `api/social/listings.js`: `${source}__${source_id}`). pulpo-social
+  // embeds these ids in IG + FB UTM links; if the frontend uses a different
+  // separator the linked listings 404 with "This listing is no longer
+  // available." (regression caught after Phase 2 first auto-publishes —
+  // 2026-05-14.)
+  const id = sourceKey && sourceId
+    ? `${sourceKey}__${sourceId}`
+    : `pulpo__${Math.random().toString(36).slice(2)}`;
+  // PR-7 — prefer the backend-derived source_type when present (the
+  // pipeline now sets it via pulpo/derived_rules.derive_source_type).
+  // Fallback to the FE-side derivation keeps things rendering during
+  // the deploy window before the new ranked.json lands.
+  const sourceType: "on_market" | "off_market" =
+    raw.source_type === "off_market" || raw.source_type === "on_market"
+      ? raw.source_type
+      : deriveSourceType(sourceKey);
+
+  // Off-market listings hide the source name entirely (the user's rule
+  // — never reveal that a listing came from WhatsApp/Facebook/private).
+  // We pass an empty label and let the FE substitute the i18n
+  // "Off-market" string.
+  const sourceLabel =
+    sourceType === "off_market"
+      ? ""
+      : SOURCE_LABELS[sourceKey] ??
+        sourceKey.replace(/^\w/, (c) => c.toUpperCase());
+
+  const urlLanguage: "en" | "es" | "mixed" | null =
+    raw.url_language === "en" || raw.url_language === "es" || raw.url_language === "mixed"
+      ? raw.url_language
+      : null;
+
+  // The source language a single-language (un-enriched) listing string is
+  // actually written in. Prefer the enrichment's declared url_language;
+  // otherwise detect it from the raw broker title. Used so a Spanish-only
+  // broker string is placed in the .es slot instead of being mislabeled as
+  // English — the exact defense-in-depth for the leak PR #988 closes at the
+  // pipeline. "mixed" resolves to English placement (its en side is the
+  // primary). See detectListingLang().
+  const contentLang: "en" | "es" =
+    urlLanguage === "es"
+      ? "es"
+      : urlLanguage === "en" || urlLanguage === "mixed"
+        ? "en"
+        : detectListingLang(typeof raw.title === "string" ? raw.title : "");
+
+  // Schema v3 emits {en, es} dicts for title_canonical /
+  // short_description_canonical / reasons_to_buy when DeepSeek runs. The
+  // fallback template path also emits {en, es} (post-#988). A residual
+  // single-language string (fresh listing before enrichment) is placed in
+  // the slot matching its ACTUAL language — never blindly .en — so tr()
+  // renders it honestly and a badge can flag original-language content.
+  const localizedFromAny = (
+    canonical: any,
+    legacy: string | undefined,
+  ): { en: string; es?: string } => {
+    // Bilingual (or partial) dict: keep whichever sides are non-empty.
+    if (canonical && typeof canonical === "object") {
+      const en = typeof canonical.en === "string" ? canonical.en : "";
+      const es = typeof canonical.es === "string" ? canonical.es : "";
+      if (en || es) {
+        const out: { en: string; es?: string } = { en };
+        if (es) out.es = es;
+        return out;
+      }
+    }
+    const single =
+      typeof canonical === "string" && canonical.length > 0
+        ? canonical
+        : typeof legacy === "string" && legacy.length > 0
+          ? legacy
+          : "";
+    if (!single) return { en: "" };
+    // Honest slot: place the single string in its real language.
+    return contentLang === "es" ? { en: "", es: single } : { en: single };
+  };
+
+  const titleLocalized = localizedFromAny(raw.title_canonical, raw.title);
+  // Localized fallback (never a hardcoded English "Untitled" shown to ES users).
+  if (!titleLocalized.en && !titleLocalized.es) {
+    titleLocalized.en = "Untitled";
+    titleLocalized.es = "Sin título";
+  }
+
+  const descLegacy = typeof raw.description === "string"
+    ? decodeHtmlEntities(raw.description).replace(/\s+/g, " ").trim()
+    : undefined;
+  const descLocalized = localizedFromAny(raw.short_description_canonical, descLegacy);
+
+  const usps: Listing["usps"] = Array.isArray(raw.reasons_to_buy)
+    ? (raw.reasons_to_buy
+        .map((s: any): { en: string; es?: string } | null => {
+          if (s && typeof s === "object") {
+            const en = typeof s.en === "string" ? s.en : "";
+            const es = typeof s.es === "string" ? s.es : "";
+            if (en || es) {
+              const out: { en: string; es?: string } = { en };
+              if (es) out.es = es;
+              return out;
+            }
+            return null;
+          }
+          if (typeof s === "string" && s.length > 0) {
+            return contentLang === "es" ? { en: "", es: s } : { en: s };
+          }
+          return null;
+        })
+        // Drop entries with NO usable text on either side. The LLM path can
+        // produce `{en: ""}` placeholders; without this guard the card
+        // renders an empty <li> with just a check icon. Keep an entry when
+        // EITHER language has content (an es-only entry is valid).
+        .filter((u: { en: string; es?: string } | null): u is { en: string; es?: string } =>
+          u !== null && ((u.en?.trim().length ?? 0) > 0 || (u.es?.trim().length ?? 0) > 0)))
+    : [];
+
+  const isBeachfront = Boolean(raw.is_beachfront);
+  const photos = buildPhotos(raw);
+  const department = typeof raw.department === "string" ? raw.department : null;
+
+  return {
+    id,
+    title: titleLocalized,
+    description: descLocalized,
+    usps,
+    url_language: urlLanguage,
+    zone_name: pretty(raw.zone, ZONE_NAMES),
+    region: department,
+    country: typeof raw.country === "string" ? raw.country : country.code,
+    province_state: department
+      ? `${department}, ${country.name_en}`
+      : country.name_en,
+    land_type: deriveLandType(raw, typeof raw.property_type === "string" ? raw.property_type : null),
+    size_m2: typeof raw.area_m2 === "number" ? raw.area_m2 : null,
+    price: typeof raw.price_usd === "number" ? raw.price_usd : null,
+    previous_price: typeof raw.previous_price === "number" ? raw.previous_price : null,
+    price_per_m2: typeof raw.price_per_m2 === "number" ? raw.price_per_m2 : null,
+    // Zone-relative price context — drives the detail-page PriceContextBlock.
+    // All seven fields are nullable; the block degrades gracefully when any
+    // are missing (sparse zones, fresh scrapes, incomplete listings).
+    zone:                   typeof raw.zone === "string"                    ? raw.zone                   : null,
+    zone_percentile:        typeof raw.zone_percentile === "number"         ? raw.zone_percentile        : null,
+    price_vs_zone_median:   typeof raw.price_vs_zone_median === "number"    ? raw.price_vs_zone_median   : null,
+    price_vs_zone_pct:      typeof raw.price_vs_zone_pct === "number"       ? raw.price_vs_zone_pct      : null,
+    zone_price_per_m2_min:  typeof raw.zone_price_per_m2_min === "number"   ? raw.zone_price_per_m2_min  : null,
+    zone_price_per_m2_max:  typeof raw.zone_price_per_m2_max === "number"   ? raw.zone_price_per_m2_max  : null,
+    zone_comp_count:        typeof raw.zone_comp_count === "number"         ? raw.zone_comp_count        : null,
+    zone_comparison_scope:
+      raw.zone_comparison_scope === "zone"
+      || raw.zone_comparison_scope === "macro"
+      || raw.zone_comparison_scope === "country"
+        ? raw.zone_comparison_scope
+        : null,
+    photos,
+    thumbnail_url:
+      typeof raw.hero_photo_path === "string" && raw.hero_photo_path.length > 0
+        ? raw.hero_photo_path
+        : null,
+    photos_count: typeof raw.photos_count === "number" ? raw.photos_count : photos.length,
+    hero_photo_quality_score:
+      typeof raw.hero_photo_quality_score === "number" ? raw.hero_photo_quality_score : null,
+    has_text_overlay:
+      typeof raw.has_text_overlay === "boolean" ? raw.has_text_overlay : null,
+    // Image-enrichment flags. Defensive defaults (false) keep older
+    // ranked.json records valid during the rollout window before the
+    // first nightly populates the sidecars.
+    hero_eligible: raw.hero_eligible === true,
+    card_eligible: raw.card_eligible === true,
+    first_seen_date: daysSince(raw.first_seen_at),
+    // Source-of-truth listing age: comes from the scraper's parse of
+    // the original posting's mod_dt. `null` means we couldn't extract
+    // it from the source — DON'T conflate with 0 ("posted today"),
+    // because 0 would falsely fire the "Nuevo" badge for stale
+    // listings whose source date was unparseable.
+    days_listed: typeof raw.days_listed === "number" ? raw.days_listed : null,
+    is_repriced: Boolean(raw.is_repriced),
+    source_type: sourceType,
+    source_label: sourceLabel,
+    source_id: sourceKey,
+    beachfront_tier: deriveBeachfrontTier(isBeachfront, raw.beachfront_tier),
+    has_ocean_view: Boolean(raw.has_ocean_view),
+    has_mountain_view: Boolean(raw.has_mountain_view),
+    has_water_body: Boolean(raw.has_water_body),
+    is_flat: Boolean(raw.is_flat),
+    has_water: Boolean(raw.has_water),
+    has_power: Boolean(raw.has_power),
+    has_sewage: typeof raw.has_sewage === "boolean" ? raw.has_sewage : null,
+    road_access_type: deriveRoadAccess(Boolean(raw.has_paved_access), raw.road_access_type),
+    readiness_score: typeof raw.readiness_score === "number" ? raw.readiness_score : 0,
+    zoning_use: typeof raw.zoning_use === "string" ? raw.zoning_use : null,
+    dist_beach_km: typeof raw.dist_beach_km === "number" ? raw.dist_beach_km : null,
+    dist_airport_km: typeof raw.dist_airport_km === "number" ? raw.dist_airport_km : null,
+    dist_nearest_town_km:
+      typeof raw.dist_nearest_town_km === "number" ? raw.dist_nearest_town_km : null,
+    has_lat_lng: Number.isFinite(raw.lat) && Number.isFinite(raw.lng),
+    // PR-5/WS4 — pass the raw coordinates through for the map view.
+    // Clamp non-numbers to null so map read-sites can guard with hasCoords().
+    lat: Number.isFinite(raw.lat) ? raw.lat : null,
+    lng: Number.isFinite(raw.lng) ? raw.lng : null,
+    geocoding_confidence:
+      raw.geocoding_confidence === "high" ||
+      raw.geocoding_confidence === "medium" ||
+      raw.geocoding_confidence === "low"
+        ? raw.geocoding_confidence
+        : null,
+    geocoding_source:
+      raw.geocoding_source === "extracted" ||
+      raw.geocoding_source === "estimated" ||
+      raw.geocoding_source === "nominatim"
+        ? raw.geocoding_source
+        : null,
+    geocoding_reference:
+      typeof raw.geocoding_reference === "string" && raw.geocoding_reference.trim().length > 0
+        ? raw.geocoding_reference
+        : null,
+    existence_status:
+      raw.existence_status === "confirmed_current" ||
+      raw.existence_status === "missing_recently" ||
+      raw.existence_status === "stale"
+        ? raw.existence_status
+        : null,
+    is_sold: Boolean(raw.is_sold),
+    original_url: sourceType === "on_market" && typeof raw.url === "string" ? raw.url : null,
+    rank: typeof raw.rank === "number" ? raw.rank : null,
+    rank_score: typeof raw.rank_score === "number" ? raw.rank_score : null,
+    value_score: typeof raw.value_score === "number" ? raw.value_score : null,
+    location_score: typeof raw.location_score === "number" ? raw.location_score : null,
+    momentum_score: typeof raw.momentum_score === "number" ? raw.momentum_score : null,
+    property_type: typeof raw.property_type === "string" ? raw.property_type : null,
+    bedrooms: typeof raw.bedrooms === "number" ? raw.bedrooms : null,
+    // Built-property facts (plan 010) — same graceful-null guard style
+    // as bedrooms above. ranked.json carries these sparsely today;
+    // plan 009/011 raise coverage and the tiles light up as data lands.
+    bathrooms: typeof raw.bathrooms === "number" ? raw.bathrooms : null,
+    built_area_m2: typeof raw.built_area_m2 === "number" ? raw.built_area_m2 : null,
+    year_built: typeof raw.year_built === "number" ? raw.year_built : null,
+    year_renovated: typeof raw.year_renovated === "number" ? raw.year_renovated : null,
+    parking_spaces: typeof raw.parking_spaces === "number" ? raw.parking_spaces : null,
+    floor: typeof raw.floor === "number" ? raw.floor : null,
+    hoa_fee_usd_monthly: typeof raw.hoa_fee_usd_monthly === "number" ? raw.hoa_fee_usd_monthly : null,
+    furnished: typeof raw.furnished === "boolean" ? raw.furnished : null,
+    has_pool: typeof raw.has_pool === "boolean" ? raw.has_pool : null,
+    // IA-axis fields. During the rollout window, ranked.json may not
+    // yet carry them — graceful nulls keep the legacy homepage code
+    // working unchanged while the backend catches up.
+    master_category:
+      typeof raw.master_category === "string" &&
+      VALID_MASTER_CATEGORIES.has(raw.master_category as MasterCategory)
+        ? (raw.master_category as MasterCategory)
+        : null,
+    subcategory:
+      typeof raw.subcategory === "string" &&
+      VALID_SUBCATEGORIES.has(raw.subcategory as Subcategory)
+        ? (raw.subcategory as Subcategory)
+        : null,
+    discovery_tags: adaptDiscoveryTags(raw.discovery_tags),
+    star_rating: typeof raw.star_rating === "number" ? raw.star_rating : 0,
+    // Backend writes `is_incomplete` directly. Fallback derives from
+    // the same rule client-side so the FE stays correct during the
+    // rollout window before the first nightly emits the flag.
+    is_incomplete:
+      typeof raw.is_incomplete === "boolean"
+        ? raw.is_incomplete
+        : raw.price_usd == null || raw.area_m2 == null,
+  };
+}
+
+let cache: { ts: number; listings: Listing[] } | null = null;
+

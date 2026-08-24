@@ -1,6 +1,6 @@
 # Pulpo v1 API — contract
 
-Status: **PR-1 (contract frozen, `/api/v1/ping` live). Remaining endpoints land in PR-2 and PR-5.**
+Status: **live — `/ping`, `/meta`, `/listings`, `/listings/:id`.**
 
 ## Why this exists
 
@@ -109,20 +109,44 @@ proves the module chain survives Vercel's bundler.
 
 `Cache-Control: no-store`.
 
-### `GET /api/v1/meta` — PR-2
+### `GET /api/v1/meta`
 
 Vocabulary for building queries: zones (slug, display name, count), categories,
 price bounds, `total`, `generated_at`, `country`. Channels build their menus
 from this so no zone list is ever hardcoded in an adapter.
 
-### `GET /api/v1/listings` — PR-5
+### `GET /api/v1/listings`
 
-Ranked, filtered, paginated listings. Query params reuse the website's existing
-shareable-filter URL vocabulary (`web/app/data/filter-url.ts`), so a website
-share link and an API call speak the same dialect. Plus `sort`, `limit`
-(default 10, max 50), `offset`, `country`.
+Ranked, filtered, paginated listings. Query params are parsed with the
+website's own share-link codec (`shared/engine/params.ts`), so these two mean
+exactly the same thing:
 
-### `GET /api/v1/listings/:id` — PR-5
+```
+/browse?sub=land&pmax=250000&features=ocean_view
+/api/v1/listings?sub=land&pmax=250000&features=ocean_view
+```
+
+| key | meaning |
+|---|---|
+| `zones` `types` `features` `infra` `status` `tag` | comma-separated sets |
+| `pmin` `pmax` `smin` `smax` | price / size bounds (`pmax` absent = uncapped) |
+| `master` `sub` | `beach\|lake` / `homes\|condos\|land` |
+| `ready` `score_min` `rmax` | readiness floor, score floor, rank cap |
+| `inc` | `1` to include incomplete listings |
+| `q` | free-text, all tokens must match |
+| `sort` | `rank` (default) `price_asc` `price_desc` `newest` |
+| `limit` `offset` | default 10, max 50 / max offset 2000 |
+| `country` | `SV` (default) |
+
+Unknown params are ignored and malformed numbers fall back to defaults rather
+than erroring — a bot sending `limit=abc` gets the first page, not a 400 it
+cannot explain to a user. `country` is the exception: silently serving a
+different country than asked for would be a lie, so that is a hard `400`.
+
+`total` is the size of the whole filtered set, not the page, so a channel can
+decide whether to offer "more results".
+
+### `GET /api/v1/listings/:id`
 
 One listing by canonical ID. Unknown ID → `404 not_found`.
 

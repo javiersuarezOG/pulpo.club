@@ -25,13 +25,30 @@ export const ID_SEPARATOR = "__";
 /**
  * Characters allowed in an id we are willing to look up.
  *
- * Mirrors `SAFE_LISTING_ID_RE` in web/app/lib/url-routing.ts. Ids reach
- * this code from URL path segments and chat messages, and a source_id
- * is broker-controlled text, so anything outside this set is rejected
- * rather than sanitized — a rejected lookup is a 404, a sanitized one
- * could be a path traversal.
+ * Ids reach this code from URL path segments and from chat messages,
+ * and a source_id is broker-controlled text, so anything outside this
+ * set is rejected rather than sanitized — a rejected lookup is a 404,
+ * a sanitized one could be a path traversal.
+ *
+ * `%` is included, and that is a deliberate difference from
+ * `SAFE_LISTING_ID_RE` in web/app/lib/url-routing.ts.
+ *
+ * 14 of 1,849 live listings (all from `csbr`, whose source_ids are full
+ * broker slugs) carry percent-encoded emoji, e.g.
+ * `terreno-en-venta-en-juayua-...-%f0%9f%8c%bf`. The website's stricter
+ * regex means those are already un-deep-linkable there — a pre-existing
+ * gap, not one introduced here. Rejecting them in the API too would be
+ * worse than that: /api/v1/listings would return a listing whose
+ * /api/v1/listings/:id call then 400s, leaving a bot at a dead end it
+ * cannot explain.
+ *
+ * Allowing `%` is safe in this context specifically because the id is
+ * only ever used for an equality comparison against catalog values —
+ * it never becomes a filesystem path, so a `%2e%2e%2f` payload matches
+ * nothing and does nothing. Slashes and dots-as-traversal remain
+ * rejected by the character set either way.
  */
-const SAFE_ID_RE = /^[A-Za-z0-9._-]+$/;
+const SAFE_ID_RE = /^[A-Za-z0-9._%-]+$/;
 
 export interface ListingIdParts {
   source: string;

@@ -43,6 +43,20 @@ describe("buildListingId", () => {
     }
   });
 
+  it("accepts the percent-encoded slugs csbr actually publishes", () => {
+    // 14 live listings carry percent-encoded emoji in their source_id.
+    // Rejecting them would make /listings return rows whose detail
+    // lookup 400s. Safe here because the id is only ever compared for
+    // equality, never used as a path.
+    expect(
+      buildListingId("csbr", "terreno-en-juayua-%f0%9f%8c%bf"),
+    ).toBe("csbr__terreno-en-juayua-%f0%9f%8c%bf");
+    expect(parseListingId("csbr__terreno-%f0%9f%8c%bf")).toEqual({
+      source: "csbr",
+      sourceId: "terreno-%f0%9f%8c%bf",
+    });
+  });
+
   it("rejects path-traversal and separator-injection characters", () => {
     expect(buildListingId("../../etc", "passwd")).toBeNull();
     expect(buildListingId("remax", "a/b")).toBeNull();
@@ -74,6 +88,7 @@ describe("parseListingId", () => {
       "remax|123",         // the featured.json format is not canonical
       "remax-123",         // the sitemap format is not canonical
       "remax__../../etc/passwd",
+      "remax__a/b",
       "remax__a b",
       null,
       undefined,
