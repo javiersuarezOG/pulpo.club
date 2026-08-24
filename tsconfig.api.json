@@ -1,0 +1,25 @@
+{
+  // Server-side TypeScript project: the `/api/v1/*` handlers plus the
+  // shared core they import.
+  //
+  // Why a second project instead of widening the root one: the root
+  // project is the browser build (DOM lib, no Node globals). Pulling
+  // @types/node in globally there would change ambient types the web
+  // app relies on — `setTimeout` returning `NodeJS.Timeout` instead of
+  // `number` is the classic way that breaks a working frontend. So the
+  // root tsconfig pins `"types": []` and this project is the only one
+  // that sees Node globals.
+  //
+  // `shared/**` is included in BOTH projects on purpose: it is the
+  // proof that the core stays platform-neutral. Code that reaches for
+  // `fs` or `process` in shared/ fails the root typecheck immediately.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2022"],
+    "types": ["node"],
+    "moduleResolution": "Bundler",
+    "noEmit": true
+  },
+  "include": ["api/**/*.ts", "shared/**/*"],
+  "exclude": ["node_modules", "web/dist"]
+}
