@@ -1,0 +1,20 @@
+{
+  "width": 1280,
+  "height": 720,
+  "aspect_ratio": 1.778,
+  "file_size_kb": 123.1,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-08-24T04:00:32.409390+00:00",
+  "derivative_width": 1280,
+  "derivative_height": 720,
+  "hero_photo_quality_score": 90,
+  "has_text_overlay": true,
+  "has_marketing_overlay": null,
+  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/CF4220H1S6/baTbGywgmF/Terreno_Comercial_y_Residencial_en_Venta_en_Ilobasco__Barrio_Los_Desamparados_400000_Negociables.jpeg",
+  "candidate_count": 2,
+  "content_sha1": "f5072a3f218b6d2b",
+  "dhash": 6474427320460714291,
+  "duplicates_dropped": 1
+}
