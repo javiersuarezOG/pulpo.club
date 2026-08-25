@@ -17,7 +17,13 @@
   "compilerOptions": {
     "lib": ["ES2022"],
     "types": ["node"],
-    "moduleResolution": "Bundler",
+    // Mirrors api/tsconfig.json on purpose. Vercel compiles the
+    // functions as CommonJS (see that file), so typechecking them as
+    // ESM here would validate a shape that never ships — and would
+    // hide exactly the import-interop mistakes that only bite in the
+    // emitted output.
+    "module": "CommonJS",
+    "moduleResolution": "Node",
     "noEmit": true
   },
   "include": ["api/**/*.ts", "shared/**/*"],

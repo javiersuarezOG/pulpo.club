@@ -1,0 +1,47 @@
+{
+  // Module format for the TypeScript serverless functions. This file
+  // exists to make one specific thing true: what Vercel emits under
+  // api/ must be CommonJS.
+  //
+  // WHY IT IS LOAD-BEARING
+  // @vercel/node picks the output format like this:
+  //
+  //   isEsm = ext === ".mjs" || ext === ".mts"
+  //           || (pkg.type === "module" && [".js",".ts",".tsx"].includes(ext))
+  //   ...
+  //   if (isEsm) { if (tsConfig.compilerOptions.module === undefined)
+  //                  tsConfig.compilerOptions.module = "nodenext" }
+  //
+  // api/package.json deliberately sets "type": "commonjs" (see the
+  // _comment there), so isEsm is FALSE for our .ts functions — and the
+  // `module` correction only happens when it is TRUE. The tsconfig is
+  // then resolved by walking UP from the entrypoint, which without this
+  // file lands on the repo root tsconfig.json and its "module":
+  // "ESNext".
+  //
+  // Result: ESM `import` statements emitted into a directory Node
+  // treats as CommonJS, so every function died at load with
+  // "SyntaxError: Cannot use import statement outside a module",
+  // surfacing as FUNCTION_INVOCATION_FAILED. That is exactly what
+  // happened to /api/v1/* and /api/mcp on 2026-08-25.
+  //
+  // Sitting here, this config is found before the root one for every
+  // entrypoint under api/, so the emit matches the declared type.
+  //
+  // Guardrail: tests/api/api_module_format.test.js replicates the
+  // resolution above and fails if these two ever disagree again.
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "lib": ["ES2022"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "checkJs": false,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": false
+  },
+  "include": ["**/*.ts"]
+}
