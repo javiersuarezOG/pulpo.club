@@ -72,6 +72,21 @@ jobs:
           MONITOR_STATUS_DIR: ${{ runner.temp }}/pulpo_monitor_status
         run: python3 scripts/check_webhook_health.py ${{ (github.event_name == 'workflow_dispatch' && inputs.test_slack) && '--test-slack' || '' }}
 
+      # ACTIVE probe, as opposed to the passive heartbeat above. The
+      # `telegram` family in check_webhook_health.py notices that events
+      # stopped arriving, which for an organic-traffic bot is slow and
+      # ambiguous ("nobody messaged us" is not an outage). This asks
+      # Telegram directly whether our webhook is still registered, still
+      # pointed at production, and still being delivered to — so a
+      # deregistration or a rotated secret is caught even with zero
+      # users. Never blocks: it Slacks and exits 0.
+      - name: Probe Telegram webhook registration
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_WEBHOOK_URL: ${{ vars.TELEGRAM_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python3 scripts/check_telegram_webhook.py
+
       - name: Slack on webhook-health job failure
         if: failure() || cancelled()
         env:
