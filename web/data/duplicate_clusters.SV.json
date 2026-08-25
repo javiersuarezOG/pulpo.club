@@ -156,6 +156,52 @@
     ]
   },
   {
+    "count": 4,
+    "cross_source": false,
+    "fingerprint": "eb1b0b1225c4307e0c98913d56e17ef5705736f3",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 39000.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650181",
+        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650181/",
+        "zone": "suchitoto"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 39000.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650153",
+        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650153/",
+        "zone": "suchitoto"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 39000.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650144",
+        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650144/",
+        "zone": "suchitoto"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 39000.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650148",
+        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650148/",
+        "zone": "suchitoto"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
     "count": 3,
     "cross_source": false,
     "fingerprint": "acd51d255aeae4378cf8d70dae7442bc07b3168e",
@@ -350,18 +396,18 @@
         "area_m2": null,
         "price_usd": 99000.0,
         "source": "realestate_au_sv",
-        "source_id": "finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899563",
+        "source_id": "finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899551",
         "title": "finca atiluya, santa isabel ishuatan, sonsonate, Santa Isabel Ishuatan, Sonsonate, Santa Isabel Ishuatan, Sonsonate Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899563/",
+        "url": "https://www.realestate.com.au/international/sv/finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899551/",
         "zone": "sonsonate"
       },
       {
         "area_m2": null,
         "price_usd": 99000.0,
         "source": "realestate_au_sv",
-        "source_id": "finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899551",
+        "source_id": "finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899563",
         "title": "finca atiluya, santa isabel ishuatan, sonsonate, Santa Isabel Ishuatan, Sonsonate, Santa Isabel Ishuatan, Sonsonate Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899551/",
+        "url": "https://www.realestate.com.au/international/sv/finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899563/",
         "zone": "sonsonate"
       }
     ],
@@ -406,18 +452,18 @@
         "area_m2": null,
         "price_usd": 291898.0,
         "source": "realestate_au_sv",
-        "source_id": "canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850310",
+        "source_id": "canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850309",
         "title": "Cantón La Perla, Polígono 4, Número 13, de la Hacienda Taquillo, Jicalapa, La Libertad, Jicalapa, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850310/",
+        "url": "https://www.realestate.com.au/international/sv/canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850309/",
         "zone": "la-libertad"
       },
       {
         "area_m2": null,
         "price_usd": 291898.0,
         "source": "realestate_au_sv",
-        "source_id": "canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850309",
+        "source_id": "canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850310",
         "title": "Cantón La Perla, Polígono 4, Número 13, de la Hacienda Taquillo, Jicalapa, La Libertad, Jicalapa, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850309/",
+        "url": "https://www.realestate.com.au/international/sv/canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850310/",
         "zone": "la-libertad"
       }
     ],
@@ -447,62 +493,6 @@
         "title": "Las Arcas Armenia Sonsonate, Armenia, Sonsonate, Armenia, Sonsonate Land for Sale - realestate.com.au",
         "url": "https://www.realestate.com.au/international/sv/las-arcas-armenia-sonsonate-armenia-sonsonate-armenia-sonsonate-310100522448/",
         "zone": "armenia"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "3695c504c47f59c1971316eaee4df9d48cd620eb",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 275000.0,
-        "source": "realestate_au_sv",
-        "source_id": "nejapa-nejapa-san-salvador-nejapa-san-salvador-310101864518",
-        "title": "Nejapa, Nejapa, San Salvador, Nejapa, San Salvador Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/nejapa-nejapa-san-salvador-nejapa-san-salvador-310101864518/",
-        "zone": "nejapa"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 275000.0,
-        "source": "realestate_au_sv",
-        "source_id": "nejapa-nejapa-san-salvador-nejapa-san-salvador-310101864512",
-        "title": "Nejapa, Nejapa, San Salvador, Nejapa, San Salvador Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/nejapa-nejapa-san-salvador-nejapa-san-salvador-310101864512/",
-        "zone": "nejapa"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "3a2fdf644646a6f80a0eb9fa2d617250b3907cf6",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 411236.0,
-        "source": "realestate_au_sv",
-        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395392",
-        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395392/",
-        "zone": "santa-tecla"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 411236.0,
-        "source": "realestate_au_sv",
-        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287054",
-        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287054/",
-        "zone": "santa-tecla"
       }
     ],
     "sources": [
@@ -1128,34 +1118,6 @@
   {
     "count": 2,
     "cross_source": false,
-    "fingerprint": "8c184211875cac2bc2a0adc3584d2a42729853ad",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 120000.0,
-        "source": "realestate_au_sv",
-        "source_id": "los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329908",
-        "title": "Los Naranjos, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana, Chalchuapa, Sonsonate Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329908/",
-        "zone": "chalchuapa"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 120000.0,
-        "source": "realestate_au_sv",
-        "source_id": "los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329892",
-        "title": "Los Naranjos, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana, Chalchuapa, Sonsonate Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329892/",
-        "zone": "chalchuapa"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
     "fingerprint": "a2239abf184705466f0a047da292a34dbfa01dd9",
     "samples": [
       {
@@ -1352,62 +1314,6 @@
   {
     "count": 2,
     "cross_source": false,
-    "fingerprint": "d22995138e01c8dafd983e5d27718f8594a12e0d",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 20099.0,
-        "source": "realestate_au_sv",
-        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310107705305",
-        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310107705305/",
-        "zone": "chalatenango"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 20140.0,
-        "source": "realestate_au_sv",
-        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371",
-        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371/",
-        "zone": "chalatenango"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "d5b0d52d133374ef1574de6ba5cd127534441a53",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 20860.0,
-        "source": "realestate_au_sv",
-        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310108188618",
-        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310108188618/",
-        "zone": "chalatenango"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 21177.0,
-        "source": "realestate_au_sv",
-        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310104492653",
-        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310104492653/",
-        "zone": "chalatenango"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
     "fingerprint": "de8f0bcb83ba5e3024112f7595528372e10e5565",
     "samples": [
       {
@@ -1487,34 +1393,6 @@
     ],
     "sources": [
       "remax"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "eb1b0b1225c4307e0c98913d56e17ef5705736f3",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 39000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650181",
-        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650181/",
-        "zone": "suchitoto"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 39000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650144",
-        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650144/",
-        "zone": "suchitoto"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
     ]
   },
   {
