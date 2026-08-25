@@ -1567,9 +1567,11 @@
       "humor": "bargain",
       "status": "scheduled",
       "approved": true,
-      "posted": false,
-      "posted_at": null,
-      "posted_media_id": null
+      "posted": true,
+      "posted_at": "2026-08-25T01:48:59.936868+00:00",
+      "posted_media_id": "18111675316816421",
+      "comment_posted": true,
+      "comment_id": "18125165161790852"
     },
     {
       "day": 264,
