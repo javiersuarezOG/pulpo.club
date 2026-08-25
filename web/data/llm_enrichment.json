@@ -141035,5 +141035,388 @@
     "cost_usd": 0.00112608,
     "finish_reason": "stop",
     "latency_ms": 3457
+  },
+  "encuentra24|32759709": {
+    "ts": "2026-08-25T03:54:36.047012+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "New 2-Level House in Residencial Bonavista, La Libertad",
+      "es": "Casa nueva de 2 niveles en Residencial Bonavista, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "New 2-level house in Residencial Bonavista, Zaragoza, La Libertad, with 275 m² of construction. It has 3 bedrooms, 4 bathrooms, parking for 2 vehicles, and a garden. Amenities include a pool, hiking area, coworking space, gym, clubhouse, and football court with ocean views.",
+      "es": "Casa nueva de 2 niveles en Residencial Bonavista, Zaragoza, La Libertad, con 275 m² de construcción. Cuenta con 3 habitaciones, 4 baños, parqueo para 2 vehículos y jardín. Las amenidades incluyen piscina, área de senderismo, coworking, gimnasio, casa club y cancha de fútbol con vista al mar."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "New construction, never lived in",
+        "es": "Construcción nueva, nunca habitada"
+      },
+      {
+        "en": "275 m², 3 bedrooms, 4 baths",
+        "es": "275 m², 3 habitaciones, 4 baños"
+      },
+      {
+        "en": "Amenities with ocean views",
+        "es": "Amenidades con vista al mar"
+      },
+      {
+        "en": "Gated community with pool and gym",
+        "es": "Residencial con piscina y gimnasio"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 4.0,
+      "built_area_m2": 275.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3274,
+    "tokens_out": 528,
+    "cost_usd": 0.00146478,
+    "finish_reason": "stop",
+    "latency_ms": 3402
+  },
+  "bienesraices|2462": {
+    "ts": "2026-08-25T03:54:36.393720+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Golf-Front Lot, El Encanto Country Club",
+      "es": "Terreno Plano Frente al Golf, El Encanto Country Club"
+    },
+    "short_description_canonical": {
+      "en": "Flat 635.28 m² residential lot in El Encanto Río Bosque Country Club, San José Villanueva, La Libertad. Located fronting the golf course, it includes a lifetime club membership. The lot is 100% flat, reducing construction costs and time.",
+      "es": "Terreno residencial plano de 635.28 m² en El Encanto Río Bosque Country Club, San José Villanueva, La Libertad. Ubicado frente al campo de golf, incluye membresía vitalicia al club. El terreno es 100% plano, reduciendo costos y tiempos de construcción."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Fronting the golf course",
+        "es": "Frente al campo de golf"
+      },
+      {
+        "en": "Lifetime club membership included",
+        "es": "Membresía vitalicia al club incluida"
+      },
+      {
+        "en": "100% flat terrain, lower build costs",
+        "es": "Terreno 100% plano, menores costos de construcción"
+      },
+      {
+        "en": "24/7 private security and gated access",
+        "es": "Seguridad privada 24/7 y acceso controlado"
+      }
+    ],
+    "lat": 13.6333,
+    "lng": -89.35,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San José Villanueva, La Libertad, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3442,
+    "tokens_out": 472,
+    "cost_usd": 0.00144854,
+    "finish_reason": "stop",
+    "latency_ms": 3750
+  },
+  "remax|003284607006": {
+    "ts": "2026-08-25T03:54:36.655386+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "200 m² Lot for Sale in San Rafael Oriente",
+      "es": "Lote de 200 m² en Venta en San Rafael Oriente"
+    },
+    "short_description_canonical": {
+      "en": "Rectangular 200 m² residential lot in Lotificación El Carmen, San Rafael Oriente, San Miguel. The lot measures 8 by 25 meters with paved road access, sidewalks, potable water, electricity, street lighting, and controlled access. Priced at $46,500, it is ready for residential construction.",
+      "es": "Lote residencial rectangular de 200 m² en Lotificación El Carmen, San Rafael Oriente, San Miguel. El lote mide 8 por 25 metros con acceso pavimentado, aceras, agua potable, electricidad, alumbrado público y acceso controlado. Precio de $46,500, listo para construcción residencial."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Paved road access",
+        "es": "Acceso pavimentado"
+      },
+      {
+        "en": "Utilities: water, electricity, lighting",
+        "es": "Servicios: agua, electricidad, alumbrado"
+      },
+      {
+        "en": "Controlled access and security",
+        "es": "Acceso controlado y seguridad"
+      },
+      {
+        "en": "Rectangular 8×25 m layout",
+        "es": "Forma rectangular de 8×25 m"
+      }
+    ],
+    "lat": 13.4333,
+    "lng": -88.1167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Rafael Oriente, San Miguel, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3252,
+    "tokens_out": 477,
+    "cost_usd": 0.00140274,
+    "finish_reason": "stop",
+    "latency_ms": 4010
+  },
+  "remax|003093357025": {
+    "ts": "2026-08-25T03:54:36.675204+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Residential Land in Santa Rosa, Mejicanos",
+      "es": "Terreno Residencial en Santa Rosa, Mejicanos"
+    },
+    "short_description_canonical": {
+      "en": "Residential lot of 174.07 m² in Santa Rosa Subdivision, Mejicanos, San Salvador. The land has vehicle access via concrete road and utilities including potable water, electricity, sewage, and telecommunications. It features two terraces, existing retaining walls, and structures that can be incorporated into a new project.",
+      "es": "Lote residencial de 174.07 m² en la Urbanización Santa Rosa, Mejicanos, San Salvador. El terreno cuenta con acceso vehicular por calle de concreto y servicios de agua potable, electricidad, alcantarillado y telecomunicaciones. Incluye dos terrazas, muros de contención y estructuras existentes que pueden incorporarse a un nuevo proyecto."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "174.07 m² residential lot",
+        "es": "Lote residencial de 174.07 m²"
+      },
+      {
+        "en": "Utilities: water, electricity, sewage",
+        "es": "Servicios: agua, electricidad, alcantarillado"
+      },
+      {
+        "en": "Concrete road access",
+        "es": "Acceso por calle de concreto"
+      },
+      {
+        "en": "Two terraces for construction",
+        "es": "Dos terrazas para construcción"
+      },
+      {
+        "en": "Minutes from schools and transport",
+        "es": "Minutos de escuelas y transporte"
+      }
+    ],
+    "lat": 13.7403,
+    "lng": -89.2131,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Mejicanos, San Salvador",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3240,
+    "tokens_out": 517,
+    "cost_usd": 0.0014435,
+    "finish_reason": "stop",
+    "latency_ms": 4030
+  },
+  "bienesraices|2461": {
+    "ts": "2026-08-25T03:54:37.147429+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Two Eco-Tourism Lots for Sale, Huizúcar Road",
+      "es": "Dos Terrenos Eco-Turísticos en Venta, Carretera a Huizúcar"
+    },
+    "short_description_canonical": {
+      "en": "Two semi-flat lots totaling 1,759.82 m² (1,266 and 1,252 v²) in Cadejo Montaña, on the Huizúcar road near San Salvador. Direct access from a paved main road, gated private complex with electric gate and security booth, assigned parking. Private electricity project with individual meters, water by truck, designed for ecological biodigester; sold together or separately at $150,000 USD each.",
+      "es": "Dos lotes semi-planos que suman 1,759.82 m² (1,266 y 1,252 v²) en Cadejo Montaña, sobre la carretera a Huizúcar, cerca de San Salvador. Acceso directo desde calle principal pavimentada, complejo privado con portón eléctrico y caseta de seguridad, parqueo asignado. Proyecto de energía privado con contadores independientes, agua por pipa, diseñado para biodigestor ecológico; se venden juntos o por separado a $150,000 USD cada uno."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Two lots, 1,759.82 m² total",
+        "es": "Dos lotes, 1,759.82 m² en total"
+      },
+      {
+        "en": "Gated complex with security booth",
+        "es": "Complejo privado con caseta de seguridad"
+      },
+      {
+        "en": "Direct access from paved road",
+        "es": "Acceso directo desde calle pavimentada"
+      },
+      {
+        "en": "Individual electric meters per lot",
+        "es": "Contadores eléctricos independientes por lote"
+      },
+      {
+        "en": "Eco-tourism zoning near San Salvador",
+        "es": "Zona eco-turística cerca de San Salvador"
+      }
+    ],
+    "lat": 13.6167,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Huizúcar, La Libertad, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3431,
+    "tokens_out": 622,
+    "cost_usd": 0.00161057,
+    "finish_reason": "stop",
+    "latency_ms": 4504
+  },
+  "encuentra24|32195277": {
+    "ts": "2026-08-25T04:45:39.945745+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront House with Boat, Viento Frio",
+      "es": "Casa frente al mar con bote, Viento Frío"
+    },
+    "short_description_canonical": {
+      "en": "Two-story beachfront house in Viento Frio, Nombre de Dios. Main bedroom upstairs with terrace and ocean view; downstairs kitchen, dining, laundry, outdoor shower, and storage. Includes 22-foot boat, private ramp, boat hangar, 2,000-gallon water tanks, fully furnished with A/C.",
+      "es": "Casa de dos pisos frente al mar en Viento Frío, Nombre de Dios. Recámara principal arriba con terraza y vista al mar; abajo cocina, comedor, lavandería, ducha exterior y depósito. Incluye bote de 22 pies, rampa privada, hangar para bote, tanques de agua de 2,000 galones, totalmente amueblada con A/A."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront with ocean views",
+        "es": "Frente al mar con vistas al océano"
+      },
+      {
+        "en": "Includes 22-foot boat and ramp",
+        "es": "Incluye bote de 22 pies y rampa"
+      },
+      {
+        "en": "Fully furnished with A/C",
+        "es": "Totalmente amueblada con A/A"
+      },
+      {
+        "en": "2,000-gallon water tanks",
+        "es": "Tanques de agua de 2,000 galones"
+      },
+      {
+        "en": "Private boat hangar",
+        "es": "Hangar privado para bote"
+      }
+    ],
+    "lat": 9.5833,
+    "lng": -79.4667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Viento Frio, Nombre de Dios, Colón",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.5,
+      "built_area_m2": 300.0,
+      "parking_spaces": 4,
+      "furnished": true,
+      "has_pool": null
+    },
+    "tokens_in": 2431,
+    "tokens_out": 544,
+    "cost_usd": 0.00125477,
+    "finish_reason": "stop",
+    "latency_ms": 3861
+  },
+  "encuentra24|32861523": {
+    "ts": "2026-08-25T04:45:40.492812+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Condo Near Panama City, 132 m², Fully Furnished",
+      "es": "Apartamento frente al mar cerca de Ciudad de Panamá, 132 m², totalmente amueblado"
+    },
+    "short_description_canonical": {
+      "en": "Spacious 132 m² beachfront condo in PH Casa Bonita, Veracruz, minutes from the Bridge of the Americas and Panama City. Features 1 large bedroom, 2 full baths, private balcony, and covered parking. Fully furnished with appliances, built in 2008, and a 3-minute walk to the beach.",
+      "es": "Amplio apartamento frente al mar de 132 m² en PH Casa Bonita, Veracruz, a minutos del Puente de las Américas y la Ciudad de Panamá. Cuenta con 1 recámara amplia, 2 baños completos, balcón privado y estacionamiento cubierto. Totalmente amueblado con electrodomésticos, construido en 2008, y a 3 minutos caminando de la playa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront, 3-minute walk to beach",
+        "es": "Frente al mar, a 3 minutos de la playa"
+      },
+      {
+        "en": "Fully furnished with appliances included",
+        "es": "Totalmente amueblado con electrodomésticos incluidos"
+      },
+      {
+        "en": "Minutes from Bridge of the Americas",
+        "es": "Minutos del Puente de las Américas"
+      },
+      {
+        "en": "Resort-style amenities in PH Casa Bonita",
+        "es": "Amenidades estilo resort en PH Casa Bonita"
+      }
+    ],
+    "lat": 8.8833,
+    "lng": -79.6167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Veracruz, Panamá",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": 2008,
+      "year_renovated": null,
+      "bedrooms": 1,
+      "bathrooms": 2.0,
+      "built_area_m2": 132.0,
+      "parking_spaces": 1,
+      "furnished": true,
+      "has_pool": null
+    },
+    "tokens_in": 2656,
+    "tokens_out": 546,
+    "cost_usd": 0.00131772,
+    "finish_reason": "stop",
+    "latency_ms": 4408
   }
 }

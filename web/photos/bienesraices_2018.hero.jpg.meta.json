@@ -6,12 +6,15 @@
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-06-08T09:12:58.175103+00:00",
+  "computed_at": "2026-08-25T03:59:16.472026+00:00",
   "derivative_width": 543,
   "derivative_height": 528,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/2320785/35950929/EB-HX0785.jpg?rasterize=true&version=1625323785",
-  "candidate_count": 5
+  "candidate_count": 5,
+  "content_sha1": "6bfb8788512f4a63",
+  "dhash": 16301070372591685796,
+  "duplicates_dropped": 0
 }
