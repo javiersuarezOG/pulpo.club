@@ -1,0 +1,28 @@
+{
+  "width": 6400,
+  "height": 3600,
+  "aspect_ratio": 1.778,
+  "file_size_kb": 7924.4,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-08-26T04:13:10.939756+00:00",
+  "source_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003094034002/v3/HDPhotos/5-MARCA-5_94cfbb9bd4a14bb2a69ade14911864a5.jpg",
+  "original_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003094034002/v3/HDPhotos/5-MARCA-5_94cfbb9bd4a14bb2a69ade14911864a5.jpg",
+  "transform_used": "none",
+  "fetched_at": "2026-08-26T04:13:11.984740+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": null,
+  "resdet_detected_height": null,
+  "resdet_upscaled": null,
+  "quarantined": false,
+  "aesthetic": {
+    "visual_appeal": 5.0,
+    "issues": [
+      "uninteresting"
+    ],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.053 color_entropy=0.467"
+  }
+}

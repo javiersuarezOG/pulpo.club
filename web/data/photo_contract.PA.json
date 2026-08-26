@@ -1,13 +1,13 @@
 {
-  "ranked_total": 38,
-  "with_local_path": 38,
-  "local_path_exists": 38,
+  "ranked_total": 35,
+  "with_local_path": 35,
+  "local_path_exists": 35,
   "local_path_missing": 0,
   "missing_rate": 0.0,
   "nulled": 0,
   "top_browse": {
-    "n": 38,
-    "present": 38,
+    "n": 35,
+    "present": 35,
     "missing": 0,
     "coverage": 1.0
   },
@@ -23,5 +23,5 @@
     "top_browse_coverage": 0.95,
     "top_hero_coverage": 1.0
   },
-  "evaluated_at": "2026-08-25T04:46:47.061998+00:00"
+  "evaluated_at": "2026-08-26T05:00:53.135136+00:00"
 }
