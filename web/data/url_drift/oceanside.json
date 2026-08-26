@@ -2,7 +2,7 @@
   "source": "oceanside",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-08-26T13:26:08.863603+00:00",
+  "probed_at": "2026-08-26T20:09:56.129281+00:00",
   "last_probe": {
     "probed_url": "https://oceansideelsalvador.com/",
     "status_code": 200,
@@ -17,6 +17,6 @@
     "final_url": "https://oceansideelsalvador.com/",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-08-26T13:26:08.863629+00:00"
+    "last_ok_at": "2026-08-26T20:09:56.129300+00:00"
   }
 }
