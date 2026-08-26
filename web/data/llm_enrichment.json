@@ -141418,5 +141418,421 @@
     "cost_usd": 0.00131772,
     "finish_reason": "stop",
     "latency_ms": 4408
+  },
+  "citymax_sc|terreno-agrocomercial-en-venta-en-quezaltepeque": {
+    "ts": "2026-08-26T04:04:16.685759+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Quezaltepeque, La Libertad",
+      "es": "Terreno en Venta en Quezaltepeque, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel for sale in Quezaltepeque, La Libertad department. The listing does not specify size, zoning, or utilities. Price is $360,000. Located in the Quezaltepeque area, near Sitio del Niño and San Juan Opico.",
+      "es": "Terreno en venta en Quezaltepeque, departamento de La Libertad. El anuncio no especifica tamaño, zonificación ni servicios. Precio de $360,000. Ubicado en la zona de Quezaltepeque, cerca de Sitio del Niño y San Juan Opico."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Listed at $360,000",
+        "es": "Precio de $360,000"
+      },
+      {
+        "en": "Located in Quezaltepeque, La Libertad",
+        "es": "Ubicado en Quezaltepeque, La Libertad"
+      },
+      {
+        "en": "Near Sitio del Niño and San Juan Opico",
+        "es": "Cerca de Sitio del Niño y San Juan Opico"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Quezaltepeque, La Libertad, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3088,
+    "tokens_out": 451,
+    "cost_usd": 0.00132986,
+    "finish_reason": "stop",
+    "latency_ms": 3486
+  },
+  "citymax_sc|apartamento-en-venta-en-el-zonte-wave-crest": {
+    "ts": "2026-08-26T04:04:16.932834+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Condo at El Zonte, Surf City",
+      "es": "Apartamento frente al mar en El Zonte, Surf City"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront condo at El Zonte, in Surf City, La Libertad. This unit offers direct ocean views and access to the beach. Priced at $220,100, it is part of a beachfront apartment complex in the popular surf destination.",
+      "es": "Apartamento frente al mar en El Zonte, en Surf City, La Libertad. Esta unidad ofrece vistas directas al océano y acceso a la playa. Con un precio de $220,100, forma parte de un complejo de apartamentos frente al mar en el popular destino de surf."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location at El Zonte",
+        "es": "Ubicación frente al mar en El Zonte"
+      },
+      {
+        "en": "In Surf City, La Libertad",
+        "es": "En Surf City, La Libertad"
+      },
+      {
+        "en": "Direct ocean views and access",
+        "es": "Vistas y acceso directo al océano"
+      },
+      {
+        "en": "Priced at $220,100",
+        "es": "Precio de $220,100"
+      }
+    ],
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Zonte beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3076,
+    "tokens_out": 450,
+    "cost_usd": 0.00132552,
+    "finish_reason": "stop",
+    "latency_ms": 3734
+  },
+  "citymax_sc|casa-en-venta-con-apartamento-en-bahia-dorada": {
+    "ts": "2026-08-26T04:04:16.972614+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Condo for Sale in Bahía Dorada, La Libertad",
+      "es": "Condominio en Venta en Bahía Dorada, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Condo in Bahía Dorada, La Libertad, listed at $625,000. The property is part of a beachfront development in the La Libertad area. Specific details on size, bedrooms, and amenities are not provided in the listing.",
+      "es": "Condominio en Bahía Dorada, La Libertad, listado en $625,000. La propiedad es parte de un desarrollo frente a la playa en la zona de La Libertad. No se proporcionan detalles específicos sobre tamaño, habitaciones y comodidades en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in Bahía Dorada",
+        "es": "Ubicación frente a la playa en Bahía Dorada"
+      },
+      {
+        "en": "Listed at $625,000",
+        "es": "Listado en $625,000"
+      },
+      {
+        "en": "Part of La Libertad coastal area",
+        "es": "Parte de la zona costera de La Libertad"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3080,
+    "tokens_out": 430,
+    "cost_usd": 0.0013046,
+    "finish_reason": "stop",
+    "latency_ms": 3773
+  },
+  "remax|001463693009": {
+    "ts": "2026-08-26T04:04:17.133843+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Panoramic View Lot in Los Planes de Renderos",
+      "es": "Lote con Vista Panorámica en Los Planes de Renderos"
+    },
+    "short_description_canonical": {
+      "en": "Land lot of 1501 square varas (approx. 1049 m²) in Los Planes de Renderos, Panchimalco, San Salvador. It offers panoramic views of San Salvador and is minutes from El Mirador, with fresh weather year-round. Ideal for building a residence, vacation home, or retreat.",
+      "es": "Lote de 1501 varas cuadradas (aprox. 1049 m²) en Los Planes de Renderos, Panchimalco, San Salvador. Ofrece vistas panorámicas de San Salvador y está a minutos de El Mirador, con clima fresco todo el año. Ideal para construir una residencia, casa de descanso o retiro."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Panoramic views of San Salvador",
+        "es": "Vistas panorámicas de San Salvador"
+      },
+      {
+        "en": "Minutes from El Mirador",
+        "es": "Minutos de El Mirador"
+      },
+      {
+        "en": "Fresh weather year-round",
+        "es": "Clima fresco todo el año"
+      },
+      {
+        "en": "Close to the capital",
+        "es": "Cerca de la capital"
+      }
+    ],
+    "lat": 13.6167,
+    "lng": -89.2167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Los Planes de Renderos, Panchimalco, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3156,
+    "tokens_out": 474,
+    "cost_usd": 0.00137352,
+    "finish_reason": "stop",
+    "latency_ms": 3934
+  },
+  "citymax_sc|the-break-apartamentos-en-venta-en-el-sunzal": {
+    "ts": "2026-08-26T04:04:17.175802+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Condos for Sale in Surf City, El Salvador",
+      "es": "Apartamentos frente al mar en Surf City, El Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront condos for sale in Surf City, El Salvador, located in the municipality of Tamanique, La Libertad. These properties offer direct oceanfront access and are priced at $218,000. Ideal for coastal living or investment in a popular surf destination.",
+      "es": "Apartamentos frente al mar en venta en Surf City, El Salvador, ubicados en el municipio de Tamanique, La Libertad. Estas propiedades ofrecen acceso directo al océano y están valoradas en $218,000. Ideales para vivir en la costa o invertir en un destino de surf popular."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in Surf City",
+        "es": "Ubicación frente al mar en Surf City"
+      },
+      {
+        "en": "Priced at $218,000",
+        "es": "Precio de $218,000"
+      },
+      {
+        "en": "Popular surf destination",
+        "es": "Destino de surf popular"
+      }
+    ],
+    "lat": 13.487,
+    "lng": -89.6133,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Tunco beach, Surf City, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3070,
+    "tokens_out": 426,
+    "cost_usd": 0.0012975,
+    "finish_reason": "stop",
+    "latency_ms": 3976
+  },
+  "remax|001463693008": {
+    "ts": "2026-08-26T04:04:17.279832+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Panoramic View Lot in Los Planes de Renderos",
+      "es": "Lote con vista panorámica en Los Planes de Renderos"
+    },
+    "short_description_canonical": {
+      "en": "Flat 1,048 m² lot in Los Planes de Renderos, near El Mirador, with panoramic views of San Salvador. The land is 1,499.92 square varas and enjoys cool weather year-round. Located minutes from the capital, ideal for a residence or retreat.",
+      "es": "Lote plano de 1,048 m² en Los Planes de Renderos, cerca de El Mirador, con vista panorámica de San Salvador. El terreno tiene 1,499.92 varas cuadradas y disfruta de clima fresco todo el año. Ubicado a minutos de la capital, ideal para residencia o retiro."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Panoramic views of San Salvador",
+        "es": "Vistas panorámicas de San Salvador"
+      },
+      {
+        "en": "Cool climate year-round",
+        "es": "Clima fresco todo el año"
+      },
+      {
+        "en": "Minutes from El Mirador",
+        "es": "Minutos de El Mirador"
+      },
+      {
+        "en": "Near the capital city",
+        "es": "Cerca de la capital"
+      }
+    ],
+    "lat": 13.6333,
+    "lng": -89.2167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Los Planes de Renderos, Panchimalco, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3160,
+    "tokens_out": 463,
+    "cost_usd": 0.0013625,
+    "finish_reason": "stop",
+    "latency_ms": 4079
+  },
+  "remax|001463693007": {
+    "ts": "2026-08-26T04:04:20.462230+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Los Planes de Renderos, Panoramic Views",
+      "es": "Lote en Los Planes de Renderos, Vistas Panorámicas"
+    },
+    "short_description_canonical": {
+      "en": "Land lot of 2,254.94 square varas (1,575.97 m²) in Los Planes de Renderos, near El Mirador, Panchimalco, San Salvador. The property offers panoramic views of San Salvador and is minutes from the capital. Ideal for building a residence, vacation home, or retreat.",
+      "es": "Lote de 2,254.94 varas cuadradas (1,575.97 m²) en Los Planes de Renderos, cerca de El Mirador, Panchimalco, San Salvador. La propiedad ofrece vistas panorámicas de San Salvador y está a minutos de la capital. Ideal para construir una residencia, casa de vacaciones o retiro."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Panoramic views of San Salvador",
+        "es": "Vistas panorámicas de San Salvador"
+      },
+      {
+        "en": "Near El Mirador, minutes from capital",
+        "es": "Cerca de El Mirador, a minutos de la capital"
+      },
+      {
+        "en": "2,254.94 square varas (1,575.97 m²)",
+        "es": "2,254.94 varas cuadradas (1,575.97 m²)"
+      },
+      {
+        "en": "Cool climate year-round",
+        "es": "Clima fresco todo el año"
+      }
+    ],
+    "lat": 13.6333,
+    "lng": -89.2167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Panchimalco, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3160,
+    "tokens_out": 503,
+    "cost_usd": 0.0014065,
+    "finish_reason": "stop",
+    "latency_ms": 3776
+  },
+  "remax|003093848010": {
+    "ts": "2026-08-26T04:04:20.808556+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "699 m² Land on Ruta de las Flores, Juayúa",
+      "es": "Terreno de 699 m² en Ruta de las Flores, Juayúa"
+    },
+    "short_description_canonical": {
+      "en": "Flat 699.13 m² lot in Cantón La Puente, Juayúa, Sonsonate, on the Ruta de las Flores. It has an 11.18 m frontage and 62.53 m depth, with water feasibility via ADESCO and electricity via CLESA. Located in a private residential area with panoramic views of the Ilamatepec Mountain Range and Santa Ana Volcano, with year-round vehicle access.",
+      "es": "Terreno plano de 699.13 m² en Cantón La Puente, Juayúa, Sonsonate, sobre la Ruta de las Flores. Cuenta con 11.18 m de frente y 62.53 m de fondo, con factibilidad de agua vía ADESCO y electricidad vía CLESA. Ubicado en un residencial privado con vistas panorámicas a la Cordillera Ilamatepec y al Volcán de Santa Ana, con acceso vehicular todo el año."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "On the Ruta de las Flores",
+        "es": "Sobre la Ruta de las Flores"
+      },
+      {
+        "en": "Panoramic volcano and mountain views",
+        "es": "Vistas panorámicas al volcán y montañas"
+      },
+      {
+        "en": "Private residential, safe area",
+        "es": "Residencial privado, zona segura"
+      },
+      {
+        "en": "Water and electricity feasibility",
+        "es": "Factibilidad de agua y electricidad"
+      },
+      {
+        "en": "Year-round vehicle access",
+        "es": "Acceso vehicular todo el año"
+      }
+    ],
+    "lat": 13.8436,
+    "lng": -89.7464,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Juayúa, Sonsonate",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3367,
+    "tokens_out": 565,
+    "cost_usd": 0.00153059,
+    "finish_reason": "stop",
+    "latency_ms": 3875
   }
 }
