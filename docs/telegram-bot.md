@@ -1,15 +1,5 @@
 # Telegram bot — setup and runbook
 
-> ⚠️ **DO NOT COMPLETE THE SETUP BELOW YET.** This bot calls `/api/v1/*`,
-> which was withdrawn from production on 2026-08-25 because TypeScript
-> serverless functions fail to run on our Vercel project (they returned
-> 500 `FUNCTION_INVOCATION_FAILED`; see `docs/api-v1.md`). The webhook
-> handler itself is healthy and correctly returns
-> `503 telegram_not_configured` until it is given credentials — so
-> nothing is broken today. But if you register the webhook before the
-> API is restored, the bot will answer users with the "catalog
-> unavailable" message on every search. Restore `/api/v1` first.
-
 `POST /api/telegram/webhook`
 
 ## What it is

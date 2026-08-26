@@ -1,63 +1,6 @@
 # Pulpo v1 API — contract
 
-Status: **WITHDRAWN from production 2026-08-25 — see "Deployment blocker" below.**
-
-## Deployment blocker (2026-08-25)
-
-The endpoints were merged, deployed, and returned `500
-FUNCTION_INVOCATION_FAILED` for every route. The website, the data files
-and every CommonJS function were unaffected throughout, and nothing
-consumed the endpoints, so there was no user impact — but they have been
-withdrawn rather than left broken on production.
-
-**What is established:**
-
-* Every CommonJS function works, including newly added ones
-  (`api/telegram/webhook.js` correctly returns `503
-  telegram_not_configured`). **Only TypeScript functions fail**, so this
-  is about how `.ts` is compiled for this project, not about the code.
-* `@vercel/node` computes
-  `isEsm = ext is .mjs/.mts || (pkg.type === "module" && ext is .js/.ts/.tsx)`
-  and only forces `compilerOptions.module` when `isEsm` is **true**.
-  `api/package.json` declares `"type": "commonjs"`, so `isEsm` is false
-  for our `.ts` files and the resolved tsconfig's `module` is used
-  verbatim.
-* Reproduced locally with the real compiler: compiling a handler with
-  `module: ESNext` emits `import` statements, and Node throws
-  `SyntaxError: Cannot use import statement outside a module` when
-  loading it from a directory whose package.json says `commonjs`.
-  Compiling the same file with `module: CommonJS` emits `require()` and
-  returns HTTP 200.
-* **Adding `api/tsconfig.json` with `"module": "CommonJS"` did NOT fix
-  production**, so tsconfig resolution is not the whole story. The
-  remaining unknown is what `findConfigFile(options.project, cwd)`
-  actually resolves to during the build, and that needs the deploy-time
-  build log to settle.
-
-**Why it could not be caught before merge:** unit tests import the
-TypeScript *source* through Vite, which handles ESM happily — the
-failure exists only in Vercel's *emitted output*. The spike in PR-1 was
-designed to catch exactly this, but its gate was a preview curl, and
-previews are SSO-gated to the Vercel team so no agent can reach one.
-
-**To finish this, one of:**
-
-1. Vercel build/runtime logs for a failing invocation (the fastest
-   path — the thrown error names the cause outright), or
-2. A preview URL an agent can reach (`VERCEL_AUTOMATION_BYPASS_SECRET`
-   on the project), so fixes can be iterated without touching
-   production.
-
-**Fallback if TypeScript stays unworkable:** write the endpoints as
-CommonJS `.js` — the format 20+ functions in this repo, including the
-new Telegram webhook, are demonstrably running in this exact deployment
-— with the shared core bundled in at build time. That bundling was
-verified locally: an esbuild CJS bundle of the handler loads under Node
-20 and returns the correct payload.
-
-The `shared/` core, the website's use of it, the characterization
-goldens and the Telegram handler all remain on `main` and are healthy.
-Only the `api/v1/*` and `api/mcp/*` TypeScript files were withdrawn.
+Status: **live — `/ping`, `/meta`, `/listings`, `/listings/:id`.**
 
 ## Why this exists
 
