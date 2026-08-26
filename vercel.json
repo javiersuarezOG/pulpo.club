@@ -6,6 +6,9 @@
   "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_AUTHOR_LOGIN\" = \"pulpo-bot\" ] && exit 0 || exit 1",
   "outputDirectory": ".",
   "functions": {
+    "api/v1/probeA.ts": {
+      "includeFiles": "shared/dist/api-core.cjs"
+    },
     "api/v1/ping.ts": {
       "includeFiles": "shared/dist/api-core.cjs",
       "excludeFiles": "{web/photos*/**,web/data/ig_assets/**,web/data/*.jsonl,web/data/ranked.json,web/data/llm_enrichment*.json,web/dist/**,vendor/**}"
