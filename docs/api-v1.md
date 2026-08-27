@@ -32,6 +32,56 @@ would add latency and serverless cost to a working site for no user benefit.
                    MCP server (in-process)
 ```
 
+## The api/ boundary rule — read before touching a handler
+
+Endpoints under `api/v1` and `api/mcp` are **CommonJS `.js`, not
+TypeScript**. That is a hard constraint, not a preference.
+
+Vercel compiles TypeScript functions only for files inside `api/`, and
+the restriction is **transitive**: nothing in a `.ts` function's
+dependency graph may reach outside `api/` at any depth. These handlers
+need the shared core, so they cannot be TypeScript. Established on
+2026-08-27 by deploying probe functions to a preview and bisecting:
+
+| probe | result |
+|---|---|
+| CommonJS entrypoint → outside `api/` | 200 |
+| TS → self-contained `.js` inside `api/` | 200 |
+| TS → `.ts` inside `api/` | 200 |
+| TS → `shared/*.ts` (outside) | **500** |
+| TS → plain `.js` (outside) | **500** |
+| TS → `.js` inside `api/` → outside | **500** (transitive) |
+
+Two theories were tested and disproven — don't retry them. It is **not**
+a module-format problem: a no-import `.ts` function works with either
+`export default` or `module.exports`. And `includeFiles: shared/**`
+does not help: the files were never missing, they were uncompiled.
+
+**How shared code is reached:**
+
+```
+api/v1/*.js  --require-->  api/_core.js  --require-->  shared/dist/api-core.cjs
+```
+
+`shared/dist/api-core.cjs` is an esbuild bundle of `shared/api-core.ts`,
+self-contained (zero external imports) and **committed** — generating it
+only at build time left it absent from a fresh checkout and every
+endpoint 500'd. `shared/` stays TypeScript and holds every rule worth
+type-checking; the handlers are HTTP plumbing.
+
+**Guardrails.** `tests/api/api_import_boundary.test.js` fails on any
+`.ts` under those directories, on a handler requiring `shared/`
+directly, or on an entrypoint missing the bundle from `includeFiles`.
+`tests/api/shared_bundle_fresh.test.js` rebuilds the bundle and compares
+byte-for-byte so source and deployed logic cannot drift.
+
+**Alarm.** `scripts/check_api_health.py` runs every 6 hours from
+`pulpo-webhook-health.yml` and Slacks on failure. No build-time check
+can see this failure class — the fault lived only in the emitted bundle
+while CI was green — so it hits the real endpoints and checks response
+*shape*: listing floors, canonical ids, absolute URLs, a detail
+round-trip, and a live PII assertion.
+
 ## Versioning
 
 `v1` is **path-frozen and additive-only**. Safe: new endpoints, new response
