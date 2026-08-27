@@ -559,6 +559,28 @@ jobs:
             --run-url "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
             || echo "::warning::bilingual-coverage canary failed (non-blocking)"
 
+      - name: Geo-coverage canary (enrichment heartbeat, Slack)
+        # The positive heartbeat for the GEO pass. A green unit test only
+        # proves the fetch code works when invoked; it cannot prove the
+        # pass still runs, that geo_cells.json still persists between
+        # runs, or that a provider hasn't quietly started refusing us.
+        # Watches: sidecar missing, records stale, per-provider coverage
+        # below threshold or dropping sharply, a provider disabled
+        # mid-run, and — most expensive of all — the cell cache shrinking,
+        # which means it is not being committed and every night re-pays
+        # every external API call.
+        # Alert, never block (CLAUDE.md: never silent-freeze data). Runs
+        # at the same pre-canary point so an operator paged at 02:30 UTC
+        # can correlate every signal against one Actions run.
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          python3 scripts/check_geo_coverage.py \
+            --data-dir web/data \
+            --run-url "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            || echo "::warning::geo-coverage canary failed (non-blocking)"
+
       - name: Stranded-inventory alert (R6)
         # R6 of docs/RESILIENCE-AUDIT-PRD.md. Reads R1's candidate
         # bundle at web/data/.staging/<run_id>/ and fires Slack + opens

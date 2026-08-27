@@ -430,3 +430,114 @@ def test_history_country_comes_from_the_active_manifest(tmp_path, monkeypatch):
          history_path=tmp_path / "h.jsonl")
     row = json.loads((tmp_path / "h.jsonl").read_text().strip().splitlines()[-1])
     assert row["country"] == "PA"
+
+
+# ── robustness guards ─────────────────────────────────────────────────
+
+def test_result_length_mismatch_is_a_failure_not_a_silent_misalignment(tmp_path):
+    """zip() truncates. A provider returning the wrong number of results
+    would attach one cell's data to a different cell, in a cache that
+    persists for months — so it must be treated as a failed fetch."""
+    class _Short:
+        calls = []
+        def __call__(self, url, params, headers, timeout_s):
+            # Asked for 3 coordinates, answers with 2.
+            return _StubResponse({"elevation": [100.0, 200.0]})
+
+    # Patch the module object the orchestrator actually iterates, not a
+    # fresh import of the same name — another test in the suite reloads
+    # automation modules, which can leave those as two distinct objects.
+    elev = geo.REGISTRY["open_meteo_elevation"]
+    orig = elev.fetch_batch
+    try:
+        # Bypass the provider's own padding to simulate a misbehaving one.
+        elev.fetch_batch = lambda cells, **kw: [{"elevation_m": 1}] * (len(cells) - 1)
+        m = _run([_listing(f"l{i}", 13.0 + i * 0.02, -89.0) for i in range(3)],
+                 tmp_path, _Short())
+    finally:
+        elev.fetch_batch = orig
+
+    assert m["calls_failed"] == 3
+    assert m["calls_ok"] == 0
+    # Nothing was written, so the next run retries cleanly.
+    assert load_cache(tmp_path / "geo_cells.json") == {}
+
+
+def test_registry_has_no_duplicate_provider_or_category():
+    """A duplicate PROVIDER silently drops a module; a duplicate CATEGORY
+    has two providers overwriting each other's slot in every record. Both
+    are invisible at runtime, so the module raises at import — this pins
+    that the current registry is clean."""
+    names = [m.PROVIDER for m in geo._PROVIDER_MODULES]
+    cats = [m.CATEGORY for m in geo._PROVIDER_MODULES]
+    assert len(set(names)) == len(names), names
+    assert len(set(cats)) == len(cats), cats
+    assert set(geo.REGISTRY) == set(names)
+
+
+def test_every_provider_satisfies_the_module_contract():
+    """Adding a provider means declaring all of this; a missing attribute
+    would only surface as an AttributeError mid-nightly."""
+    for mod in geo._PROVIDER_MODULES:
+        assert isinstance(mod.PROVIDER, str) and mod.PROVIDER
+        assert isinstance(mod.VERSION, int) and mod.VERSION >= 1
+        assert isinstance(mod.CATEGORY, str) and mod.CATEGORY
+        assert mod.TTL_CLASS in ("static", "slow")
+        assert mod.CELL_STEP_DEG > 0
+        assert mod.CELL_DECIMALS >= 0
+        assert callable(mod.fetch)
+        if mod.TTL_CLASS == "slow":
+            assert mod.REFRESH_DAYS > 0, f"{mod.PROVIDER} is slow but never refreshes"
+
+
+def test_stale_records_age_out_of_the_sidecar(tmp_path):
+    get = _Elevation()
+    _run([_listing("gone", 13.6989, -89.1914)], tmp_path, get, now_fn=lambda: NOW)
+    # A year later the listing is long delisted, and a different one runs.
+    later = NOW + timedelta(days=365)
+    _run([_listing("current", 14.0, -89.0)], tmp_path, get, now_fn=lambda: later)
+    side = load_cache(tmp_path / "geo_enrichment.json")
+    assert "t|current" in side
+    assert "t|gone" not in side
+
+
+def test_live_listings_never_age_out(tmp_path):
+    """A listing still in the catalog is re-assembled every run, so its
+    timestamp is always today — retention can never evict it."""
+    get = _Elevation()
+    _run([_listing("a", 13.6989, -89.1914)], tmp_path, get, now_fn=lambda: NOW)
+    later = NOW + timedelta(days=365)
+    _run([_listing("a", 13.6989, -89.1914)], tmp_path, get, now_fn=lambda: later)
+    assert "t|a" in load_cache(tmp_path / "geo_enrichment.json")
+
+
+def test_retention_is_age_based_not_presence_based(tmp_path):
+    """The two-country trap: the SV and PA passes share this file, so
+    pruning by 'absent from this run' would delete the other country."""
+    get = _Elevation()
+    _run([_listing("sv1", 13.6989, -89.1914)], tmp_path, get)   # SV pass
+    _run([_listing("pa1", 8.9824, -79.5199)], tmp_path, get)    # PA pass
+    side = load_cache(tmp_path / "geo_enrichment.json")
+    assert set(side) == {"t|sv1", "t|pa1"}
+
+
+def test_retention_can_be_disabled(tmp_path, monkeypatch):
+    monkeypatch.setenv("PULPO_GEO_SIDECAR_RETENTION_DAYS", "0")
+    get = _Elevation()
+    _run([_listing("gone", 13.6989, -89.1914)], tmp_path, get, now_fn=lambda: NOW)
+    _run([_listing("current", 14.0, -89.0)], tmp_path, get,
+         now_fn=lambda: NOW + timedelta(days=365))
+    assert "t|gone" in load_cache(tmp_path / "geo_enrichment.json")
+
+
+def test_unparseable_timestamp_is_kept_not_deleted(tmp_path):
+    """Losing data on a format surprise is worse than carrying it."""
+    get = _Elevation()
+    _run([_listing("a", 13.6989, -89.1914)], tmp_path, get, now_fn=lambda: NOW)
+    path = tmp_path / "geo_enrichment.json"
+    data = json.loads(path.read_text())
+    data["t|weird"] = {"assembled_at": "not-a-date", "providers": {}}
+    path.write_text(json.dumps(data))
+    _run([_listing("a", 13.6989, -89.1914)], tmp_path, get,
+         now_fn=lambda: NOW + timedelta(days=365))
+    assert "t|weird" in load_cache(path)
