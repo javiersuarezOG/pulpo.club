@@ -15,6 +15,7 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 
 import { buildServer } from "../../api/mcp/index.js";
+import * as tools from "../../api/mcp/_tools.js";
 import { argsToQuery, getListing, getMarketMeta, searchListings, summarize } from "../../api/mcp/_tools.js";
 import { __testing__ } from "../../api/v1/_catalog.js";
 import { selectListings } from "../../api/v1/_serve.js";
@@ -45,7 +46,7 @@ const row = (over = {}) => ({
   ...over,
 });
 
-const seam = handler.__catalogTesting__ ?? __testing__;
+const seam = tools.__catalogTesting__ ?? __testing__;
 const setCatalog = (rows, generatedAt = "2026-08-21T04:04:32Z") =>
   seam.setCatalog("SV", { rows, generatedAt, country: "SV" });
 

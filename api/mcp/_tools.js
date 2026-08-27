@@ -264,3 +264,9 @@ module.exports = {
   GET_LISTING_SCHEMA,
   META_SCHEMA,
 };
+
+// Test seam — the same _catalog instance the tools read, so a spec
+// injecting a fixture and the code under test agree. Importing
+// _catalog.js separately from an ESM spec can yield a second instance
+// whose override the tools never see.
+module.exports.__catalogTesting__ = require("../v1/_catalog.js").__testing__;
