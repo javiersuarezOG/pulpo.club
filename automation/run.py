@@ -2506,6 +2506,75 @@ def main() -> int:
     except Exception as _e:
         print(f"[nominatim] failed (non-fatal): {_e!r}")
 
+    # GEO-1 — geospatial due-diligence enrichment from each listing's
+    # lat/lng against free open APIs (elevation, solar + climate normals;
+    # more providers land in later PRs). Runs HERE because lat/lng is
+    # maximally populated at this point — scraper-extracted, then LLM-
+    # estimated, then Nominatim-backfilled — and still before rank().
+    #
+    # Results are cached per rounded coordinate CELL in
+    # web/data/geo_cells.json, so ~1.9k listings cost a few dozen calls
+    # and a warm cache costs zero. Per-listing records land in
+    # web/data/geo_enrichment.json. Both are committed by the nightly
+    # (see the git add block in pulpo-nightly.yml) — an uncommitted cache
+    # would re-pay every night on the fresh runner.
+    #
+    # Non-fatal by construction: the deadline defers the tail to tomorrow
+    # and a failed cell is simply refetched next run.
+    try:
+        from automation.geo_enrichment import enrich_listings as _geo_enrich
+        _geo_deadline_s = _env_float("PULPO_GEO_DEADLINE_SECONDS", 600.0)
+        _geo_deadline = ((_time.monotonic() + _geo_deadline_s)
+                         if _geo_deadline_s > 0 else None)
+        _geo_providers = [p.strip() for p
+                          in _env_str("PULPO_GEO_PROVIDERS", "").split(",")
+                          if p.strip()]
+        geo_metrics = _geo_enrich(
+            listings,
+            cells_path   = web_data_dir / "geo_cells.json",
+            sidecar_path = web_data_dir / "geo_enrichment.json",
+            history_path = web_data_dir / "geo_enrichment_history.jsonl",
+            providers    = _geo_providers or None,
+            deadline     = _geo_deadline,
+            max_listings = _env_int("PULPO_GEO_LIMIT", 0),
+        )
+        if geo_metrics.get("offline_skip"):
+            print("[geo_enrich] offline — skipped")
+        else:
+            print(f"[geo_enrich] listings={geo_metrics['listings_seen']} "
+                  f"with_coords={geo_metrics['listings_with_coords']} "
+                  f"no_coords={geo_metrics['listings_no_coords']} "
+                  f"cells_needed={geo_metrics['cells_needed']} "
+                  f"cache_hits={geo_metrics['cache_hits']} "
+                  f"api_calls={geo_metrics['api_calls']} "
+                  f"ok={geo_metrics['calls_ok']} "
+                  f"na={geo_metrics['calls_na']} "
+                  f"failed={geo_metrics['calls_failed']} "
+                  f"assembled={geo_metrics['assembled']} "
+                  f"pending={geo_metrics['listings_pending']} "
+                  f"deadline_hit={geo_metrics['deadline_hit']} "
+                  f"disabled={geo_metrics['providers_disabled']}")
+            for _pname, _pm in (geo_metrics.get("per_provider") or {}).items():
+                print(f"[geo_enrich]   {_pname}: "
+                      f"needed={_pm['cells_needed']} calls={_pm['api_calls']} "
+                      f"ok={_pm['ok']} na={_pm['na']} failed={_pm['failed']}"
+                      + (f" DISABLED({_pm.get('disabled_reason')})"
+                         if _pm.get("disabled") else ""))
+            _ph_capture("geo_enrichment_completed", {
+                "listings_seen":       geo_metrics.get("listings_seen"),
+                "listings_with_coords": geo_metrics.get("listings_with_coords"),
+                "assembled":           geo_metrics.get("assembled"),
+                "listings_pending":    geo_metrics.get("listings_pending"),
+                "api_calls":           geo_metrics.get("api_calls"),
+                "cache_hits":          geo_metrics.get("cache_hits"),
+                "calls_failed":        geo_metrics.get("calls_failed"),
+                "deadline_hit":        geo_metrics.get("deadline_hit"),
+                "providers_disabled":  len(geo_metrics.get("providers_disabled") or []),
+                "duration_s":          geo_metrics.get("duration_s"),
+            })
+    except Exception as _e:
+        print(f"[geo_enrich] failed (non-fatal): {_e!r}")
+
     # PR-8.5 — re-run distance fields AFTER LLM + Nominatim so
     # haversine fires on the freshly-geocoded listings. The first
     # apply_distances pass earlier in the pipeline used zone-table
