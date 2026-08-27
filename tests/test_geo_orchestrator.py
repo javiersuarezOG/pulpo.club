@@ -409,11 +409,24 @@ def test_second_country_run_accumulates_into_the_same_sidecar(tmp_path):
     assert cell_key("open_meteo_elevation", "8.98,-79.52", 1) in cells
 
 
-def test_country_is_stamped_from_the_active_manifest(tmp_path, monkeypatch):
-    """Follows the manifest, not a hardcoded literal, and not the listing's
-    own field — check_country_hardcodes.py enforces the first part; this
-    proves the value actually tracks the active country."""
+def test_record_country_comes_from_the_listing(tmp_path, monkeypatch):
+    """Per-listing country is the LISTING's own field, not the run's.
+
+    Both files are shared across the SV and PA passes, so a row must carry
+    the country it actually belongs to — stamping the active country would
+    relabel every SV row during the PA pass.
+    """
     monkeypatch.setenv("PULPO_ACTIVE_COUNTRY", "PA")
-    # The listing still claims SV; the stamp must follow the run, not the row.
-    _run([_listing("a", 8.9824, -79.5199, country="SV")], tmp_path, _Elevation())
-    assert load_cache(tmp_path / "geo_enrichment.json")["t|a"]["country"] == "PA"
+    _run([_listing("a", 13.6989, -89.1914, country="SV")], tmp_path, _Elevation())
+    assert load_cache(tmp_path / "geo_enrichment.json")["t|a"]["country"] == "SV"
+
+
+def test_history_country_comes_from_the_active_manifest(tmp_path, monkeypatch):
+    """The run-level telemetry row is about the run, so it tracks the
+    active country — read from the manifest, never a hardcoded literal
+    (scripts/check_country_hardcodes.py enforces the latter)."""
+    monkeypatch.setenv("PULPO_ACTIVE_COUNTRY", "PA")
+    _run([_listing("a", 8.9824, -79.5199)], tmp_path, _Elevation(),
+         history_path=tmp_path / "h.jsonl")
+    row = json.loads((tmp_path / "h.jsonl").read_text().strip().splitlines()[-1])
+    assert row["country"] == "PA"
