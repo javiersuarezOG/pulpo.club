@@ -1,63 +1,6 @@
 # Pulpo v1 API — contract
 
-Status: **WITHDRAWN from production 2026-08-25 — see "Deployment blocker" below.**
-
-## Deployment blocker (2026-08-25)
-
-The endpoints were merged, deployed, and returned `500
-FUNCTION_INVOCATION_FAILED` for every route. The website, the data files
-and every CommonJS function were unaffected throughout, and nothing
-consumed the endpoints, so there was no user impact — but they have been
-withdrawn rather than left broken on production.
-
-**What is established:**
-
-* Every CommonJS function works, including newly added ones
-  (`api/telegram/webhook.js` correctly returns `503
-  telegram_not_configured`). **Only TypeScript functions fail**, so this
-  is about how `.ts` is compiled for this project, not about the code.
-* `@vercel/node` computes
-  `isEsm = ext is .mjs/.mts || (pkg.type === "module" && ext is .js/.ts/.tsx)`
-  and only forces `compilerOptions.module` when `isEsm` is **true**.
-  `api/package.json` declares `"type": "commonjs"`, so `isEsm` is false
-  for our `.ts` files and the resolved tsconfig's `module` is used
-  verbatim.
-* Reproduced locally with the real compiler: compiling a handler with
-  `module: ESNext` emits `import` statements, and Node throws
-  `SyntaxError: Cannot use import statement outside a module` when
-  loading it from a directory whose package.json says `commonjs`.
-  Compiling the same file with `module: CommonJS` emits `require()` and
-  returns HTTP 200.
-* **Adding `api/tsconfig.json` with `"module": "CommonJS"` did NOT fix
-  production**, so tsconfig resolution is not the whole story. The
-  remaining unknown is what `findConfigFile(options.project, cwd)`
-  actually resolves to during the build, and that needs the deploy-time
-  build log to settle.
-
-**Why it could not be caught before merge:** unit tests import the
-TypeScript *source* through Vite, which handles ESM happily — the
-failure exists only in Vercel's *emitted output*. The spike in PR-1 was
-designed to catch exactly this, but its gate was a preview curl, and
-previews are SSO-gated to the Vercel team so no agent can reach one.
-
-**To finish this, one of:**
-
-1. Vercel build/runtime logs for a failing invocation (the fastest
-   path — the thrown error names the cause outright), or
-2. A preview URL an agent can reach (`VERCEL_AUTOMATION_BYPASS_SECRET`
-   on the project), so fixes can be iterated without touching
-   production.
-
-**Fallback if TypeScript stays unworkable:** write the endpoints as
-CommonJS `.js` — the format 20+ functions in this repo, including the
-new Telegram webhook, are demonstrably running in this exact deployment
-— with the shared core bundled in at build time. That bundling was
-verified locally: an esbuild CJS bundle of the handler loads under Node
-20 and returns the correct payload.
-
-The `shared/` core, the website's use of it, the characterization
-goldens and the Telegram handler all remain on `main` and are healthy.
-Only the `api/v1/*` and `api/mcp/*` TypeScript files were withdrawn.
+Status: **live — `/ping`, `/meta`, `/listings`, `/listings/:id`.**
 
 ## Why this exists
 
@@ -88,6 +31,56 @@ would add latency and serverless cost to a working site for no user benefit.
      (in-process)       |
                    MCP server (in-process)
 ```
+
+## The api/ boundary rule — read before touching a handler
+
+Endpoints under `api/v1` and `api/mcp` are **CommonJS `.js`, not
+TypeScript**. That is a hard constraint, not a preference.
+
+Vercel compiles TypeScript functions only for files inside `api/`, and
+the restriction is **transitive**: nothing in a `.ts` function's
+dependency graph may reach outside `api/` at any depth. These handlers
+need the shared core, so they cannot be TypeScript. Established on
+2026-08-27 by deploying probe functions to a preview and bisecting:
+
+| probe | result |
+|---|---|
+| CommonJS entrypoint → outside `api/` | 200 |
+| TS → self-contained `.js` inside `api/` | 200 |
+| TS → `.ts` inside `api/` | 200 |
+| TS → `shared/*.ts` (outside) | **500** |
+| TS → plain `.js` (outside) | **500** |
+| TS → `.js` inside `api/` → outside | **500** (transitive) |
+
+Two theories were tested and disproven — don't retry them. It is **not**
+a module-format problem: a no-import `.ts` function works with either
+`export default` or `module.exports`. And `includeFiles: shared/**`
+does not help: the files were never missing, they were uncompiled.
+
+**How shared code is reached:**
+
+```
+api/v1/*.js  --require-->  api/_core.js  --require-->  shared/dist/api-core.cjs
+```
+
+`shared/dist/api-core.cjs` is an esbuild bundle of `shared/api-core.ts`,
+self-contained (zero external imports) and **committed** — generating it
+only at build time left it absent from a fresh checkout and every
+endpoint 500'd. `shared/` stays TypeScript and holds every rule worth
+type-checking; the handlers are HTTP plumbing.
+
+**Guardrails.** `tests/api/api_import_boundary.test.js` fails on any
+`.ts` under those directories, on a handler requiring `shared/`
+directly, or on an entrypoint missing the bundle from `includeFiles`.
+`tests/api/shared_bundle_fresh.test.js` rebuilds the bundle and compares
+byte-for-byte so source and deployed logic cannot drift.
+
+**Alarm.** `scripts/check_api_health.py` runs every 6 hours from
+`pulpo-webhook-health.yml` and Slacks on failure. No build-time check
+can see this failure class — the fault lived only in the emitted bundle
+while CI was green — so it hits the real endpoints and checks response
+*shape*: listing floors, canonical ids, absolute URLs, a detail
+round-trip, and a live PII assertion.
 
 ## Versioning
 
