@@ -1,19 +1,19 @@
 {
-  "computed_at": "2026-08-26T04:14:48.643199+00:00",
+  "computed_at": "2026-08-27T13:39:00.004361+00:00",
   "filter_strictness": "moderate",
   "kpi": {
-    "active_sources": 13,
+    "active_sources": 14,
     "per_shelf_visible": {
       "beach_condos": {
-        "count": 26,
+        "count": 29,
         "renders_on_homepage": true
       },
       "beach_homes": {
-        "count": 141,
+        "count": 146,
         "renders_on_homepage": true
       },
       "beach_land": {
-        "count": 425,
+        "count": 487,
         "renders_on_homepage": true
       },
       "lake_condos": {
@@ -21,7 +21,7 @@
         "renders_on_homepage": false
       },
       "lake_homes": {
-        "count": 10,
+        "count": 9,
         "renders_on_homepage": true
       },
       "lake_land": {
@@ -59,8 +59,8 @@
         "target_prd": null
       },
       "citymax_sc": {
-        "coverage_pct_vs_discovered": 50.0,
-        "kept": 150,
+        "coverage_pct_vs_discovered": 49.3,
+        "kept": 148,
         "status": "green",
         "target_discovered": null,
         "target_prd": 300
@@ -80,8 +80,8 @@
         "target_prd": null
       },
       "encuentra24": {
-        "coverage_pct_vs_discovered": 0.8,
-        "kept": 25,
+        "coverage_pct_vs_discovered": 0.9,
+        "kept": 27,
         "status": "green",
         "target_discovered": null,
         "target_prd": 2947
@@ -123,8 +123,8 @@
       },
       "realestate_au_sv": {
         "coverage_pct_vs_discovered": null,
-        "kept": 0,
-        "status": "skipped",
+        "kept": 293,
+        "status": "green",
         "target_discovered": null,
         "target_prd": null
       },
@@ -137,7 +137,7 @@
       },
       "remax": {
         "coverage_pct_vs_discovered": null,
-        "kept": 263,
+        "kept": 262,
         "status": "green",
         "target_discovered": null,
         "target_prd": null
@@ -168,8 +168,8 @@
     "registered_sources": 19,
     "shelves_rendering": 5,
     "shelves_total": 6,
-    "total_in_dataset": 1543,
-    "total_visible_listings": 1333
+    "total_in_dataset": 1835,
+    "total_visible_listings": 1617
   },
   "min_real_listings": 4
 }

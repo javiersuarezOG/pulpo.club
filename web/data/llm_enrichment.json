@@ -141834,5 +141834,474 @@
     "cost_usd": 0.00153059,
     "finish_reason": "stop",
     "latency_ms": 3875
+  },
+  "realestate_au_sv|san-rafael-oriente-lote-2-poligono-d-lotificacion-el-carmen-san-rafael-oriente-san-miguel-san-rafael-oriente-san-miguel-310119658729": {
+    "ts": "2026-08-27T13:27:06.361405+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in San Rafael Oriente, Lotificación El Carmen",
+      "es": "Terreno en San Rafael Oriente, Lotificación El Carmen"
+    },
+    "short_description_canonical": {
+      "en": "Land lot in Lotificación El Carmen, San Rafael Oriente, San Miguel. This is a residential lot within a gated community. The property is offered at USD 46,500.",
+      "es": "Lote de terreno en Lotificación El Carmen, San Rafael Oriente, San Miguel. Es un lote residencial dentro de una comunidad cerrada. La propiedad se ofrece en USD 46,500."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in gated community El Carmen",
+        "es": "Ubicado en comunidad cerrada El Carmen"
+      },
+      {
+        "en": "Price USD 46,500",
+        "es": "Precio USD 46,500"
+      },
+      {
+        "en": "Residential zoning in San Miguel",
+        "es": "Zonificación residencial en San Miguel"
+      }
+    ],
+    "lat": 13.4333,
+    "lng": -88.1167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Rafael Oriente, San Miguel",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3090,
+    "tokens_out": 383,
+    "cost_usd": 0.0012556,
+    "finish_reason": "stop",
+    "latency_ms": 3061
+  },
+  "realestate_au_sv|planes-de-renderos-panchimalco-san-salvador-sur-san-salvador-lote-3-panchimalco-san-salvador-panchimalco-san-salvador-310109926139": {
+    "ts": "2026-08-27T13:27:06.490781+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Planes de Renderos, Panchimalco",
+      "es": "Terreno en Venta en Planes de Renderos, Panchimalco"
+    },
+    "short_description_canonical": {
+      "en": "Land lot for sale in Planes de Renderos, Panchimalco, San Salvador. The property is located in a residential area of the municipality. No further details on size or utilities are provided in the listing.",
+      "es": "Terreno en venta en Planes de Renderos, Panchimalco, San Salvador. La propiedad se ubica en una zona residencial del municipio. No se proporcionan más detalles sobre tamaño o servicios en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Planes de Renderos, Panchimalco",
+        "es": "Ubicado en Planes de Renderos, Panchimalco"
+      },
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Listado por RE/MAX Central"
+      },
+      {
+        "en": "Price: $115,000 USD",
+        "es": "Precio: $115,000 USD"
+      }
+    ],
+    "lat": 13.6333,
+    "lng": -89.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Panchimalco, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3101,
+    "tokens_out": 415,
+    "cost_usd": 0.00129377,
+    "finish_reason": "stop",
+    "latency_ms": 3192
+  },
+  "realestate_au_sv|lotificacion-santa-rosa-mejicanos-mejicanos-san-salvador-mejicanos-san-salvador-310119658743": {
+    "ts": "2026-08-27T13:27:06.532740+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Mejicanos, San Salvador",
+      "es": "Terreno en Venta en Mejicanos, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Lotificacion Santa Rosa, Mejicanos, San Salvador. The property is offered for sale at USD 30,000. No further details on size or utilities are provided.",
+      "es": "Terreno en Lotificación Santa Rosa, Mejicanos, San Salvador. La propiedad se ofrece en venta por USD 30,000. No se proporcionan más detalles sobre tamaño o servicios."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Mejicanos, San Salvador",
+        "es": "Ubicado en Mejicanos, San Salvador"
+      },
+      {
+        "en": "Priced at USD 30,000",
+        "es": "Precio de USD 30,000"
+      },
+      {
+        "en": "For sale via RE/MAX",
+        "es": "En venta a través de RE/MAX"
+      }
+    ],
+    "lat": 13.7401,
+    "lng": -89.2132,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Mejicanos, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3084,
+    "tokens_out": 393,
+    "cost_usd": 0.00126498,
+    "finish_reason": "stop",
+    "latency_ms": 3233
+  },
+  "realestate_au_sv|planes-de-renderos-panchimalco-san-salvador-sur-san-salvador-lote-4-panchimalco-san-salvador-panchimalco-san-salvador-310109926160": {
+    "ts": "2026-08-27T13:27:06.576848+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Planes de Renderos, Panchimalco",
+      "es": "Terreno en Venta en Planes de Renderos, Panchimalco"
+    },
+    "short_description_canonical": {
+      "en": "Land lot for sale in Planes de Renderos, Panchimalco, San Salvador. The property is located in a residential area of the municipality. No further details on size or features are provided.",
+      "es": "Lote de terreno en venta en Planes de Renderos, Panchimalco, San Salvador. La propiedad se ubica en una zona residencial del municipio. No se proporcionan más detalles sobre tamaño o características."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Planes de Renderos, Panchimalco",
+        "es": "Ubicado en Planes de Renderos, Panchimalco"
+      },
+      {
+        "en": "For sale at USD 115,000",
+        "es": "En venta por USD 115,000"
+      },
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Publicado por RE/MAX Central"
+      }
+    ],
+    "lat": 13.6333,
+    "lng": -89.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Panchimalco, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3101,
+    "tokens_out": 411,
+    "cost_usd": 0.00128937,
+    "finish_reason": "stop",
+    "latency_ms": 3277
+  },
+  "realestate_au_sv|planes-de-renderos-panchimalco-san-salvador-sur-san-salvador-lote-2-panchimalco-san-salvador-panchimalco-san-salvador-310109926136": {
+    "ts": "2026-08-27T13:27:06.710745+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Planes de Renderos, Panchimalco",
+      "es": "Terreno en Venta en Planes de Renderos, Panchimalco"
+    },
+    "short_description_canonical": {
+      "en": "Land lot for sale in Planes de Renderos, Panchimalco, San Salvador. The property is located in a residential area of the municipality. No further details on size or features are provided in the listing.",
+      "es": "Lote de terreno en venta en Planes de Renderos, Panchimalco, San Salvador. La propiedad se ubica en una zona residencial del municipio. No se proporcionan más detalles sobre tamaño o características en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Planes de Renderos, Panchimalco",
+        "es": "Ubicado en Planes de Renderos, Panchimalco"
+      },
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Anunciado por RE/MAX Central"
+      },
+      {
+        "en": "Price: USD 145,000",
+        "es": "Precio: USD 145,000"
+      }
+    ],
+    "lat": 13.6167,
+    "lng": -89.1833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Panchimalco municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3101,
+    "tokens_out": 417,
+    "cost_usd": 0.00129597,
+    "finish_reason": "stop",
+    "latency_ms": 3412
+  },
+  "remax|002523785003": {
+    "ts": "2026-08-27T13:27:09.867905+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat 1085 m² land, Km 28 Troncal del Norte, Guazapa",
+      "es": "Terreno plano 1085 m², Km 28 Troncal del Norte, Guazapa"
+    },
+    "short_description_canonical": {
+      "en": "Flat 1085.33 m² land in an urbanized subdivision at Km 28 on the Troncal del Norte Highway, Guazapa, San Salvador. Includes electricity, private drinking water, and a maintained septic tank. Suitable for housing, agricultural, industrial, or recreational use, with two access points.",
+      "es": "Terreno plano de 1085.33 m² en urbanización en el Km 28 de la carretera Troncal del Norte, Guazapa, San Salvador. Incluye electricidad, agua potable privada y tanque séptico con mantenimiento. Apto para vivienda, uso agrícola, industrial o recreativo, con dos accesos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat 1085.33 m², urbanized subdivision",
+        "es": "Plano 1085.33 m², urbanización"
+      },
+      {
+        "en": "Electricity, private water, septic tank",
+        "es": "Electricidad, agua privada, tanque séptico"
+      },
+      {
+        "en": "Two access points around property",
+        "es": "Dos accesos alrededor del terreno"
+      },
+      {
+        "en": "Minutes from Apopa and shopping centers",
+        "es": "Minutos de Apopa y centros comerciales"
+      }
+    ],
+    "lat": 13.9833,
+    "lng": -89.2167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Guazapa, San Salvador, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3402,
+    "tokens_out": 512,
+    "cost_usd": 0.00148174,
+    "finish_reason": "stop",
+    "latency_ms": 3506
+  },
+  "remax|003093331055": {
+    "ts": "2026-08-27T13:27:10.503497+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Costa del Sol Land in Golden Lake Community",
+      "es": "Terreno en Costa del Sol, Comunidad Golden Lake"
+    },
+    "short_description_canonical": {
+      "en": "Flat 500 v² (349.46 m²) residential lot in Golden Lake, Costa del Sol, La Paz. Condominium regime with basic utilities and private dock access to Jaltepeque Estuary. Amenities include clubhouse, tennis court, artificial lake, and playground. Beach access via Tesoro Beach Hotel membership, offered separately. Priced at USD $95,000.",
+      "es": "Lote residencial plano de 500 v² (349.46 m²) en Golden Lake, Costa del Sol, La Paz. Régimen de condominio con servicios básicos y acceso a muelle privado hacia el estero de Jaltepeque. Comodidades incluyen casa club, cancha de tenis, lago artificial y área de juegos infantiles. Acceso a la playa mediante membresía del Hotel Tesoro Beach, ofrecida por separado. Precio: USD $95,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private dock to Jaltepeque Estuary",
+        "es": "Muelle privado hacia el estero Jaltepeque"
+      },
+      {
+        "en": "Flat 500 v² lot, 100% buildable",
+        "es": "Lote plano de 500 v², 100% construible"
+      },
+      {
+        "en": "Airbnb allowed for rental income",
+        "es": "Airbnb permitido para renta"
+      },
+      {
+        "en": "Gated community with clubhouse and tennis",
+        "es": "Comunidad cerrada con casa club y tenis"
+      },
+      {
+        "en": "Beach access via Tesoro Beach Hotel",
+        "es": "Acceso a playa vía Hotel Tesoro Beach"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3308,
+    "tokens_out": 574,
+    "cost_usd": 0.00152456,
+    "finish_reason": "stop",
+    "latency_ms": 4192
+  },
+  "remax|350804510": {
+    "ts": "2026-08-27T13:27:10.945826+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "25,307 m² Land in Jiquilisco, Usulután",
+      "es": "Terreno de 25,307 m² en Jiquilisco, Usulután"
+    },
+    "short_description_canonical": {
+      "en": "Rural land of 25,307.41 m² (3.6 manzanas) in San Juan del Gozo, Jiquilisco, Usulután, with flat topography and fertile soil. It includes a small unfinished house of 8 m² with 2 bedrooms, a pit latrine, and areas for dining and kitchen. Paved road access, 5 minutes from Laguna de San Juan del Gozo, 15 minutes from Playa Puerta Escondida, and 20 minutes from Bahía de Jiquilisco.",
+      "es": "Terreno rústico de 25,307.41 m² (3.6 manzanas) en San Juan del Gozo, Jiquilisco, Usulután, con topografía plana y suelo fértil. Incluye una pequeña casa sin terminar de 8 m² con 2 habitaciones, sanitario de fosa y áreas para comedor y cocina. Acceso por calle pavimentada, a 5 minutos de la laguna de San Juan del Gozo, a 15 minutos de la playa virgen Puerta Escondida y a 20 minutos de la Bahía de Jiquilisco."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "25,307 m² flat fertile land",
+        "es": "25,307 m² de terreno plano y fértil"
+      },
+      {
+        "en": "5 min from San Juan del Gozo lagoon",
+        "es": "5 min de la laguna de San Juan del Gozo"
+      },
+      {
+        "en": "15 min from virgin Puerta Escondida beach",
+        "es": "15 min de la playa virgen Puerta Escondida"
+      },
+      {
+        "en": "20 min from Bahía de Jiquilisco",
+        "es": "20 min de la Bahía de Jiquilisco"
+      },
+      {
+        "en": "Paved road access",
+        "es": "Acceso por calle pavimentada"
+      }
+    ],
+    "lat": 13.2,
+    "lng": -88.595,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bahía de Jiquilisco",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 2,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3586,
+    "tokens_out": 657,
+    "cost_usd": 0.00169092,
+    "finish_reason": "stop",
+    "latency_ms": 4454
+  },
+  "encuentra24|32899258": {
+    "ts": "2026-08-27T14:21:11.685296+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4-Bed House in Santa Clara, Cocle, Near Beach",
+      "es": "Casa de 4 Habitaciones en Santa Clara, Coclé, Cerca de la Playa"
+    },
+    "short_description_canonical": {
+      "en": "House in Santa Clara, Coclé, minutes from shops and the beach. 600 m² built on a 2600 m² lot with 4 bedrooms, 4 bathrooms, service quarters, and 4 parking spaces. Features a perimeter fence, gate, living-dining room, kitchen, laundry area, green areas, and a temporary pool. Paved road access in a secure, quiet community. Price: $440,000.",
+      "es": "Casa en Santa Clara, Coclé, a minutos de comercios y de la playa. 600 m² construidos en un terreno de 2600 m² con 4 habitaciones, 4 baños, cuarto de servicio y 4 estacionamientos. Cuenta con cerca perimetral, portón, sala-comedor, cocina, área de lavandería, áreas verdes y piscina temporal. Acceso por vía asfaltada en comunidad segura y tranquila. Precio: $440,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "600 m² built, 2600 m² lot",
+        "es": "600 m² construidos, 2600 m² de terreno"
+      },
+      {
+        "en": "4 bedrooms, 4 bathrooms, service quarters",
+        "es": "4 habitaciones, 4 baños, cuarto de servicio"
+      },
+      {
+        "en": "Minutes from the beach",
+        "es": "A minutos de la playa"
+      },
+      {
+        "en": "Paved road, secure community",
+        "es": "Vía asfaltada, comunidad segura"
+      },
+      {
+        "en": "Temporary pool and green areas",
+        "es": "Piscina temporal y áreas verdes"
+      }
+    ],
+    "lat": 8.85,
+    "lng": -80.1,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Clara, Coclé, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.0,
+      "built_area_m2": 600.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2425,
+    "tokens_out": 598,
+    "cost_usd": 0.00131255,
+    "finish_reason": "stop",
+    "latency_ms": 4519
   }
 }
