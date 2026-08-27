@@ -1173,6 +1173,20 @@ jobs:
           # pipeline.
           git add web/data/llm_enrichment.json 2>/dev/null || true
           git add web/data/llm_enrichment_log.jsonl 2>/dev/null || true
+          # GEO-1 — geospatial due-diligence enrichment. THESE LINES ARE
+          # LOAD-BEARING: geo_cells.json is the per-coordinate-cell cache
+          # that makes the pass nearly free after the first backfill. A
+          # runner starts from a fresh checkout, so a cache that is not
+          # committed does not exist — it would re-pay every external API
+          # call every night (the mistake web/data/bilingual_fill.json and
+          # geocoding_nominatim.json are still making today).
+          # Producer: automation/geo_enrichment/. Consumers: the same
+          # module's cache-hit path tomorrow, the [geo_enrich] coverage
+          # line in the run summary, and the listing detail Due Diligence
+          # block once it ships.
+          git add web/data/geo_cells.json 2>/dev/null || true
+          git add web/data/geo_enrichment.json 2>/dev/null || true
+          git add web/data/geo_enrichment_history.jsonl 2>/dev/null || true
           # Weekly News Spotlight carry-forward artifact — refreshed above
           # by scripts/refresh_news_spotlight.py. Read by every Pro email
           # (build_issue._make_news_spotlight); committing it nightly is
