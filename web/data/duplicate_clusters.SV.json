@@ -2,6 +2,61 @@
   {
     "count": 6,
     "cross_source": false,
+    "fingerprint": "686d604b9fe406a31ce6eeca15db6789bd151a65",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 214133.0,
+        "source": "realestate_au_sv",
+        "source_id": "condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807329",
+        "title": "CONDADO DE SANTA JULIA, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807329/",
+        "zone": "masahuat"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 214133.0,
+        "source": "realestate_au_sv",
+        "source_id": "condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807330",
+        "title": "CONDADO DE SANTA JULIA, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807330/",
+        "zone": "masahuat"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 214133.0,
+        "source": "realestate_au_sv",
+        "source_id": "condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807334",
+        "title": "CONDADO DE SANTA JULIA, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807334/",
+        "zone": "masahuat"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 214133.0,
+        "source": "realestate_au_sv",
+        "source_id": "condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807314",
+        "title": "CONDADO DE SANTA JULIA, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807314/",
+        "zone": "masahuat"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 214140.0,
+        "source": "realestate_au_sv",
+        "source_id": "condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807318",
+        "title": "CONDADO DE SANTA JULIA, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/condado-de-santa-julia-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310105807318/",
+        "zone": "masahuat"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 6,
+    "cross_source": false,
     "fingerprint": "fbd9d3caa832090c02ba0b8b624b4de8263a8eac",
     "samples": [
       {
@@ -55,6 +110,135 @@
     ]
   },
   {
+    "count": 4,
+    "cross_source": false,
+    "fingerprint": "9d3d41d0e424326dc335a37e3f1985f65354bc68",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 35000.0,
+        "source": "realestate_au_sv",
+        "source_id": "portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485860",
+        "title": "Portezuelo atras de MC El Brasil, Porvenir Jocotillo, Santa Ana, Porvenir Jocotillo, Santa Ana Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485860/",
+        "zone": "santa-ana"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 35000.0,
+        "source": "realestate_au_sv",
+        "source_id": "portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485866",
+        "title": "Portezuelo atras de MC El Brasil, Porvenir Jocotillo, Santa Ana, Porvenir Jocotillo, Santa Ana Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485866/",
+        "zone": "santa-ana"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 35000.0,
+        "source": "realestate_au_sv",
+        "source_id": "portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485859",
+        "title": "Portezuelo atras de MC El Brasil, Porvenir Jocotillo, Santa Ana, Porvenir Jocotillo, Santa Ana Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485859/",
+        "zone": "santa-ana"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 35000.0,
+        "source": "realestate_au_sv",
+        "source_id": "portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485858",
+        "title": "Portezuelo atras de MC El Brasil, Porvenir Jocotillo, Santa Ana, Porvenir Jocotillo, Santa Ana Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485858/",
+        "zone": "santa-ana"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 4,
+    "cross_source": false,
+    "fingerprint": "eb1b0b1225c4307e0c98913d56e17ef5705736f3",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 39000.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650181",
+        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650181/",
+        "zone": "suchitoto"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 39000.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650153",
+        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650153/",
+        "zone": "suchitoto"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 39000.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650144",
+        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650144/",
+        "zone": "suchitoto"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 39000.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650148",
+        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650148/",
+        "zone": "suchitoto"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 3,
+    "cross_source": false,
+    "fingerprint": "acd51d255aeae4378cf8d70dae7442bc07b3168e",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 60000.0,
+        "source": "realestate_au_sv",
+        "source_id": "porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340880",
+        "title": "Porción 1 lotes 251 y 252 lotificacion arcos del espino cantón el espino, JUCURAN USULUTAN ESTE, Jucuaran, Usulután, Jucuaran, Usulutan Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340880/",
+        "zone": "el-espino"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 60000.0,
+        "source": "realestate_au_sv",
+        "source_id": "porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340881",
+        "title": "Porción 1 lotes 251 y 252 lotificacion arcos del espino cantón el espino, JUCURAN USULUTAN ESTE, Jucuaran, Usulután, Jucuaran, Usulutan Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340881/",
+        "zone": "el-espino"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 60000.0,
+        "source": "realestate_au_sv",
+        "source_id": "porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340859",
+        "title": "Porción 1 lotes 251 y 252 lotificacion arcos del espino cantón el espino, JUCURAN USULUTAN ESTE, Jucuaran, Usulután, Jucuaran, Usulutan Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/porcion-1-lotes-251-y-252-lotificacion-arcos-del-espino-canton-el-espino-jucuran-usulutan-este-jucuaran-usulutan-jucuaran-usulutan-310119340859/",
+        "zone": "el-espino"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
     "count": 3,
     "cross_source": false,
     "fingerprint": "cad82211d638e4d5b8df26b5b637c6aa95f51492",
@@ -94,6 +278,62 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "01d91f4016293e8f2805d1e44d87fd398f2d525d",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 80000.0,
+        "source": "realestate_au_sv",
+        "source_id": "jiboa-country-club-san-pedro-masahuat-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310103716161",
+        "title": "Jiboa Country Club, San Pedro Masahuat, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/jiboa-country-club-san-pedro-masahuat-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310103716161/",
+        "zone": "masahuat"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 80000.0,
+        "source": "realestate_au_sv",
+        "source_id": "jiboa-country-club-san-pedro-masahuat-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310103716159",
+        "title": "Jiboa Country Club, San Pedro Masahuat, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/jiboa-country-club-san-pedro-masahuat-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310103716159/",
+        "zone": "masahuat"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "0515a84d8ac00d7a9afb615902edf7f36c639f7c",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 70000.0,
+        "source": "realestate_au_sv",
+        "source_id": "terreno-en-venta-en-residencial-senderos-del-mar-el-palmarcito-tamanique-la-libertad-tamanique-la-libertad-department-310105814172",
+        "title": "Terreno en venta, en Residencial Senderos del mar, El Palmarcito., Tamanique, La Libertad, Tamanique, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/terreno-en-venta-en-residencial-senderos-del-mar-el-palmarcito-tamanique-la-libertad-tamanique-la-libertad-department-310105814172/",
+        "zone": "la-libertad"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 70000.0,
+        "source": "realestate_au_sv",
+        "source_id": "terreno-en-venta-en-residencial-senderos-del-mar-el-palmarcito-tamanique-la-libertad-tamanique-la-libertad-department-310105814156",
+        "title": "Terreno en venta, en Residencial Senderos del mar, El Palmarcito., Tamanique, La Libertad, Tamanique, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/terreno-en-venta-en-residencial-senderos-del-mar-el-palmarcito-tamanique-la-libertad-tamanique-la-libertad-department-310105814156/",
+        "zone": "la-libertad"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "10b41cc4ee33e62d556f15b0e40ef9b101bce5f8",
     "samples": [
       {
@@ -117,6 +357,62 @@
     ],
     "sources": [
       "remax"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "145e73819b71245b4d1c088b487d40f4f4b8a10f",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 153000.0,
+        "source": "realestate_au_sv",
+        "source_id": "parcelacion-estancias-vistas-del-mar-lotes-9-10-y-11-poligono-b-km-46-5-carretera-del-litoral-la-libertad-costa-l-l-la-libertad-la-libertad-la-libertad-la-libertad-department-310109867599",
+        "title": "PARCELACION ESTANCIAS VISTAS DEL MAR LOTES 9, 10 Y 11 POLIGONO B KM. 46.5 CARRETERA DEL LITORAL, LA LIBERTAD COSTA. L.L., La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/parcelacion-estancias-vistas-del-mar-lotes-9-10-y-11-poligono-b-km-46-5-carretera-del-litoral-la-libertad-costa-l-l-la-libertad-la-libertad-la-libertad-la-libertad-department-310109867599/",
+        "zone": "la-libertad"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 153000.0,
+        "source": "realestate_au_sv",
+        "source_id": "parcelacion-estancias-vistas-del-mar-lotes-9-10-y-11-poligono-b-km-46-5-carretera-del-litoral-la-libertad-costa-l-l-la-libertad-la-libertad-la-libertad-la-libertad-department-310108163913",
+        "title": "PARCELACION ESTANCIAS VISTAS DEL MAR LOTES 9, 10 Y 11 POLIGONO B KM. 46.5 CARRETERA DEL LITORAL, LA LIBERTAD COSTA. L.L., La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/parcelacion-estancias-vistas-del-mar-lotes-9-10-y-11-poligono-b-km-46-5-carretera-del-litoral-la-libertad-costa-l-l-la-libertad-la-libertad-la-libertad-la-libertad-department-310108163913/",
+        "zone": "la-libertad"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "1d530c8ada30673bac77a1f48aefd1032c41160a",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 99000.0,
+        "source": "realestate_au_sv",
+        "source_id": "finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899551",
+        "title": "finca atiluya, santa isabel ishuatan, sonsonate, Santa Isabel Ishuatan, Sonsonate, Santa Isabel Ishuatan, Sonsonate Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899551/",
+        "zone": "sonsonate"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 99000.0,
+        "source": "realestate_au_sv",
+        "source_id": "finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899563",
+        "title": "finca atiluya, santa isabel ishuatan, sonsonate, Santa Isabel Ishuatan, Sonsonate, Santa Isabel Ishuatan, Sonsonate Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/finca-atiluya-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-santa-isabel-ishuatan-sonsonate-310109899563/",
+        "zone": "sonsonate"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
     ]
   },
   {
@@ -150,29 +446,141 @@
   {
     "count": 2,
     "cross_source": false,
-    "fingerprint": "41d515a61719aef9bb7965ac13a70a998abd3b51",
+    "fingerprint": "28d3d53fd0bd77ea5a56f2079a5a04157117fac3",
     "samples": [
       {
-        "area_m2": 550.0,
-        "price_usd": 213463.0,
-        "source": "csbr",
-        "source_id": "casco-de-finca-en-venta-en-la-geortermica-de-ahuachapan-2",
-        "title": "CASCO DE FINCA EN VENTA - AHUCHAPÁN",
-        "url": "https://www.camarabienesraices.com.sv/propiedad/casco-de-finca-en-venta-en-la-geortermica-de-ahuachapan-2/",
-        "zone": "ahuachapan"
+        "area_m2": null,
+        "price_usd": 291898.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850309",
+        "title": "Cantón La Perla, Polígono 4, Número 13, de la Hacienda Taquillo, Jicalapa, La Libertad, Jicalapa, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850309/",
+        "zone": "la-libertad"
       },
       {
-        "area_m2": 550.0,
-        "price_usd": 213463.0,
-        "source": "csbr",
-        "source_id": "casco-de-finca-en-venta-en-la-geortermica-de-ahuachapan",
-        "title": "CASCO DE FINCA EN VENTA - AHUCHAPÁN",
-        "url": "https://www.camarabienesraices.com.sv/propiedad/casco-de-finca-en-venta-en-la-geortermica-de-ahuachapan/",
-        "zone": "ahuachapan"
+        "area_m2": null,
+        "price_usd": 291898.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850310",
+        "title": "Cantón La Perla, Polígono 4, Número 13, de la Hacienda Taquillo, Jicalapa, La Libertad, Jicalapa, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-la-perla-poligono-4-numero-13-de-la-hacienda-taquillo-jicalapa-la-libertad-jicalapa-la-libertad-department-310109850310/",
+        "zone": "la-libertad"
       }
     ],
     "sources": [
-      "csbr"
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "2d9da77ef06b09af1f7a238cce5b622f2995f965",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 550000.0,
+        "source": "realestate_au_sv",
+        "source_id": "las-arcas-armenia-sonsonate-armenia-sonsonate-armenia-sonsonate-310108376987",
+        "title": "Las Arcas Armenia Sonsonate, Armenia, Sonsonate, Armenia, Sonsonate Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/las-arcas-armenia-sonsonate-armenia-sonsonate-armenia-sonsonate-310108376987/",
+        "zone": "armenia"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 550000.0,
+        "source": "realestate_au_sv",
+        "source_id": "las-arcas-armenia-sonsonate-armenia-sonsonate-armenia-sonsonate-310100522448",
+        "title": "Las Arcas Armenia Sonsonate, Armenia, Sonsonate, Armenia, Sonsonate Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/las-arcas-armenia-sonsonate-armenia-sonsonate-armenia-sonsonate-310100522448/",
+        "zone": "armenia"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "3695c504c47f59c1971316eaee4df9d48cd620eb",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 275000.0,
+        "source": "realestate_au_sv",
+        "source_id": "nejapa-nejapa-san-salvador-nejapa-san-salvador-310101864518",
+        "title": "Nejapa, Nejapa, San Salvador, Nejapa, San Salvador Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/nejapa-nejapa-san-salvador-nejapa-san-salvador-310101864518/",
+        "zone": "nejapa"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 275000.0,
+        "source": "realestate_au_sv",
+        "source_id": "nejapa-nejapa-san-salvador-nejapa-san-salvador-310101864512",
+        "title": "Nejapa, Nejapa, San Salvador, Nejapa, San Salvador Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/nejapa-nejapa-san-salvador-nejapa-san-salvador-310101864512/",
+        "zone": "nejapa"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "3a2fdf644646a6f80a0eb9fa2d617250b3907cf6",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 411236.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395392",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395392/",
+        "zone": "santa-tecla"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 411236.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287054",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287054/",
+        "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "44776a4d049a6aad0d265a9edc402d5a00fca62f",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 421741.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395381",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395381/",
+        "zone": "santa-tecla"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 421741.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287063",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287063/",
+        "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
     ]
   },
   {
@@ -206,6 +614,34 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "4bb12eb935248b1f80e22793f4d9763725f06ff1",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 596450.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395383",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395383/",
+        "zone": "santa-tecla"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 596450.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287056",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287056/",
+        "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "4f374c83615d26c4bfea80ada518838169a028d1",
     "samples": [
       {
@@ -229,6 +665,34 @@
     ],
     "sources": [
       "remax"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "4f8f564f0c4d107aae76cba017cdb679ecae63bd",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 413510.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109422558",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109422558/",
+        "zone": "santa-tecla"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 413510.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287053",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287053/",
+        "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
     ]
   },
   {
@@ -318,6 +782,34 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "59744af2f621d910f809d7cbf90d267c8adcf22e",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 440422.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395384",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395384/",
+        "zone": "santa-tecla"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 440422.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287049",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287049/",
+        "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "5ac1f26a2ec92c72b887aaf62090374b809373ed",
     "samples": [
       {
@@ -369,6 +861,62 @@
     ],
     "sources": [
       "vivolatam"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "5e782636c68e1dc7a437d09431c26d59eb447aad",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 49775.0,
+        "source": "realestate_au_sv",
+        "source_id": "san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813079",
+        "title": "SAN DIEGO,  LA  Libertad, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813079/",
+        "zone": "san-diego"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 50000.0,
+        "source": "realestate_au_sv",
+        "source_id": "san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813067",
+        "title": "SAN DIEGO,  LA  Libertad, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813067/",
+        "zone": "san-diego"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "6ab2b35ca846f764149a34a334eb048051683789",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 465765.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395395",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395395/",
+        "zone": "santa-tecla"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 465765.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287051",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287051/",
+        "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
     ]
   },
   {
@@ -458,6 +1006,62 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "852358878e1b3b3d308b7215e0192ac66efaaf89",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 350000.0,
+        "source": "realestate_au_sv",
+        "source_id": "hacienda-santa-emilia-lote-numero-15-el-block-b-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108529944",
+        "title": "Hacienda Santa Emilia, Lote Número 15 el Block B, La Libertad, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/hacienda-santa-emilia-lote-numero-15-el-block-b-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108529944/",
+        "zone": "la-libertad"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 350000.0,
+        "source": "realestate_au_sv",
+        "source_id": "hacienda-santa-emilia-lote-numero-15-el-block-b-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310107834170",
+        "title": "Hacienda Santa Emilia, Lote Número 15 el Block B, La Libertad, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/hacienda-santa-emilia-lote-numero-15-el-block-b-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310107834170/",
+        "zone": "la-libertad"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "86411f355ec45135dce1d9de7c3c8e742a581d96",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 448100.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395379",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395379/",
+        "zone": "santa-tecla"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 448100.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287041",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287041/",
+        "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "866ea58a91262863898a9b55f926f810f14fefa5",
     "samples": [
       {
@@ -481,6 +1085,62 @@
     ],
     "sources": [
       "csbr"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "8727daf09f450414573a31ef100f9d7daa7ff9cb",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 503209.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395386",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395386/",
+        "zone": "santa-tecla"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 503209.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287042",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287042/",
+        "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "883f8e8594ea118f222c10ec9358ace0e408431a",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 442020.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109422559",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109422559/",
+        "zone": "santa-tecla"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 442020.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287050",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287050/",
+        "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
     ]
   },
   {
@@ -514,6 +1174,62 @@
   {
     "count": 2,
     "cross_source": false,
+    "fingerprint": "a959acedd3edb02fc3ff8668d21869b5730ae507",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 456864.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395393",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395393/",
+        "zone": "santa-tecla"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 456864.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287052",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287052/",
+        "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "aa80b1d2b35a1abd56b4f5eaca637652c665662d",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 525519.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109422560",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109422560/",
+        "zone": "santa-tecla"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 525519.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287046",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287046/",
+        "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
     "fingerprint": "bd93293dcefd94a6f862800e8cfa9f8ca0b58437",
     "samples": [
       {
@@ -537,6 +1253,118 @@
     ],
     "sources": [
       "csbr"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "be18a7a321ecd8f63277923545183bec39c11c3d",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 391026.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395391",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395391/",
+        "zone": "santa-tecla"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 391026.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287047",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287047/",
+        "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "c6f5b6d7c7ffc9b639375bec887700f302dc206f",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 305262.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395398",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395398/",
+        "zone": "santa-tecla"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 305262.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287058",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287058/",
+        "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "de8f0bcb83ba5e3024112f7595528372e10e5565",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 419448.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395388",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395388/",
+        "zone": "santa-tecla"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 419448.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287061",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287061/",
+        "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "e76aa307799a949158bd2e798510cf17833b3641",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 319752.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395389",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310119395389/",
+        "zone": "santa-tecla"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 319752.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287055",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287055/",
+        "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
     ]
   },
   {
@@ -593,6 +1421,62 @@
     ],
     "sources": [
       "csbr"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "fcab593f41ba5dd7005d818dc693982aa946ed18",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 25000.0,
+        "source": "realestate_au_sv",
+        "source_id": "lotificacion-yaguatique-canton-elprogreso-san-miguel-san-miguel-san-miguel-san-miguel-310109328914",
+        "title": "LOTIFICACION YAGUATIQUE, CANTON ELPROGRESO, San Miguel, San Miguel, San Miguel, San Miguel Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/lotificacion-yaguatique-canton-elprogreso-san-miguel-san-miguel-san-miguel-san-miguel-310109328914/",
+        "zone": "san-miguel"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 25000.0,
+        "source": "realestate_au_sv",
+        "source_id": "lotificacion-yaguatique-canton-elprogreso-san-miguel-san-miguel-san-miguel-san-miguel-310119364471",
+        "title": "LOTIFICACION YAGUATIQUE, CANTON ELPROGRESO, San Miguel, San Miguel, San Miguel, San Miguel Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/lotificacion-yaguatique-canton-elprogreso-san-miguel-san-miguel-san-miguel-san-miguel-310119364471/",
+        "zone": "san-miguel"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "fe098f5a2ea7c7eb4f6334f59bd96af6bb7d094d",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 464270.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109422556",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109422556/",
+        "zone": "santa-tecla"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 464270.0,
+        "source": "realestate_au_sv",
+        "source_id": "km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287062",
+        "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287062/",
+        "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
     ]
   }
 ]
