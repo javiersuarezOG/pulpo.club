@@ -264,3 +264,6 @@ module.exports = {
   GET_LISTING_SCHEMA,
   META_SCHEMA,
 };
+
+// Test seam — same instance the tools read, so specs and code agree.
+module.exports.__catalogTesting__ = require("../v1/_catalog.js").__testing__;
