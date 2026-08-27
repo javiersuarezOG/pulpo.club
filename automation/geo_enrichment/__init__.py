@@ -57,7 +57,7 @@ from __future__ import annotations
 
 import os
 import time as _time
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from types import ModuleType
 from typing import Any, Callable, Optional
@@ -78,6 +78,7 @@ from ._cache import (
     iso,
     load_cache,
     make_entry,
+    parse_iso,
     prune,
     save_cache,
     utcnow,
@@ -93,6 +94,17 @@ _PROVIDER_MODULES: tuple[ModuleType, ...] = (
 )
 
 REGISTRY: dict[str, ModuleType] = {m.PROVIDER: m for m in _PROVIDER_MODULES}
+
+# Fail at import, not in production. A duplicate PROVIDER would silently
+# drop a module from the registry; a duplicate CATEGORY would have two
+# providers overwriting each other's slot in every assembled record. Both
+# are invisible at runtime, so they are checked here where adding a
+# provider is the only thing that can trigger them.
+if len(REGISTRY) != len(_PROVIDER_MODULES):
+    raise RuntimeError("geo_enrichment: duplicate PROVIDER name in the registry")
+_CATEGORIES = [m.CATEGORY for m in _PROVIDER_MODULES]
+if len(set(_CATEGORIES)) != len(_CATEGORIES):
+    raise RuntimeError(f"geo_enrichment: duplicate CATEGORY in the registry: {_CATEGORIES}")
 
 # Per-listing status values (PRD's `estado`).
 ST_OK = "ok"
@@ -110,6 +122,13 @@ _PROVIDER_FAILURE_LIMIT = 3
 _GLOBAL_STATUS_CODES = frozenset({401, 403, 429})
 
 _DEFAULT_MAX_CALLS = 400
+
+# Records for listings that have left the catalog stop being re-assembled,
+# so their assembled_at freezes and they age out. Deliberately age-based
+# rather than "not in this run's listings": the SV and PA passes share this
+# file, so presence-based pruning would delete every PA record during the
+# SV run and vice versa.
+_DEFAULT_SIDECAR_RETENTION_DAYS = 90
 
 
 def _g(li: Any, name: str) -> Any:
@@ -169,6 +188,34 @@ def _resolve_providers(providers: Optional[list[str]]) -> list[ModuleType]:
         return list(_PROVIDER_MODULES)
     wanted = {p.strip().lower() for p in providers if p and p.strip()}
     return [m for m in _PROVIDER_MODULES if m.PROVIDER in wanted]
+
+
+def _prune_sidecar(sidecar: dict, *, now: datetime, retention_days: int) -> int:
+    """Drop records that stopped being refreshed. Returns rows dropped.
+
+    Age-based on purpose. A listing still in the catalog is re-assembled
+    every run, so its `assembled_at` is always today and it never ages out;
+    only genuinely delisted ones do. Pruning by "absent from this run's
+    listings" would be catastrophic here — the SV and PA passes share this
+    file, so each run would delete the other country's records.
+    """
+    if retention_days <= 0:
+        return 0
+    cutoff = now - timedelta(days=retention_days)
+    dropped = 0
+    for key in list(sidecar.keys()):
+        rec = sidecar.get(key)
+        if not isinstance(rec, dict):
+            del sidecar[key]
+            dropped += 1
+            continue
+        ts = parse_iso(rec.get("assembled_at"))
+        # An unparseable timestamp is left alone rather than deleted —
+        # losing data on a format surprise is worse than carrying it.
+        if ts is not None and ts < cutoff:
+            del sidecar[key]
+            dropped += 1
+    return dropped
 
 
 def enrich_listings(
@@ -354,6 +401,21 @@ def enrich_listings(
             last_call_at = _time.monotonic()
 
             stamped = now()
+            # A provider returning a different number of results than it
+            # was asked for would silently misalign here — zip() truncates,
+            # and we would attach one cell's data to a different cell in a
+            # cache that persists for months. Treat it as a failed fetch.
+            if not isinstance(results, list) or len(results) != len(chunk):
+                metrics["calls_failed"] += len(chunk)
+                pm["failed"] += len(chunk)
+                consecutive_failures += 1
+                if consecutive_failures >= _PROVIDER_FAILURE_LIMIT:
+                    disabled.add(mod.PROVIDER)
+                    pm["disabled"] = True
+                    pm["disabled_reason"] = "result_length_mismatch"
+                    metrics["providers_disabled"].append(mod.PROVIDER)
+                continue
+
             for cid, payload in zip(chunk, results):
                 status = STATUS_OK if payload else STATUS_NA
                 cells[cell_key(mod.PROVIDER, cid, mod.VERSION)] = make_entry(
@@ -439,8 +501,15 @@ def enrich_listings(
         prune(cells, current_versions={m.PROVIDER: m.VERSION for m in mods})
         save_cache(cells_path, cells)
     if candidates:
+        metrics["sidecar_pruned"] = _prune_sidecar(
+            sidecar,
+            now=now(),
+            retention_days=env_int("PULPO_GEO_SIDECAR_RETENTION_DAYS",
+                                   _DEFAULT_SIDECAR_RETENTION_DAYS),
+        )
         atomic_write_json(sidecar_path, sidecar,
                           separators=(",", ":"), sort_keys=True)
+        metrics["sidecar_records"] = len(sidecar)
 
     metrics["cells_cached"] = len(cells)
     metrics["duration_s"] = round(_time.monotonic() - started, 1)

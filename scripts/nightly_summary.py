@@ -270,6 +270,56 @@ def format_source_line(src: str, row: dict) -> str:
     return f"  {mark} {src:<18} scraped={scraped:<5} {kept_str:<11} {status}{extras_str}"
 
 
+def _geo_audit(data_dir: Path) -> Optional[dict]:
+    """Measure geo coverage via the canary's own audit.
+
+    Imported lazily and defensively: this summary is the last step of the
+    nightly and exists to narrate what happened, so it must not be the
+    thing that fails. A missing or broken canary simply omits the section.
+    """
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from check_geo_coverage import audit as _audit
+        return _audit(data_dir)
+    except Exception:  # noqa: BLE001 — observability must never break the run
+        return None
+
+
+def format_geo_block(geo: Optional[dict]) -> list[str]:
+    """GEO ENRICHMENT section, or nothing when the pass has not run yet.
+
+    Observability, not validation (same contract as the rest of this
+    summary): it reports what happened and never fails the workflow. The
+    numbers come from scripts/check_geo_coverage.audit, so the summary and
+    the Slack canary can never disagree about coverage.
+    """
+    if not geo or not geo.get("sidecar_present"):
+        return []
+    lines = ["GEO ENRICHMENT (due-diligence data per listing)"]
+    lines.append(f"  {geo['records']} listings carry a geo record.")
+    coverage = geo.get("coverage") or {}
+    for name, pct in coverage.items():
+        lines.append(f"    {name:<24} {pct:>5.1f}% resolved")
+    cells = geo.get("cells_cached")
+    if cells is not None:
+        # The cache is the whole economics of this pass — a shrinking cell
+        # count means we are re-paying for calls we already made.
+        lines.append(f"  {cells} coordinate cells cached "
+                     f"(this is what keeps the pass nearly free).")
+    last = geo.get("last_run") or {}
+    if last:
+        lines.append(f"  Last run: {last.get('api_calls', '?')} API calls, "
+                     f"{last.get('calls_failed', 0)} failed, "
+                     f"{last.get('listings_pending', 0)} listings still pending.")
+        disabled = last.get("providers_disabled") or []
+        if disabled:
+            lines.append(f"  WARNING: provider(s) disabled mid-run: {', '.join(disabled)}")
+        if last.get("deadline_hit"):
+            lines.append("  Budget deadline was hit — the remainder resumes tomorrow.")
+    lines.append("")
+    return lines
+
+
 def format_summary(
     *,
     listing_count: Optional[int],
@@ -284,6 +334,7 @@ def format_summary(
     remote_health_error: Optional[str] = None,
     candidate_bundle: Optional[dict] = None,
     promotion_status: str = PROMOTION_NO_BUNDLE,
+    geo: Optional[dict] = None,
 ) -> str:
     """Pure: assemble the final summary block from the resolved inputs."""
     lines: list[str] = []
@@ -318,6 +369,8 @@ def format_summary(
     # R5: candidate-bundle awareness. Emits CANDIDATE STATUS only when
     # R1's bundle exists for this run; otherwise legacy summary flows
     # through unchanged so pre-R1 pipelines see no surprise sections.
+    lines.extend(format_geo_block(geo))
+
     candidate_lines = format_candidate_block(candidate_bundle, promotion_status)
     lines.extend(candidate_lines)
 
@@ -463,6 +516,7 @@ def main(argv: Optional[list[str]] = None) -> int:
         remote_health_error=remote_health_error,
         candidate_bundle=candidate_bundle,
         promotion_status=promotion_status,
+        geo=_geo_audit(data_dir),
     )
 
     # Always print to stdout — this is the operator-facing surface.

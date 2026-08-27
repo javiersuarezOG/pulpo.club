@@ -144,6 +144,55 @@ PostHog alerts:
    Slack-pages when a served listing ships monolingual, identical, or
    language-swapped copy. It never blocks the nightly (alert + backfill).
 
+### Geo enrichment (pipeline-side)
+
+Per-listing due-diligence data (elevation, solar/climate, and the providers
+landing in GEO-2/3) is produced by `automation/geo_enrichment/` during the
+nightly and committed to `web/data/geo_enrichment.json` +
+`web/data/geo_cells.json`. There is no user-facing surface yet, so **all**
+its observability is pipeline-side. Three signals, each answering a
+different question:
+
+| Signal | Where | Answers |
+|---|---|---|
+| `[geo_enrich] …` log line | nightly job log, one line + one per provider | What happened this run: cells needed, cache hits, API calls, ok/na/failed, pending, whether the deadline or a provider short-circuit fired |
+| `geo_enrichment_completed` | PostHog (`_ph_capture` in `automation/run.py`) | The same run-level counters, queryable over time — use it to trend `api_calls` and `calls_failed` |
+| `check_geo_coverage.py` | nightly step + Slack | Whether the *committed state* is healthy — this is the positive heartbeat |
+
+**Why the canary exists.** A green unit test proves the fetch code works
+when invoked. It cannot prove the pass still runs, that its cache still
+persists, or that a provider has not quietly started refusing us — the same
+class of silence that hid the 2026-05-27 Resend outage for 7 days.
+[scripts/check_geo_coverage.py](../scripts/check_geo_coverage.py) watches
+six things and Slack-pages on any of them, **never blocking** the data
+commit (`--strict` exists only to prove the guardrail fires):
+
+1. **sidecar missing** — the pass never produced committed output; usually a
+   dropped `git add` line in `pulpo-nightly.yml`.
+2. **stale** — newest `assembled_at` older than 48h, i.e. the pass stopped
+   running. This is the heartbeat proper.
+3. **coverage below threshold** — a provider is not resolving for enough
+   listings (default 90%). `na` counts as resolved: "no modeled river in
+   this cell" is an answer, not a gap.
+4. **coverage drop** — a provider fell >20 points since the previous run,
+   which catches a provider that just started refusing before it bottoms out.
+5. **provider disabled mid-run** — the auth/quota/ban short-circuit fired.
+6. **cell cache shrank** — `geo_cells.json` lost >50% of its rows, meaning
+   it is not persisting between runs and **every night is re-paying every
+   external API call**. This is the most expensive silent failure available
+   here, and it is exactly the mistake `bilingual_fill.json` and
+   `geocoding_nominatim.json` are still making.
+
+The end-of-run summary renders a GEO ENRICHMENT block from the *same*
+`audit()` function the canary uses, so the narrative and the alert can never
+disagree about coverage.
+
+**Suggested PostHog alert:** fire when `calls_failed > 0` on
+`geo_enrichment_completed` for two consecutive runs, or when
+`providers_disabled > 0` at all. A single failed cell is self-healing (failed
+cells are never cached, so the next run retries them); a persistent one is a
+provider relationship problem.
+
 ### Web Vitals
 
 | Event | Payload | Fires from |
