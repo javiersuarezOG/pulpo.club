@@ -87,10 +87,14 @@ describe("public serving code never reaches for the PII catalog", () => {
   });
 
   it("has no fallback chain from the slim catalog to the full one", () => {
-    const src = fs.readFileSync(path.join(repoRoot, "api", "v1", "_catalog.ts"), "utf8");
+    const src = fs.readFileSync(path.join(repoRoot, "api", "v1", "_catalog.js"), "utf8");
     const code = src.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
-    // Exactly one catalog filename is constructed, in catalogFilename().
-    expect(code.match(/ranked\.list/g) ?? []).toHaveLength(2);
+    // Exactly one catalog filename is constructed, in catalogFilename(),
+    // and it always names the slim projection — there is no branch that
+    // can fall back to the PII-bearing ranked.json.
+    const built = code.match(/ranked\.list/g) ?? [];
+    expect(built.length).toBeGreaterThan(0);
+    expect(code).not.toMatch(/["'`][^"'`]*\branked\.json\b/);
   });
 });
 

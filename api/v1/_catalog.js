@@ -1,4 +1,7 @@
-// api/v1/_catalog.ts — reads the listing catalog off the function bundle.
+// api/v1/_catalog.js — reads the listing catalog off the function bundle.
+//
+// CommonJS because a TypeScript function cannot reach outside api/ at
+// any depth (see docs/api-v1.md); these handlers need shared/.
 //
 // Deliberately NOT in shared/: it touches `fs` and `process`, and
 // shared/ is imported by the browser build. The root tsconfig pins
@@ -23,8 +26,8 @@
 // mode we want. vercel.json additionally excludes ranked.json from
 // these functions' bundles, so the guarantee is structural as well.
 
-import fs from "fs";
-import path from "path";
+const fs = require("fs");
+const path = require("path");
 
 /**
  * Countries this API will serve.
@@ -34,22 +37,19 @@ import path from "path";
  * be publishing known-wrong geography. Adding a country here is the one
  * edit needed once its data is trustworthy.
  */
-export const SUPPORTED_COUNTRIES = ["SV"] as const;
-export type CountryCode = (typeof SUPPORTED_COUNTRIES)[number];
+const SUPPORTED_COUNTRIES = ["SV"];
 
-export const DEFAULT_COUNTRY: CountryCode = "SV";
+const DEFAULT_COUNTRY = "SV";
 
 /**
  * Resolve and validate a country query param.
  * Returns null for anything unsupported so the handler can 400 rather
  * than silently serving a different country than the caller asked for.
  */
-export function resolveCountry(raw: unknown): CountryCode | null {
+function resolveCountry(raw) {
   if (raw == null || raw === "") return DEFAULT_COUNTRY;
   const value = String(Array.isArray(raw) ? raw[0] : raw).trim().toUpperCase();
-  return (SUPPORTED_COUNTRIES as readonly string[]).includes(value)
-    ? (value as CountryCode)
-    : null;
+  return SUPPORTED_COUNTRIES.includes(value) ? value : null;
 }
 
 /**
@@ -60,37 +60,24 @@ export function resolveCountry(raw: unknown): CountryCode | null {
  * legacy un-suffixed names, and `ranked.list.SV.json` does not exist on
  * disk, so asking for it would 503 the whole API.
  */
-export function catalogFilename(country: CountryCode): string {
+function catalogFilename(country) {
   return country === "SV" ? "ranked.list.json" : `ranked.list.${country}.json`;
-}
-
-export interface Catalog {
-  /** Raw pipeline rows, pre-sorted by rank_score desc (complete first). */
-  rows: Record<string, unknown>[];
-  /** Pipeline run timestamp, or null when unstamped. Never faked with now(). */
-  generatedAt: string | null;
-  country: CountryCode;
-}
-
-interface CacheEntry {
-  mtimeMs: number;
-  catalog: Catalog;
 }
 
 // Per-country, keyed on mtime — the same shape /api/social/listings has
 // used in production. Data changes once nightly, so a warm instance
 // parses ~6MB of JSON once and then serves from memory. A redeploy or
 // a data commit changes the mtime and invalidates naturally.
-const cache = new Map<string, CacheEntry>();
+const cache = new Map();
 
-function dataFileCandidates(filename: string): string[] {
+function dataFileCandidates(filename) {
   return [
     path.join(__dirname, "..", "..", "web", "data", filename),
     path.join(process.cwd(), "web", "data", filename),
   ];
 }
 
-function readJson(filename: string): { json: unknown; mtimeMs: number } | null {
+function readJson(filename) {
   for (const p of dataFileCandidates(filename)) {
     try {
       const stat = fs.statSync(p);
@@ -105,10 +92,10 @@ function readJson(filename: string): { json: unknown; mtimeMs: number } | null {
 
 /** Pipeline timestamp for a country, or null. Best-effort: a missing or
  *  malformed last_updated file must not take the catalog down with it. */
-function readGeneratedAt(country: CountryCode): string | null {
+function readGeneratedAt(country) {
   const filename = country === "SV" ? "last_updated.json" : `last_updated.${country}.json`;
   const found = readJson(filename);
-  const value = (found?.json as { last_updated?: unknown } | undefined)?.last_updated;
+  const value = found && found.json ? found.json.last_updated : undefined;
   return typeof value === "string" && value ? value : null;
 }
 
@@ -120,7 +107,7 @@ function readGeneratedAt(country: CountryCode): string | null {
  * result set. An empty array and "the data did not deploy" look
  * identical to a channel otherwise, and the second one is an incident.
  */
-export function loadCatalog(country: CountryCode = DEFAULT_COUNTRY): Catalog | null {
+function loadCatalog(country = DEFAULT_COUNTRY) {
   // Test override wins outright. Checked before touching the filesystem
   // so specs behave identically whether or not web/data exists on the
   // machine running them.
@@ -129,7 +116,7 @@ export function loadCatalog(country: CountryCode = DEFAULT_COUNTRY): Catalog | n
   const filename = catalogFilename(country);
 
   for (const p of dataFileCandidates(filename)) {
-    let mtimeMs: number;
+    let mtimeMs;
     try {
       mtimeMs = fs.statSync(p).mtimeMs;
     } catch {
@@ -142,8 +129,8 @@ export function loadCatalog(country: CountryCode = DEFAULT_COUNTRY): Catalog | n
     try {
       const parsed = JSON.parse(fs.readFileSync(p, "utf8"));
       if (!Array.isArray(parsed)) return null;
-      const catalog: Catalog = {
-        rows: parsed as Record<string, unknown>[],
+      const catalog = {
+        rows: parsed,
         generatedAt: readGeneratedAt(country),
         country,
       };
@@ -162,14 +149,23 @@ export function loadCatalog(country: CountryCode = DEFAULT_COUNTRY): Catalog | n
 // CI blocker for every unrelated PR (the social-floor precedent).
 // `set(country, null)` models "the catalog did not deploy" so the 503
 // path is testable too.
-const overrides = new Map<CountryCode, Catalog | null>();
+const overrides = new Map();
 
-export const __testing__ = {
-  setCatalog(country: CountryCode, catalog: Catalog | null) {
+const __testing__ = {
+  setCatalog(country, catalog) {
     overrides.set(country, catalog);
   },
   reset() {
     overrides.clear();
     cache.clear();
   },
+};
+
+module.exports = {
+  SUPPORTED_COUNTRIES,
+  DEFAULT_COUNTRY,
+  resolveCountry,
+  catalogFilename,
+  loadCatalog,
+  __testing__,
 };

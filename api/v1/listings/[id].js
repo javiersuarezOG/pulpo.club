@@ -13,16 +13,19 @@
 // lot wastes the user's trip. Unknown id and hidden listing both return
 // 404 rather than leaking which one it was.
 
-import { API_VERSION } from "../../_core.js";
-import { parseListingId } from "../../_core.js";
-import { loadAdapted, toWire } from "../_serve";
-import { resolveCountry, SUPPORTED_COUNTRIES } from "../_catalog";
-import { makeRateLimiter, ipFromRequest, send429 } from "../../_rate_limit.js";
-import { methodNotAllowed, logApi, type ApiRequest, type ApiResponse } from "../_http";
+
+
+// CommonJS, not TypeScript: a .ts function cannot reach outside api/ at
+// any depth, and these need the shared core (docs/api-v1.md).
+const { API_VERSION, parseListingId } = require("../../_core.js");
+const { loadAdapted, toWire } = require("../_serve.js");
+const { resolveCountry, SUPPORTED_COUNTRIES } = require("../_catalog.js");
+const { makeRateLimiter, ipFromRequest, send429 } = require("../../_rate_limit.js");
+const { methodNotAllowed, logApi } = require("../_http.js");
 
 const limiter = makeRateLimiter({ windowMs: 60_000, maxAttempts: 60, name: "v1_listing_detail" });
 
-export default function handler(req: ApiRequest, res: ApiResponse) {
+module.exports = function handler(req, res) {
   const t0 = Date.now();
 
   if (req.method !== "GET") return methodNotAllowed(res, "GET");
@@ -30,14 +33,14 @@ export default function handler(req: ApiRequest, res: ApiResponse) {
   const rl = limiter.hit(ipFromRequest(req));
   if (!rl.allowed) return send429(res, rl, "v1_listing_detail");
 
-  const rawId = req.query?.id;
+  const rawId = req.query && req.query.id;
   const id = Array.isArray(rawId) ? rawId[0] : rawId;
   if (!parseListingId(id)) {
     logApi("v1_listing_detail", { status: 400, reason: "invalid_id", ms: Date.now() - t0 });
     return res.status(400).json({ error: "invalid_param", param: "id" });
   }
 
-  const country = resolveCountry(req.query?.country);
+  const country = resolveCountry(req.query && req.query.country);
   if (!country) {
     return res.status(400).json({ error: "unknown_country", supported: SUPPORTED_COUNTRIES });
   }
@@ -65,4 +68,10 @@ export default function handler(req: ApiRequest, res: ApiResponse) {
     generated_at: loaded.generatedAt,
     data: toWire(found),
   });
-}
+};
+
+// Test seam. Re-exported from the handler so specs mutate the SAME
+// module instance the handler reads — importing _catalog.js separately
+// from an ESM test can otherwise produce a second instance whose
+// override the handler never sees.
+module.exports.__catalogTesting__ = require("../_catalog.js").__testing__;

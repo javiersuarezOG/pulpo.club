@@ -6,8 +6,13 @@
 // precedent), and it would make the counts assertions untestable.
 
 import { afterEach, describe, expect, it } from "vitest";
-import handler, { buildMeta } from "../../api/v1/meta.ts";
-import { __testing__, catalogFilename, resolveCountry } from "../../api/v1/_catalog.ts";
+import handler, { buildMeta } from "../../api/v1/meta.js";
+import { __testing__, catalogFilename, resolveCountry } from "../../api/v1/_catalog.js";
+
+// Use the seam the HANDLER exposes so the override lands on the same
+// module instance the handler reads (ESM import + CJS require of the
+// same file can otherwise yield two instances).
+const seam = handler.__catalogTesting__ ?? __testing__;
 
 function mockRes() {
   return {
@@ -51,7 +56,7 @@ const catalog = (rows, generatedAt = "2026-08-21T04:04:32.112201+00:00") => ({
   country: "SV",
 });
 
-afterEach(() => __testing__.reset());
+afterEach(() => seam.reset());
 
 describe("country resolution", () => {
   it("defaults to SV when absent or empty", () => {
@@ -167,7 +172,7 @@ describe("buildMeta", () => {
 
 describe("GET /api/v1/meta", () => {
   it("serves the vocabulary with a CDN cache header", () => {
-    __testing__.setCatalog("SV", catalog([row(), row({ source_id: "2", zone: "mizata" })]));
+    seam.setCatalog("SV", catalog([row(), row({ source_id: "2", zone: "mizata" })]));
     const res = mockRes();
     handler(mockReq(), res);
 
@@ -191,7 +196,7 @@ describe("GET /api/v1/meta", () => {
   it("503s when the catalog is missing instead of serving an empty payload", () => {
     // "No zones" and "the data did not deploy" look identical to a
     // channel, and only one of them is an incident.
-    __testing__.setCatalog("SV", null);
+    seam.setCatalog("SV", null);
     const res = mockRes();
     handler(mockReq(), res);
     expect(res.statusCode).toBe(503);

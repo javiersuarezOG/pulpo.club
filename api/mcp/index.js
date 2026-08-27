@@ -32,36 +32,34 @@
 //
 // Setup instructions live in docs/mcp.md.
 
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 
-import { API_VERSION } from "../_core.js";
-import {
-  GET_LISTING_SCHEMA,
-  META_SCHEMA,
-  SEARCH_SCHEMA,
-  getListing,
-  getMarketMeta,
-  searchListings,
-  type ToolResult,
-} from "./_tools";
-import { makeRateLimiter, ipFromRequest, send429 } from "../_rate_limit.js";
-import { logApi, type ApiRequest, type ApiResponse } from "../v1/_http";
 
+
+
+const { McpServer } = require("@modelcontextprotocol/sdk/server/mcp.js");
+const { StreamableHTTPServerTransport } = require("@modelcontextprotocol/sdk/server/streamableHttp.js");
+
+const { API_VERSION } = require("../_core.js");
+const {
+  GET_LISTING_SCHEMA, META_SCHEMA, SEARCH_SCHEMA,
+  getListing, getMarketMeta, searchListings,
+} = require("./_tools.js");
+const { makeRateLimiter, ipFromRequest, send429 } = require("../_rate_limit.js");
+const { logApi } = require("../v1/_http.js");
 const posthog = require("../_posthog");
 
 const limiter = makeRateLimiter({ windowMs: 60_000, maxAttempts: 60, name: "mcp" });
 
 /** MCP tool results are content blocks. JSON goes in a text block —
  *  models parse it reliably and it survives every client renderer. */
-function wrap(result: ToolResult) {
+function wrap(result) {
   return {
-    content: [{ type: "text" as const, text: JSON.stringify(result.payload, null, 2) }],
+    content: [{ type: "text", text: JSON.stringify(result.payload, null, 2) }],
     isError: !result.ok,
   };
 }
 
-export function buildServer(): McpServer {
+function buildServer() {
   const server = new McpServer(
     { name: "pulpo", version: API_VERSION },
     {
@@ -86,7 +84,7 @@ export function buildServer(): McpServer {
         "location, momentum) unless another sort is given.",
       inputSchema: SEARCH_SCHEMA,
     },
-    async (args: Record<string, unknown>) => {
+    async (args) => {
       const r = searchListings(args ?? {});
       track("search_listings", r);
       return wrap(r);
@@ -103,7 +101,7 @@ export function buildServer(): McpServer {
         "the same zone. Use the id returned by search_listings.",
       inputSchema: GET_LISTING_SCHEMA,
     },
-    async (args: Record<string, unknown>) => {
+    async (args) => {
       const r = getListing(args ?? {});
       track("get_listing", r);
       return wrap(r);
@@ -121,7 +119,7 @@ export function buildServer(): McpServer {
         "zone slugs rather than guessing.",
       inputSchema: META_SCHEMA,
     },
-    async (args: Record<string, unknown>) => {
+    async (args) => {
       const r = getMarketMeta(args ?? {});
       track("get_market_meta", r);
       return wrap(r);
@@ -131,9 +129,9 @@ export function buildServer(): McpServer {
   return server;
 }
 
-function track(tool: string, r: ToolResult) {
+function track(tool, r) {
   try {
-    const p: any = r.payload ?? {};
+    const p = r.payload ?? {};
     posthog.capture("mcp:anon", "mcp.tool_called", {
       tool,
       ok: r.ok,
@@ -147,7 +145,7 @@ function track(tool: string, r: ToolResult) {
   }
 }
 
-export default async function handler(req: ApiRequest, res: ApiResponse) {
+async function handler(req, res) {
   const t0 = Date.now();
 
   // MCP's streamable-HTTP transport is POST-driven. GET is reserved for
@@ -173,11 +171,11 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
   try {
     await server.connect(transport);
-    await transport.handleRequest(req as any, res as any, (req as any).body);
+    await transport.handleRequest(req, res, req.body);
     logApi("mcp", { status: 200, ms: Date.now() - t0 });
-  } catch (err: any) {
-    logApi("mcp", { status: 500, error_class: err?.constructor?.name, ms: Date.now() - t0 });
-    if (!(res as any).headersSent) {
+  } catch (err) {
+    logApi("mcp", { status: 500, error_class: err && err.constructor && err.constructor.name, ms: Date.now() - t0 });
+    if (!res.headersSent) {
       res.status(500).json({ error: "mcp_transport_failed" });
     }
   } finally {
@@ -186,3 +184,6 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     try { await posthog.flush(); } catch { /* never fail a call on telemetry */ }
   }
 }
+
+module.exports = handler;
+module.exports.buildServer = buildServer;

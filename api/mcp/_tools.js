@@ -1,4 +1,4 @@
-// api/mcp/_tools.ts — the three Pulpo capabilities, as MCP tools.
+// api/mcp/_tools.js — the three Pulpo capabilities, as MCP tools.
 //
 // Kept separate from the transport wiring in index.ts so the logic is
 // unit-testable without standing up a JSON-RPC server.
@@ -18,19 +18,18 @@
 //   * Every listing carries its canonical id and a real pulpo.club URL,
 //     so the model can cite a link the user can actually open.
 
-import { z } from "zod";
 
-import { zoneName } from "../_core.js";
-import { loadAdapted, selectListings, publicBaseUrl, absolutePhoto, SORTS } from "../v1/_serve";
-import { resolveCountry, type CountryCode } from "../v1/_catalog";
-import { parseListingId } from "../_core.js";
-import type { Listing } from "../_core.js";
 
-export const MAX_RESULTS = 25;
+const { z } = require("zod");
+const { zoneName, parseListingId } = require("../_core.js");
+const { loadAdapted, selectListings, publicBaseUrl, absolutePhoto, SORTS } = require("../v1/_serve.js");
+const { resolveCountry } = require("../v1/_catalog.js");
+
+const MAX_RESULTS = 25;
 
 /** Compact projection for a result list — enough for the model to
  *  compare options and cite one, without flooding its context. */
-export function summarize(l: Listing) {
+function summarize(l) {
   const base = publicBaseUrl();
   return {
     id: l.id,
@@ -51,7 +50,7 @@ export function summarize(l: Listing) {
 }
 
 /** Fuller projection for a single listing the user drilled into. */
-export function detail(l: Listing) {
+function detail(l) {
   const base = publicBaseUrl();
   return {
     ...summarize(l),
@@ -87,9 +86,9 @@ export function detail(l: Listing) {
 
 /** Turn structured tool args into the website's own query dialect, so
  *  MCP, the website and /api/v1 all resolve a request identically. */
-export function argsToQuery(args: Record<string, unknown>): string {
+function argsToQuery(args) {
   const p = new URLSearchParams();
-  const set = (k: string, v: unknown) => {
+  const set = (k, v) => {
     if (v == null || v === "") return;
     p.set(k, Array.isArray(v) ? v.join(",") : String(v));
   };
@@ -134,12 +133,7 @@ export function argsToQuery(args: Record<string, unknown>): string {
   return p.toString();
 }
 
-export interface ToolResult {
-  ok: boolean;
-  payload: unknown;
-}
-
-export function searchListings(args: Record<string, unknown>): ToolResult {
+function searchListings(args) {
   const country = resolveCountry(args.country);
   if (!country) return { ok: false, payload: { error: "unknown_country", supported: ["SV"] } };
 
@@ -162,7 +156,7 @@ export function searchListings(args: Record<string, unknown>): ToolResult {
   };
 }
 
-export function getListing(args: Record<string, unknown>): ToolResult {
+function getListing(args) {
   const id = typeof args.id === "string" ? args.id : "";
   if (!parseListingId(id)) return { ok: false, payload: { error: "invalid_id", id } };
 
@@ -179,7 +173,7 @@ export function getListing(args: Record<string, unknown>): ToolResult {
   return { ok: true, payload: { data_as_of: loaded.generatedAt, listing: detail(found) } };
 }
 
-export function getMarketMeta(args: Record<string, unknown>): ToolResult {
+function getMarketMeta(args) {
   const country = resolveCountry(args.country);
   if (!country) return { ok: false, payload: { error: "unknown_country", supported: ["SV"] } };
 
@@ -187,9 +181,9 @@ export function getMarketMeta(args: Record<string, unknown>): ToolResult {
   if (!loaded) return { ok: false, payload: { error: "data_unavailable" } };
 
   const visible = loaded.listings.filter((l) => !l.is_sold && !l.is_incomplete);
-  const tally = new Map<string, { slug: string; name: string; count: number }>();
+  const tally = new Map();
   for (const l of visible) {
-    const slug = (l as any).zone ?? null;
+    const slug = l.zone ?? null;
     const key = typeof slug === "string" && slug ? slug : null;
     if (!key) continue;
     const hit = tally.get(key) ?? { slug: key, name: zoneName(key), count: 0 };
@@ -197,7 +191,7 @@ export function getMarketMeta(args: Record<string, unknown>): ToolResult {
     tally.set(key, hit);
   }
 
-  const prices = visible.map((l) => l.price).filter((n): n is number => typeof n === "number");
+  const prices = visible.map((l) => l.price).filter((n) => typeof n === "number");
 
   return {
     ok: true,
@@ -223,7 +217,7 @@ export function getMarketMeta(args: Record<string, unknown>): ToolResult {
 
 // ── Tool definitions (schema + description the LLM actually reads) ───
 
-export const SEARCH_SCHEMA = {
+const SEARCH_SCHEMA = {
   query: z.string().optional()
     .describe("Free-text keywords matched against title, zone and broker id. All words must match."),
   category: z.enum(["beach", "lake"]).optional()
@@ -242,18 +236,31 @@ export const SEARCH_SCHEMA = {
     .describe("Required utilities/access. ALL listed must apply."),
   tags: z.array(z.enum(["top_rated", "under_250k", "gated", "waterfront"])).optional()
     .describe("Curated discovery tags. ALL listed must apply."),
-  sort: z.enum(SORTS as unknown as [string, ...string[]]).optional()
+  sort: z.enum(SORTS).optional()
     .describe("Result order. Defaults to 'rank' (Pulpo's own quality+value ranking)."),
   limit: z.number().min(1).max(MAX_RESULTS).optional().describe(`Results per page, max ${MAX_RESULTS}. Default 10.`),
   offset: z.number().min(0).optional().describe("Skip this many results, for paging."),
   country: z.string().optional().describe("ISO country code. Only 'SV' (El Salvador) today."),
 };
 
-export const GET_LISTING_SCHEMA = {
+const GET_LISTING_SCHEMA = {
   id: z.string().describe("Canonical listing id, e.g. 'remax__001461165132', as returned by search_listings."),
   country: z.string().optional(),
 };
 
-export const META_SCHEMA = {
+const META_SCHEMA = {
   country: z.string().optional(),
+};
+
+module.exports = {
+  MAX_RESULTS,
+  summarize,
+  detail,
+  argsToQuery,
+  searchListings,
+  getListing,
+  getMarketMeta,
+  SEARCH_SCHEMA,
+  GET_LISTING_SCHEMA,
+  META_SCHEMA,
 };

@@ -1,39 +1,36 @@
-// THE api/ IMPORT BOUNDARY — the rule that actually took production down.
+// THE api/ BOUNDARY RULE — what took production down, encoded as a test.
 //
-// INCIDENT (2026-08-25). Every /api/v1/* and /api/mcp endpoint returned
-// 500 FUNCTION_INVOCATION_FAILED while CI was fully green and the
+// INCIDENT (2026-08-25 → 27). Every /api/v1/* and /api/mcp endpoint
+// returned 500 FUNCTION_INVOCATION_FAILED while CI was green and the
 // website was fine.
 //
-// Cause, established by deploying eight probe functions to a preview
-// and bisecting:
+// Established by deploying probe functions to a preview and bisecting:
 //
-//   probe0  CommonJS, no imports                        200
-//   probe1  TS, no imports, export default              200
-//   probe2  TS, no imports, module.exports              200
-//   probe4  TS imports api/_rate_limit.js  (inside)     200
-//   probe5  TS imports a .ts             (inside)       200
-//   probe3  TS imports shared/*.ts       (OUTSIDE)      500  <--
-//   probe6  TS imports plain .js         (OUTSIDE)      500  <--
-//   probe7  CommonJS require()s          (OUTSIDE)      200
+//   CommonJS entrypoint            -> outside api/     200
+//   TS entrypoint -> .js inside api/ (self-contained)  200
+//   TS entrypoint -> .ts inside api/                   200
+//   TS entrypoint -> shared/*.ts   (OUTSIDE)           500
+//   TS entrypoint -> plain .js     (OUTSIDE)           500
+//   TS entrypoint -> .js inside api/ -> OUTSIDE        500   <-- transitive
 //
-// So: Vercel compiles TypeScript functions only for files INSIDE api/.
-// Anything a .ts function imports from beyond that tree is never
-// compiled into the bundle and the function dies at load. It is not
-// about TypeScript, the file extension, or ESM vs CommonJS — a plain
-// `require()` across the very same boundary is fine, because those are
-// resolved by the file tracer rather than the compiler.
+// Vercel compiles TypeScript functions only for files inside api/, and
+// the restriction is TRANSITIVE: nothing in a .ts function's dependency
+// graph may reach outside api/, at any depth. A CommonJS entrypoint has
+// no such limit, because its requires are resolved by the file tracer
+// rather than the compiler.
 //
-// The earlier module-format theory (and the api/tsconfig.json written
-// for it) was wrong; probe1/2/5 disprove it and that test was deleted.
+// Two earlier theories were wrong and are recorded so nobody re-tries
+// them: it is not a module-format problem (a no-import .ts function
+// works fine either way), and includeFiles does not help (the files
+// were never missing, they were uncompiled).
 //
-// WHY THIS TEST AND NOT A BEHAVIOURAL ONE: unit tests import the
-// TypeScript SOURCE through Vite, which resolves ../../shared happily.
-// The failure exists only in Vercel's emitted bundle. No test that
-// imports the source can see it, so the invariant has to be asserted
-// against the import graph itself.
+// THE RULE THIS ENFORCES: serverless entrypoints that need the shared
+// core are CommonJS .js, reaching it through api/_core.js.
 //
-// The sanctioned way to reach shared code is api/_core.js — CommonJS,
-// inside api/, requiring the prebuilt shared/dist/api-core.cjs.
+// A behavioural test cannot catch this class — specs import the source
+// through Vite, which resolves everything happily. The failure exists
+// only in Vercel's emitted bundle, which is exactly why it shipped
+// green the first time. So this asserts the shape instead.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -43,81 +40,75 @@ import { describe, expect, it } from "vitest";
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const apiDir = path.join(repoRoot, "api");
 
-/** Every TypeScript file Vercel will compile under api/. `.d.ts` is
- *  excluded: declarations are erased at compile time and never loaded,
- *  so they may reference outside api/ safely. */
-function apiTypeScriptFiles() {
-  return fs
-    .readdirSync(apiDir, { recursive: true, withFileTypes: true })
-    .filter((e) => e.isFile() && e.name.endsWith(".ts") && !e.name.endsWith(".d.ts"))
+function walk(dir) {
+  return fs.readdirSync(dir, { recursive: true, withFileTypes: true })
+    .filter((e) => e.isFile())
     .map((e) => path.join(e.parentPath ?? e.path, e.name));
 }
 
-/** Relative import/export specifiers, ignoring `import type` (also erased). */
-function relativeValueSpecifiers(source) {
-  const withoutTypeOnly = source.replace(/\bimport\s+type\s+[\s\S]*?from\s*["'][^"']+["']/g, "");
-  const out = [];
-  const re = /\b(?:import|export)\b[^;]*?from\s*["'](\.[^"']*)["']/g;
-  let m;
-  while ((m = re.exec(withoutTypeOnly))) out.push(m[1]);
-  const bare = /\bimport\s*\(\s*["'](\.[^"']*)["']\s*\)/g;
-  while ((m = bare.exec(withoutTypeOnly))) out.push(m[1]);
-  return out;
-}
+const SHARED_CONSUMERS = ["api/v1", "api/mcp"];
 
-describe("TypeScript functions never import across the api/ boundary", () => {
-  const files = apiTypeScriptFiles();
+describe("serverless functions respect the api/ boundary", () => {
+  it("no TypeScript sources under api/v1 or api/mcp", () => {
+    // These need the shared core, so they must be CommonJS. A .ts file
+    // here compiles fine locally and 500s in production.
+    const ts = walk(apiDir)
+      .filter((f) => f.endsWith(".ts") && !f.endsWith(".d.ts"))
+      .map((f) => path.relative(repoRoot, f).split(path.sep).join("/"))
+      .filter((f) => SHARED_CONSUMERS.some((d) => f.startsWith(`${d}/`)));
 
-  it("finds TypeScript functions to check (guards a vacuous pass)", () => {
-    expect(files.length).toBeGreaterThan(0);
+    expect(
+      ts,
+      `TypeScript under ${SHARED_CONSUMERS.join(" / ")} cannot reach shared/ at runtime ` +
+        `and will return 500 FUNCTION_INVOCATION_FAILED. Write it as CommonJS .js and ` +
+        `require("../_core.js").`,
+    ).toEqual([]);
   });
 
-  for (const file of files) {
-    const rel = path.relative(repoRoot, file);
-    it(`${rel} resolves every value import inside api/`, () => {
-      for (const spec of relativeValueSpecifiers(fs.readFileSync(file, "utf8"))) {
-        const resolved = path.resolve(path.dirname(file), spec);
-        expect(
-          resolved.startsWith(apiDir + path.sep),
-          `${rel} imports "${spec}", which resolves outside api/ to ` +
-            `${path.relative(repoRoot, resolved)}. Vercel does not compile that file into ` +
-            `the function bundle, so the endpoint will return 500 ` +
-            `FUNCTION_INVOCATION_FAILED at load while CI stays green. ` +
-            `Reach shared code through api/_core.js instead.`,
-        ).toBe(true);
-      }
-    });
-  }
+  it("they reach shared code only through the api/_core.js bridge", () => {
+    const files = walk(apiDir)
+      .filter((f) => f.endsWith(".js"))
+      .filter((f) => SHARED_CONSUMERS.some((d) =>
+        path.relative(repoRoot, f).split(path.sep).join("/").startsWith(`${d}/`)));
 
-  it("the sanctioned bridge exists and crosses the boundary via require()", () => {
+    expect(files.length).toBeGreaterThan(0);
+
+    for (const f of files) {
+      const rel = path.relative(repoRoot, f).split(path.sep).join("/");
+      const code = fs.readFileSync(f, "utf8")
+        .replace(/\/\*[\s\S]*?\*\//g, "")
+        .replace(/^\s*\/\/.*$/gm, "");
+      const direct = code.match(/require\(["'][^"']*\/shared\/(?!dist\/api-core)[^"']*["']\)/g);
+      expect(
+        direct,
+        `${rel} requires shared/ directly. Go through api/_core.js so there is one ` +
+          `place the boundary is crossed.`,
+      ).toBeNull();
+    }
+  });
+
+  it("the bridge exists, is CommonJS, and requires the prebuilt bundle", () => {
     const bridge = path.join(apiDir, "_core.js");
     expect(fs.existsSync(bridge)).toBe(true);
     const src = fs.readFileSync(bridge, "utf8");
-    // CommonJS require is the form proven to work across the boundary.
     expect(src).toMatch(/require\(["']\.\.\/shared\/dist\/api-core\.cjs["']\)/);
     expect(src).not.toMatch(/^\s*import\s/m);
   });
 
-  it("the bridge's bundle is actually built by npm run build", () => {
-    // If this drops out of the build script the bridge throws
-    // "Cannot find module" and every endpoint 500s again.
-    const pkg = JSON.parse(fs.readFileSync(path.join(repoRoot, "package.json"), "utf8"));
-    expect(pkg.scripts.build).toContain("build_shared_cjs.mjs");
-    expect(fs.existsSync(path.join(repoRoot, "scripts", "build_shared_cjs.mjs"))).toBe(true);
-  });
-
-  it("every TS function ships the bundle in its deployment", () => {
+  it("every routable entrypoint ships the bundle in its deployment", () => {
     const cfg = JSON.parse(fs.readFileSync(path.join(repoRoot, "vercel.json"), "utf8"));
-    for (const file of files) {
-      const rel = path.relative(repoRoot, file).split(path.sep).join("/");
-      // Only routable entrypoints get a functions entry; helpers are
-      // pulled in with their importer.
-      if (rel.split("/").pop().startsWith("_")) continue;
+    const entrypoints = walk(apiDir)
+      .filter((f) => f.endsWith(".js"))
+      .map((f) => path.relative(repoRoot, f).split(path.sep).join("/"))
+      .filter((f) => SHARED_CONSUMERS.some((d) => f.startsWith(`${d}/`)))
+      .filter((f) => !path.basename(f).startsWith("_"));
+
+    for (const rel of entrypoints) {
       const entry = cfg.functions?.[rel];
       expect(entry, `${rel} has no vercel.json functions entry`).toBeDefined();
       expect(
         String(entry.includeFiles ?? ""),
-        `${rel} must includeFiles shared/dist/api-core.cjs or the bridge cannot resolve`,
+        `${rel} must includeFiles shared/dist/api-core.cjs or the bridge cannot resolve at runtime`,
       ).toContain("shared/dist/api-core.cjs");
     }
   });

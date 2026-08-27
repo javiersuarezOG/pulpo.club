@@ -20,19 +20,23 @@
 // Response: { ok, version, runtime, now }
 // Cache: none — a cached liveness probe tells you nothing.
 
-import { API_VERSION } from "../_core.js";
-import { makeRateLimiter, ipFromRequest, send429 } from "../_rate_limit.js";
-import { methodNotAllowed, logApi, type ApiRequest, type ApiResponse } from "./_http";
 
 // Generous: this is a probe, not a capability. The limiter exists so a
 // scanner cannot spin up unbounded function invocations.
+
+// CommonJS, not TypeScript: a .ts function cannot reach outside api/ at
+// any depth, and this needs the shared core (docs/api-v1.md).
+const { API_VERSION } = require("../_core.js");
+const { makeRateLimiter, ipFromRequest, send429 } = require("../_rate_limit.js");
+const { methodNotAllowed, logApi } = require("./_http.js");
+
 const limiter = makeRateLimiter({
   windowMs: 60_000,
   maxAttempts: 120,
   name: "v1_ping",
 });
 
-export default function handler(req: ApiRequest, res: ApiResponse) {
+module.exports = function handler(req, res) {
   const t0 = Date.now();
 
   if (req.method !== "GET") return methodNotAllowed(res, "GET");
@@ -50,4 +54,4 @@ export default function handler(req: ApiRequest, res: ApiResponse) {
     runtime: "node",
     now: new Date().toISOString(),
   });
-}
+};

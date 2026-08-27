@@ -1,4 +1,7 @@
-// api/v1/_serve.ts — the pipeline both listing endpoints share.
+// api/v1/_serve.js — the pipeline both listing endpoints share.
+//
+// CommonJS: a TypeScript function cannot reach outside api/ at any
+// depth, and this needs the shared core (docs/api-v1.md).
 //
 // Every step here is the shared core; this file only wires them
 // together and injects the two things a serverless function knows that
@@ -11,29 +14,36 @@
 // calling the same functions. If the two ever disagree, one of them
 // stopped using shared/ — which is what the parity test checks.
 
-import fs from "fs";
-import path from "path";
+const fs = require("fs");
+const path = require("path");
 
-import { adaptListing, type CountryRef } from "../_core.js";
-import { applyFilters, applyRankCap, makeDefaultFilters } from "../_core.js";
-import { readFilterFromURL } from "../_core.js";
-import { buildListingId } from "../_core.js";
-import type { Listing } from "../_core.js";
-import { loadCatalog, type CountryCode } from "./_catalog";
+// The shared core, via the CommonJS bridge. A CommonJS entrypoint may
+// require across the api/ boundary; a TypeScript one may not, at any
+// depth. That is why these handlers are .js.
+const {
+  adaptListing,
+  applyFilters,
+  applyRankCap,
+  makeDefaultFilters,
+  readFilterFromURL,
+  buildListingId,
+} = require("../_core.js");
+const { loadCatalog } = require("./_catalog.js");
+
+
 
 /** Sorts v1 exposes. Deliberately a subset of the website's nine: the
  *  others depend on user-adjustable V/L/M weights, which are a web
  *  power feature and would make every response uncacheable. Additive
  *  later if a channel actually needs them. */
-export const SORTS = ["rank", "price_asc", "price_desc", "newest"] as const;
-export type Sort = (typeof SORTS)[number];
-export const DEFAULT_SORT: Sort = "rank";
+const SORTS = ["rank", "price_asc", "price_desc", "newest"];
+const DEFAULT_SORT = "rank";
 
-export const DEFAULT_LIMIT = 10;
-export const MAX_LIMIT = 50;
-export const MAX_OFFSET = 2000;
+const DEFAULT_LIMIT = 10;
+const MAX_LIMIT = 50;
+const MAX_OFFSET = 2000;
 
-const comparators: Record<Sort, (a: Listing, b: Listing) => number> = {
+const comparators = {
   // The catalog arrives pre-sorted by the pipeline's rank_score, but
   // sort explicitly rather than relying on that: adaptListing and the
   // filters both preserve order, yet depending on an upstream invariant
@@ -50,7 +60,7 @@ const comparators: Record<Sort, (a: Listing, b: Listing) => number> = {
   },
 };
 
-let manifestCache: Record<string, CountryRef> = {};
+let manifestCache = {};
 
 /**
  * Country manifest for the adapter. Read from pulpo/countries/<cc>.json
@@ -62,7 +72,7 @@ let manifestCache: Record<string, CountryRef> = {};
  * endpoint. Every catalog row carries its own `country` anyway, so this
  * is only the fallback path.
  */
-export function countryRef(code: CountryCode): CountryRef {
+function countryRef(code) {
   if (manifestCache[code]) return manifestCache[code];
   const candidates = [
     path.join(__dirname, "..", "..", "pulpo", "countries", `${code.toLowerCase()}.json`),
@@ -91,7 +101,7 @@ export function countryRef(code: CountryCode): CountryRef {
  * `limit` into `clamp(0)` = 1 and every default request returns a
  * single listing. Caught by the envelope test before it shipped.
  */
-export function clampInt(raw: unknown, fallback: number, min: number, max: number): number {
+function clampInt(raw, fallback, min, max) {
   const first = Array.isArray(raw) ? raw[0] : raw;
   if (first == null || first === "") return fallback;
   const v = Number(first);
@@ -99,22 +109,15 @@ export function clampInt(raw: unknown, fallback: number, min: number, max: numbe
   return Math.min(max, Math.max(min, Math.trunc(v)));
 }
 
-export function resolveSort(raw: unknown): Sort {
+function resolveSort(raw) {
   const v = String(Array.isArray(raw) ? raw[0] : raw ?? "").trim();
-  return (SORTS as readonly string[]).includes(v) ? (v as Sort) : DEFAULT_SORT;
+  return SORTS.includes(v) ? v : DEFAULT_SORT;
 }
 
 /** Adapt every catalog row for a country. */
-export function adaptAll(rows: Record<string, unknown>[], code: CountryCode): Listing[] {
+function adaptAll(rows, code) {
   const ref = countryRef(code);
   return rows.map((r) => adaptListing(r, ref));
-}
-
-export interface SelectResult {
-  listings: Listing[];
-  total: number;
-  limit: number;
-  offset: number;
 }
 
 /**
@@ -126,9 +129,9 @@ export interface SelectResult {
  *   /api/v1/listings?sub=land&pmax=250000
  * mean the same thing by construction.
  */
-export function selectListings(listings: Listing[], query: string): SelectResult {
+function selectListings(listings, query) {
   const params = new URLSearchParams(query);
-  const filters = readFilterFromURL(query, makeDefaultFilters() as any);
+  const filters = readFilterFromURL(query, makeDefaultFilters());
 
   const filtered = applyRankCap(applyFilters(listings, filters), filters.rank_max);
   const sorted = [...filtered].sort(comparators[resolveSort(params.get("sort"))]);
@@ -147,9 +150,7 @@ export function selectListings(listings: Listing[], query: string): SelectResult
 }
 
 /** Load + adapt a country's catalog, or null when the data is missing. */
-export function loadAdapted(
-  code: CountryCode,
-): { listings: Listing[]; generatedAt: string | null } | null {
+function loadAdapted(code) {
   const catalog = loadCatalog(code);
   if (!catalog) return null;
   return { listings: adaptAll(catalog.rows, code), generatedAt: catalog.generatedAt };
@@ -157,25 +158,25 @@ export function loadAdapted(
 
 /** Absolute URL for a bundle-relative photo path, so a Telegram or MCP
  *  client can fetch the image without knowing our origin. */
-export function absolutePhoto(url: string | null | undefined, base: string): string | null {
+function absolutePhoto(url, base) {
   if (!url) return null;
   if (/^https?:\/\//i.test(url)) return url;
   return `${base.replace(/\/$/, "")}${url.startsWith("/") ? "" : "/"}${url}`;
 }
 
-export function publicBaseUrl(): string {
+function publicBaseUrl() {
   return (process.env.PULPO_PUBLIC_BASE_URL || "https://pulpo.club").replace(/\/$/, "");
 }
 
 /** Project a Listing for the wire: absolute photo URLs + a deep link
  *  back to the website. Bilingual fields pass through untouched — one
  *  cacheable representation, and the channel picks the locale. */
-export function toWire(l: Listing) {
+function toWire(l) {
   const base = publicBaseUrl();
   return {
     ...l,
     photos: Array.isArray(l.photos)
-      ? l.photos.map((p: any) =>
+      ? l.photos.map((p) =>
           typeof p === "string"
             ? absolutePhoto(p, base)
             : { ...p, url: absolutePhoto(p?.url, base) },
@@ -186,4 +187,20 @@ export function toWire(l: Listing) {
   };
 }
 
-export { buildListingId };
+module.exports = {
+  SORTS,
+  DEFAULT_SORT,
+  DEFAULT_LIMIT,
+  MAX_LIMIT,
+  MAX_OFFSET,
+  countryRef,
+  clampInt,
+  resolveSort,
+  adaptAll,
+  selectListings,
+  loadAdapted,
+  absolutePhoto,
+  publicBaseUrl,
+  toWire,
+  buildListingId,
+};

@@ -87,6 +87,20 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: python3 scripts/check_telegram_webhook.py
 
+      # LIVE probe of the public API. The build-time guardrails cannot
+      # see this failure class: on 2026-08-25 every /api/v1 and /api/mcp
+      # endpoint returned 500 while CI was fully green, because the
+      # fault existed only in Vercel's emitted bundle. It was found by a
+      # human days later. This is the alarm that would have caught it,
+      # and it checks response SHAPE too — an endpoint serving an empty
+      # catalog is as broken as one that 500s. Never blocks: Slacks and
+      # exits 0.
+      - name: Probe the public API (v1 + MCP)
+        env:
+          PULPO_API_BASE: ${{ vars.PULPO_API_BASE || 'https://pulpo.club' }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python3 scripts/check_api_health.py
+
       - name: Slack on webhook-health job failure
         if: failure() || cancelled()
         env:

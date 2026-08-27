@@ -31,10 +31,14 @@
 //     price_usd: { min, max } | null,
 //     size_m2:   { min, max } | null }
 
-import { zoneName } from "../_core.js";
-import { loadCatalog, resolveCountry, SUPPORTED_COUNTRIES } from "./_catalog";
-import { makeRateLimiter, ipFromRequest, send429 } from "../_rate_limit.js";
-import { methodNotAllowed, logApi, type ApiRequest, type ApiResponse } from "./_http";
+
+
+// CommonJS, not TypeScript: a .ts function cannot reach outside api/ at
+// any depth, and these need the shared core (docs/api-v1.md).
+const { zoneName } = require("../_core.js");
+const { loadCatalog, resolveCountry, SUPPORTED_COUNTRIES } = require("./_catalog.js");
+const { makeRateLimiter, ipFromRequest, send429 } = require("../_rate_limit.js");
+const { methodNotAllowed, logApi } = require("./_http.js");
 
 const limiter = makeRateLimiter({
   windowMs: 60_000,
@@ -45,15 +49,12 @@ const limiter = makeRateLimiter({
 /** Rows a caller could actually retrieve. Mirrors the website's default
  *  visibility rules (web/app/pages.jsx:applyFilters) so counts here and
  *  results there agree. */
-function isVisible(row: Record<string, unknown>): boolean {
+function isVisible(row) {
   return row.is_sold !== true && row.is_incomplete !== true;
 }
 
-function countBy(
-  rows: Record<string, unknown>[],
-  key: string,
-): { value: string; count: number }[] {
-  const tally = new Map<string, number>();
+function countBy(rows, key) {
+  const tally = new Map();
   for (const row of rows) {
     const value = row[key];
     if (typeof value !== "string" || !value) continue;
@@ -64,8 +65,8 @@ function countBy(
     .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
 }
 
-function countTags(rows: Record<string, unknown>[]): { value: string; count: number }[] {
-  const tally = new Map<string, number>();
+function countTags(rows) {
+  const tally = new Map();
   for (const row of rows) {
     const tags = row.discovery_tags;
     if (!Array.isArray(tags)) continue;
@@ -82,10 +83,7 @@ function countTags(rows: Record<string, unknown>[]): { value: string; count: num
 /** Min/max over a numeric field, or null when nothing usable is present.
  *  Null rather than [0, 0]: a channel rendering a price slider must be
  *  able to tell "no data" from "everything is free". */
-function bounds(
-  rows: Record<string, unknown>[],
-  key: string,
-): { min: number; max: number } | null {
+function bounds(rows, key) {
   let min = Infinity;
   let max = -Infinity;
   for (const row of rows) {
@@ -98,11 +96,7 @@ function bounds(
   return { min, max };
 }
 
-export function buildMeta(catalog: {
-  rows: Record<string, unknown>[];
-  generatedAt: string | null;
-  country: string;
-}) {
+function buildMeta(catalog) {
   const rows = catalog.rows.filter(isVisible);
 
   const zoneTally = countBy(rows, "zone");
@@ -124,7 +118,7 @@ export function buildMeta(catalog: {
   };
 }
 
-export default function handler(req: ApiRequest, res: ApiResponse) {
+function handler(req, res) {
   const t0 = Date.now();
 
   if (req.method !== "GET") return methodNotAllowed(res, "GET");
@@ -132,7 +126,7 @@ export default function handler(req: ApiRequest, res: ApiResponse) {
   const rl = limiter.hit(ipFromRequest(req));
   if (!rl.allowed) return send429(res, rl, "v1_meta");
 
-  const country = resolveCountry(req.query?.country);
+  const country = resolveCountry(req.query && req.query.country);
   if (!country) {
     logApi("v1_meta", { status: 400, reason: "unknown_country", ms: Date.now() - t0 });
     return res.status(400).json({
@@ -156,3 +150,12 @@ export default function handler(req: ApiRequest, res: ApiResponse) {
   logApi("v1_meta", { status: 200, country, zones: meta.zones.length, total: meta.total, ms: Date.now() - t0 });
   return res.status(200).json(meta);
 }
+
+module.exports = handler;
+module.exports.buildMeta = buildMeta;
+
+// Test seam. Re-exported from the handler so specs mutate the SAME
+// module instance the handler reads — importing _catalog.js separately
+// from an ESM test can otherwise produce a second instance whose
+// override the handler never sees.
+module.exports.__catalogTesting__ = require("./_catalog.js").__testing__;

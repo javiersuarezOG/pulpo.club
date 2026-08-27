@@ -22,16 +22,20 @@
 // nightly, so the CDN serves nearly every request and origin cost stays
 // near zero however much channel traffic arrives.
 
-import { API_VERSION } from "../_core.js";
-import { loadAdapted, selectListings, toWire, DEFAULT_LIMIT, MAX_LIMIT } from "./_serve";
-import { resolveCountry, SUPPORTED_COUNTRIES } from "./_catalog";
-import { makeRateLimiter, ipFromRequest, send429 } from "../_rate_limit.js";
-import { methodNotAllowed, logApi, type ApiRequest, type ApiResponse } from "./_http";
+
+
+// CommonJS, not TypeScript: a .ts function cannot reach outside api/ at
+// any depth, and these need the shared core (docs/api-v1.md).
+const { API_VERSION } = require("../_core.js");
+const { loadAdapted, selectListings, toWire, DEFAULT_LIMIT, MAX_LIMIT } = require("./_serve.js");
+const { resolveCountry, SUPPORTED_COUNTRIES } = require("./_catalog.js");
+const { makeRateLimiter, ipFromRequest, send429 } = require("../_rate_limit.js");
+const { methodNotAllowed, logApi } = require("./_http.js");
 
 const limiter = makeRateLimiter({ windowMs: 60_000, maxAttempts: 60, name: "v1_listings" });
 
 /** The raw query string, however the runtime chose to expose it. */
-export function queryString(req: ApiRequest): string {
+function queryString(req) {
   const fromUrl = typeof req.url === "string" ? req.url.split("?")[1] : "";
   if (fromUrl) return fromUrl;
   const q = req.query;
@@ -44,7 +48,7 @@ export function queryString(req: ApiRequest): string {
   return params.toString();
 }
 
-export default function handler(req: ApiRequest, res: ApiResponse) {
+function handler(req, res) {
   const t0 = Date.now();
 
   if (req.method !== "GET") return methodNotAllowed(res, "GET");
@@ -52,7 +56,7 @@ export default function handler(req: ApiRequest, res: ApiResponse) {
   const rl = limiter.hit(ipFromRequest(req));
   if (!rl.allowed) return send429(res, rl, "v1_listings");
 
-  const country = resolveCountry(req.query?.country);
+  const country = resolveCountry(req.query && req.query.country);
   if (!country) {
     logApi("v1_listings", { status: 400, reason: "unknown_country", ms: Date.now() - t0 });
     return res.status(400).json({ error: "unknown_country", supported: SUPPORTED_COUNTRIES });
@@ -85,4 +89,12 @@ export default function handler(req: ApiRequest, res: ApiResponse) {
   });
 }
 
-export const __testing__ = { DEFAULT_LIMIT, MAX_LIMIT };
+module.exports = handler;
+module.exports.queryString = queryString;
+module.exports.__testing__ = { DEFAULT_LIMIT, MAX_LIMIT };
+
+// Test seam. Re-exported from the handler so specs mutate the SAME
+// module instance the handler reads — importing _catalog.js separately
+// from an ESM test can otherwise produce a second instance whose
+// override the handler never sees.
+module.exports.__catalogTesting__ = require("./_catalog.js").__testing__;

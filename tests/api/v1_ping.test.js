@@ -16,7 +16,7 @@
 // curl in the PR body is what actually settles the deploy question.
 
 import { describe, expect, it } from "vitest";
-import handler from "../../api/v1/ping.ts";
+import handler from "../../api/v1/ping.js";
 import { API_VERSION } from "../../shared/version.ts";
 
 function mockRes() {

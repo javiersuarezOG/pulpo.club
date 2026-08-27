@@ -14,11 +14,11 @@ import { afterEach, describe, expect, it } from "vitest";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 
-import { buildServer } from "../../api/mcp/index.ts";
-import { argsToQuery, getListing, getMarketMeta, searchListings, summarize } from "../../api/mcp/_tools.ts";
-import { __testing__ } from "../../api/v1/_catalog.ts";
-import { selectListings } from "../../api/v1/_serve.ts";
-import { adaptAll } from "../../api/v1/_serve.ts";
+import { buildServer } from "../../api/mcp/index.js";
+import { argsToQuery, getListing, getMarketMeta, searchListings, summarize } from "../../api/mcp/_tools.js";
+import { __testing__ } from "../../api/v1/_catalog.js";
+import { selectListings } from "../../api/v1/_serve.js";
+import { adaptAll } from "../../api/v1/_serve.js";
 
 const row = (over = {}) => ({
   source: "remax",
@@ -45,10 +45,11 @@ const row = (over = {}) => ({
   ...over,
 });
 
+const seam = handler.__catalogTesting__ ?? __testing__;
 const setCatalog = (rows, generatedAt = "2026-08-21T04:04:32Z") =>
-  __testing__.setCatalog("SV", { rows, generatedAt, country: "SV" });
+  seam.setCatalog("SV", { rows, generatedAt, country: "SV" });
 
-afterEach(() => __testing__.reset());
+afterEach(() => seam.reset());
 
 describe("argsToQuery", () => {
   it("translates structured args into the website's query dialect", () => {
@@ -150,7 +151,7 @@ describe("search_listings", () => {
     setCatalog([row()]);
     expect(searchListings({ country: "PA" })).toMatchObject({ ok: false });
 
-    __testing__.setCatalog("SV", null);
+    seam.setCatalog("SV", null);
     const gone = searchListings({});
     expect(gone.ok).toBe(false);
     expect(gone.payload.error).toBe("data_unavailable");
@@ -272,7 +273,7 @@ describe("JSON-RPC protocol surface", () => {
   });
 
   it("surfaces a tool-level failure as isError, not a transport crash", async () => {
-    __testing__.setCatalog("SV", null);
+    seam.setCatalog("SV", null);
     const { client, server } = await connect();
 
     const res = await client.callTool({ name: "search_listings", arguments: {} });

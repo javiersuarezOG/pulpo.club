@@ -9,10 +9,10 @@
 // All fixtures synthetic; these specs never read web/data.
 
 import { afterEach, describe, expect, it } from "vitest";
-import handler from "../../api/v1/listings.ts";
-import detailHandler from "../../api/v1/listings/[id].ts";
-import { __testing__ } from "../../api/v1/_catalog.ts";
-import { selectListings, adaptAll } from "../../api/v1/_serve.ts";
+import handler from "../../api/v1/listings.js";
+import detailHandler from "../../api/v1/listings/[id].js";
+import { __testing__ } from "../../api/v1/_catalog.js";
+import { selectListings, adaptAll } from "../../api/v1/_serve.js";
 import {
   applyFilters,
   applyRankCap,
@@ -68,10 +68,11 @@ const row = (over = {}) => ({
   ...over,
 });
 
+const seam = handler.__catalogTesting__ ?? __testing__;
 const setCatalog = (rows, generatedAt = "2026-08-21T04:04:32Z") =>
-  __testing__.setCatalog("SV", { rows, generatedAt, country: "SV" });
+  seam.setCatalog("SV", { rows, generatedAt, country: "SV" });
 
-afterEach(() => __testing__.reset());
+afterEach(() => seam.reset());
 
 describe("GET /api/v1/listings", () => {
   it("returns an envelope with the catalog timestamp, not request time", () => {
@@ -195,7 +196,7 @@ describe("GET /api/v1/listings", () => {
     expect(bad.statusCode).toBe(400);
     expect(bad.body.error).toBe("unknown_country");
 
-    __testing__.setCatalog("SV", null);
+    seam.setCatalog("SV", null);
     const gone = mockRes();
     handler(mockReq(), gone);
     expect(gone.statusCode).toBe(503);

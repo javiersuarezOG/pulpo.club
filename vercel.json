@@ -6,26 +6,23 @@
   "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_AUTHOR_LOGIN\" = \"pulpo-bot\" ] && exit 0 || exit 1",
   "outputDirectory": ".",
   "functions": {
-    "api/v1/probeA.ts": {
-      "includeFiles": "shared/dist/api-core.cjs"
-    },
-    "api/v1/ping.ts": {
+    "api/v1/ping.js": {
       "includeFiles": "shared/dist/api-core.cjs",
       "excludeFiles": "{web/photos*/**,web/data/ig_assets/**,web/data/*.jsonl,web/data/ranked.json,web/data/llm_enrichment*.json,web/dist/**,vendor/**}"
     },
-    "api/mcp/index.ts": {
+    "api/mcp/index.js": {
       "includeFiles": "web/data/ranked.list.json,web/data/last_updated.json,pulpo/countries/*.json,shared/dist/api-core.cjs",
       "excludeFiles": "{web/photos*/**,web/data/ig_assets/**,web/data/*.jsonl,web/data/ranked.json,web/data/llm_enrichment*.json,web/dist/**,vendor/**}"
     },
-    "api/v1/listings.ts": {
+    "api/v1/listings.js": {
       "includeFiles": "web/data/ranked.list.json,web/data/last_updated.json,pulpo/countries/*.json,shared/dist/api-core.cjs",
       "excludeFiles": "{web/photos*/**,web/data/ig_assets/**,web/data/*.jsonl,web/data/ranked.json,web/data/llm_enrichment*.json,web/dist/**,vendor/**}"
     },
-    "api/v1/listings/[id].ts": {
+    "api/v1/listings/[id].js": {
       "includeFiles": "web/data/ranked.list.json,web/data/last_updated.json,pulpo/countries/*.json,shared/dist/api-core.cjs",
       "excludeFiles": "{web/photos*/**,web/data/ig_assets/**,web/data/*.jsonl,web/data/ranked.json,web/data/llm_enrichment*.json,web/dist/**,vendor/**}"
     },
-    "api/v1/meta.ts": {
+    "api/v1/meta.js": {
       "includeFiles": "web/data/ranked.list.json,web/data/last_updated.json,pulpo/countries/*.json,shared/dist/api-core.cjs",
       "excludeFiles": "{web/photos*/**,web/data/ig_assets/**,web/data/*.jsonl,web/data/ranked.json,web/data/llm_enrichment*.json,web/dist/**,vendor/**}"
     },
