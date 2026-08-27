@@ -384,3 +384,36 @@ def test_history_row_records_coverage(tmp_path):
     row = json.loads(rows[-1])
     assert row["assembled"] == 1
     assert row["coverage"]["open_meteo_elevation"] == 1.0
+
+
+def test_second_country_run_accumulates_into_the_same_sidecar(tmp_path):
+    """The nightly runs run.py twice (SV, then PA with PULPO_ACTIVE_COUNTRY=PA).
+
+    Both invocations share geo_cells.json and geo_enrichment.json, which is
+    why neither file appears in the workflow's PA snapshot/restore list —
+    they are load-modify-save accumulators like llm_enrichment.json, not
+    wholesale-overwrite outputs like ranked.json. If the second run ever
+    started clobbering the first run's entries, this test fails and the
+    workflow would need a snapshot entry.
+    """
+    get = _Elevation()
+    _run([_listing("sv1", 13.6989, -89.1914)], tmp_path, get)   # SV pass
+    _run([_listing("pa1", 8.9824, -79.5199)], tmp_path, get)    # PA pass
+
+    side = load_cache(tmp_path / "geo_enrichment.json")
+    assert set(side) == {"t|sv1", "t|pa1"}
+    assert side["t|sv1"]["elevation"]["elevation_m"] is not None
+
+    cells = load_cache(tmp_path / "geo_cells.json")
+    assert cell_key("open_meteo_elevation", "13.70,-89.19", 1) in cells
+    assert cell_key("open_meteo_elevation", "8.98,-79.52", 1) in cells
+
+
+def test_country_is_stamped_from_the_active_manifest(tmp_path, monkeypatch):
+    """Follows the manifest, not a hardcoded literal, and not the listing's
+    own field — check_country_hardcodes.py enforces the first part; this
+    proves the value actually tracks the active country."""
+    monkeypatch.setenv("PULPO_ACTIVE_COUNTRY", "PA")
+    # The listing still claims SV; the stamp must follow the run, not the row.
+    _run([_listing("a", 8.9824, -79.5199, country="SV")], tmp_path, _Elevation())
+    assert load_cache(tmp_path / "geo_enrichment.json")["t|a"]["country"] == "PA"
