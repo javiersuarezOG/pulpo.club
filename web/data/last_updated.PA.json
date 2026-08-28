@@ -1,11 +1,11 @@
 {
-  "last_updated": "2026-08-27T14:22:53.614891+00:00",
-  "started_at": "2026-08-27T13:39:11.438291+00:00",
-  "duration_seconds": 2622.18,
-  "total_listings": 41,
-  "dropped": 0,
+  "last_updated": "2026-08-28T15:55:21.600419+00:00",
+  "started_at": "2026-08-28T15:06:07.207605+00:00",
+  "duration_seconds": 2954.39,
+  "total_listings": 37,
+  "dropped": 1,
   "per_source_raw": {
-    "encuentra24": 41
+    "encuentra24": 38
   },
   "source_status": {
     "encuentra24": "green"
@@ -13,39 +13,39 @@
   "coverage": {
     "encuentra24": {
       "supplier": null,
-      "pulled": 41,
+      "pulled": 38,
       "max_pages_hit": false
     }
   },
   "derived_field_population": {
     "source_type_off_market": 0.0,
     "source_type_on_market": 1.0,
-    "previous_price": 0.0488,
-    "beachfront_tier_on_beach": 0.2683,
-    "beachfront_tier_walk_to_beach": 0.0732,
+    "previous_price": 0.0811,
+    "beachfront_tier_on_beach": 0.2703,
+    "beachfront_tier_walk_to_beach": 0.0541,
     "beachfront_tier_near_beach": 0.0,
-    "land_type_commercial": 0.0732,
-    "land_type_tourist": 0.0976,
-    "land_type_residential": 0.8293,
-    "is_motivated": 0.0732
+    "land_type_commercial": 0.0541,
+    "land_type_tourist": 0.1081,
+    "land_type_residential": 0.8378,
+    "is_motivated": 0.0541
   },
   "field_completeness": {
     "encuentra24": {
-      "n_listings": 41,
+      "n_listings": 37,
       "fields": {
         "price_usd": 1.0,
         "area_m2": 0.0,
-        "zone": 0.2,
-        "municipality": 0.2,
-        "department": 0.2,
+        "zone": 0.22,
+        "municipality": 0.22,
+        "department": 0.22,
         "location_text": 1.0,
         "lat": 0.78,
         "lng": 0.78,
         "is_beachfront": 0.27,
-        "has_paved_access": 0.07,
-        "has_water": 0.24,
-        "has_power": 0.07,
-        "is_repriced": 0.05,
+        "has_paved_access": 0.05,
+        "has_water": 0.3,
+        "has_power": 0.05,
+        "is_repriced": 0.08,
         "days_listed": 1.0,
         "photos_count": 1.0,
         "broker_name": 1.0,
@@ -57,16 +57,16 @@
     }
   },
   "property_type_counts": {
-    "house": 41
+    "house": 37
   },
   "validation_by_type": {
     "house": {
       "pass": 8,
-      "flag": 33,
-      "drop": 0
+      "flag": 29,
+      "drop": 1
     }
   },
-  "v_fallback_no_price": 41,
+  "v_fallback_no_price": 37,
   "v_fallback_no_comps": 0,
   "sources": [
     "encuentra24"

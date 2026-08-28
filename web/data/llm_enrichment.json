@@ -142303,5 +142303,588 @@
     "cost_usd": 0.00131255,
     "finish_reason": "stop",
     "latency_ms": 4519
+  },
+  "citymax_sc|the-break-apartamento-en-venta-en-el-sunzal-la-libertad": {
+    "ts": "2026-08-28T14:56:38.655216+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Condos for Sale in Surf City, El Salvador",
+      "es": "Apartamentos frente al mar en Surf City, El Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront condos for sale in Surf City, La Libertad, El Salvador. Located in Tamanique, these properties offer direct ocean frontage. Price from $538,800.",
+      "es": "Apartamentos frente al mar en venta en Surf City, La Libertad, El Salvador. Ubicados en Tamanique, estas propiedades ofrecen frente al mar directo. Precio desde $538,800."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in Surf City",
+        "es": "Ubicación frente al mar en Surf City"
+      },
+      {
+        "en": "Direct ocean frontage",
+        "es": "Frente al mar directo"
+      },
+      {
+        "en": "In La Libertad, El Salvador",
+        "es": "En La Libertad, El Salvador"
+      }
+    ],
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Zonte beach (Surf City area)",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3073,
+    "tokens_out": 387,
+    "cost_usd": 0.00125541,
+    "finish_reason": "stop",
+    "latency_ms": 3800
+  },
+  "citymax_sc|casa-de-campo-en-venta-san-pedro-nonualco": {
+    "ts": "2026-08-28T14:56:38.700506+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in Zacatecoluca, La Paz",
+      "es": "Casa en Venta en Zacatecoluca, La Paz"
+    },
+    "short_description_canonical": {
+      "en": "House for sale in Zacatecoluca, La Paz, near the airport and Costa del Sol. The property is priced at $65,000. It is located in the municipality of San Luis La Herradura, La Paz.",
+      "es": "Casa en venta en Zacatecoluca, La Paz, cerca del aeropuerto y Costa del Sol. La propiedad está valorada en $65,000. Se ubica en el municipio de San Luis La Herradura, La Paz."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Near international airport",
+        "es": "Cerca del aeropuerto internacional"
+      },
+      {
+        "en": "Close to Costa del Sol",
+        "es": "Cerca de Costa del Sol"
+      },
+      {
+        "en": "Priced at $65,000",
+        "es": "Precio de $65,000"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3086,
+    "tokens_out": 395,
+    "cost_usd": 0.00126772,
+    "finish_reason": "stop",
+    "latency_ms": 3846
+  },
+  "csbr|terreno-en-venta-sobre-carretera-del-litoral-salinas-de-ayacachapa-sonsonate": {
+    "ts": "2026-08-28T14:56:38.755241+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale on Coastal Highway, Sonsonate",
+      "es": "Terreno en venta sobre Carretera del Litoral, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Land for sale along the Carretera del Litoral in Salinas de Ayacachapa, Sonsonate. The property is listed at $195,000. No further details are provided in the listing.",
+      "es": "Terreno en venta sobre la Carretera del Litoral en Salinas de Ayacachapa, Sonsonate. La propiedad está listada en $195,000. No se proporcionan más detalles en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located on Carretera del Litoral",
+        "es": "Ubicado sobre Carretera del Litoral"
+      },
+      {
+        "en": "In Salinas de Ayacachapa, Sonsonate",
+        "es": "En Salinas de Ayacachapa, Sonsonate"
+      },
+      {
+        "en": "Priced at $195,000",
+        "es": "Precio de $195,000"
+      }
+    ],
+    "lat": 13.7167,
+    "lng": -89.7167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Sonsonate municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3074,
+    "tokens_out": 407,
+    "cost_usd": 0.00127768,
+    "finish_reason": "stop",
+    "latency_ms": 3900
+  },
+  "citymax_sc|terreno-en-venta-para-desarrollo-en-la-libertad": {
+    "ts": "2026-08-28T14:56:38.797633+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "57 manzanas land for development in La Libertad",
+      "es": "Terreno de 57 manzanas para desarrollo en La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land for sale for development, 57 manzanas (approx. 40 ha) in La Libertad, El Salvador. Suitable for lotification and real estate development. Price: USD 7,500,000.",
+      "es": "Terreno en venta para desarrollo, 57 manzanas (aprox. 40 ha) en La Libertad, El Salvador. Apto para lotificar y desarrollo inmobiliario. Precio: USD 7,500,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "57 manzanas (approx. 40 ha) development land",
+        "es": "57 manzanas (aprox. 40 ha) para desarrollo"
+      },
+      {
+        "en": "Ideal for lotification projects",
+        "es": "Ideal para proyectos de lotificación"
+      },
+      {
+        "en": "Located in La Libertad department",
+        "es": "Ubicado en el departamento de La Libertad"
+      }
+    ],
+    "lat": 13.4889,
+    "lng": -89.3222,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Libertad municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3079,
+    "tokens_out": 413,
+    "cost_usd": 0.00128563,
+    "finish_reason": "stop",
+    "latency_ms": 3944
+  },
+  "citymax_sc|wave-crest-apartamentos-en-venta-en-el-zonte": {
+    "ts": "2026-08-28T14:56:38.971947+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Condo in Surf City, La Libertad",
+      "es": "Apartamento frente al mar en Surf City, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront condo in Surf City, La Libertad, El Salvador. This apartment offers direct ocean views and is part of a beachfront development. Priced at $259,900. Ideal for coastal living or rental investment.",
+      "es": "Apartamento frente al mar en Surf City, La Libertad, El Salvador. Este apartamento ofrece vistas directas al océano y forma parte de un desarrollo frente al mar. Precio: $259,900. Ideal para vida costera o inversión de alquiler."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in Surf City",
+        "es": "Ubicación frente al mar en Surf City"
+      },
+      {
+        "en": "Direct ocean views",
+        "es": "Vistas directas al océano"
+      },
+      {
+        "en": "Part of beachfront development",
+        "es": "Parte de desarrollo frente al mar"
+      },
+      {
+        "en": "Priced at $259,900",
+        "es": "Precio: $259,900"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3073,
+    "tokens_out": 433,
+    "cost_usd": 0.00130601,
+    "finish_reason": "stop",
+    "latency_ms": 4117
+  },
+  "citymax_sc|exclusivo-apartamento-lock-off-en-venta-en-el-zonte": {
+    "ts": "2026-08-28T14:56:39.414141+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Condo in El Zonte, Surf City",
+      "es": "Apartamento frente al mar en El Zonte, Surf City"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront condo in El Zonte, Surf City, La Libertad. This apartment offers direct oceanfront living in a prime coastal location. The property is part of an exclusive beach development, ideal for those seeking a turnkey coastal residence.",
+      "es": "Apartamento frente al mar en El Zonte, Surf City, La Libertad. Este apartamento ofrece vida directa frente al océano en una ubicación costera privilegiada. La propiedad es parte de un desarrollo exclusivo de playa, ideal para quienes buscan una residencia costera lista para habitar."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in El Zonte",
+        "es": "Ubicación frente al mar en El Zonte"
+      },
+      {
+        "en": "Part of exclusive beach development",
+        "es": "Parte de desarrollo exclusivo de playa"
+      },
+      {
+        "en": "In Surf City, La Libertad",
+        "es": "En Surf City, La Libertad"
+      },
+      {
+        "en": "Price: $543,200",
+        "es": "Precio: $543,200"
+      }
+    ],
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Zonte beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3076,
+    "tokens_out": 449,
+    "cost_usd": 0.00132442,
+    "finish_reason": "stop",
+    "latency_ms": 4560
+  },
+  "remax|003093331057": {
+    "ts": "2026-08-28T14:56:43.080879+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Los Cañales, Juayúa",
+      "es": "Terreno en Venta en Los Cañales, Juayúa"
+    },
+    "short_description_canonical": {
+      "en": "Flat land lots in Los Cañales, 8 minutes from downtown Juayúa, in a cool-climate area with natural surroundings. Sizes range from 652.45 m² to 985.61 m², located 1 km from the main road with easy vehicle access and basic utilities. Near Los Chorros de La Calera and Río Monterrey, ideal for a home or tourism project. Starting price $45,000.",
+      "es": "Terrenos planos en Los Cañales, a 8 minutos del centro de Juayúa, en una zona de clima fresco y entorno natural. Tamaños desde 652.45 m² hasta 985.61 m², ubicados a 1 km de la carretera principal con fácil acceso vehicular y servicios básicos. Cerca de Los Chorros de La Calera y Río Monterrey, ideal para vivienda o proyecto turístico. Precio desde $45,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "8 minutes from downtown Juayúa",
+        "es": "A 8 minutos del centro de Juayúa"
+      },
+      {
+        "en": "Flat topography, easy vehicle access",
+        "es": "Topografía plana, fácil acceso vehicular"
+      },
+      {
+        "en": "1 km from main road",
+        "es": "A 1 km de la carretera principal"
+      },
+      {
+        "en": "Near Los Chorros de La Calera",
+        "es": "Cerca de Los Chorros de La Calera"
+      },
+      {
+        "en": "Starting price $45,000",
+        "es": "Precio desde $45,000"
+      }
+    ],
+    "lat": 13.8433,
+    "lng": -89.8914,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Juayúa, Sonsonate",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3316,
+    "tokens_out": 567,
+    "cost_usd": 0.00151902,
+    "finish_reason": "stop",
+    "latency_ms": 4425
+  },
+  "remax|001461694386": {
+    "ts": "2026-08-28T14:56:43.139260+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "6,154 m² lot with house, tower income",
+      "es": "Lote de 6,154 m² con casa, ingreso por torre"
+    },
+    "short_description_canonical": {
+      "en": "Semi-rural lot of 6,154 m² with a house to remodel, located next to the San José Villanueva cemetery. It has electricity and ANDA water service, and includes a telecommunications tower that pays $412 monthly for 25 years. Entrance is about 100 meters from the main street.",
+      "es": "Lote semi-rural de 6,154 m² con casa para remodelar, ubicado junto al cementerio de San José Villanueva. Cuenta con servicio de electricidad y agua de ANDA, e incluye una torre de telecomunicaciones que paga $412 mensuales por 25 años. La entrada está a unos 100 metros de la calle principal."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Tower income $412/month for 25 years",
+        "es": "Ingreso por torre $412/mes por 25 años"
+      },
+      {
+        "en": "Electricity and ANDA water connected",
+        "es": "Electricidad y agua de ANDA conectadas"
+      },
+      {
+        "en": "Square lot, easily identifiable boundaries",
+        "es": "Lote cuadrado, linderos fácilmente identificables"
+      },
+      {
+        "en": "100 m from main street entrance",
+        "es": "Entrada a 100 m de calle principal"
+      }
+    ],
+    "lat": 13.65,
+    "lng": -89.35,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San José Villanueva, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3175,
+    "tokens_out": 501,
+    "cost_usd": 0.00140835,
+    "finish_reason": "stop",
+    "latency_ms": 4383
+  },
+  "remax|2523785005": {
+    "ts": "2026-08-28T14:56:43.281973+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4.5 Manzanas Flat Land, El Paisnal, San Salvador",
+      "es": "4.5 Manzanas Terreno Plano, El Paisnal, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Flat 4.5-manzana (31,723.84 m²) land lot in El Paisnal, San Salvador, behind La Cabaña Sugar Mill. Suitable for agricultural, commercial, industrial, or residential development. Located 3 minutes from the highway and 5 minutes from Troncal del Norte; basic utilities nearby. Price negotiable.",
+      "es": "Terreno plano de 4.5 manzanas (31,723.84 m²) en El Paisnal, San Salvador, detrás del Ingenio La Cabaña. Apto para desarrollo agrícola, comercial, industrial o residencial. Ubicado a 3 minutos de la carretera y 5 minutos de la Troncal del Norte; servicios básicos cercanos. Precio negociable."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "100% flat land reduces earthmoving costs",
+        "es": "Terreno 100% plano reduce costos de movimiento de tierra"
+      },
+      {
+        "en": "3 min to highway, 5 min to Troncal",
+        "es": "3 min a carretera, 5 min a Troncal"
+      },
+      {
+        "en": "Behind La Cabaña Sugar Mill",
+        "es": "Detrás del Ingenio La Cabaña"
+      },
+      {
+        "en": "Basic utilities available nearby",
+        "es": "Servicios básicos disponibles cerca"
+      },
+      {
+        "en": "Growing area with appreciation potential",
+        "es": "Zona en crecimiento con potencial de plusvalía"
+      }
+    ],
+    "lat": 13.9333,
+    "lng": -89.1333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Paisnal, San Salvador, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3314,
+    "tokens_out": 555,
+    "cost_usd": 0.00150528,
+    "finish_reason": "stop",
+    "latency_ms": 4483
+  },
+  "remax|003093331056": {
+    "ts": "2026-08-28T14:56:43.286155+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Land Lots in Los Cañales, Juayúa",
+      "es": "Lotes Planos en Los Cañales, Juayúa"
+    },
+    "short_description_canonical": {
+      "en": "Flat land lots in Los Cañales, 8 minutes from downtown Juayúa, in an area with cool climate and natural surroundings. Sizes range from 652 m² to 986 m², located 1 km from the main road with easy vehicle access and basic utilities. Near Los Chorros de La Calera and Río Monterrey, and emerging residential developments.",
+      "es": "Lotes de terreno plano en Los Cañales, a 8 minutos del centro de Juayúa, en una zona de clima fresco y entorno natural. Tamaños desde 652 m² hasta 986 m², ubicados a 1 km de la carretera principal con fácil acceso vehicular y servicios básicos. Cerca de Los Chorros de La Calera y Río Monterrey, y de desarrollos residenciales emergentes."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "8 minutes from downtown Juayúa",
+        "es": "A 8 minutos del centro de Juayúa"
+      },
+      {
+        "en": "1 km from main road",
+        "es": "A 1 km de la carretera principal"
+      },
+      {
+        "en": "Flat topography, easy access",
+        "es": "Topografía plana, fácil acceso"
+      },
+      {
+        "en": "Near Los Chorros de La Calera",
+        "es": "Cerca de Los Chorros de La Calera"
+      },
+      {
+        "en": "Basic utilities available",
+        "es": "Servicios básicos disponibles"
+      }
+    ],
+    "lat": 13.8436,
+    "lng": -89.8903,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Juayúa, Sonsonate, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3316,
+    "tokens_out": 534,
+    "cost_usd": 0.00148272,
+    "finish_reason": "stop",
+    "latency_ms": 4585
+  },
+  "encuentra24|30234826": {
+    "ts": "2026-08-28T15:54:11.688133+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Golf Club Coronado House, 452 m², 4 Bedrooms",
+      "es": "Casa en Club de Golf Coronado, 452 m², 4 habitaciones"
+    },
+    "short_description_canonical": {
+      "en": "House of 452 m² built on a 1,227 m² lot in the private, 24/7 secured Golf Club Coronado community. It has 4 bedrooms, 3.5 bathrooms, a den with bar and billiards, open kitchen, home theater, covered terrace, pool with jacuzzi and bohío, and parking for 4 cars. Fully furnished and equipped, including appliances and laundry. Priced at $650,000.",
+      "es": "Casa de 452 m² construidos en un terreno de 1,227 m² en la comunidad privada y segura del Club de Golf de Coronado, con garita 24/7. Tiene 4 habitaciones, 3.5 baños, den con bar y billar, cocina abierta, teatro en casa, terraza techada, piscina con jacuzzi y bohío, y estacionamiento para 4 autos. Totalmente amueblada y equipada, incluyendo electrodomésticos y lavandería. Precio: $650,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Comunidad cerrada con seguridad 24/7"
+      },
+      {
+        "en": "Fully furnished and equipped",
+        "es": "Totalmente amueblada y equipada"
+      },
+      {
+        "en": "Pool with jacuzzi and bohío",
+        "es": "Piscina con jacuzzi y bohío"
+      },
+      {
+        "en": "4 bedrooms, 3.5 bathrooms",
+        "es": "4 habitaciones, 3.5 baños"
+      },
+      {
+        "en": "Parking for 4 cars",
+        "es": "Estacionamiento para 4 autos"
+      }
+    ],
+    "lat": 8.5167,
+    "lng": -79.8667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Coronado, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 3.5,
+      "built_area_m2": 452.0,
+      "parking_spaces": 4,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2549,
+    "tokens_out": 616,
+    "cost_usd": 0.00136583,
+    "finish_reason": "stop",
+    "latency_ms": 4842
   }
 }
