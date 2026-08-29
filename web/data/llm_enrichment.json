@@ -142886,5 +142886,107 @@
     "cost_usd": 0.00136583,
     "finish_reason": "stop",
     "latency_ms": 4842
+  },
+  "realestate_au_sv|kilometro-28-troncal-del-norte-poligono-17-lote-06-12-13-y-14-parcela-cihutan-guazapa-san-salvador-guazapa-san-salvador-guazapa-san-salvador-310119699338": {
+    "ts": "2026-08-29T09:39:58.510778+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Guazapa, San Salvador",
+      "es": "Terreno en Venta en Guazapa, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 4 lots (06, 12, 13, 14) in Polígono 17, Parcela Cihutan, Guazapa, San Salvador. Located at Km 28 on Troncal del Norte. Offered at $140,000.",
+      "es": "Parcela de terreno de 4 lotes (06, 12, 13, 14) en Polígono 17, Parcela Cihutan, Guazapa, San Salvador. Ubicada en el Km 28 de la Troncal del Norte. Precio: $140,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "4 lots in one parcel",
+        "es": "4 lotes en una parcela"
+      },
+      {
+        "en": "Km 28 Troncal del Norte",
+        "es": "Km 28 Troncal del Norte"
+      },
+      {
+        "en": "Listed at $140,000",
+        "es": "Precio de $140,000"
+      }
+    ],
+    "lat": 13.9833,
+    "lng": -89.2167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Guazapa, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3116,
+    "tokens_out": 425,
+    "cost_usd": 0.00130882,
+    "finish_reason": "stop",
+    "latency_ms": 3366
+  },
+  "encuentra24|29890987": {
+    "ts": "2026-08-29T10:29:22.599022+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachside House in Playa Coronado, 4 Bedrooms",
+      "es": "Casa cerca del mar en Playa Coronado, 4 habitaciones"
+    },
+    "short_description_canonical": {
+      "en": "House of 1,000 m² on Calle Amanecer in Playa Coronado, steps from the sea. It has 4 bedrooms with A/C, 4 full bathrooms, functional kitchen, spacious living room, private pool, and storage. A 5-minute walk to Playa Serena. Priced at $325,000.",
+      "es": "Casa de 1,000 m² en Calle Amanecer en Playa Coronado, a pasos del mar. Cuenta con 4 recámaras con A/C, 4 baños completos, cocina funcional, sala amplia, piscina privada y depósito. A 5 minutos caminando de Playa Serena. Precio: $325,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "5-minute walk to Playa Serena",
+        "es": "A 5 minutos caminando de Playa Serena"
+      },
+      {
+        "en": "Private pool and storage included",
+        "es": "Piscina privada y depósito incluidos"
+      },
+      {
+        "en": "All bedrooms with air conditioning",
+        "es": "Todas las recámaras con aire acondicionado"
+      },
+      {
+        "en": "1,000 m² lot in exclusive area",
+        "es": "Terreno de 1,000 m² en zona exclusiva"
+      }
+    ],
+    "lat": 8.5,
+    "lng": -79.8667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Coronado, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.0,
+      "built_area_m2": 1000.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2418,
+    "tokens_out": 513,
+    "cost_usd": 0.00121716,
+    "finish_reason": "stop",
+    "latency_ms": 3991
   }
 }

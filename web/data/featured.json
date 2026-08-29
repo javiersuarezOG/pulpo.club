@@ -18,17 +18,17 @@
       "pick_count": 3
     }
   },
-  "picked_at": "2026-08-28T15:06:04.740128+00:00",
-  "expires_at": "2026-08-29T00:00:00+00:00",
+  "picked_at": "2026-08-29T09:49:20.619021+00:00",
+  "expires_at": "2026-08-30T00:00:00+00:00",
   "tier": "elite",
   "listing_id": "encuentra24|32759709",
-  "rank_score": 75.52,
+  "rank_score": 79.96,
   "hero_photo_quality_score": 80,
   "fallback": false,
   "pool": [
     {
       "listing_id": "encuentra24|32759709",
-      "rank_score": 75.52,
+      "rank_score": 79.96,
       "hero_photo_quality_score": 80,
       "photos_count": 21
     }
@@ -45,7 +45,7 @@
     },
     {
       "listing_id": "oceanside|12451",
-      "rank_score": 67.04,
+      "rank_score": 65.45,
       "master_category": "beach",
       "subcategory": "homes",
       "star_rating": 3.5,
@@ -54,7 +54,7 @@
     },
     {
       "listing_id": "oceanside|15752",
-      "rank_score": 58.18,
+      "rank_score": 57.57,
       "master_category": "beach",
       "subcategory": "land",
       "star_rating": 3.0,
