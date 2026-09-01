@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-29T09:39:54.130695+00:00",
+  "computed_at": "2026-09-01T08:32:06.328924+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -275,6 +275,43 @@
       ],
       "sources": [
         "remax"
+      ]
+    },
+    {
+      "count": 3,
+      "cross_source": false,
+      "fingerprint": "d22995138e01c8dafd983e5d27718f8594a12e0d",
+      "samples": [
+        {
+          "area_m2": null,
+          "price_usd": 20140.0,
+          "source": "realestate_au_sv",
+          "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747541",
+          "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747541/",
+          "zone": "chalatenango"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 20075.0,
+          "source": "realestate_au_sv",
+          "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747511",
+          "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747511/",
+          "zone": "chalatenango"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 20140.0,
+          "source": "realestate_au_sv",
+          "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371",
+          "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371/",
+          "zone": "chalatenango"
+        }
+      ],
+      "sources": [
+        "realestate_au_sv"
       ]
     },
     {
@@ -1485,10 +1522,10 @@
   "overlap_matrix": {},
   "per_source": {
     "bienesraices": {
-      "kept_as_unique": 507,
-      "raw": 508,
+      "kept_as_unique": 503,
+      "raw": 504,
       "shared_with_others": 0,
-      "unique_in_source": 507
+      "unique_in_source": 503
     },
     "citymax": {
       "kept_as_unique": 38,
@@ -1497,10 +1534,10 @@
       "unique_in_source": 38
     },
     "citymax_sc": {
-      "kept_as_unique": 163,
-      "raw": 163,
+      "kept_as_unique": 162,
+      "raw": 162,
       "shared_with_others": 0,
-      "unique_in_source": 163
+      "unique_in_source": 162
     },
     "csbr": {
       "kept_as_unique": 284,
@@ -1539,22 +1576,22 @@
       "unique_in_source": 26
     },
     "realestate_au_sv": {
-      "kept_as_unique": 265,
-      "raw": 304,
+      "kept_as_unique": 266,
+      "raw": 307,
       "shared_with_others": 0,
-      "unique_in_source": 265
+      "unique_in_source": 266
     },
     "remax": {
-      "kept_as_unique": 306,
-      "raw": 321,
+      "kept_as_unique": 309,
+      "raw": 324,
       "shared_with_others": 0,
-      "unique_in_source": 306
+      "unique_in_source": 309
     },
     "santizo": {
-      "kept_as_unique": 86,
-      "raw": 86,
+      "kept_as_unique": 88,
+      "raw": 88,
       "shared_with_others": 0,
-      "unique_in_source": 86
+      "unique_in_source": 88
     },
     "vivolatam": {
       "kept_as_unique": 157,
@@ -1569,6 +1606,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2025,
-  "total_unique_fingerprints": 1962
+  "total_in_dataset": 2028,
+  "total_unique_fingerprints": 1963
 }

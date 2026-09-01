@@ -142988,5 +142988,1142 @@
     "cost_usd": 0.00121716,
     "finish_reason": "stop",
     "latency_ms": 3991
+  },
+  "realestate_au_sv|parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747519": {
+    "ts": "2026-09-01T08:32:10.233023+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in La Ceiba, Nueva Concepción, Chalatenango",
+      "es": "Terreno en La Ceiba, Nueva Concepción, Chalatenango"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Parcelación La Ceiba, Cantón Santa Rosa, Nueva Concepción, Chalatenango. Offered at $21,529. No further details provided.",
+      "es": "Parcela de terreno en Parcelación La Ceiba, Cantón Santa Rosa, Nueva Concepción, Chalatenango. Ofrecida en $21,529. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Parcelación La Ceiba",
+        "es": "Ubicado en Parcelación La Ceiba"
+      },
+      {
+        "en": "In Cantón Santa Rosa, Nueva Concepción",
+        "es": "En Cantón Santa Rosa, Nueva Concepción"
+      },
+      {
+        "en": "Listed at $21,529",
+        "es": "Listado en $21,529"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -88.9333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Chalatenango municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3096,
+    "tokens_out": 395,
+    "cost_usd": 0.00127042,
+    "finish_reason": "stop",
+    "latency_ms": 2825
+  },
+  "realestate_au_sv|parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747541": {
+    "ts": "2026-09-01T08:32:10.664326+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in La Ceiba, Nueva Concepción, Chalatenango",
+      "es": "Terreno en La Ceiba, Nueva Concepción, Chalatenango"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in La Ceiba, Cantón Santa Rosa, Nueva Concepción, Chalatenango. Offered for sale by RE/MAX EXPANSION. No further details provided.",
+      "es": "Parcela de terreno en La Ceiba, Cantón Santa Rosa, Nueva Concepción, Chalatenango. Se ofrece en venta por RE/MAX EXPANSION. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Listed by RE/MAX EXPANSION",
+        "es": "Listado por RE/MAX EXPANSION"
+      },
+      {
+        "en": "Located in Nueva Concepción, Chalatenango",
+        "es": "Ubicado en Nueva Concepción, Chalatenango"
+      },
+      {
+        "en": "Priced at USD 20,140",
+        "es": "Precio de USD 20,140"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -88.95,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3096,
+    "tokens_out": 404,
+    "cost_usd": 0.00128032,
+    "finish_reason": "stop",
+    "latency_ms": 3257
+  },
+  "realestate_au_sv|lotificacion-miraflores-el-rosario-la-paz-el-rosario-morazan-department-310119747509": {
+    "ts": "2026-09-01T08:32:10.682705+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in El Rosario, Morazán",
+      "es": "Terreno en Venta en El Rosario, Morazán"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Lotificacion Miraflores, El Rosario, Morazán Department. The property is listed for sale at USD 80,000. No further details on size or features are provided.",
+      "es": "Lote en Lotificación Miraflores, El Rosario, departamento de Morazán. La propiedad está a la venta por USD 80,000. No se proporcionan más detalles sobre tamaño o características."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Listed at USD 80,000",
+        "es": "Precio de USD 80,000"
+      },
+      {
+        "en": "Located in El Rosario, Morazán",
+        "es": "Ubicado en El Rosario, Morazán"
+      },
+      {
+        "en": "Part of Lotificacion Miraflores",
+        "es": "Parte de Lotificación Miraflores"
+      }
+    ],
+    "lat": 13.5833,
+    "lng": -88.0833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Rosario, Morazán Department",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3071,
+    "tokens_out": 401,
+    "cost_usd": 0.00127027,
+    "finish_reason": "stop",
+    "latency_ms": 3275
+  },
+  "encuentra24|32928832": {
+    "ts": "2026-09-01T08:32:11.191777+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beach House for Sale in Residencial Atami, La Libertad",
+      "es": "Casa de Playa en Venta en Residencial Atami, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Two-level beach house in Residencial Atami, La Libertad, Surf City. 300 m² built area with 4 bedrooms, 3 bathrooms, and parking for 6 vehicles. Features include a family pool, gazebo, gardens, and ocean views from the upper living area. Located in a private residential with private beach access.",
+      "es": "Casa de playa de dos niveles en Residencial Atami, La Libertad, Surf City. 300 m² de construcción con 4 habitaciones, 3 baños y estacionamiento para 6 vehículos. Cuenta con piscina familiar, glorieta, jardines y vista al mar desde la sala superior. Ubicada en residencial privado con playa privada."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private residential with private beach",
+        "es": "Residencial privado con playa privada"
+      },
+      {
+        "en": "Ocean views from upper living area",
+        "es": "Vista al mar desde sala superior"
+      },
+      {
+        "en": "Family pool and gazebo",
+        "es": "Piscina familiar y glorieta"
+      },
+      {
+        "en": "Parking for 6 vehicles",
+        "es": "Estacionamiento para 6 vehículos"
+      }
+    ],
+    "lat": 13.487,
+    "lng": -89.6133,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Tunco beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 3.0,
+      "built_area_m2": 300.0,
+      "parking_spaces": 6,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3337,
+    "tokens_out": 500,
+    "cost_usd": 0.00145099,
+    "finish_reason": "stop",
+    "latency_ms": 3785
+  },
+  "realestate_au_sv|lote-s-n-canton-el-escalon-san-jose-villanueva-la-libertad-san-jose-villanueva-la-libertad-san-jose-villanueva-la-libertad-department-310119719261": {
+    "ts": "2026-09-01T08:32:12.647270+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in San José Villanueva, La Libertad",
+      "es": "Lote en Venta en San José Villanueva, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Cantón El Escalón, San José Villanueva, La Libertad. Offered at USD 175,000. No further details provided.",
+      "es": "Lote en Cantón El Escalón, San José Villanueva, La Libertad. Precio de USD 175,000. Sin más detalles disponibles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Cantón El Escalón",
+        "es": "Ubicado en Cantón El Escalón"
+      },
+      {
+        "en": "Listed at USD 175,000",
+        "es": "Precio de USD 175,000"
+      },
+      {
+        "en": "In San José Villanueva, La Libertad",
+        "es": "En San José Villanueva, La Libertad"
+      }
+    ],
+    "lat": 13.6333,
+    "lng": -89.35,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San José Villanueva, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3097,
+    "tokens_out": 387,
+    "cost_usd": 0.00126189,
+    "finish_reason": "stop",
+    "latency_ms": 2680
+  },
+  "remax|003284449018": {
+    "ts": "2026-09-01T08:32:14.026086+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat 895 m² Land in Llano del Muerto, Perquín",
+      "es": "Terreno plano de 895 m² en Llano del Muerto, Perquín"
+    },
+    "short_description_canonical": {
+      "en": "Flat 895.73 m² land lot in Llano del Muerto, Perquín, Morazán, surrounded by pine forests and cool mountain climate. Located 1 km from Río Negro and 200 meters from mountain tourist centers, with easy access to the Perquín–Marcala international highway. Electricity and water access available, ideal for building a country home.",
+      "es": "Terreno plano de 895.73 m² en Llano del Muerto, Perquín, Morazán, rodeado de bosques de pino y clima fresco de montaña. Ubicado a 1 km del Río Negro y a 200 metros de centros turísticos de montaña, con fácil acceso a la carretera internacional Perquín–Marcala. Acceso inmediato a electricidad y agua, ideal para construir una casa de campo."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat 895.73 m² lot, build-ready",
+        "es": "Lote plano de 895.73 m², listo para construir"
+      },
+      {
+        "en": "1 km from Río Negro river",
+        "es": "A 1 km del río Negro"
+      },
+      {
+        "en": "200 m from mountain tourist centers",
+        "es": "A 200 m de centros turísticos de montaña"
+      },
+      {
+        "en": "Electricity and water access immediate",
+        "es": "Acceso inmediato a electricidad y agua"
+      },
+      {
+        "en": "Near Perquín–Marcala international highway",
+        "es": "Cerca de la carretera internacional Perquín–Marcala"
+      }
+    ],
+    "lat": 13.9583,
+    "lng": -88.1583,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Perquín, Morazán",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3353,
+    "tokens_out": 575,
+    "cost_usd": 0.00153781,
+    "finish_reason": "stop",
+    "latency_ms": 3671
+  },
+  "remax|002472129113": {
+    "ts": "2026-09-01T08:32:14.655131+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots in La Ceiba, Nueva Concepción",
+      "es": "Lotes residenciales planos en La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Phase 1 offers 95 lots, 70 available, with individual deeds and financing options. Each lot includes water connection and meter; gravel streets with curb and gutter expected by March 2026.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas en la Urbanización La Ceiba, Nueva Concepción, Chalatenango. La Fase 1 ofrece 95 lotes, 70 disponibles, con escrituras individuales y opciones de financiamiento. Cada lote incluye conexión de agua y medidor; calles de grava con cordón y cuneta previstas para marzo de 2026."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Individual deeds in owner's name",
+        "es": "Escrituras individuales a nombre del propietario"
+      },
+      {
+        "en": "1 km from Central Park",
+        "es": "A 1 km del Parque Central"
+      },
+      {
+        "en": "700 m from Blvd. Arturo Gutiérrez",
+        "es": "A 700 m del Blvd. Arturo Gutiérrez"
+      },
+      {
+        "en": "Flat topography, semi-urban residential",
+        "es": "Topografía plana, residencial semiurbano"
+      },
+      {
+        "en": "Water connection and meter included",
+        "es": "Conexión de agua y medidor incluidos"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.0167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3444,
+    "tokens_out": 541,
+    "cost_usd": 0.00152498,
+    "finish_reason": "stop",
+    "latency_ms": 3990
+  },
+  "remax|002472129112": {
+    "ts": "2026-09-01T08:32:14.927914+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots in La Ceiba, Nueva Concepción",
+      "es": "Lotes residenciales planos en La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas (approx. 203 m²) in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Located 1 km from Central Park, 700 m from Blvd. Arturo Gutiérrez, and across from Las Palmeras neighborhood. Phase 1 offers 95 lots, 70 available, with individual deeds, water connection, and gravel streets with curb and gutter.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas (aprox. 203 m²) en la Urbanización La Ceiba, Nueva Concepción, Chalatenango. Ubicados a 1 km del Parque Central, 700 m del Blvd. Arturo Gutiérrez y frente a la colonia Las Palmeras. La Fase 1 ofrece 95 lotes, 70 disponibles, con escrituras individuales, conexión de agua y calles de grava con cordón cuneta."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Individual deeds, verified in Land Registry",
+        "es": "Escrituras individuales, verificadas en Registro"
+      },
+      {
+        "en": "1 km from Central Park, 700 m from Blvd.",
+        "es": "A 1 km del Parque Central, 700 m del Blvd."
+      },
+      {
+        "en": "Flat topography, semi-urban residential zoning",
+        "es": "Topografía plana, uso residencial semi-urbano"
+      },
+      {
+        "en": "Water connection and meter included per lot",
+        "es": "Conexión de agua y medidor incluidos por lote"
+      },
+      {
+        "en": "Bank financing available (BFA, FEDECREDITO, ACACYPAC)",
+        "es": "Financiamiento bancario disponible (BFA, FEDECREDITO, ACACYPAC)"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.3,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3445,
+    "tokens_out": 619,
+    "cost_usd": 0.00161105,
+    "finish_reason": "stop",
+    "latency_ms": 4244
+  },
+  "remax|002472129111": {
+    "ts": "2026-09-01T08:32:15.081359+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots, La Ceiba Subdivision, Nueva Concepción",
+      "es": "Lotes planos residenciales, Residencial La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Phase 1 offers 95 lots, 70 available, with individual deeds and financing options. Each lot includes water connection and meter; gravel streets with curb and gutter, completion expected March 2026.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas en Residencial La Ceiba, Nueva Concepción, Chalatenango. Fase 1 ofrece 95 lotes, 70 disponibles, con escrituras individuales y opciones de financiamiento. Cada lote incluye conexión de agua y medidor; calles de grava con cordón y cuneta, finalización estimada en marzo de 2026."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1 km from Central Park",
+        "es": "A 1 km del Parque Central"
+      },
+      {
+        "en": "700 m from Blvd. Arturo Gutiérrez",
+        "es": "A 700 m del Blvd. Arturo Gutiérrez"
+      },
+      {
+        "en": "Individual deeds, verified in registry",
+        "es": "Escrituras individuales, verificadas en registro"
+      },
+      {
+        "en": "Water connection and meter included",
+        "es": "Conexión de agua y medidor incluidos"
+      },
+      {
+        "en": "Bank financing available (BFA, FEDECREDITO)",
+        "es": "Financiamiento bancario disponible (BFA, FEDECREDITO)"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.3,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3468,
+    "tokens_out": 559,
+    "cost_usd": 0.00155126,
+    "finish_reason": "stop",
+    "latency_ms": 3889
+  },
+  "remax|002472129110": {
+    "ts": "2026-09-01T08:32:15.410880+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots in La Ceiba, Nueva Concepción",
+      "es": "Lotes residenciales planos en La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Phase 1 offers 95 lots, 70 available, with individual deeds and unencumbered titles. Each lot includes water connection and meter; electricity poles and wiring throughout, gravel streets with curb and gutter.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas en la Urbanización La Ceiba, Nueva Concepción, Chalatenango. La Fase 1 ofrece 95 lotes, 70 disponibles, con escrituras individuales y títulos libres de gravámenes. Cada lote incluye conexión de agua y medidor; postes y cableado eléctrico en todo el desarrollo, calles de grava con cordón y cuneta."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1 km from Central Park",
+        "es": "1 km del Parque Central"
+      },
+      {
+        "en": "700 m from Blvd. Arturo Gutiérrez",
+        "es": "700 m del Blvd. Arturo Gutiérrez"
+      },
+      {
+        "en": "Individual deeds, unencumbered",
+        "es": "Escrituras individuales, libres de gravámenes"
+      },
+      {
+        "en": "Water connection and meter included",
+        "es": "Conexión de agua y medidor incluidos"
+      },
+      {
+        "en": "Flat topography, semi-urban zoning",
+        "es": "Topografía plana, uso semi-urbano"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.3,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3444,
+    "tokens_out": 550,
+    "cost_usd": 0.00153488,
+    "finish_reason": "stop",
+    "latency_ms": 4055
+  },
+  "remax|002472129109": {
+    "ts": "2026-09-01T08:32:15.789602+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots in La Ceiba, Nueva Concepción",
+      "es": "Lotes residenciales planos en La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Phase 1 offers 95 lots, 70 available, with individual deeds and financing options. Each lot includes water connection and meter; gravel streets with curb and gutter expected by March 2026.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas en la Urbanización La Ceiba, Nueva Concepción, Chalatenango. La Fase 1 ofrece 95 lotes, 70 disponibles, con escrituras individuales y opciones de financiamiento. Cada lote incluye conexión de agua y medidor; calles de grava con cordón y cuneta previstas para marzo de 2026."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Individual deeds, verified in registry",
+        "es": "Escrituras individuales, verificadas en registro"
+      },
+      {
+        "en": "1 km from Central Park",
+        "es": "A 1 km del Parque Central"
+      },
+      {
+        "en": "700 m from Blvd. Arturo Gutiérrez",
+        "es": "A 700 m del Blvd. Arturo Gutiérrez"
+      },
+      {
+        "en": "Flat topography, semi-urban zoning",
+        "es": "Topografía plana, uso semiurbano"
+      },
+      {
+        "en": "Bank financing available (BFA, FEDECREDITO)",
+        "es": "Financiamiento bancario disponible (BFA, FEDECREDITO)"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -88.9333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3444,
+    "tokens_out": 552,
+    "cost_usd": 0.00153708,
+    "finish_reason": "stop",
+    "latency_ms": 4134
+  },
+  "remax|002472129108": {
+    "ts": "2026-09-01T08:32:16.520881+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots, La Ceiba Subdivision, Nueva Concepción",
+      "es": "Lotes planos residenciales, Residencial La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Phase 1 offers 95 lots, 70 available, with individual deeds and gravel streets with curb and gutter. Each lot includes a water connection and meter; electricity poles and wiring are throughout.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas en Residencial La Ceiba, Nueva Concepción, Chalatenango. La Fase 1 ofrece 95 lotes, 70 disponibles, con escrituras individuales y calles de grava con cordón cuneta. Cada lote incluye conexión de agua y medidor; postes y cableado eléctrico en todo el desarrollo."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Individual deeds, verified in registry",
+        "es": "Escrituras individuales, verificadas en registro"
+      },
+      {
+        "en": "1 km from Central Park",
+        "es": "A 1 km del Parque Central"
+      },
+      {
+        "en": "700 m from Blvd. Arturo Gutiérrez",
+        "es": "A 700 m del Blvd. Arturo Gutiérrez"
+      },
+      {
+        "en": "Water connection and meter included",
+        "es": "Conexión de agua y medidor incluidos"
+      },
+      {
+        "en": "Flat topography, semi-urban zoning",
+        "es": "Topografía plana, uso semi-urbano"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.3,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3444,
+    "tokens_out": 540,
+    "cost_usd": 0.00152388,
+    "finish_reason": "stop",
+    "latency_ms": 3873
+  },
+  "remax|002472129107": {
+    "ts": "2026-09-01T08:32:17.156963+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots in La Ceiba, Nueva Concepción",
+      "es": "Lotes residenciales planos en La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Phase 1 offers 95 lots, 70 available, with individual deeds and bank financing. Each lot includes water connection and meter; gravel streets with curb and gutter, completion by March 2026.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas en Urbanización La Ceiba, Nueva Concepción, Chalatenango. La Fase 1 ofrece 95 lotes, 70 disponibles, con escrituras individuales y financiamiento bancario. Cada lote incluye conexión de agua y medidor; calles de grava con cordón cuneta, finalización en marzo 2026."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Individual deeds, verified in registry",
+        "es": "Escrituras individuales, verificadas en registro"
+      },
+      {
+        "en": "Water connection and meter included",
+        "es": "Conexión de agua y medidor incluidos"
+      },
+      {
+        "en": "Flat topography, semi-urban residential",
+        "es": "Topografía plana, residencial semi-urbano"
+      },
+      {
+        "en": "Bank financing available (BFA, FEDECREDITO, ACACYPAC)",
+        "es": "Financiamiento bancario disponible (BFA, FEDECREDITO, ACACYPAC)"
+      },
+      {
+        "en": "1 km from Central Park, 700 m from Blvd. Arturo Gutiérrez",
+        "es": "1 km del Parque Central, 700 m del Blvd. Arturo Gutiérrez"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.3,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3444,
+    "tokens_out": 577,
+    "cost_usd": 0.00156458,
+    "finish_reason": "stop",
+    "latency_ms": 4348
+  },
+  "remax|002282685131": {
+    "ts": "2026-09-01T08:32:18.006790+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Two 500 v² Lots in Miraflores Subdivision",
+      "es": "Dos lotes de 500 v² en Residencial Miraflores"
+    },
+    "short_description_canonical": {
+      "en": "Two flat 500 v² lots in Miraflores Subdivision, near Plaza Los Cocos and El Encuentro shopping center, 10 minutes from the International Airport. Each lot is completely flat with easy access. Priced at $40,000 per lot, ideal for commercial projects, storage, or parking.",
+      "es": "Dos lotes planos de 500 v² en Residencial Miraflores, cerca de Plaza Los Cocos y del centro comercial El Encuentro, a 10 minutos del Aeropuerto Internacional. Cada lote es completamente plano y de fácil acceso. Precio de $40,000 por lote, ideal para proyectos comerciales, bodegas o estacionamiento."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "10 minutes from International Airport",
+        "es": "A 10 minutos del Aeropuerto Internacional"
+      },
+      {
+        "en": "Near Plaza Los Cocos and El Encuentro",
+        "es": "Cerca de Plaza Los Cocos y El Encuentro"
+      },
+      {
+        "en": "Flat, easily accessible lots",
+        "es": "Lotes planos y de fácil acceso"
+      },
+      {
+        "en": "Ideal for commercial or storage use",
+        "es": "Ideal para uso comercial o bodega"
+      }
+    ],
+    "lat": 13.6929,
+    "lng": -89.2182,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Miraflores Subdivision, near San Luis Talpa, La Paz",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3207,
+    "tokens_out": 499,
+    "cost_usd": 0.00141479,
+    "finish_reason": "stop",
+    "latency_ms": 3351
+  },
+  "remax|002472129106": {
+    "ts": "2026-09-01T08:32:18.199230+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots in La Ceiba, Nueva Concepción",
+      "es": "Lotes residenciales planos en La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas (approx. 246 m²) in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Located 1 km from Central Park, 700 m from Blvd. Arturo Gutiérrez, and 100 m from Turicentro Splash. Individual deeds, water connection with meter, and electricity available; gravel streets with curb and gutter expected by March 2026.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas (aprox. 246 m²) en la Urbanización La Ceiba, Nueva Concepción, Chalatenango. Ubicados a 1 km del Parque Central, 700 m del Blvd. Arturo Gutiérrez y 100 m del Turicentro Splash. Escrituras individuales, conexión de agua con medidor y electricidad disponible; calles de grava con cordón y cuneta previstas para marzo de 2026."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Individual deeds, verified in registry",
+        "es": "Escrituras individuales, verificadas en registro"
+      },
+      {
+        "en": "1 km from Central Park",
+        "es": "A 1 km del Parque Central"
+      },
+      {
+        "en": "Flat topography, ready to build",
+        "es": "Topografía plana, lista para construir"
+      },
+      {
+        "en": "Water connection and meter included",
+        "es": "Conexión de agua y medidor incluidos"
+      },
+      {
+        "en": "Bank financing available (BFA, FEDECREDITO)",
+        "es": "Financiamiento bancario disponible (BFA, FEDECREDITO)"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.3,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3444,
+    "tokens_out": 587,
+    "cost_usd": 0.00157558,
+    "finish_reason": "stop",
+    "latency_ms": 4172
+  },
+  "santizo|10335609": {
+    "ts": "2026-09-01T08:32:18.386687+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury House in Boca Raton, Miami",
+      "es": "Casa de Lujo en Boca Raton, Miami"
+    },
+    "short_description_canonical": {
+      "en": "Luxury house in exclusive residential Boca Raton, Miami, Florida. Features living room, dining room, open kitchen, social bathroom, laundry area, four bedrooms, pool, terrace, and large garden. Priced at $2,000,000.",
+      "es": "Casa de lujo en exclusiva residencial Boca Raton, Miami, Florida. Cuenta con sala, comedor, cocina abierta, baño social, área de lavandería, cuatro habitaciones, piscina, terraza y jardín amplio. Precio: $2,000,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Four bedrooms, pool, terrace",
+        "es": "Cuatro habitaciones, piscina, terraza"
+      },
+      {
+        "en": "Exclusive Boca Raton residential",
+        "es": "Residencial exclusivo Boca Raton"
+      },
+      {
+        "en": "Large garden and open kitchen",
+        "es": "Jardín amplio y cocina abierta"
+      }
+    ],
+    "lat": 13.7942,
+    "lng": -88.8965,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Salvador centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3155,
+    "tokens_out": 420,
+    "cost_usd": 0.00131385,
+    "finish_reason": "stop",
+    "latency_ms": 3305
+  },
+  "santizo|10335978": {
+    "ts": "2026-09-01T08:32:18.683945+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lakefront House in Ilopango, 250 m²",
+      "es": "Casa frente al lago en Ilopango, 250 m²"
+    },
+    "short_description_canonical": {
+      "en": "House for sale in Ilopango, San Salvador, with 250 m² of construction on a 1,500 v² lot. It has 3 bedrooms, 2 bathrooms, living room, dining room, kitchen, and a large garden. Panoramic lake view, premium location, and free of liens.",
+      "es": "Casa en venta en Ilopango, San Salvador, con 250 m² de construcción en un terreno de 1,500 v². Cuenta con 3 habitaciones, 2 baños, sala, comedor, cocina y amplio jardín. Vista panorámica al lago, ubicación premium y libre de gravamen."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Panoramic lake view",
+        "es": "Vista panorámica al lago"
+      },
+      {
+        "en": "Free of liens",
+        "es": "Libre de gravamen"
+      },
+      {
+        "en": "Large garden",
+        "es": "Amplio jardín"
+      },
+      {
+        "en": "Premium location",
+        "es": "Ubicación premium"
+      }
+    ],
+    "lat": 13.7017,
+    "lng": -89.1094,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ilopango municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 250.0,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3190,
+    "tokens_out": 453,
+    "cost_usd": 0.0013596,
+    "finish_reason": "stop",
+    "latency_ms": 3272
+  },
+  "remax|002523785004": {
+    "ts": "2026-09-01T08:32:18.908563+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4.5 Manzanas Flat Land, El Paisnal",
+      "es": "4.5 Manzanas Terreno Plano, El Paisnal"
+    },
+    "short_description_canonical": {
+      "en": "Flat 4.5 manzanas (31,723.84 m²) multi-use land in Hacienda La Cabaña, El Paisnal, North San Salvador. Suitable for agricultural, commercial, industrial, or residential subdivision. Located 3 minutes from main road and 5 minutes from Troncal del Norte Highway, behind La Cabaña Sugar Mill. Utilities nearby, price negotiable.",
+      "es": "Terreno plano de 4.5 manzanas (31,723.84 m²) de uso múltiple en Hacienda La Cabaña, El Paisnal, Norte de San Salvador. Apto para agrícola, comercial, industrial o subdivisión residencial. Ubicado a 3 minutos de la carretera principal y 5 minutos de la carretera Troncal del Norte, detrás del Ingenio La Cabaña. Servicios cercanos, precio negociable."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "100% flat, ready to build",
+        "es": "100% plano, listo para construir"
+      },
+      {
+        "en": "3 min to main road, 5 min to Troncal del Norte",
+        "es": "3 min a carretera principal, 5 min a Troncal del Norte"
+      },
+      {
+        "en": "Behind La Cabaña Sugar Mill",
+        "es": "Detrás del Ingenio La Cabaña"
+      },
+      {
+        "en": "High growth industrial/commercial zone",
+        "es": "Zona industrial/comercial de alto crecimiento"
+      },
+      {
+        "en": "Utilities nearby",
+        "es": "Servicios cercanos"
+      }
+    ],
+    "lat": 13.9667,
+    "lng": -89.1333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Paisnal, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3361,
+    "tokens_out": 570,
+    "cost_usd": 0.00153447,
+    "finish_reason": "stop",
+    "latency_ms": 3980
+  },
+  "santizo|10308741": {
+    "ts": "2026-09-01T08:32:19.319835+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "One-Level House for Sale in La Fontana I",
+      "es": "Casa de un Nivel en Venta en La Fontana I"
+    },
+    "short_description_canonical": {
+      "en": "One-level house for sale in Residencial La Fontana I. It includes living room, dining room, kitchen, terrace, and large garden. It has four bedrooms, three bathrooms, and two parking spaces.",
+      "es": "Casa de un nivel en venta en Residencial La Fontana I. Incluye sala, comedor, cocina, terraza y jardín amplio. Cuenta con cuatro dormitorios, tres baños y dos estacionamientos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "One-level layout, no stairs",
+        "es": "Distribución de un nivel, sin escaleras"
+      },
+      {
+        "en": "Four bedrooms, three bathrooms",
+        "es": "Cuatro dormitorios, tres baños"
+      },
+      {
+        "en": "Large garden and terrace",
+        "es": "Jardín amplio y terraza"
+      },
+      {
+        "en": "Two parking spaces included",
+        "es": "Dos estacionamientos incluidos"
+      }
+    ],
+    "lat": 13.6929,
+    "lng": -89.2182,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Salvador, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 3.0,
+      "built_area_m2": null,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3132,
+    "tokens_out": 427,
+    "cost_usd": 0.00131534,
+    "finish_reason": "stop",
+    "latency_ms": 2798
+  },
+  "encuentra24|32903896": {
+    "ts": "2026-09-01T09:29:31.416843+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury 4-Bed House in Santa María Golf & Country Club",
+      "es": "Casa de lujo de 4 habitaciones en Santa María Golf & Country Club"
+    },
+    "short_description_canonical": {
+      "en": "Luxury single-family house in The Woods, Santa María Golf & Country Club, Panama. Built area of 520 m² on a 604 m² lot, with 4 bedrooms, 4.5 bathrooms, and 4 parking spaces. Features marble floors, Italian kitchen, family room, den, terrace, garden, and lake view. Community offers sports courts, children's area, and 24-hour security. Price: $2,400,000.",
+      "es": "Casa unifamiliar de lujo en The Woods, Santa María Golf & Country Club, Panamá. Área construida de 520 m² en un terreno de 604 m², con 4 recámaras, 4.5 baños y 4 estacionamientos. Cuenta con pisos de mármol, cocina italiana, family room, den, terraza, jardín y vista al lago. La comunidad ofrece canchas deportivas, área de juegos y seguridad 24 horas. Precio: $2,400,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Lake view from terrace and garden",
+        "es": "Vista al lago desde terraza y jardín"
+      },
+      {
+        "en": "Golf & Country Club community amenities",
+        "es": "Comodidades de comunidad Golf & Country Club"
+      },
+      {
+        "en": "24-hour security and sports courts",
+        "es": "Seguridad 24 horas y canchas deportivas"
+      },
+      {
+        "en": "Marble floors and Italian kitchen",
+        "es": "Pisos de mármol y cocina italiana"
+      }
+    ],
+    "lat": 8.9833,
+    "lng": -79.5167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa María Golf & Country Club, Panama City",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.5,
+      "built_area_m2": 520.0,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2487,
+    "tokens_out": 573,
+    "cost_usd": 0.00130179,
+    "finish_reason": "stop",
+    "latency_ms": 4186
+  },
+  "encuentra24|31897659": {
+    "ts": "2026-09-01T09:29:31.689519+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Modern Beach House in Playa Blanca, Río Hato",
+      "es": "Casa de playa moderna en Playa Blanca, Río Hato"
+    },
+    "short_description_canonical": {
+      "en": "Modern beach house in Playa Blanca, Río Hato, with 355 m² built on a 1,883 m² lot. Built in 2023, it has 3 bedrooms, 3 full baths, 2 half baths, staff quarters, and parking for 2. Located about 500 meters from the beach in a gated complex with electric gate. Fully furnished with pool, BBQ area, and backup systems. Ideal for living, vacationing, or tourist rental investment.",
+      "es": "Casa de playa moderna en Playa Blanca, Río Hato, con 355 m² construidos en un terreno de 1,883 m². Construida en 2023, cuenta con 3 recámaras, 3 baños completos, 2 medios baños, cuarto de empleada y estacionamiento para 2. Ubicada a unos 500 metros de la playa en un complejo cerrado con portón eléctrico. Totalmente amoblada, con piscina, área de BBQ y sistemas de respaldo. Ideal para vivir, vacacionar o invertir en alquiler turístico."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Built 2023, modern construction",
+        "es": "Construida en 2023, construcción moderna"
+      },
+      {
+        "en": "Fully furnished with appliances included",
+        "es": "Totalmente amoblada con línea blanca incluida"
+      },
+      {
+        "en": "Heated pool and BBQ area",
+        "es": "Piscina climatizada y área de BBQ"
+      },
+      {
+        "en": "500 meters from the beach",
+        "es": "A 500 metros de la playa"
+      },
+      {
+        "en": "Gated complex with electric gate",
+        "es": "Complejo cerrado con portón eléctrico"
+      }
+    ],
+    "lat": 8.3667,
+    "lng": -80.0167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa Blanca, Río Hato",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": 2023,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.0,
+      "built_area_m2": 355.0,
+      "parking_spaces": 2,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2653,
+    "tokens_out": 623,
+    "cost_usd": 0.00140161,
+    "finish_reason": "stop",
+    "latency_ms": 4459
   }
 }
