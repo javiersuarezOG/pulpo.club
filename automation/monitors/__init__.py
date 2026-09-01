@@ -59,6 +59,13 @@ def env(name: str, default: str = "") -> str:
     return value.strip() if value and value.strip() else default
 
 
+# Cloudflare fronts api.clerk.com / api.resend.com and blocks the default
+# `Python-urllib/3.x` UA with error 1010 BEFORE auth is evaluated. Any
+# plain descriptive UA passes the edge; do NOT impersonate a browser.
+# See the measurement table in api/cron/webhook-health.py.
+USER_AGENT = "pulpo-monitor/1.0 (+https://pulpo.club)"
+
+
 def request_json(
     method: str,
     url: str,
@@ -77,6 +84,8 @@ def request_json(
         url,
         data=data,
         headers={
+            # First so an explicit caller-supplied UA still wins.
+            "User-Agent": USER_AGENT,
             **(headers or {}),
             **({"Content-Type": "application/json"} if payload is not None else {}),
         },
@@ -107,7 +116,7 @@ def post_json(
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
-        headers={**headers, "Content-Type": "application/json"},
+        headers={"User-Agent": USER_AGENT, **headers, "Content-Type": "application/json"},
         method="POST",
     )
     try:
