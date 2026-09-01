@@ -2,13 +2,13 @@
   "source": "realtyelsalvador",
   "drift_state": "unreachable",
   "reason": "http_status=403",
-  "probed_at": "2026-09-01T11:46:31.761692+00:00",
+  "probed_at": "2026-09-01T16:44:47.069392+00:00",
   "last_probe": {
     "probed_url": "https://realtyelsalvador.com",
     "status_code": 403,
     "final_url": "https://realtyelsalvador.com",
     "response_size_bytes": null,
-    "duration_ms": 106,
+    "duration_ms": 167,
     "error": null
   },
   "baseline": null
