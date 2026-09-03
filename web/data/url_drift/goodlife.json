@@ -1,14 +1,14 @@
 {
   "source": "goodlife",
-  "drift_state": "ok",
-  "reason": "matches_baseline",
-  "probed_at": "2026-09-03T11:24:26.820299+00:00",
+  "drift_state": "unreachable",
+  "reason": "http_status=429",
+  "probed_at": "2026-09-03T16:31:42.429366+00:00",
   "last_probe": {
     "probed_url": "https://goodlifeelsalvador.com/",
-    "status_code": 200,
+    "status_code": 429,
     "final_url": "https://goodlifeelsalvador.com/",
-    "response_size_bytes": null,
-    "duration_ms": 2564,
+    "response_size_bytes": 960,
+    "duration_ms": 71,
     "error": null
   },
   "baseline": {
