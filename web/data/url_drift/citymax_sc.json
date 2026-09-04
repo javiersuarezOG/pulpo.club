@@ -2,7 +2,7 @@
   "source": "citymax_sc",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-09-04T04:42:02.169952+00:00",
+  "probed_at": "2026-09-04T11:27:15.140941+00:00",
   "last_probe": {
     "probed_url": "https://www.citymax-sc.com/inmuebles/venta/el-salvador",
     "status_code": 200,
@@ -17,6 +17,6 @@
     "final_url": "https://www.citymax-sc.com/inmuebles/venta/el-salvador",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-09-04T04:42:02.169975+00:00"
+    "last_ok_at": "2026-09-04T11:27:15.140966+00:00"
   }
 }
