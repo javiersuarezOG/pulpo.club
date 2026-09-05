@@ -276,6 +276,43 @@
     ]
   },
   {
+    "count": 3,
+    "cross_source": false,
+    "fingerprint": "d22995138e01c8dafd983e5d27718f8594a12e0d",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 20140.0,
+        "source": "realestate_au_sv",
+        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747541",
+        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747541/",
+        "zone": "chalatenango"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 20075.0,
+        "source": "realestate_au_sv",
+        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747511",
+        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747511/",
+        "zone": "chalatenango"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 20140.0,
+        "source": "realestate_au_sv",
+        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371",
+        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371/",
+        "zone": "chalatenango"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
     "count": 2,
     "cross_source": false,
     "fingerprint": "01d91f4016293e8f2805d1e44d87fd398f2d525d",
@@ -726,34 +763,6 @@
   {
     "count": 2,
     "cross_source": false,
-    "fingerprint": "52dbb87addab041f3b421b6ab736a558f7ff0ce2",
-    "samples": [
-      {
-        "area_m2": 250.2,
-        "price_usd": 35000.0,
-        "source": "remax",
-        "source_id": "00146166103",
-        "title": "LAND FOR SALE IN SAN CRISTOBAL I SAN LUIS TALPA",
-        "url": "https://www.remax-elsalvador.com/00146166103",
-        "zone": "san-luis-talpa"
-      },
-      {
-        "area_m2": 250.2,
-        "price_usd": 35000.0,
-        "source": "remax",
-        "source_id": "00146166102",
-        "title": "LAND FOR SALE IN SAN CRISTOBAL I SAN LUIS TALPA",
-        "url": "https://www.remax-elsalvador.com/00146166102",
-        "zone": "san-luis-talpa"
-      }
-    ],
-    "sources": [
-      "remax"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
     "fingerprint": "53b99fd00af920a8ded47a9bb7803b340b6bce68",
     "samples": [
       {
@@ -1137,6 +1146,34 @@
         "title": "KM 12.5 CARRETERA A COMASAGUA, SANTA TECLA, LA LIBERTAD, Santa Tecla, La Libertad, Santa Tecla, La Libertad Department Land for Sale - realestate.com.au",
         "url": "https://www.realestate.com.au/international/sv/km-12-5-carretera-a-comasagua-santa-tecla-la-libertad-santa-tecla-la-libertad-santa-tecla-la-libertad-department-310109287050/",
         "zone": "santa-tecla"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "8c184211875cac2bc2a0adc3584d2a42729853ad",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 120000.0,
+        "source": "realestate_au_sv",
+        "source_id": "los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329908",
+        "title": "Los Naranjos, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana, Chalchuapa, Sonsonate Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329908/",
+        "zone": "chalchuapa"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 120000.0,
+        "source": "realestate_au_sv",
+        "source_id": "los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329892",
+        "title": "Los Naranjos, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana, Chalchuapa, Sonsonate Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329892/",
+        "zone": "chalchuapa"
       }
     ],
     "sources": [
