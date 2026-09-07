@@ -1,22 +1,22 @@
 {
   "en": {
-    "candidates_seen": 4,
-    "llm_cost_usd": 0.00042486,
-    "paragraph": "El Salvador's tourism is booming, surpassing Cuba and Costa Rica, with record revenues projected at $3.6 billion. This growth, driven by improved safety and infrastructure, signals rising demand for coastal and lake properties. For you as a buyer, this means appreciating values and rental potential. Consider investing now to capitalize on the momentum.",
-    "picked_at": "2026-08-29",
-    "source_date": "28 Aug 2026",
+    "candidates_seen": 1,
+    "llm_cost_usd": 0.00023867000000000002,
+    "paragraph": "A swimmer died and three were rescued after strong currents at Playa El Majahual, La Libertad Costa. If you're scouting coastal property, this is a reminder to check water safety and rescue services near your potential lot. Ask locals about rip currents and seasonal hazards before buying. Your family's safety matters as much as the view.",
+    "picked_at": "2026-09-07",
+    "source_date": "7 Sep 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/politica/el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica/?utm_source=rss&utm_medium=rss&utm_campaign=el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica",
-    "title": "El Salvador's tourism boom boosts coastal property appeal"
+    "source_url": "https://lapagina.com.sv/nacionales/persona-muere-ahogada-en-playa-el-majahual/?utm_source=rss&utm_medium=rss&utm_campaign=persona-muere-ahogada-en-playa-el-majahual",
+    "title": "Drowning at El Majahual: Beach Safety Alert"
   },
   "es": {
-    "candidates_seen": 4,
-    "llm_cost_usd": 0.00047609000000000003,
-    "paragraph": "El turismo en El Salvador está en pleno auge, superando a destinos como Cuba y Costa Rica. Esto significa más visitantes y mayor demanda de alojamiento, lo que puede aumentar el valor de las propiedades costeras y de lago. Si estás pensando en comprar, ahora es un buen momento para invertir, ya que el crecimiento turístico podría traducirse en mejores rendimientos de alquiler y plusvalía a futuro.",
-    "picked_at": "2026-08-29",
-    "source_date": "28 ago 2026",
+    "candidates_seen": 1,
+    "llm_cost_usd": 0.000313,
+    "paragraph": "Esta semana, un incidente en Playa El Majahual, en La Libertad Costa, dejó una persona fallecida y tres rescatadas tras ser arrastradas por corrientes marinas. Para vos, que estás considerando comprar propiedad costera, esto subraya la importancia de evaluar la seguridad de la playa y la cercanía a servicios de emergencia. Antes de decidir, investigá el historial de accidentes, la presencia de salvavidas y las condiciones del mar en la zona. Priorizá tu tranquilidad y la de tu familia.",
+    "picked_at": "2026-09-07",
+    "source_date": "7 sep 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/politica/el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica/?utm_source=rss&utm_medium=rss&utm_campaign=el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica",
-    "title": "El Salvador consolida su auge turístico superando a Cuba y Costa Rica"
+    "source_url": "https://lapagina.com.sv/nacionales/persona-muere-ahogada-en-playa-el-majahual/?utm_source=rss&utm_medium=rss&utm_campaign=persona-muere-ahogada-en-playa-el-majahual",
+    "title": "Persona muere ahogada en playa El Majahual"
   }
 }
