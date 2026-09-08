@@ -1,0 +1,20 @@
+{
+  "width": 1600,
+  "height": 1200,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 476.4,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-09-08T08:00:07.418259+00:00",
+  "derivative_width": 1440,
+  "derivative_height": 1080,
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": false,
+  "has_marketing_overlay": true,
+  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/KUMUN972DT/B6yBgSCNkd/Terreno_en_Venta_en_Playa_Costa_Azul__1332_v%C2%B2_en_2_Fila.jpeg",
+  "candidate_count": 3,
+  "content_sha1": "f85e9e15928ab12f",
+  "dhash": 9699206233957411255,
+  "duplicates_dropped": 1
+}
