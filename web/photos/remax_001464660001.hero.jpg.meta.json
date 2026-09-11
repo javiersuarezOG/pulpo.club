@@ -1,0 +1,20 @@
+{
+  "width": 1000,
+  "height": 540,
+  "aspect_ratio": 1.852,
+  "file_size_kb": 1360.5,
+  "hero_eligible": false,
+  "card_eligible": false,
+  "hires_eligible": false,
+  "computed_at": "2026-09-11T08:18:20.303882+00:00",
+  "derivative_width": 1000,
+  "derivative_height": 540,
+  "hero_photo_quality_score": 0,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://remax-central.com.sv/storage/properties/fSKey93U91sS4VhZkLF5-large.png",
+  "candidate_count": 1,
+  "content_sha1": "39bc78b6118d8235",
+  "dhash": 7767708601609909352,
+  "duplicates_dropped": 0
+}
