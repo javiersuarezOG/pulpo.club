@@ -2,7 +2,7 @@
   "source": "santizo",
   "drift_state": "unreachable",
   "reason": "http_status=404",
-  "probed_at": "2026-09-16T21:24:30.900128+00:00",
+  "probed_at": "2026-09-17T04:59:52.526596+00:00",
   "last_probe": {
     "probed_url": "https://santizorealestate.com/s/ventas",
     "status_code": 404,
