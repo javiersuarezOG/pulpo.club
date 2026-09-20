@@ -2,7 +2,7 @@
   "source": "remax",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-09-20T16:14:30.971851+00:00",
+  "probed_at": "2026-09-20T20:54:46.069529+00:00",
   "last_probe": {
     "probed_url": "https://www.remax-elsalvador.com",
     "status_code": 200,
@@ -17,6 +17,6 @@
     "final_url": "https://www.remax-elsalvador.com",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-09-20T16:14:30.971880+00:00"
+    "last_ok_at": "2026-09-20T20:54:46.069555+00:00"
   }
 }
