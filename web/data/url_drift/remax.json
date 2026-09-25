@@ -2,13 +2,13 @@
   "source": "remax",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-09-25T05:05:07.193140+00:00",
+  "probed_at": "2026-09-25T11:58:39.405732+00:00",
   "last_probe": {
     "probed_url": "https://www.remax-elsalvador.com",
     "status_code": 200,
     "final_url": "https://www.remax-elsalvador.com",
     "response_size_bytes": null,
-    "duration_ms": 1237,
+    "duration_ms": 1348,
     "error": null
   },
   "baseline": {
@@ -17,6 +17,6 @@
     "final_url": "https://www.remax-elsalvador.com",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-09-25T05:05:07.193167+00:00"
+    "last_ok_at": "2026-09-25T11:58:39.405759+00:00"
   }
 }
