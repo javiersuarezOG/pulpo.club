@@ -1,0 +1,20 @@
+{
+  "width": 1299,
+  "height": 821,
+  "aspect_ratio": 1.582,
+  "file_size_kb": 275.1,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-09-25T07:55:24.561479+00:00",
+  "derivative_width": 1299,
+  "derivative_height": 821,
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/DAR25P4ARR/weHKwpgsXc/Venta_de_Terreno_Rural_de_7.jpeg",
+  "candidate_count": 3,
+  "content_sha1": "ef489ea82c54bbc5",
+  "dhash": 11935982833533557003,
+  "duplicates_dropped": 1
+}
