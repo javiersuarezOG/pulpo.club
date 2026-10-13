@@ -1,0 +1,14 @@
+{
+  "failure_id": "fd79c503",
+  "source": "essurf",
+  "ts": "2026-10-13T09:01:19.209783+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 0.61,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
