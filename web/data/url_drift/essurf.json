@@ -2,13 +2,13 @@
   "source": "essurf",
   "drift_state": "unreachable",
   "reason": "http_status=403",
-  "probed_at": "2026-10-13T00:48:50.130327+00:00",
+  "probed_at": "2026-10-13T14:21:45.257305+00:00",
   "last_probe": {
     "probed_url": "https://elsalvadorsurfrealestate.com",
     "status_code": 403,
     "final_url": "https://elsalvadorsurfrealestate.com",
     "response_size_bytes": null,
-    "duration_ms": 117,
+    "duration_ms": 179,
     "error": null
   },
   "baseline": {
