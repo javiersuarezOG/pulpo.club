@@ -2,13 +2,13 @@
   "source": "csbr",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-10-15T17:08:45.761389+00:00",
+  "probed_at": "2026-10-15T21:30:31.958361+00:00",
   "last_probe": {
     "probed_url": "https://www.camarabienesraices.com.sv/resultado-busqueda/?keyword=&type%5B0%5D=fincas&type%5B1%5D=playa&type%5B2%5D=terrenos",
     "status_code": 200,
     "final_url": "https://www.camarabienesraices.com.sv/resultado-busqueda/?keyword=&type%5B0%5D=fincas&type%5B1%5D=playa&type%5B2%5D=terrenos",
     "response_size_bytes": null,
-    "duration_ms": 1888,
+    "duration_ms": 3125,
     "error": null
   },
   "baseline": {
@@ -17,6 +17,6 @@
     "final_url": "https://www.camarabienesraices.com.sv/resultado-busqueda/?keyword=&type%5B0%5D=fincas&type%5B1%5D=playa&type%5B2%5D=terrenos",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-10-15T17:08:45.761417+00:00"
+    "last_ok_at": "2026-10-15T21:30:31.958442+00:00"
   }
 }
