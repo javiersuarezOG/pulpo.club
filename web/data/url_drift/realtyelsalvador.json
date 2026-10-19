@@ -1,15 +1,22 @@
 {
   "source": "realtyelsalvador",
-  "drift_state": "unreachable",
-  "reason": "http_status=403",
-  "probed_at": "2026-10-19T13:33:31.219707+00:00",
+  "drift_state": "ok",
+  "reason": "first_probe_seeds_baseline",
+  "probed_at": "2026-10-19T22:27:17.910476+00:00",
   "last_probe": {
     "probed_url": "https://realtyelsalvador.com",
-    "status_code": 403,
+    "status_code": 200,
     "final_url": "https://realtyelsalvador.com",
     "response_size_bytes": null,
-    "duration_ms": 116,
+    "duration_ms": 611,
     "error": null
   },
-  "baseline": null
+  "baseline": {
+    "source": "realtyelsalvador",
+    "probed_url": "https://realtyelsalvador.com",
+    "final_url": "https://realtyelsalvador.com",
+    "status_code": 200,
+    "response_size_bytes": null,
+    "last_ok_at": "2026-10-19T22:27:17.910496+00:00"
+  }
 }
