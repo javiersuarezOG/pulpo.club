@@ -1,0 +1,26 @@
+{
+  "width": 2048,
+  "height": 1152,
+  "aspect_ratio": 1.778,
+  "file_size_kb": 5571.4,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-10-20T08:08:44.167361+00:00",
+  "source_url": "https://images.remax-ccamls.com/003093706020/original/Taquillo-Hijuela-4-1_29b3fe67d38c4868998bc1b676de7f4d06d11f94.png",
+  "original_url": "https://images.remax-ccamls.com/003093706020/original/Taquillo-Hijuela-4-1_29b3fe67d38c4868998bc1b676de7f4d06d11f94.png",
+  "transform_used": "none",
+  "fetched_at": "2026-10-20T08:08:44.324229+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": null,
+  "resdet_detected_height": null,
+  "resdet_upscaled": null,
+  "quarantined": false,
+  "aesthetic": {
+    "visual_appeal": 7.3,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.252 color_entropy=0.550"
+  }
+}
