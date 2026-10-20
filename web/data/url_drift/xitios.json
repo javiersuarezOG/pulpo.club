@@ -2,13 +2,13 @@
   "source": "xitios",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-10-19T22:27:20.948733+00:00",
+  "probed_at": "2026-10-20T05:00:04.500713+00:00",
   "last_probe": {
     "probed_url": "https://www.xitios.com.sv/propiedades/buscar?categoria%5B%5D=VEN&tipo%5B%5D=RAN",
     "status_code": 200,
     "final_url": "https://www.xitios.com.sv/propiedades/buscar?categoria%5B%5D=VEN&tipo%5B%5D=RAN",
     "response_size_bytes": null,
-    "duration_ms": 622,
+    "duration_ms": 621,
     "error": null
   },
   "baseline": {
@@ -17,6 +17,6 @@
     "final_url": "https://www.xitios.com.sv/propiedades/buscar?categoria%5B%5D=VEN&tipo%5B%5D=RAN",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-10-19T22:27:20.948762+00:00"
+    "last_ok_at": "2026-10-20T05:00:04.500736+00:00"
   }
 }
