@@ -2,13 +2,13 @@
   "source": "goodlife",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-10-20T11:48:42.067648+00:00",
+  "probed_at": "2026-10-20T17:17:39.482464+00:00",
   "last_probe": {
     "probed_url": "https://goodlifeelsalvador.com/",
     "status_code": 200,
     "final_url": "https://goodlifeelsalvador.com/",
     "response_size_bytes": null,
-    "duration_ms": 2410,
+    "duration_ms": 3088,
     "error": null
   },
   "baseline": {
@@ -17,6 +17,6 @@
     "final_url": "https://goodlifeelsalvador.com/",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-10-20T11:48:42.067680+00:00"
+    "last_ok_at": "2026-10-20T17:17:39.482492+00:00"
   }
 }
