@@ -1,22 +1,22 @@
 {
   "en": {
-    "candidates_seen": 4,
-    "llm_cost_usd": 0.00042486,
-    "paragraph": "El Salvador's tourism is booming, surpassing Cuba and Costa Rica, with record revenues projected at $3.6 billion. This growth, driven by improved safety and infrastructure, signals rising demand for coastal and lake properties. For you as a buyer, this means appreciating values and rental potential. Consider investing now to capitalize on the momentum.",
-    "picked_at": "2026-08-29",
-    "source_date": "28 Aug 2026",
+    "candidates_seen": 3,
+    "llm_cost_usd": 0.00040341000000000004,
+    "paragraph": "Three people were pulled from the water at Playa San Blas in La Libertad Costa this week, a reminder that strong currents are common along El Salvador's Pacific coast. If you're buying near a beach, ask locals and lifeguards about rip currents and seasonal swell before you commit. Check whether your property sits near a manned lifeguard station, and factor in that many stretches have no permanent rescue coverage. Visit at different tides and times before deciding.",
+    "picked_at": "2026-09-14",
+    "source_date": "13 Sep 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/politica/el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica/?utm_source=rss&utm_medium=rss&utm_campaign=el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica",
-    "title": "El Salvador's tourism boom boosts coastal property appeal"
+    "source_url": "https://lapagina.com.sv/nacionales/tres-personas-son-rescatadas-tras-encontrarse-en-peligro-en-playa-san-blas/?utm_source=rss&utm_medium=rss&utm_campaign=tres-personas-son-rescatadas-tras-encontrarse-en-peligro-en-playa-san-blas",
+    "title": "Rescues at San Blas Highlight Beach Safety Risks"
   },
   "es": {
-    "candidates_seen": 4,
-    "llm_cost_usd": 0.00047609000000000003,
-    "paragraph": "El turismo en El Salvador está en pleno auge, superando a destinos como Cuba y Costa Rica. Esto significa más visitantes y mayor demanda de alojamiento, lo que puede aumentar el valor de las propiedades costeras y de lago. Si estás pensando en comprar, ahora es un buen momento para invertir, ya que el crecimiento turístico podría traducirse en mejores rendimientos de alquiler y plusvalía a futuro.",
-    "picked_at": "2026-08-29",
-    "source_date": "28 ago 2026",
+    "candidates_seen": 3,
+    "llm_cost_usd": 0.0004656400000000001,
+    "paragraph": "Tres personas fueron rescatadas en playa San Blas, La Libertad Costa, tras quedar en peligro en el agua. El rescate lo hizo la Unidad de Guardavidas de Protección Civil. Si estás pensando comprar cerca de playas como San Blas, esto te recuerda que las corrientes pueden ser fuertes y que la seguridad acuática varía según la zona. Antes de decidir, visitá la playa en distintas horas, preguntá a locales y verificá si hay guardavidas y señalización. Revisá también restricciones de construcción y acceso.",
+    "picked_at": "2026-09-14",
+    "source_date": "13 sep 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/politica/el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica/?utm_source=rss&utm_medium=rss&utm_campaign=el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica",
-    "title": "El Salvador consolida su auge turístico superando a Cuba y Costa Rica"
+    "source_url": "https://lapagina.com.sv/nacionales/tres-personas-son-rescatadas-tras-encontrarse-en-peligro-en-playa-san-blas/?utm_source=rss&utm_medium=rss&utm_campaign=tres-personas-son-rescatadas-tras-encontrarse-en-peligro-en-playa-san-blas",
+    "title": "Tres personas son rescatadas tras encontrarse en peligro en playa San Blas"
   }
 }
