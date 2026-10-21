@@ -276,27 +276,36 @@
     ]
   },
   {
-    "count": 2,
+    "count": 3,
     "cross_source": false,
-    "fingerprint": "01d91f4016293e8f2805d1e44d87fd398f2d525d",
+    "fingerprint": "d22995138e01c8dafd983e5d27718f8594a12e0d",
     "samples": [
       {
         "area_m2": null,
-        "price_usd": 80000.0,
+        "price_usd": 20140.0,
         "source": "realestate_au_sv",
-        "source_id": "jiboa-country-club-san-pedro-masahuat-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310103716161",
-        "title": "Jiboa Country Club, San Pedro Masahuat, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/jiboa-country-club-san-pedro-masahuat-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310103716161/",
-        "zone": "masahuat"
+        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747541",
+        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747541/",
+        "zone": "chalatenango"
       },
       {
         "area_m2": null,
-        "price_usd": 80000.0,
+        "price_usd": 20075.0,
         "source": "realestate_au_sv",
-        "source_id": "jiboa-country-club-san-pedro-masahuat-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310103716159",
-        "title": "Jiboa Country Club, San Pedro Masahuat, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/jiboa-country-club-san-pedro-masahuat-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310103716159/",
-        "zone": "masahuat"
+        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747511",
+        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747511/",
+        "zone": "chalatenango"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 20140.0,
+        "source": "realestate_au_sv",
+        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371",
+        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371/",
+        "zone": "chalatenango"
       }
     ],
     "sources": [
@@ -717,34 +726,6 @@
         "title": "San Diego Lot Development, La Libertad LAST REMAINING LOTS AVAILABLE!",
         "url": "https://www.remax-elsalvador.com/001463160064",
         "zone": "san-diego"
-      }
-    ],
-    "sources": [
-      "remax"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "52dbb87addab041f3b421b6ab736a558f7ff0ce2",
-    "samples": [
-      {
-        "area_m2": 250.2,
-        "price_usd": 35000.0,
-        "source": "remax",
-        "source_id": "00146166103",
-        "title": "LAND FOR SALE IN SAN CRISTOBAL I SAN LUIS TALPA",
-        "url": "https://www.remax-elsalvador.com/00146166103",
-        "zone": "san-luis-talpa"
-      },
-      {
-        "area_m2": 250.2,
-        "price_usd": 35000.0,
-        "source": "remax",
-        "source_id": "00146166102",
-        "title": "LAND FOR SALE IN SAN CRISTOBAL I SAN LUIS TALPA",
-        "url": "https://www.remax-elsalvador.com/00146166102",
-        "zone": "san-luis-talpa"
       }
     ],
     "sources": [
@@ -1393,6 +1374,34 @@
     ],
     "sources": [
       "remax"
+    ]
+  },
+  {
+    "count": 2,
+    "cross_source": false,
+    "fingerprint": "e9298aa949d411c4a8936dd5466f267d83d1e7b5",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 120000.0,
+        "source": "realestate_au_sv",
+        "source_id": "los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-santa-ana-310108329908",
+        "title": "Los Naranjos, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-santa-ana-310108329908/",
+        "zone": "chalchuapa"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 120000.0,
+        "source": "realestate_au_sv",
+        "source_id": "los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-santa-ana-310108329892",
+        "title": "Los Naranjos, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-santa-ana-310108329892/",
+        "zone": "chalchuapa"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
     ]
   },
   {
