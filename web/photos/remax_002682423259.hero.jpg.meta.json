@@ -1,0 +1,20 @@
+{
+  "width": 1232,
+  "height": 1071,
+  "aspect_ratio": 1.15,
+  "file_size_kb": 399.9,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-10-19T08:22:43.913236+00:00",
+  "derivative_width": 1232,
+  "derivative_height": 1071,
+  "hero_photo_quality_score": 90,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://images.remax-ccamls.com/002682423259/original/poster_2026-10-16-083456-3_ef7cc72ad90842c3a7c2095125b3a04d13e60885.jpg",
+  "candidate_count": 1,
+  "content_sha1": "0254f47372b259c0",
+  "dhash": 8750599718633432405,
+  "duplicates_dropped": 0
+}

@@ -6,12 +6,15 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-07-25T06:16:25.035924+00:00",
+  "computed_at": "2026-10-19T08:22:32.086572+00:00",
   "derivative_width": 1600,
   "derivative_height": 900,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002283543021/v3/HDPhotos/Casa%20de%20campo%20Moncagua.jpg",
-  "candidate_count": 1
+  "winning_url": "https://images.remax-ccamls.com/002283543021/original/Casa-de-campo-Moncagua_f8a87f18ab0e7b798313ccebb9473a9d.jpg",
+  "candidate_count": 1,
+  "content_sha1": "a09e46e9ca23fb28",
+  "dhash": 1869104776599054641,
+  "duplicates_dropped": 0
 }
