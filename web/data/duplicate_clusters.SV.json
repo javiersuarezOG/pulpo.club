@@ -110,91 +110,36 @@
     ]
   },
   {
-    "count": 4,
+    "count": 3,
     "cross_source": false,
-    "fingerprint": "9d3d41d0e424326dc335a37e3f1985f65354bc68",
+    "fingerprint": "12049ac3aca3dfef6512594196bf4d21903a0195",
     "samples": [
       {
         "area_m2": null,
         "price_usd": 35000.0,
         "source": "realestate_au_sv",
-        "source_id": "portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485860",
-        "title": "Portezuelo atras de MC El Brasil, Porvenir Jocotillo, Santa Ana, Porvenir Jocotillo, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485860/",
-        "zone": "santa-ana"
+        "source_id": "alegria-usulutan-norte-alegria-usulutan-alegria-usulutan-310110178705",
+        "title": "Alegria, Usulutan Norte, Alegria, Usulután, Alegria, Usulutan Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/alegria-usulutan-norte-alegria-usulutan-alegria-usulutan-310110178705/",
+        "zone": "alegria"
       },
       {
         "area_m2": null,
         "price_usd": 35000.0,
         "source": "realestate_au_sv",
-        "source_id": "portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485866",
-        "title": "Portezuelo atras de MC El Brasil, Porvenir Jocotillo, Santa Ana, Porvenir Jocotillo, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485866/",
-        "zone": "santa-ana"
+        "source_id": "alegria-usulutan-norte-alegria-usulutan-alegria-usulutan-310110178699",
+        "title": "Alegria, Usulutan Norte, Alegria, Usulután, Alegria, Usulutan Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/alegria-usulutan-norte-alegria-usulutan-alegria-usulutan-310110178699/",
+        "zone": "alegria"
       },
       {
         "area_m2": null,
         "price_usd": 35000.0,
         "source": "realestate_au_sv",
-        "source_id": "portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485859",
-        "title": "Portezuelo atras de MC El Brasil, Porvenir Jocotillo, Santa Ana, Porvenir Jocotillo, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485859/",
-        "zone": "santa-ana"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 35000.0,
-        "source": "realestate_au_sv",
-        "source_id": "portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485858",
-        "title": "Portezuelo atras de MC El Brasil, Porvenir Jocotillo, Santa Ana, Porvenir Jocotillo, Santa Ana Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/portezuelo-atras-de-mc-el-brasil-porvenir-jocotillo-santa-ana-porvenir-jocotillo-santa-ana-310109485858/",
-        "zone": "santa-ana"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 4,
-    "cross_source": false,
-    "fingerprint": "eb1b0b1225c4307e0c98913d56e17ef5705736f3",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 39000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650181",
-        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650181/",
-        "zone": "suchitoto"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 39000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650153",
-        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650153/",
-        "zone": "suchitoto"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 39000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650144",
-        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650144/",
-        "zone": "suchitoto"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 39000.0,
-        "source": "realestate_au_sv",
-        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650148",
-        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650148/",
-        "zone": "suchitoto"
+        "source_id": "alegria-usulutan-norte-alegria-usulutan-alegria-usulutan-310110178703",
+        "title": "Alegria, Usulutan Norte, Alegria, Usulután, Alegria, Usulutan Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/alegria-usulutan-norte-alegria-usulutan-alegria-usulutan-310110178703/",
+        "zone": "alegria"
       }
     ],
     "sources": [
@@ -276,27 +221,73 @@
     ]
   },
   {
-    "count": 2,
+    "count": 3,
     "cross_source": false,
-    "fingerprint": "01d91f4016293e8f2805d1e44d87fd398f2d525d",
+    "fingerprint": "d22995138e01c8dafd983e5d27718f8594a12e0d",
     "samples": [
       {
         "area_m2": null,
-        "price_usd": 80000.0,
+        "price_usd": 20140.0,
         "source": "realestate_au_sv",
-        "source_id": "jiboa-country-club-san-pedro-masahuat-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310103716161",
-        "title": "Jiboa Country Club, San Pedro Masahuat, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/jiboa-country-club-san-pedro-masahuat-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310103716161/",
-        "zone": "masahuat"
+        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747541",
+        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747541/",
+        "zone": "chalatenango"
       },
       {
         "area_m2": null,
-        "price_usd": 80000.0,
+        "price_usd": 20075.0,
         "source": "realestate_au_sv",
-        "source_id": "jiboa-country-club-san-pedro-masahuat-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310103716159",
-        "title": "Jiboa Country Club, San Pedro Masahuat, San Pedro Masahuat, La Paz, San Pedro Masahuat, La Paz Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/jiboa-country-club-san-pedro-masahuat-san-pedro-masahuat-la-paz-san-pedro-masahuat-la-paz-department-310103716159/",
-        "zone": "masahuat"
+        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747511",
+        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747511/",
+        "zone": "chalatenango"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 20140.0,
+        "source": "realestate_au_sv",
+        "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371",
+        "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371/",
+        "zone": "chalatenango"
+      }
+    ],
+    "sources": [
+      "realestate_au_sv"
+    ]
+  },
+  {
+    "count": 3,
+    "cross_source": false,
+    "fingerprint": "eb1b0b1225c4307e0c98913d56e17ef5705736f3",
+    "samples": [
+      {
+        "area_m2": null,
+        "price_usd": 39000.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650181",
+        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650181/",
+        "zone": "suchitoto"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 39000.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650153",
+        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650153/",
+        "zone": "suchitoto"
+      },
+      {
+        "area_m2": null,
+        "price_usd": 39000.0,
+        "source": "realestate_au_sv",
+        "source_id": "canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650148",
+        "title": "CANTON COPAPAYO, SUCHITOTO, CUSCATLAN., Copapayo, Cuscatlán, Copapayo, Cuscatlán Department Land for Sale - realestate.com.au",
+        "url": "https://www.realestate.com.au/international/sv/canton-copapayo-suchitoto-cuscatlan-copapayo-cuscatlan-copapayo-cuscatlan-department-310100650148/",
+        "zone": "suchitoto"
       }
     ],
     "sources": [
@@ -413,34 +404,6 @@
     ],
     "sources": [
       "realestate_au_sv"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "2219e5242b117f34c602369561c809a91d306026",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 458925.93,
-        "source": "vivolatam",
-        "source_id": "47nhyj2e8z",
-        "title": "Industrial land for sale in Industrial Intercomplex Park",
-        "url": "https://www.vivolatam.com/en/el-salvador/real-estate/l/industrial-land-for-sale-in-industrial-intercomplex-park-47nhyj2e8z",
-        "zone": "san-juan-opico"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 458978.83,
-        "source": "vivolatam",
-        "source_id": "59qh16unx7",
-        "title": "Industrial land for sale in Industrial Intercomplex Park",
-        "url": "https://www.vivolatam.com/en/el-salvador/real-estate/l/industrial-land-for-sale-in-industrial-intercomplex-park-59qh16unx7",
-        "zone": "san-juan-opico"
-      }
-    ],
-    "sources": [
-      "vivolatam"
     ]
   },
   {
@@ -698,62 +661,6 @@
   {
     "count": 2,
     "cross_source": false,
-    "fingerprint": "51914f44a9271f62ff473404ae787a0cd74b0187",
-    "samples": [
-      {
-        "area_m2": 199.88,
-        "price_usd": 49775.0,
-        "source": "remax",
-        "source_id": "001463160066",
-        "title": "San Diego Lot Development, La Libertad LAST REMAINING LOTS AVAILABLE!",
-        "url": "https://www.remax-elsalvador.com/001463160066",
-        "zone": "san-diego"
-      },
-      {
-        "area_m2": 199.88,
-        "price_usd": 50000.0,
-        "source": "remax",
-        "source_id": "001463160064",
-        "title": "San Diego Lot Development, La Libertad LAST REMAINING LOTS AVAILABLE!",
-        "url": "https://www.remax-elsalvador.com/001463160064",
-        "zone": "san-diego"
-      }
-    ],
-    "sources": [
-      "remax"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "52dbb87addab041f3b421b6ab736a558f7ff0ce2",
-    "samples": [
-      {
-        "area_m2": 250.2,
-        "price_usd": 35000.0,
-        "source": "remax",
-        "source_id": "00146166103",
-        "title": "LAND FOR SALE IN SAN CRISTOBAL I SAN LUIS TALPA",
-        "url": "https://www.remax-elsalvador.com/00146166103",
-        "zone": "san-luis-talpa"
-      },
-      {
-        "area_m2": 250.2,
-        "price_usd": 35000.0,
-        "source": "remax",
-        "source_id": "00146166102",
-        "title": "LAND FOR SALE IN SAN CRISTOBAL I SAN LUIS TALPA",
-        "url": "https://www.remax-elsalvador.com/00146166102",
-        "zone": "san-luis-talpa"
-      }
-    ],
-    "sources": [
-      "remax"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
     "fingerprint": "53b99fd00af920a8ded47a9bb7803b340b6bce68",
     "samples": [
       {
@@ -861,34 +768,6 @@
     ],
     "sources": [
       "vivolatam"
-    ]
-  },
-  {
-    "count": 2,
-    "cross_source": false,
-    "fingerprint": "5e782636c68e1dc7a437d09431c26d59eb447aad",
-    "samples": [
-      {
-        "area_m2": null,
-        "price_usd": 49775.0,
-        "source": "realestate_au_sv",
-        "source_id": "san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813079",
-        "title": "SAN DIEGO,  LA  Libertad, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813079/",
-        "zone": "san-diego"
-      },
-      {
-        "area_m2": null,
-        "price_usd": 50000.0,
-        "source": "realestate_au_sv",
-        "source_id": "san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813067",
-        "title": "SAN DIEGO,  LA  Libertad, La Libertad, La Libertad, La Libertad, La Libertad Department Land for Sale - realestate.com.au",
-        "url": "https://www.realestate.com.au/international/sv/san-diego-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310108813067/",
-        "zone": "san-diego"
-      }
-    ],
-    "sources": [
-      "realestate_au_sv"
     ]
   },
   {
@@ -1152,18 +1031,18 @@
         "area_m2": null,
         "price_usd": 2416879.58,
         "source": "vivolatam",
-        "source_id": "263hkfuh6x",
+        "source_id": "13e7urktk9",
         "title": "Industrial land for sale in Industrial Intercomplex Park",
-        "url": "https://www.vivolatam.com/en/el-salvador/real-estate/l/industrial-land-for-sale-in-industrial-intercomplex-park-263hkfuh6x",
+        "url": "https://www.vivolatam.com/en/el-salvador/real-estate/l/industrial-land-for-sale-in-industrial-intercomplex-park-13e7urktk9",
         "zone": "la-libertad"
       },
       {
         "area_m2": null,
         "price_usd": 2416879.58,
         "source": "vivolatam",
-        "source_id": "13e7urktk9",
+        "source_id": "263hkfuh6x",
         "title": "Industrial land for sale in Industrial Intercomplex Park",
-        "url": "https://www.vivolatam.com/en/el-salvador/real-estate/l/industrial-land-for-sale-in-industrial-intercomplex-park-13e7urktk9",
+        "url": "https://www.vivolatam.com/en/el-salvador/real-estate/l/industrial-land-for-sale-in-industrial-intercomplex-park-263hkfuh6x",
         "zone": "la-libertad"
       }
     ],

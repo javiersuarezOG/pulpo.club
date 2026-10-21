@@ -1,17 +1,20 @@
 {
-  "width": 1200,
-  "height": 900,
+  "width": 1280,
+  "height": 960,
   "aspect_ratio": 1.333,
-  "file_size_kb": 241.4,
+  "file_size_kb": 236.9,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-06-12T13:52:37.780202+00:00",
-  "derivative_width": 1200,
-  "derivative_height": 900,
+  "computed_at": "2026-09-25T07:57:49.355037+00:00",
+  "derivative_width": 1280,
+  "derivative_height": 960,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://image.vivolatam.com/eyJidWNrZXQiOiJ2bC1jZG4iLCJrZXkiOiJhc3NldHMvbWVkaWEvYXBwL2VsLXNhbHZhZG9yL3JlYWwtZXN0YXRlL2wvODJ4cmZtZnJuYy9pbWFnZXMvMDEzX2RkYzI4MWY0LWJlN2UtNGY1Yi04MjE1LWU2YzFlZGQzNWMzNy5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjEyMDAsImhlaWdodCI6OTAwLCJmaXQiOiJmaWxsIn19fQ==",
-  "candidate_count": 5
+  "winning_url": "https://cdn.vivolatam.com/assets/media/app/el-salvador/real-estate/l/82xrfmfrnc/images/013_ddc281f4-be7e-4f5b-8215-e6c1edd35c37.jpg",
+  "candidate_count": 5,
+  "content_sha1": "1e0aa488b763f943",
+  "dhash": 10923026737020461540,
+  "duplicates_dropped": 0
 }
