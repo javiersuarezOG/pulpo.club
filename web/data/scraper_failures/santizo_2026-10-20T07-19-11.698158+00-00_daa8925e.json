@@ -1,0 +1,14 @@
+{
+  "failure_id": "daa8925e",
+  "source": "santizo",
+  "ts": "2026-10-20T07:19:11.698158+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 1.27,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
