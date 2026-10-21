@@ -2,16 +2,19 @@
   "width": 960,
   "height": 659,
   "aspect_ratio": 1.457,
-  "file_size_kb": 285.3,
+  "file_size_kb": 263.8,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-06-08T09:12:45.560487+00:00",
+  "computed_at": "2026-10-08T09:18:10.064865+00:00",
   "derivative_width": 960,
   "derivative_height": 659,
   "hero_photo_quality_score": 70,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://www.xitios.com.sv/media/propiedad/05/venta-de-casa-en-playa-costa-del-sol-cl_php5bqLUV.webp",
-  "candidate_count": 2
+  "winning_url": "https://www.xitios.com.sv/media/propiedad/09/venta-de-casa-en-playa-costa-del-sol-cl_php3FGqeQ.webp",
+  "candidate_count": 2,
+  "content_sha1": "a6abbf090b9aff70",
+  "dhash": 13606794433818864844,
+  "duplicates_dropped": 0
 }
