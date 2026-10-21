@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-29T09:39:54.130695+00:00",
+  "computed_at": "2026-09-04T07:55:23.286342+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -275,6 +275,43 @@
       ],
       "sources": [
         "remax"
+      ]
+    },
+    {
+      "count": 3,
+      "cross_source": false,
+      "fingerprint": "d22995138e01c8dafd983e5d27718f8594a12e0d",
+      "samples": [
+        {
+          "area_m2": null,
+          "price_usd": 20140.0,
+          "source": "realestate_au_sv",
+          "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747541",
+          "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747541/",
+          "zone": "chalatenango"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 20075.0,
+          "source": "realestate_au_sv",
+          "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747511",
+          "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747511/",
+          "zone": "chalatenango"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 20140.0,
+          "source": "realestate_au_sv",
+          "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371",
+          "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371/",
+          "zone": "chalatenango"
+        }
+      ],
+      "sources": [
+        "realestate_au_sv"
       ]
     },
     {
@@ -1148,6 +1185,34 @@
     {
       "count": 2,
       "cross_source": false,
+      "fingerprint": "8c184211875cac2bc2a0adc3584d2a42729853ad",
+      "samples": [
+        {
+          "area_m2": null,
+          "price_usd": 120000.0,
+          "source": "realestate_au_sv",
+          "source_id": "los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329908",
+          "title": "Los Naranjos, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana, Chalchuapa, Sonsonate Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329908/",
+          "zone": "chalchuapa"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 120000.0,
+          "source": "realestate_au_sv",
+          "source_id": "los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329892",
+          "title": "Los Naranjos, Chalchuapa, Santa Ana, Chalchuapa, Santa Ana, Chalchuapa, Sonsonate Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/los-naranjos-chalchuapa-santa-ana-chalchuapa-santa-ana-chalchuapa-sonsonate-310108329892/",
+          "zone": "chalchuapa"
+        }
+      ],
+      "sources": [
+        "realestate_au_sv"
+      ]
+    },
+    {
+      "count": 2,
+      "cross_source": false,
       "fingerprint": "a2239abf184705466f0a047da292a34dbfa01dd9",
       "samples": [
         {
@@ -1485,52 +1550,46 @@
   "overlap_matrix": {},
   "per_source": {
     "bienesraices": {
-      "kept_as_unique": 507,
-      "raw": 508,
+      "kept_as_unique": 500,
+      "raw": 501,
       "shared_with_others": 0,
-      "unique_in_source": 507
+      "unique_in_source": 500
     },
     "citymax": {
-      "kept_as_unique": 38,
-      "raw": 38,
+      "kept_as_unique": 37,
+      "raw": 37,
       "shared_with_others": 0,
-      "unique_in_source": 38
+      "unique_in_source": 37
     },
     "citymax_sc": {
-      "kept_as_unique": 163,
-      "raw": 163,
+      "kept_as_unique": 164,
+      "raw": 164,
       "shared_with_others": 0,
-      "unique_in_source": 163
+      "unique_in_source": 164
     },
     "csbr": {
-      "kept_as_unique": 284,
-      "raw": 289,
+      "kept_as_unique": 280,
+      "raw": 285,
       "shared_with_others": 0,
-      "unique_in_source": 284
+      "unique_in_source": 280
     },
     "encuentra24": {
-      "kept_as_unique": 24,
-      "raw": 24,
+      "kept_as_unique": 26,
+      "raw": 26,
       "shared_with_others": 0,
-      "unique_in_source": 24
+      "unique_in_source": 26
     },
     "essurf": {
-      "kept_as_unique": 35,
-      "raw": 35,
+      "kept_as_unique": 34,
+      "raw": 34,
       "shared_with_others": 0,
-      "unique_in_source": 35
+      "unique_in_source": 34
     },
     "goodlife": {
-      "kept_as_unique": 33,
-      "raw": 33,
+      "kept_as_unique": 32,
+      "raw": 32,
       "shared_with_others": 0,
-      "unique_in_source": 33
-    },
-    "nexo": {
-      "kept_as_unique": 9,
-      "raw": 9,
-      "shared_with_others": 0,
-      "unique_in_source": 9
+      "unique_in_source": 32
     },
     "oceanside": {
       "kept_as_unique": 26,
@@ -1539,22 +1598,22 @@
       "unique_in_source": 26
     },
     "realestate_au_sv": {
-      "kept_as_unique": 265,
-      "raw": 304,
+      "kept_as_unique": 268,
+      "raw": 310,
       "shared_with_others": 0,
-      "unique_in_source": 265
+      "unique_in_source": 268
     },
     "remax": {
-      "kept_as_unique": 306,
-      "raw": 321,
+      "kept_as_unique": 311,
+      "raw": 326,
       "shared_with_others": 0,
-      "unique_in_source": 306
+      "unique_in_source": 311
     },
     "santizo": {
-      "kept_as_unique": 86,
-      "raw": 86,
+      "kept_as_unique": 88,
+      "raw": 88,
       "shared_with_others": 0,
-      "unique_in_source": 86
+      "unique_in_source": 88
     },
     "vivolatam": {
       "kept_as_unique": 157,
@@ -1569,6 +1628,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2025,
-  "total_unique_fingerprints": 1962
+  "total_in_dataset": 2018,
+  "total_unique_fingerprints": 1952
 }
