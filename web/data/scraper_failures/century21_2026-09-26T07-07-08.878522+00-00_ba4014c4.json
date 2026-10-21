@@ -1,0 +1,14 @@
+{
+  "failure_id": "ba4014c4",
+  "source": "century21",
+  "ts": "2026-09-26T07:07:08.878522+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 3.37,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
