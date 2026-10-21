@@ -2,13 +2,13 @@
   "source": "agentiz",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-10-20T21:42:37.573918+00:00",
+  "probed_at": "2026-10-21T04:58:50.571664+00:00",
   "last_probe": {
     "probed_url": "https://sv.agentiz.com/en",
     "status_code": 200,
     "final_url": "https://sv.agentiz.com/en",
     "response_size_bytes": null,
-    "duration_ms": 848,
+    "duration_ms": 801,
     "error": null
   },
   "baseline": {
@@ -17,6 +17,6 @@
     "final_url": "https://sv.agentiz.com/en",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-10-20T21:42:37.573953+00:00"
+    "last_ok_at": "2026-10-21T04:58:50.571700+00:00"
   }
 }
