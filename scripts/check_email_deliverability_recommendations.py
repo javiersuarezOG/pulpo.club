@@ -20,12 +20,25 @@ def env(name: str, default: str = "") -> str:
     return value.strip() if value and value.strip() else default
 
 
+# Cloudflare fronts api.resend.com and blocks the default
+# `Python-urllib/3.x` UA with error 1010 BEFORE auth is evaluated. This is
+# why the "Pulpo email deliverability check" workflow has been failing.
+# Any plain descriptive UA passes the edge; do NOT impersonate a browser.
+# See the measurement table in api/cron/webhook-health.py.
+USER_AGENT = "pulpo-monitor/1.0 (+https://pulpo.club)"
+
+
 def request_json(method: str, url: str, headers: dict[str, str] | None = None, payload: dict | None = None) -> dict:
     data = json.dumps(payload).encode("utf-8") if payload is not None else None
     req = urllib.request.Request(
         url,
         data=data,
-        headers={**(headers or {}), **({"Content-Type": "application/json"} if payload is not None else {})},
+        headers={
+            # First so an explicit caller-supplied UA still wins.
+            "User-Agent": USER_AGENT,
+            **(headers or {}),
+            **({"Content-Type": "application/json"} if payload is not None else {}),
+        },
         method=method,
     )
     try:

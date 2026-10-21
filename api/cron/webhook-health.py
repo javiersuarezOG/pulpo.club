@@ -86,6 +86,30 @@ def env(name: str, default: str = "") -> str:
     return value.strip() if value and value.strip() else default
 
 
+# Cloudflare fronts both api.clerk.com and api.resend.com and blocks the
+# default `Python-urllib/3.x` User-Agent with error 1010 ("banned based
+# on your browser's signature") BEFORE auth is evaluated. Measured
+# 2026-08-09 with an invalid bearer token, so the only variable is the UA:
+#
+#   Python-urllib/3.12  -> clerk 403/1010   resend 403/1010
+#   curl/8.4.0          -> clerk 401        resend 400
+#   this UA             -> clerk 401        resend 400
+#
+# i.e. any non-default UA passes the edge and the request is then judged
+# on its credentials, which is the behaviour we want.
+#
+# This is the real cause of the 1010s that PR #642 attributed to the
+# GitHub-Actions runner. Moving the checks to the Vercel runtime kept the
+# same urllib default UA, so it kept getting 1010 — the migration changed
+# the wrong variable. Nobody found out because PULPO_CRON_SECRET was
+# never provisioned, so this endpoint was never once called successfully.
+#
+# A plain descriptive UA is sufficient — do NOT impersonate a browser.
+# It identifies us honestly to the provider and is what they can contact
+# us about.
+USER_AGENT = "pulpo-monitor/1.0 (+https://pulpo.club)"
+
+
 def request_json(method: str, url: str,
                  headers: dict | None = None,
                  payload: dict | None = None,
@@ -95,6 +119,8 @@ def request_json(method: str, url: str,
         url,
         data=data,
         headers={
+            # First so an explicit caller-supplied UA still wins.
+            "User-Agent": USER_AGENT,
             **(headers or {}),
             **({"Content-Type": "application/json"} if payload is not None else {}),
         },
@@ -114,7 +140,7 @@ def _post_json(url: str, headers: dict, payload: dict,
     req = urllib.request.Request(
         url,
         data=json.dumps(payload).encode("utf-8"),
-        headers={**headers, "Content-Type": "application/json"},
+        headers={"User-Agent": USER_AGENT, **headers, "Content-Type": "application/json"},
         method="POST",
     )
     try:
