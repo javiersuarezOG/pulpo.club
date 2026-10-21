@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-29T09:39:54.130695+00:00",
+  "computed_at": "2026-09-08T07:54:42.854155+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -275,6 +275,43 @@
       ],
       "sources": [
         "remax"
+      ]
+    },
+    {
+      "count": 3,
+      "cross_source": false,
+      "fingerprint": "d22995138e01c8dafd983e5d27718f8594a12e0d",
+      "samples": [
+        {
+          "area_m2": null,
+          "price_usd": 20140.0,
+          "source": "realestate_au_sv",
+          "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747541",
+          "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747541/",
+          "zone": "chalatenango"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 20075.0,
+          "source": "realestate_au_sv",
+          "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747511",
+          "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747511/",
+          "zone": "chalatenango"
+        },
+        {
+          "area_m2": null,
+          "price_usd": 20140.0,
+          "source": "realestate_au_sv",
+          "source_id": "parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371",
+          "title": "Parcelacion la Ceiba,  Cantón Santa Rosa, Nueva Concepción, Chalatenango, Nueva Concepcion, Chalatenango, Nueva Concepcion, Chalatenango Land for Sale - realestate.com.au",
+          "url": "https://www.realestate.com.au/international/sv/parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310106943371/",
+          "zone": "chalatenango"
+        }
+      ],
+      "sources": [
+        "realestate_au_sv"
       ]
     },
     {
@@ -719,34 +756,6 @@
           "title": "San Diego Lot Development, La Libertad LAST REMAINING LOTS AVAILABLE!",
           "url": "https://www.remax-elsalvador.com/001463160064",
           "zone": "san-diego"
-        }
-      ],
-      "sources": [
-        "remax"
-      ]
-    },
-    {
-      "count": 2,
-      "cross_source": false,
-      "fingerprint": "52dbb87addab041f3b421b6ab736a558f7ff0ce2",
-      "samples": [
-        {
-          "area_m2": 250.2,
-          "price_usd": 35000.0,
-          "source": "remax",
-          "source_id": "00146166103",
-          "title": "LAND FOR SALE IN SAN CRISTOBAL I SAN LUIS TALPA",
-          "url": "https://www.remax-elsalvador.com/00146166103",
-          "zone": "san-luis-talpa"
-        },
-        {
-          "area_m2": 250.2,
-          "price_usd": 35000.0,
-          "source": "remax",
-          "source_id": "00146166102",
-          "title": "LAND FOR SALE IN SAN CRISTOBAL I SAN LUIS TALPA",
-          "url": "https://www.remax-elsalvador.com/00146166102",
-          "zone": "san-luis-talpa"
         }
       ],
       "sources": [
@@ -1485,28 +1494,28 @@
   "overlap_matrix": {},
   "per_source": {
     "bienesraices": {
-      "kept_as_unique": 507,
-      "raw": 508,
+      "kept_as_unique": 503,
+      "raw": 504,
       "shared_with_others": 0,
-      "unique_in_source": 507
+      "unique_in_source": 503
     },
     "citymax": {
-      "kept_as_unique": 38,
-      "raw": 38,
+      "kept_as_unique": 35,
+      "raw": 35,
       "shared_with_others": 0,
-      "unique_in_source": 38
+      "unique_in_source": 35
     },
     "citymax_sc": {
-      "kept_as_unique": 163,
-      "raw": 163,
+      "kept_as_unique": 164,
+      "raw": 164,
       "shared_with_others": 0,
-      "unique_in_source": 163
+      "unique_in_source": 164
     },
     "csbr": {
-      "kept_as_unique": 284,
-      "raw": 289,
+      "kept_as_unique": 279,
+      "raw": 284,
       "shared_with_others": 0,
-      "unique_in_source": 284
+      "unique_in_source": 279
     },
     "encuentra24": {
       "kept_as_unique": 24,
@@ -1515,16 +1524,16 @@
       "unique_in_source": 24
     },
     "essurf": {
-      "kept_as_unique": 35,
-      "raw": 35,
+      "kept_as_unique": 34,
+      "raw": 34,
       "shared_with_others": 0,
-      "unique_in_source": 35
+      "unique_in_source": 34
     },
     "goodlife": {
-      "kept_as_unique": 33,
-      "raw": 33,
+      "kept_as_unique": 32,
+      "raw": 32,
       "shared_with_others": 0,
-      "unique_in_source": 33
+      "unique_in_source": 32
     },
     "nexo": {
       "kept_as_unique": 9,
@@ -1539,22 +1548,22 @@
       "unique_in_source": 26
     },
     "realestate_au_sv": {
-      "kept_as_unique": 265,
-      "raw": 304,
+      "kept_as_unique": 258,
+      "raw": 299,
       "shared_with_others": 0,
-      "unique_in_source": 265
+      "unique_in_source": 258
     },
     "remax": {
-      "kept_as_unique": 306,
-      "raw": 321,
+      "kept_as_unique": 298,
+      "raw": 312,
       "shared_with_others": 0,
-      "unique_in_source": 306
+      "unique_in_source": 298
     },
     "santizo": {
-      "kept_as_unique": 86,
-      "raw": 86,
+      "kept_as_unique": 88,
+      "raw": 88,
       "shared_with_others": 0,
-      "unique_in_source": 86
+      "unique_in_source": 88
     },
     "vivolatam": {
       "kept_as_unique": 157,
@@ -1563,12 +1572,12 @@
       "unique_in_source": 157
     },
     "xitios": {
-      "kept_as_unique": 29,
-      "raw": 29,
+      "kept_as_unique": 30,
+      "raw": 30,
       "shared_with_others": 0,
-      "unique_in_source": 29
+      "unique_in_source": 30
     }
   },
-  "total_in_dataset": 2025,
-  "total_unique_fingerprints": 1962
+  "total_in_dataset": 2001,
+  "total_unique_fingerprints": 1937
 }

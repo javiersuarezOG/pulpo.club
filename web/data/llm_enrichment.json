@@ -142988,5 +142988,2667 @@
     "cost_usd": 0.00121716,
     "finish_reason": "stop",
     "latency_ms": 3991
+  },
+  "citymax_sc|casa-a-estrenar-en-venta-el-sinai-santa-ana": {
+    "ts": "2026-09-08T07:54:46.938396+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "New House for Sale in El Sinaí, Santa Ana",
+      "es": "Casa nueva en venta en El Sinaí, Santa Ana"
+    },
+    "short_description_canonical": {
+      "en": "New house for sale in El Sinaí, Santa Ana. Price: $289,500. Details on size, bedrooms, and bathrooms are not provided in the listing.",
+      "es": "Casa nueva en venta en El Sinaí, Santa Ana. Precio: $289,500. No se proporcionan detalles sobre tamaño, habitaciones o baños en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "New construction in Santa Ana",
+        "es": "Construcción nueva en Santa Ana"
+      },
+      {
+        "en": "Located in El Sinaí neighborhood",
+        "es": "Ubicada en el residencial El Sinaí"
+      },
+      {
+        "en": "Listed at $289,500",
+        "es": "Precio de lista: $289,500"
+      }
+    ],
+    "lat": 13.9949,
+    "lng": -89.5598,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3066,
+    "tokens_out": 376,
+    "cost_usd": 0.00124142,
+    "finish_reason": "stop",
+    "latency_ms": 3017
+  },
+  "bienesraices|2466": {
+    "ts": "2026-09-08T07:54:47.229864+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "75 Manzanas Land in San Julián, Sonsonate",
+      "es": "Terreno de 75 Manzanas en San Julián, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel of 75 manzanas (524,172 m²) in San Julián, Sonsonate, 7 minutes from the main road. Includes installations and is delivered with closed gate. Price is $1.5 million, negotiable.",
+      "es": "Terreno de 75 manzanas (524,172 m²) en San Julián, Sonsonate, a 7 minutos de la calle principal. Incluye instalaciones y se entrega con puerta cerrada. Precio de $1.5 millones, negociable."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "75 manzanas (524,172 m²) total",
+        "es": "75 manzanas (524,172 m²) en total"
+      },
+      {
+        "en": "7 minutes from main road",
+        "es": "A 7 minutos de calle principal"
+      },
+      {
+        "en": "Includes existing installations",
+        "es": "Incluye instalaciones existentes"
+      },
+      {
+        "en": "Delivered with closed gate",
+        "es": "Se entrega con puerta cerrada"
+      },
+      {
+        "en": "Negotiable price of $1.5M",
+        "es": "Precio negociable de $1.5M"
+      }
+    ],
+    "lat": 13.7167,
+    "lng": -89.5667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Julián, Sonsonate, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3193,
+    "tokens_out": 490,
+    "cost_usd": 0.00140111,
+    "finish_reason": "stop",
+    "latency_ms": 3310
+  },
+  "citymax_sc|casa-en-venta-en-el-centro-de-tamanique-la-libertad": {
+    "ts": "2026-09-08T07:54:47.280535+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale in Chiltiupán, La Libertad",
+      "es": "Casa en Venta en Chiltiupán, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "House for sale in Chiltiupán, La Libertad, priced at $190,000. The listing does not specify size, bedrooms, or other details. Located in a coastal area near popular beaches such as El Zonte and San Blas.",
+      "es": "Casa en venta en Chiltiupán, La Libertad, con precio de $190,000. El anuncio no especifica tamaño, habitaciones ni otros detalles. Ubicada en una zona costera cerca de playas populares como El Zonte y San Blas."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Near El Zonte and San Blas beaches",
+        "es": "Cerca de las playas El Zonte y San Blas"
+      },
+      {
+        "en": "Priced at $190,000",
+        "es": "Precio de $190,000"
+      },
+      {
+        "en": "Coastal municipality of La Libertad",
+        "es": "Municipio costero de La Libertad"
+      }
+    ],
+    "lat": 13.4983,
+    "lng": -89.5538,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Zonte beach",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3079,
+    "tokens_out": 427,
+    "cost_usd": 0.00130103,
+    "finish_reason": "stop",
+    "latency_ms": 3360
+  },
+  "bienesraices|2475": {
+    "ts": "2026-09-08T07:54:47.526733+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Industrial Land on Bulevar Bazzini, Ateos – 6.3 Manzanas",
+      "es": "Terreno Industrial en Bulevar Bazzini, Ateos – 6.3 Manzanas"
+    },
+    "short_description_canonical": {
+      "en": "Industrial land of 6.3 manzanas (~63,000 v²) on Bulevar Bazzini, Ateos. The terrain is 80% flat, with guaranteed utility feasibility for industrial services. Priced at $25.00 per square vara, total $1,575,000 USD.",
+      "es": "Terreno industrial de 6.3 manzanas (~63,000 v²) sobre el Bulevar Bazzini, Ateos. La superficie es 80% plana, con factibilidad garantizada de servicios industriales. Precio de $25.00 por vara cuadrada, total $1,575,000 USD."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct access on Bulevar Bazzini",
+        "es": "Acceso directo sobre Bulevar Bazzini"
+      },
+      {
+        "en": "80% flat terrain reduces earthwork costs",
+        "es": "80% plano reduce costos de terracería"
+      },
+      {
+        "en": "Guaranteed utility feasibility for industrial use",
+        "es": "Factibilidad garantizada de servicios industriales"
+      },
+      {
+        "en": "Large 6.3 manzanas (~63,000 v²) lot",
+        "es": "Gran extensión de 6.3 manzanas (~63,000 v²)"
+      },
+      {
+        "en": "Price per vara: $25.00 USD",
+        "es": "Precio por vara: $25.00 USD"
+      }
+    ],
+    "lat": 13.5833,
+    "lng": -89.4333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Sacacoyo, La Libertad, El Salvador",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3487,
+    "tokens_out": 557,
+    "cost_usd": 0.00155419,
+    "finish_reason": "stop",
+    "latency_ms": 3607
+  },
+  "bienesraices|2474": {
+    "ts": "2026-09-08T07:54:47.634841+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront lots at Residencial Atenea, Costa del Sol",
+      "es": "Lotes de playa en Residencial Atenea, Costa del Sol"
+    },
+    "short_description_canonical": {
+      "en": "Residential beach lots from 350 m² at Km 65, Boulevard Costa del Sol, San Luis La Herradura, La Paz. The gated complex features a turquoise lagoon, private internal beaches, swimming area, and marina. Prices start at $154,000 USD; free construction or pre-designed house models available.",
+      "es": "Lotes residenciales de playa desde 350 m² en Km 65, Boulevard Costa del Sol, San Luis La Herradura, La Paz. El complejo privado cuenta con laguna turquesa, playas internas privadas, área de natación y marina. Precio desde $154,000 USD; construcción libre o modelos de casas pre-diseñados."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Gated complex with security and amenities",
+        "es": "Complejo privado con seguridad y amenidades"
+      },
+      {
+        "en": "Turquoise lagoon and private internal beaches",
+        "es": "Laguna turquesa y playas internas privadas"
+      },
+      {
+        "en": "Starting price $154,000 USD for 350 m²",
+        "es": "Precio desde $154,000 USD por 350 m²"
+      },
+      {
+        "en": "Free construction or pre-designed house models",
+        "es": "Construcción libre o modelos de casas pre-diseñados"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3474,
+    "tokens_out": 511,
+    "cost_usd": 0.00150008,
+    "finish_reason": "stop",
+    "latency_ms": 3715
+  },
+  "bienesraices|2476": {
+    "ts": "2026-09-08T07:54:47.778691+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land near Costa Azul Beach, 1,332 v², second row",
+      "es": "Terreno cerca de Playa Costa Azul, 1,332 v², segunda fila"
+    },
+    "short_description_canonical": {
+      "en": "Land of 1,332.45 v² (approx. 930.93 m²) in second row near Playa Costa Azul, El Salvador. Flat topography with coconut and fruit trees, includes installed electricity, water pump system, septic tank, a small house (77.20 m²) and a pool to repair. Accessible by road for all vehicles, 3-4 minutes walking to the beach.",
+      "es": "Terreno de 1,332.45 v² (aprox. 930.93 m²) en segunda fila cerca de Playa Costa Azul, El Salvador. Topografía plana con cocoteros y árboles frutales, incluye energía eléctrica instalada, sistema de bombeo de agua, fosa séptica, una pequeña casa (77.20 m²) y piscina a reparar. Acceso por calle para todo tipo de vehículos, a 3-4 minutos caminando de la playa."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "3-4 min walk to beach",
+        "es": "3-4 min caminando a la playa"
+      },
+      {
+        "en": "Flat terrain, fully usable",
+        "es": "Terreno plano, totalmente aprovechable"
+      },
+      {
+        "en": "Electricity, water pump, septic installed",
+        "es": "Electricidad, bomba de agua, fosa séptica instalados"
+      },
+      {
+        "en": "Includes 77.20 m² house and pool",
+        "es": "Incluye casa de 77.20 m² y piscina"
+      },
+      {
+        "en": "Road access for all vehicles",
+        "es": "Acceso por calle para todo vehículo"
+      }
+    ],
+    "lat": 13.5928,
+    "lng": -89.8275,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Acajutla beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": 77.2,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3502,
+    "tokens_out": 603,
+    "cost_usd": 0.00160884,
+    "finish_reason": "stop",
+    "latency_ms": 3860
+  },
+  "citymax_sc|apartamentos-lock-off-en-venta-en-the-break-el-sunzal": {
+    "ts": "2026-09-08T07:54:49.890796+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Condos for Sale in El Sunzal",
+      "es": "Apartamentos frente al mar en El Sunzal"
+    },
+    "short_description_canonical": {
+      "en": "Beachfront condos for sale in El Sunzal, La Libertad, within El Salvador's Surf City. These oceanfront units are priced at $734,700. Located directly on the beach, they offer immediate access to surf and sand.",
+      "es": "Apartamentos frente al mar en El Sunzal, La Libertad, en Surf City de El Salvador. Estas unidades frente al océano tienen un precio de $734,700. Ubicados directamente en la playa, ofrecen acceso inmediato al surf y la arena."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in El Sunzal",
+        "es": "Ubicación frente al mar en El Sunzal"
+      },
+      {
+        "en": "Surf City, La Libertad",
+        "es": "Surf City, La Libertad"
+      },
+      {
+        "en": "Price $734,700",
+        "es": "Precio $734,700"
+      }
+    ],
+    "lat": 13.4844,
+    "lng": -89.6322,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Sunzal beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3074,
+    "tokens_out": 405,
+    "cost_usd": 0.00127548,
+    "finish_reason": "stop",
+    "latency_ms": 2609
+  },
+  "citymax_sc|lotes-en-venta-en-playa-el-espino-usulutan": {
+    "ts": "2026-09-08T07:54:50.037566+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Playa El Espino, Usulután",
+      "es": "Lotes en Venta en Playa El Espino, Usulután"
+    },
+    "short_description_canonical": {
+      "en": "Land for sale in Playa El Espino, Usulután. This is a plot of land located in the coastal area of El Espino. The property is in Jucuarán municipality, Usulután department. Price is $50,000.",
+      "es": "Terreno en venta en Playa El Espino, Usulután. Se trata de un lote ubicado en la zona costera de El Espino. La propiedad está en el municipio de Jucuarán, departamento de Usulután. Precio: $50,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in El Espino",
+        "es": "Ubicación frente a la playa en El Espino"
+      },
+      {
+        "en": "Coastal land in Usulután",
+        "es": "Terreno costero en Usulután"
+      },
+      {
+        "en": "Price: $50,000",
+        "es": "Precio: $50,000"
+      }
+    ],
+    "lat": 13.174,
+    "lng": -88.557,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Playa El Espino",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3093,
+    "tokens_out": 431,
+    "cost_usd": 0.00130921,
+    "finish_reason": "stop",
+    "latency_ms": 3098
+  },
+  "citymax_sc|terreno-en-venta-en-la-libertad-con-financiamiento": {
+    "ts": "2026-09-08T07:54:50.269265+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront Land for Sale in San Diego, La Libertad",
+      "es": "Terrenos frente al mar en San Diego, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcels for sale in San Diego, La Libertad, near Surf City and close to the sea. These beachfront lots offer direct access to the coast. Ideal for building a beach house or investment.",
+      "es": "Terrenos en venta en San Diego, La Libertad, cerca de Surf City y del mar. Estos lotes frente al mar ofrecen acceso directo a la costa. Ideales para construir casa de playa o invertir."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Beachfront location in San Diego",
+        "es": "Ubicación frente al mar en San Diego"
+      },
+      {
+        "en": "Close to Surf City, La Libertad",
+        "es": "Cerca de Surf City, La Libertad"
+      },
+      {
+        "en": "Land for sale near the sea",
+        "es": "Terrenos en venta cerca del mar"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bocana San Diego",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3081,
+    "tokens_out": 399,
+    "cost_usd": 0.00127077,
+    "finish_reason": "stop",
+    "latency_ms": 3039
+  },
+  "realestate_au_sv|finca-san-bartolo-porcion-3-canton-nazareth-s-n-huizucar-la-libertad-huizucar-la-union-department-310109971794": {
+    "ts": "2026-09-08T07:54:50.634816+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Huizucar, La Libertad",
+      "es": "Terreno en Venta en Huizucar, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Cantón Nazareth, Huizucar, La Libertad. This is a land listing with no specified size or improvements. Price is $280,000. Contact RE/MAX Central for details.",
+      "es": "Terreno en el Cantón Nazareth, Huizucar, La Libertad. Esta es una lista de terreno sin tamaño ni mejoras especificadas. Precio: $280,000. Contacte a RE/MAX Central para detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Huizucar, La Libertad",
+        "es": "Ubicado en Huizucar, La Libertad"
+      },
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Listado por RE/MAX Central"
+      },
+      {
+        "en": "Price: $280,000",
+        "es": "Precio: $280,000"
+      }
+    ],
+    "lat": 13.6333,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Huizucar, La Libertad, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3099,
+    "tokens_out": 409,
+    "cost_usd": 0.00128663,
+    "finish_reason": "stop",
+    "latency_ms": 2999
+  },
+  "realestate_au_sv|lotificacion-canaan-colonia-san-jose-san-francisco-gotera-san-jose-morazan-san-jose-la-paz-department-310109971780": {
+    "ts": "2026-09-08T07:54:50.746757+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Lotificacion Canaán, San Francisco Gotera",
+      "es": "Terreno en Lotificación Canaán, San Francisco Gotera"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Lotificacion Canaán, Colonia San José, San Francisco Gotera, Morazán. Offered at USD 45,000. Specific dimensions and utilities are not stated in the listing.",
+      "es": "Terreno en Lotificación Canaán, Colonia San José, San Francisco Gotera, Morazán. Se ofrece por USD 45,000. No se especifican dimensiones ni servicios en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Lotificacion Canaán",
+        "es": "Ubicado en Lotificación Canaán"
+      },
+      {
+        "en": "In Colonia San José",
+        "es": "En Colonia San José"
+      },
+      {
+        "en": "Price USD 45,000",
+        "es": "Precio USD 45,000"
+      }
+    ],
+    "lat": 13.6961,
+    "lng": -88.1011,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Francisco Gotera, Morazán",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3078,
+    "tokens_out": 393,
+    "cost_usd": 0.00126336,
+    "finish_reason": "stop",
+    "latency_ms": 2967
+  },
+  "encuentra24|32961978": {
+    "ts": "2026-09-08T07:54:50.776428+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Private Residential House, 176 m², La Libertad",
+      "es": "Casa en residencial privado, 176 m², La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "House of 175.94 m² in a private residential complex on the road to Puerto de La Libertad, Zaragoza, La Libertad. It has 3 bedrooms, 3.5 bathrooms, and parking for 4 vehicles. The property features high-quality finishes and amenities in contact with nature.",
+      "es": "Casa de 175.94 m² en residencial privado sobre la carretera al Puerto de La Libertad, Zaragoza, La Libertad. Cuenta con 3 dormitorios, 3.5 baños y estacionamiento para 4 vehículos. La propiedad ofrece acabados de calidad y amenidades en contacto con la naturaleza."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private gated residential community",
+        "es": "Residencial privado con acceso controlado"
+      },
+      {
+        "en": "High-quality finishes throughout",
+        "es": "Acabados de alta calidad en todo"
+      },
+      {
+        "en": "Nature-integrated amenities",
+        "es": "Amenidades integradas a la naturaleza"
+      },
+      {
+        "en": "Close to Puerto de La Libertad road",
+        "es": "Cerca de la carretera al Puerto de La Libertad"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Puerto de La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 3.5,
+      "built_area_m2": 175.94,
+      "parking_spaces": 4,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3127,
+    "tokens_out": 484,
+    "cost_usd": 0.00137669,
+    "finish_reason": "stop",
+    "latency_ms": 3246
+  },
+  "encuentra24|32933129": {
+    "ts": "2026-09-08T07:54:51.285119+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "8-Bedroom Investment Property in Tamanique, La Libertad",
+      "es": "Propiedad de Inversión de 8 Habitaciones en Tamanique, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "House of 350 m² built area with 8 bedrooms and 8 bathrooms in central Tamanique, La Libertad, about 20 minutes from La Libertad beaches. Each bedroom has a private bath, two have air conditioning, and there is an open kitchen, barbecue area, and laundry zone. Ideal for guesthouse or room rental investment.",
+      "es": "Casa de 350 m² de construcción con 8 habitaciones y 8 baños en el centro de Tamanique, La Libertad, a unos 20 minutos de las playas de La Libertad. Cada habitación tiene baño privado, dos tienen aire acondicionado, y cuenta con cocina abierta, área de barbacoa y zona de lavandería. Ideal para inversión en hospedaje o alquiler por habitaciones."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "8 rooms each with private bath",
+        "es": "8 habitaciones cada una con baño privado"
+      },
+      {
+        "en": "Central Tamanique, 20 min to beaches",
+        "es": "Centro de Tamanique, 20 min a playas"
+      },
+      {
+        "en": "Versatile spaces for guesthouse or rentals",
+        "es": "Espacios versátiles para hospedaje o alquileres"
+      },
+      {
+        "en": "Includes barbecue and laundry areas",
+        "es": "Incluye área de barbacoa y lavandería"
+      }
+    ],
+    "lat": 13.5833,
+    "lng": -89.4167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Tamanique, La Libertad",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 8,
+      "bathrooms": 8.0,
+      "built_area_m2": 350.0,
+      "parking_spaces": 3,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3411,
+    "tokens_out": 542,
+    "cost_usd": 0.00151717,
+    "finish_reason": "stop",
+    "latency_ms": 3757
+  },
+  "encuentra24|32928832": {
+    "ts": "2026-09-08T07:54:51.317983+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Beachfront House for Sale in Residencial Atami, La Libertad",
+      "es": "Casa de Playa en Venta en Residencial Atami, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Two-level beach house in Residencial Atami, La Libertad, with private beach access. 300 m² built, 4 bedrooms, 3 bathrooms, parking for 6 vehicles. Features air-conditioned family room, semi-open kitchen, ocean-view living room, pool, gazebo, and gardens. Priced at $425,000.",
+      "es": "Casa de playa de dos niveles en Residencial Atami, La Libertad, con acceso a playa privada. 300 m² construidos, 4 habitaciones, 3 baños, estacionamiento para 6 vehículos. Incluye sala familiar climatizada, cocina semiabierta, sala con vista al mar, piscina, glorieta y jardines. Precio: $425,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Private beach access in gated community",
+        "es": "Acceso a playa privada en residencial cerrada"
+      },
+      {
+        "en": "Ocean view from second-level living room",
+        "es": "Vista al mar desde sala en segundo nivel"
+      },
+      {
+        "en": "4 bedrooms, 3 baths, 300 m² built",
+        "es": "4 habitaciones, 3 baños, 300 m² construidos"
+      },
+      {
+        "en": "Parking for 6 vehicles",
+        "es": "Estacionamiento para 6 vehículos"
+      },
+      {
+        "en": "Family pool, gazebo, and gardens",
+        "es": "Piscina familiar, glorieta y jardines"
+      }
+    ],
+    "lat": 13.487,
+    "lng": -89.6133,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Tunco beach",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 3.0,
+      "built_area_m2": 300.0,
+      "parking_spaces": 6,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3337,
+    "tokens_out": 567,
+    "cost_usd": 0.00152469,
+    "finish_reason": "stop",
+    "latency_ms": 3826
+  },
+  "realestate_au_sv|san-jose-villa-nueva-la-libertad-la-libertad-la-libertad-la-libertad-la-libertad-department-310109971789": {
+    "ts": "2026-09-08T07:54:52.484373+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in San Jose Villa Nueva, La Libertad",
+      "es": "Terreno en Venta en San José Villa Nueva, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in San Jose Villa Nueva, La Libertad department, listed by RE/MAX Central. Property type is house, priced at USD 70,542. No further details provided.",
+      "es": "Parcela de terreno en San José Villa Nueva, departamento de La Libertad, publicada por RE/MAX Central. El tipo de propiedad es casa, con precio de USD 70,542. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Listed by RE/MAX Central",
+        "es": "Publicado por RE/MAX Central"
+      },
+      {
+        "en": "Priced at USD 70,542",
+        "es": "Precio de USD 70,542"
+      },
+      {
+        "en": "Located in La Libertad department",
+        "es": "Ubicado en el departamento de La Libertad"
+      }
+    ],
+    "lat": 13.4883,
+    "lng": -89.3222,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "La Libertad municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3082,
+    "tokens_out": 395,
+    "cost_usd": 0.00126664,
+    "finish_reason": "stop",
+    "latency_ms": 2593
+  },
+  "realestate_au_sv|rio-negro-perquin-arambala-morazan-arambala-morazan-department-310109967745": {
+    "ts": "2026-09-08T07:54:53.253609+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Perquín, Morazán",
+      "es": "Terreno en Venta en Perquín, Morazán"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Rio Negro, Perquín, Morazán Department, El Salvador. The property is offered for sale at USD 65,000. No further details on size or features are provided.",
+      "es": "Parcela de terreno en Rio Negro, Perquín, departamento de Morazán, El Salvador. La propiedad se ofrece en venta por USD 65,000. No se proporcionan más detalles sobre tamaño o características."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Perquín, Morazán",
+        "es": "Ubicado en Perquín, Morazán"
+      },
+      {
+        "en": "Priced at USD 65,000",
+        "es": "Precio de USD 65,000"
+      },
+      {
+        "en": "Rural mountain area",
+        "es": "Zona rural montañosa"
+      }
+    ],
+    "lat": 13.95,
+    "lng": -88.15,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Perquín, Morazán, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3079,
+    "tokens_out": 397,
+    "cost_usd": 0.00126803,
+    "finish_reason": "stop",
+    "latency_ms": 2984
+  },
+  "realestate_au_sv|hacienda-la-cabna-porcion-1-colectivo-1-lotificacion-agricola-poligono-4-lote-1-el-paisnal-san-salvador-norte-el-paisnal-san-salvador-el-paisnal-san-salvador-310109953836": {
+    "ts": "2026-09-08T07:54:53.518386+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Agricultural Land in El Paisnal, San Salvador",
+      "es": "Terreno Agrícola en El Paisnal, San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Agricultural land parcel in El Paisnal, San Salvador Norte, part of an agricultural lotification. The property is offered for sale at USD 245,000. Specific details on terrain, utilities, and zoning are not provided in the listing.",
+      "es": "Parcela de terreno agrícola en El Paisnal, San Salvador Norte, parte de una lotificación agrícola. La propiedad se ofrece en venta por USD 245,000. No se proporcionan detalles específicos sobre el terreno, servicios públicos ni zonificación en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Agricultural zoning in lotification",
+        "es": "Zonificación agrícola en lotificación"
+      },
+      {
+        "en": "Located in El Paisnal, San Salvador",
+        "es": "Ubicado en El Paisnal, San Salvador"
+      },
+      {
+        "en": "Listed at USD 245,000",
+        "es": "Listado en USD 245,000"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -89.1667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Paisnal, San Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3120,
+    "tokens_out": 417,
+    "cost_usd": 0.0013011,
+    "finish_reason": "stop",
+    "latency_ms": 2883
+  },
+  "realestate_au_sv|parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747541": {
+    "ts": "2026-09-08T07:54:53.607502+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in La Ceiba, Nueva Concepción, Chalatenango",
+      "es": "Terreno en La Ceiba, Nueva Concepción, Chalatenango"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Parcelación La Ceiba, Cantón Santa Rosa, Nueva Concepción, Chalatenango. Offered for sale by RE/MAX EXPANSION. Price is USD 20,140.",
+      "es": "Parcela de terreno en Parcelación La Ceiba, Cantón Santa Rosa, Nueva Concepción, Chalatenango. Se ofrece en venta por RE/MAX EXPANSION. Precio es USD 20,140."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Listed by RE/MAX EXPANSION",
+        "es": "Listado por RE/MAX EXPANSION"
+      },
+      {
+        "en": "Priced at USD 20,140",
+        "es": "Precio de USD 20,140"
+      },
+      {
+        "en": "Located in Nueva Concepción",
+        "es": "Ubicado en Nueva Concepción"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.0167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3096,
+    "tokens_out": 408,
+    "cost_usd": 0.00128472,
+    "finish_reason": "stop",
+    "latency_ms": 2860
+  },
+  "realestate_au_sv|lotificacion-miraflores-el-rosario-la-paz-el-rosario-la-paz-department-310119747509": {
+    "ts": "2026-09-08T07:54:53.612409+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in Miraflores, El Rosario, La Paz",
+      "es": "Terreno en Miraflores, El Rosario, La Paz"
+    },
+    "short_description_canonical": {
+      "en": "Land lot in Lotificacion Miraflores, El Rosario, La Paz department. Offered at USD 80,000. No further details provided.",
+      "es": "Lote de terreno en Lotificación Miraflores, El Rosario, departamento de La Paz. Ofrecido en USD 80,000. Sin más detalles proporcionados."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Lotificacion Miraflores",
+        "es": "Ubicado en Lotificación Miraflores"
+      },
+      {
+        "en": "Price USD 80,000",
+        "es": "Precio USD 80,000"
+      },
+      {
+        "en": "Listed by RE/MAX Capital",
+        "es": "Publicado por RE/MAX Capital"
+      }
+    ],
+    "lat": 13.5833,
+    "lng": -89.0,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Rosario, La Paz, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3078,
+    "tokens_out": 375,
+    "cost_usd": 0.00124356,
+    "finish_reason": "stop",
+    "latency_ms": 2835
+  },
+  "realestate_au_sv|parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747511": {
+    "ts": "2026-09-08T07:54:54.060236+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in La Ceiba, Nueva Concepción, Chalatenango",
+      "es": "Terreno en La Ceiba, Nueva Concepción, Chalatenango"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in La Ceiba, Cantón Santa Rosa, Nueva Concepción, Chalatenango. Offered for sale at $20,075. No further details provided.",
+      "es": "Parcela de terreno en La Ceiba, Cantón Santa Rosa, Nueva Concepción, Chalatenango. Se ofrece en venta por $20,075. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Listed at $20,075",
+        "es": "Precio de $20,075"
+      },
+      {
+        "en": "Located in Nueva Concepción",
+        "es": "Ubicado en Nueva Concepción"
+      },
+      {
+        "en": "In La Ceiba parcelation",
+        "es": "En parcelación La Ceiba"
+      }
+    ],
+    "lat": 14.0667,
+    "lng": -88.9333,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Chalatenango municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3096,
+    "tokens_out": 382,
+    "cost_usd": 0.00125612,
+    "finish_reason": "stop",
+    "latency_ms": 2774
+  },
+  "realestate_au_sv|parcelacion-la-ceiba-canton-santa-rosa-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-nueva-concepcion-chalatenango-310119747519": {
+    "ts": "2026-09-08T07:54:54.260281+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Nueva Concepción, Chalatenango",
+      "es": "Terreno en Venta en Nueva Concepción, Chalatenango"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Parcelación La Ceiba, Cantón Santa Rosa, Nueva Concepción, Chalatenango. Offered at $21,529 USD. For sale through RE/MAX EXPANSION.",
+      "es": "Parcela de terreno en Parcelación La Ceiba, Cantón Santa Rosa, Nueva Concepción, Chalatenango. Ofrecida en $21,529 USD. En venta a través de RE/MAX EXPANSION."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Nueva Concepción, Chalatenango",
+        "es": "Ubicado en Nueva Concepción, Chalatenango"
+      },
+      {
+        "en": "Price: $21,529 USD",
+        "es": "Precio: $21,529 USD"
+      },
+      {
+        "en": "Listed by RE/MAX EXPANSION",
+        "es": "Listado por RE/MAX EXPANSION"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -88.95,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Chalatenango municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3096,
+    "tokens_out": 408,
+    "cost_usd": 0.00128472,
+    "finish_reason": "stop",
+    "latency_ms": 2941
+  },
+  "realestate_au_sv|lote-s-n-canton-el-escalon-san-jose-villanueva-la-libertad-san-jose-villanueva-la-libertad-san-jose-villanueva-la-libertad-department-310119719261": {
+    "ts": "2026-09-08T07:54:55.198267+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land in San José Villanueva, La Libertad",
+      "es": "Terreno en San José Villanueva, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Cantón El Escalón, San José Villanueva, La Libertad. Offered at USD 175,000. No further details provided.",
+      "es": "Lote en cantón El Escalón, San José Villanueva, La Libertad. Se ofrece por USD 175,000. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in San José Villanueva",
+        "es": "Ubicado en San José Villanueva"
+      },
+      {
+        "en": "La Libertad department",
+        "es": "Departamento de La Libertad"
+      },
+      {
+        "en": "Listed at USD 175,000",
+        "es": "Precio de USD 175,000"
+      }
+    ],
+    "lat": 13.6167,
+    "lng": -89.35,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San José Villanueva municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3097,
+    "tokens_out": 371,
+    "cost_usd": 0.00124429,
+    "finish_reason": "stop",
+    "latency_ms": 2713
+  },
+  "realestate_au_sv|canton-los-canales-juayua-sonsonate-juayua-sonsonate-310119747525": {
+    "ts": "2026-09-08T07:54:55.234874+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Juayúa, Sonsonate",
+      "es": "Terreno en Venta en Juayúa, Sonsonate"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel located in Cantón Los Cañales, Juayúa, Sonsonate. The property is offered for sale at USD 45,000. No further details on size or features are provided in the listing.",
+      "es": "Parcela de terreno ubicada en Cantón Los Cañales, Juayúa, Sonsonate. La propiedad se ofrece en venta por USD 45,000. No se proporcionan más detalles sobre tamaño o características en el anuncio."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Priced at USD 45,000",
+        "es": "Precio de USD 45,000"
+      },
+      {
+        "en": "Located in Juayúa, Sonsonate",
+        "es": "Ubicado en Juayúa, Sonsonate"
+      },
+      {
+        "en": "Listed by RE/MAX Terra 503",
+        "es": "Anunciado por RE/MAX Terra 503"
+      }
+    ],
+    "lat": 13.8436,
+    "lng": -89.8903,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Juayúa, Sonsonate",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3078,
+    "tokens_out": 406,
+    "cost_usd": 0.00127766,
+    "finish_reason": "stop",
+    "latency_ms": 2966
+  },
+  "realestate_au_sv|canton-la-puente-juayua-la-puente-sonsonate-la-puente-sonsonate-310109926147": {
+    "ts": "2026-09-08T07:54:56.313678+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land for Sale in Cantón La Puente, Juayúa",
+      "es": "Terreno en Venta en Cantón La Puente, Juayúa"
+    },
+    "short_description_canonical": {
+      "en": "Land parcel in Cantón La Puente, Juayúa, Sonsonate. The listing provides no details on size, access, utilities, or zoning. Price is set at USD 80,000.",
+      "es": "Terreno en Cantón La Puente, Juayúa, Sonsonate. El anuncio no proporciona detalles sobre tamaño, acceso, servicios ni zonificación. El precio es de USD 80,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Cantón La Puente, Juayúa",
+        "es": "Ubicado en Cantón La Puente, Juayúa"
+      },
+      {
+        "en": "Priced at USD 80,000",
+        "es": "Precio de USD 80,000"
+      },
+      {
+        "en": "Listed by RE/MAX TERRA 503",
+        "es": "Publicado por RE/MAX TERRA 503"
+      }
+    ],
+    "lat": 13.8436,
+    "lng": -89.8903,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Juayúa municipality centroid",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3081,
+    "tokens_out": 407,
+    "cost_usd": 0.00127957,
+    "finish_reason": "stop",
+    "latency_ms": 3059
+  },
+  "realestate_au_sv|lote-802-poligono-g-las-cruces-hacienda-zapotitan-ciudad-arce-la-libertad-centro-ciudad-arce-la-libertad-ciudad-arce-santa-ana-310119477671": {
+    "ts": "2026-09-08T07:54:56.333817+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Land Lot 802, Las Cruces, Ciudad Arce",
+      "es": "Lote 802, Las Cruces, Ciudad Arce"
+    },
+    "short_description_canonical": {
+      "en": "Land lot 802 in Polígono G, Las Cruces, Hacienda Zapotitán, Ciudad Arce, La Libertad. Offered at USD 449,000. No further details provided.",
+      "es": "Lote de terreno 802 en Polígono G, Las Cruces, Hacienda Zapotitán, Ciudad Arce, La Libertad. Precio de USD 449,000. No se proporcionan más detalles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Located in Las Cruces, Ciudad Arce",
+        "es": "Ubicado en Las Cruces, Ciudad Arce"
+      },
+      {
+        "en": "Part of Hacienda Zapotitán",
+        "es": "Parte de Hacienda Zapotitán"
+      },
+      {
+        "en": "Price USD 449,000",
+        "es": "Precio USD 449,000"
+      }
+    ],
+    "lat": 13.9947,
+    "lng": -89.5567,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa Ana municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3109,
+    "tokens_out": 401,
+    "cost_usd": 0.00128053,
+    "finish_reason": "stop",
+    "latency_ms": 2815
+  },
+  "remax|00146927230": {
+    "ts": "2026-09-08T07:54:57.085140+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "5,565 v² Land in Nazareth, Huizúcar, La Libertad",
+      "es": "Terreno de 5,565 v² en Nazareth, Huizúcar, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land for sale in Nazareth Canton, Huizúcar, La Libertad, with a total area of 5,565 v² (approximately 3,889 m²). Sloping topography ideal for a residential project with natural views. Strategically located near Nuevo Cuscatlán, on the route to Puerto de La Libertad, in a rapidly growing area.",
+      "es": "Terreno en venta en Cantón Nazareth, Huizúcar, La Libertad, con un área total de 5,565 v² (aproximadamente 3,889 m²). Topografía inclinada ideal para un proyecto residencial con vistas naturales. Ubicado estratégicamente cerca de Nuevo Cuscatlán, en la ruta hacia Puerto de La Libertad, en una zona de rápido crecimiento."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Near Nuevo Cuscatlán, growing area",
+        "es": "Cerca de Nuevo Cuscatlán, zona en crecimiento"
+      },
+      {
+        "en": "On route to Puerto de La Libertad",
+        "es": "En ruta hacia Puerto de La Libertad"
+      },
+      {
+        "en": "Sloping terrain with natural views",
+        "es": "Terreno inclinado con vistas naturales"
+      },
+      {
+        "en": "Ideal for residential development",
+        "es": "Ideal para desarrollo residencial"
+      }
+    ],
+    "lat": 13.6167,
+    "lng": -89.2833,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Huizúcar, La Libertad, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3205,
+    "tokens_out": 516,
+    "cost_usd": 0.00143295,
+    "finish_reason": "stop",
+    "latency_ms": 3472
+  },
+  "remax|002283140057": {
+    "ts": "2026-09-08T07:54:57.314256+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "19,130 m² Commercial Land on Comalapa Highway",
+      "es": "Terreno comercial de 19,130 m² en Autopista Comalapa"
+    },
+    "short_description_canonical": {
+      "en": "Flat 19,130 m² commercial land on Comalapa Highway, 10 minutes from El Salvador International Airport. Total area of 19,129.68 v² (13,369.92 m²) with 145.87 m of highway frontage. White soil (tierra blanca) suitable for solid construction or soil sale. Priced at $40/v², total $765,187.20.",
+      "es": "Terreno comercial plano de 19,130 m² sobre la Autopista Comalapa, a 10 minutos del Aeropuerto Internacional de El Salvador. Área total de 19,129.68 v² (13,369.92 m²) con 145.87 m de frente a la autopista. Suelo de tierra blanca apto para construcción sólida o venta de tierra. Precio de $40/v², total $765,187.20."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "145.87 m highway frontage",
+        "es": "145.87 m de frente a autopista"
+      },
+      {
+        "en": "10 min from international airport",
+        "es": "10 min del aeropuerto internacional"
+      },
+      {
+        "en": "2 min from Las Ramblas mall",
+        "es": "2 min del C.C. Las Ramblas"
+      },
+      {
+        "en": "White soil for construction",
+        "es": "Tierra blanca para construcción"
+      },
+      {
+        "en": "Two titles, flexible sale",
+        "es": "Dos matrículas, venta flexible"
+      }
+    ],
+    "lat": 13.4869,
+    "lng": -89.3217,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Comalapa Highway near El Salvador International Airport",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3543,
+    "tokens_out": 559,
+    "cost_usd": 0.00157151,
+    "finish_reason": "stop",
+    "latency_ms": 3706
+  },
+  "remax|001463160075": {
+    "ts": "2026-09-08T07:54:57.656455+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Ocean-view lots in San Blas, La Libertad",
+      "es": "Lotes con vista al mar en San Blas, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land subdivision in San Blas, Surfcity1, La Libertad, offering lots with ocean views and direct street access. Infrastructure includes electricity and potable water connections; buyers install their own septic tank. A minute's drive from El Encuentro shopping center and near surf spots like Punta Roca and El Tunco.",
+      "es": "Subdivisión de lotes en San Blas, Surfcity1, La Libertad, con vistas al mar y acceso directo desde la calle principal. Infraestructura incluye conexiones de electricidad y agua potable; los compradores instalan su propio tanque séptico. A un minuto del centro comercial El Encuentro y cerca de destinos de surf como Punta Roca y El Tunco."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Ocean views from every lot",
+        "es": "Vistas al mar desde cada lote"
+      },
+      {
+        "en": "Electricity and potable water ready",
+        "es": "Electricidad y agua potable listas"
+      },
+      {
+        "en": "1 minute from El Encuentro mall",
+        "es": "A 1 minuto del centro comercial El Encuentro"
+      },
+      {
+        "en": "Near Punta Roca, El Tunco, Sunzal",
+        "es": "Cerca de Punta Roca, El Tunco, Sunzal"
+      },
+      {
+        "en": "45 minutes from the airport",
+        "es": "A 45 minutos del aeropuerto"
+      }
+    ],
+    "lat": 13.4747,
+    "lng": -89.4889,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Blas beach, La Libertad",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3352,
+    "tokens_out": 541,
+    "cost_usd": 0.00150014,
+    "finish_reason": "stop",
+    "latency_ms": 3595
+  },
+  "remax|001463160074": {
+    "ts": "2026-09-08T07:54:57.664989+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Ocean-view land lot in San Diego, La Libertad",
+      "es": "Lote con vista al mar en San Diego, La Libertad"
+    },
+    "short_description_canonical": {
+      "en": "Land lot of 352.7 m² in a new subdivision on the hill in San Diego, La Libertad, with ocean views. Electricity and potable water feasibility are in place; buyer installs septic tank. Clubhouse with pool under construction, and beachfront clubhouse at San Diego beach.",
+      "es": "Lote de 352.7 m² en un nuevo fraccionamiento en la colina de San Diego, La Libertad, con vista al mar. Factibilidad de electricidad y agua potable disponible; el comprador instala tanque séptico. Casa club con piscina en construcción y casa club frente a la playa San Diego."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Ocean views from most lots",
+        "es": "Vista al mar desde la mayoría de lotes"
+      },
+      {
+        "en": "Electricity and water feasibility ready",
+        "es": "Factibilidad de luz y agua lista"
+      },
+      {
+        "en": "Clubhouse with pool under construction",
+        "es": "Casa club con piscina en construcción"
+      },
+      {
+        "en": "Beachfront clubhouse at San Diego",
+        "es": "Casa club frente a la playa San Diego"
+      },
+      {
+        "en": "30 minutes from the airport",
+        "es": "30 minutos del aeropuerto"
+      }
+    ],
+    "lat": 13.4843,
+    "lng": -89.7163,
+    "geocoding_confidence": "high",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bocana San Diego",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3342,
+    "tokens_out": 497,
+    "cost_usd": 0.00144904,
+    "finish_reason": "stop",
+    "latency_ms": 3404
+  },
+  "remax|003114311009": {
+    "ts": "2026-09-08T07:54:58.003424+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat 431 m² Lot in San Francisco Gotera",
+      "es": "Terreno Plano de 431 m² en San Francisco Gotera"
+    },
+    "short_description_canonical": {
+      "en": "Flat 431 m² residential lot in Lotificación Canaán, Colonia San José, San Francisco Gotera, Morazán. Potable water easily accessible and electrical power available. Ready for immediate construction.",
+      "es": "Terreno residencial plano de 431 m² en Lotificación Canaán, Colonia San José, San Francisco Gotera, Morazán. Agua potable de fácil acceso y energía eléctrica disponible. Listo para construir de inmediato."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat 431 m² lot",
+        "es": "Terreno plano de 431 m²"
+      },
+      {
+        "en": "Potable water easily accessible",
+        "es": "Agua potable de fácil acceso"
+      },
+      {
+        "en": "Electrical power available",
+        "es": "Energía eléctrica disponible"
+      },
+      {
+        "en": "Ready for immediate construction",
+        "es": "Listo para construir de inmediato"
+      }
+    ],
+    "lat": 13.6769,
+    "lng": -88.1083,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "San Francisco Gotera, Morazán",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3218,
+    "tokens_out": 419,
+    "cost_usd": 0.00132976,
+    "finish_reason": "stop",
+    "latency_ms": 2804
+  },
+  "remax|003284449018": {
+    "ts": "2026-09-08T07:54:58.833614+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat 895 m² Lot in Llano del Muerto, Perquín",
+      "es": "Terreno plano de 895 m² en Llano del Muerto, Perquín"
+    },
+    "short_description_canonical": {
+      "en": "Flat 895.73 m² residential lot in Llano del Muerto, Perquín, Morazán, surrounded by pine forests. It is 1 km from Río Negro and 200 meters from mountain tourist centers, with easy access to the Perquín–Marcala highway. Electricity and water access are immediate.",
+      "es": "Terreno residencial plano de 895.73 m² en Llano del Muerto, Perquín, Morazán, rodeado de bosques de pino. Se encuentra a 1 km del Río Negro y a 200 metros de centros turísticos de montaña, con fácil acceso a la carretera Perquín–Marcala. El acceso a electricidad y agua es inmediato."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Flat 895.73 m² lot, build-ready",
+        "es": "Terreno plano de 895.73 m², listo para construir"
+      },
+      {
+        "en": "1 km from Río Negro river",
+        "es": "A 1 km del río Río Negro"
+      },
+      {
+        "en": "200 m from mountain tourist centers",
+        "es": "A 200 m de centros turísticos de montaña"
+      },
+      {
+        "en": "Easy access to Perquín–Marcala highway",
+        "es": "Fácil acceso a carretera Perquín–Marcala"
+      },
+      {
+        "en": "Immediate electricity and water access",
+        "es": "Acceso inmediato a electricidad y agua"
+      }
+    ],
+    "lat": 13.9633,
+    "lng": -88.1597,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Perquín, Morazán",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3353,
+    "tokens_out": 553,
+    "cost_usd": 0.00151361,
+    "finish_reason": "stop",
+    "latency_ms": 3598
+  },
+  "remax|002472129112": {
+    "ts": "2026-09-08T07:55:00.215306+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots in La Ceiba, Nueva Concepción",
+      "es": "Lotes residenciales planos en La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas (203 m²) in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Located 1 km from Central Park and 700 m from Blvd. Arturo Gutiérrez, with direct street access to Turicentro Splash. Individual deeds, deep well with pending permit, electricity throughout, gravel streets with curb and gutter. 95 lots in Phase 1, 70 available.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas (203 m²) en la Urbanización La Ceiba, Nueva Concepción, Chalatenango. Ubicados a 1 km del Parque Central y a 700 m del Blvd. Arturo Gutiérrez, con acceso directo a Turicentro Splash. Escrituras individuales, pozo profundo con permiso en trámite, electricidad en todo el desarrollo, calles de grava con cordón y cuneta. 95 lotes en Fase 1, 70 disponibles."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1 km from Central Park",
+        "es": "A 1 km del Parque Central"
+      },
+      {
+        "en": "700 m from Blvd. Arturo Gutiérrez",
+        "es": "A 700 m del Blvd. Arturo Gutiérrez"
+      },
+      {
+        "en": "Individual deeds, verified in registry",
+        "es": "Escrituras individuales, verificadas en registro"
+      },
+      {
+        "en": "Flat topography, semi-urban zoning",
+        "es": "Topografía plana, uso semi-urbano"
+      },
+      {
+        "en": "Water connection included per lot",
+        "es": "Conexión de agua incluida por lote"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.3,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3445,
+    "tokens_out": 599,
+    "cost_usd": 0.00158905,
+    "finish_reason": "stop",
+    "latency_ms": 3881
+  },
+  "remax|002472129113": {
+    "ts": "2026-09-08T07:55:00.497801+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "La Ceiba Subdivision Lots, Nueva Concepción",
+      "es": "Lotes en La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Semi-urban residential lots from 280 square varas (approx. 200 m²) in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Flat topography, 1 km from Central Park, 700 m from Blvd. Arturo Gutiérrez, and 100 m from Turicentro Splash. Individual deeds, registered well with pending permit, gravel streets with curb and gutter, and financing options available.",
+      "es": "Lotes residenciales semiurbanos desde 280 varas cuadradas (aprox. 200 m²) en La Ceiba, Nueva Concepción, Chalatenango. Topografía plana, a 1 km del Parque Central, 700 m del Blvd. Arturo Gutiérrez y a 100 m del Turicentro Splash. Escrituras individuales, pozo registrado con permiso en trámite, calles de grava con cordón cuneta y opciones de financiamiento."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Individual deeds, verified in registry",
+        "es": "Escrituras individuales, verificadas en registro"
+      },
+      {
+        "en": "1 km from Central Park",
+        "es": "A 1 km del Parque Central"
+      },
+      {
+        "en": "Flat topography, 280 sq varas",
+        "es": "Topografía plana, 280 varas cuadradas"
+      },
+      {
+        "en": "Water connection and meter included",
+        "es": "Conexión de agua y medidor incluidos"
+      },
+      {
+        "en": "Bank financing available",
+        "es": "Financiamiento bancario disponible"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.3,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3444,
+    "tokens_out": 565,
+    "cost_usd": 0.00155138,
+    "finish_reason": "stop",
+    "latency_ms": 4183
+  },
+  "remax|002472129111": {
+    "ts": "2026-09-08T07:55:00.963018+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Residential Lots in La Ceiba, Nueva Concepción",
+      "es": "Lotes residenciales en La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Located 1 km from Central Park, 700 m from Blvd. Arturo Gutiérrez, and across from Las Palmeras neighborhood. Each lot includes water connection and individual meter; gravel streets with curb and gutter planned by March 2026. Individual deeds and bank financing available.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas en Urbanización La Ceiba, Nueva Concepción, Chalatenango. Ubicados a 1 km del Parque Central, a 700 m del Blvd. Arturo Gutiérrez y frente a la colonia Las Palmeras. Cada lote incluye conexión de agua y medidor individual; calles de grava con cordón cuneta previstas para marzo 2026. Escrituras individuales y financiamiento bancario disponible."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1 km from Central Park",
+        "es": "A 1 km del Parque Central"
+      },
+      {
+        "en": "700 m from Blvd. Arturo Gutiérrez",
+        "es": "A 700 m del Blvd. Arturo Gutiérrez"
+      },
+      {
+        "en": "Individual deeds, verified in registry",
+        "es": "Escrituras individuales, verificadas en registro"
+      },
+      {
+        "en": "Water connection and meter included",
+        "es": "Conexión de agua y medidor incluidos"
+      },
+      {
+        "en": "Bank financing via BFA, FEDECREDITO, ACACYPAC",
+        "es": "Financiamiento bancario vía BFA, FEDECREDITO, ACACYPAC"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.3,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3468,
+    "tokens_out": 593,
+    "cost_usd": 0.00158866,
+    "finish_reason": "stop",
+    "latency_ms": 3877
+  },
+  "remax|002472129110": {
+    "ts": "2026-09-08T07:55:01.094771+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots in La Ceiba, Nueva Concepción",
+      "es": "Lotes residenciales planos en La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Phase 1 offers 95 lots, 70 available, with individual deeds and financing options. Each lot includes water connection and meter; gravel streets with curb and gutter expected by March 2026.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas en la Urbanización La Ceiba, Nueva Concepción, Chalatenango. La Fase 1 ofrece 95 lotes, 70 disponibles, con escrituras individuales y opciones de financiamiento. Cada lote incluye conexión de agua y medidor; calles de grava con cordón y cuneta previstas para marzo de 2026."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Individual deeds, verified in registry",
+        "es": "Escrituras individuales, verificadas en registro"
+      },
+      {
+        "en": "1 km from Central Park",
+        "es": "A 1 km del Parque Central"
+      },
+      {
+        "en": "Flat topography, semi-urban zoning",
+        "es": "Topografía plana, uso semiurbano"
+      },
+      {
+        "en": "Water connection and meter included",
+        "es": "Conexión de agua y medidor incluidos"
+      },
+      {
+        "en": "Bank financing available",
+        "es": "Financiamiento bancario disponible"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.3,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3444,
+    "tokens_out": 523,
+    "cost_usd": 0.00150518,
+    "finish_reason": "stop",
+    "latency_ms": 3780
+  },
+  "remax|002472129109": {
+    "ts": "2026-09-08T07:55:01.362707+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots in La Ceiba, Nueva Concepción",
+      "es": "Lotes residenciales planos en La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Located 1 km from Central Park, 700 m from Blvd. Arturo Gutiérrez, and 100 m from Turicentro Splash. Each lot includes water connection and individual meter; power poles and wiring throughout. Individual deeds, unencumbered, with bank financing available.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas en la Urbanización La Ceiba, Nueva Concepción, Chalatenango. Ubicados a 1 km del Parque Central, 700 m del Blvd. Arturo Gutiérrez y 100 m del Turicentro Splash. Cada lote incluye conexión de agua y medidor individual; postes y cableado eléctrico en todo el desarrollo. Escrituras individuales, libres de gravamen, con financiamiento bancario disponible."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "1 km from Central Park",
+        "es": "A 1 km del Parque Central"
+      },
+      {
+        "en": "700 m from Blvd. Arturo Gutiérrez",
+        "es": "A 700 m del Blvd. Arturo Gutiérrez"
+      },
+      {
+        "en": "Individual deeds, unencumbered",
+        "es": "Escrituras individuales, libres de gravamen"
+      },
+      {
+        "en": "Water connection and meter included",
+        "es": "Conexión de agua y medidor incluidos"
+      },
+      {
+        "en": "Bank financing available",
+        "es": "Financiamiento bancario disponible"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.0167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3444,
+    "tokens_out": 572,
+    "cost_usd": 0.00155908,
+    "finish_reason": "stop",
+    "latency_ms": 3705
+  },
+  "remax|002472129108": {
+    "ts": "2026-09-08T07:55:01.536540+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots in La Ceiba, Nueva Concepción",
+      "es": "Lotes residenciales planos en La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Phase 1 offers 95 lots, 70 available, with individual deeds and financing options. Each lot includes water connection and access to electricity, with gravel streets and curb/gutter; 1 km from Central Park and 700 m from Blvd. Arturo Gutiérrez.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas en la urbanización La Ceiba, Nueva Concepción, Chalatenango. La Fase 1 ofrece 95 lotes, 70 disponibles, con escrituras individuales y opciones de financiamiento. Cada lote incluye conexión de agua y acceso a electricidad, con calles de grava y cordón cuneta; a 1 km del Parque Central y a 700 m del Blvd. Arturo Gutiérrez."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Individual deeds in owner's name",
+        "es": "Escrituras individuales a nombre del dueño"
+      },
+      {
+        "en": "1 km from Central Park",
+        "es": "A 1 km del Parque Central"
+      },
+      {
+        "en": "Water connection included per lot",
+        "es": "Conexión de agua incluida por lote"
+      },
+      {
+        "en": "Flat topography, ready to build",
+        "es": "Topografía plana, lista para construir"
+      },
+      {
+        "en": "Bank financing available (BFA, FEDECREDITO)",
+        "es": "Financiamiento bancario disponible (BFA, FEDECREDITO)"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.3,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3444,
+    "tokens_out": 574,
+    "cost_usd": 0.00156128,
+    "finish_reason": "stop",
+    "latency_ms": 3871
+  },
+  "remax|002472129107": {
+    "ts": "2026-09-08T07:55:01.887669+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots in La Ceiba, Nueva Concepción",
+      "es": "Lotes residenciales planos en La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Phase 1 offers 95 lots with individual deeds, gravel streets with curb and gutter, and water and electricity infrastructure. Located 1 km from Central Park and 700 meters from Blvd. Arturo Gutiérrez, with financing available.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas en la Urbanización La Ceiba, Nueva Concepción, Chalatenango. La Fase 1 ofrece 95 lotes con escrituras individuales, calles de grava con cordón cuneta e infraestructura de agua y electricidad. Ubicado a 1 km del Parque Central y a 700 metros del Blvd. Arturo Gutiérrez, con financiamiento disponible."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Individual deeds and verified land registry",
+        "es": "Escrituras individuales y registro verificado"
+      },
+      {
+        "en": "1 km from Central Park",
+        "es": "A 1 km del Parque Central"
+      },
+      {
+        "en": "Flat topography, 280 sq varas up",
+        "es": "Topografía plana, desde 280 varas cuadradas"
+      },
+      {
+        "en": "Water and electricity infrastructure included",
+        "es": "Infraestructura de agua y electricidad incluida"
+      },
+      {
+        "en": "Bank financing available (BFA, FEDECREDITO, ACACYPAC)",
+        "es": "Financiamiento bancario disponible (BFA, FEDECREDITO, ACACYPAC)"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.0167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3444,
+    "tokens_out": 573,
+    "cost_usd": 0.00156018,
+    "finish_reason": "stop",
+    "latency_ms": 3883
+  },
+  "remax|002472129106": {
+    "ts": "2026-09-08T07:55:02.925098+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Flat Residential Lots in La Ceiba, Nueva Concepción",
+      "es": "Lotes residenciales planos en La Ceiba, Nueva Concepción"
+    },
+    "short_description_canonical": {
+      "en": "Flat residential lots from 280 square varas in La Ceiba Subdivision, Nueva Concepción, Chalatenango. Each lot includes water connection and individual meter; power poles and wiring are throughout. Individual deeds, verified in Land Registry, with gravel streets and curb/gutter. Located 1 km from Central Park and 700 meters from Blvd. Arturo Gutiérrez.",
+      "es": "Lotes residenciales planos desde 280 varas cuadradas en Urbanización La Ceiba, Nueva Concepción, Chalatenango. Cada lote incluye conexión de agua y medidor individual; postes y cableado eléctrico en todo el desarrollo. Escrituras individuales, verificadas en el Registro, con calles de grava y cordón cuneta. Ubicado a 1 km del Parque Central y a 700 metros del Blvd. Arturo Gutiérrez."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Individual deeds, verified in Land Registry",
+        "es": "Escrituras individuales, verificadas en el Registro"
+      },
+      {
+        "en": "1 km from Central Park",
+        "es": "A 1 km del Parque Central"
+      },
+      {
+        "en": "Flat topography, semi-urban residential use",
+        "es": "Topografía plana, uso residencial semi-urbano"
+      },
+      {
+        "en": "Water connection and meter included",
+        "es": "Conexión de agua y medidor incluidos"
+      },
+      {
+        "en": "Bank financing available (BFA, FEDECREDITO, ACACYPAC)",
+        "es": "Financiamiento bancario disponible (BFA, FEDECREDITO, ACACYPAC)"
+      }
+    ],
+    "lat": 14.1333,
+    "lng": -89.3,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Nueva Concepción, Chalatenango",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3444,
+    "tokens_out": 588,
+    "cost_usd": 0.00157668,
+    "finish_reason": "stop",
+    "latency_ms": 4091
+  },
+  "santizo|10335978": {
+    "ts": "2026-09-08T07:55:03.616306+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lakefront House for Sale in Ilopango",
+      "es": "Casa en Venta en Lago de Ilopango"
+    },
+    "short_description_canonical": {
+      "en": "House for sale on Lake Ilopango, with 1,500 v2 of land and 250 m² of construction. It has 3 bedrooms, 2 bathrooms, living room, dining room, kitchen, and a large garden. Panoramic lake view, premium location, and free of liens.",
+      "es": "Casa en venta en el lago de Ilopango, con 1,500 v2 de terreno y 250 m² de construcción. Cuenta con 3 habitaciones, 2 baños, sala, comedor, cocina y amplio jardín. Vista panorámica al lago, ubicación premium y libre de gravamen."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Panoramic lake view",
+        "es": "Vista panorámica al lago"
+      },
+      {
+        "en": "1,500 v2 of land",
+        "es": "1,500 v2 de terreno"
+      },
+      {
+        "en": "Free of liens",
+        "es": "Libre de gravamen"
+      },
+      {
+        "en": "Premium location",
+        "es": "Ubicación premium"
+      }
+    ],
+    "lat": 13.7167,
+    "lng": -89.1167,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ilopango municipality centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 250.0,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3190,
+    "tokens_out": 452,
+    "cost_usd": 0.0013585,
+    "finish_reason": "stop",
+    "latency_ms": 2521
+  },
+  "remax|002282685131": {
+    "ts": "2026-09-08T07:55:03.746542+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Two Flat Lots in Miraflores, Near Airport",
+      "es": "Dos lotes planos en Miraflores, cerca del aeropuerto"
+    },
+    "short_description_canonical": {
+      "en": "Two flat lots of 500 v² each (698.9 m² total) in the Miraflores subdivision, near Plaza Los Cocos and the new El Encuentro shopping center. Each lot is completely flat with easy access, 10 minutes from the International Airport. Priced at $40,000 per lot, suitable for commercial or storage use.",
+      "es": "Dos lotes planos de 500 v² cada uno (698.9 m² en total) en la urbanización Miraflores, cerca de Plaza Los Cocos y del nuevo centro comercial El Encuentro. Cada lote es completamente plano y de fácil acceso, a 10 minutos del Aeropuerto Internacional. Precio de $40,000 por lote, aptos para uso comercial o almacenamiento."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "10 minutes from International Airport",
+        "es": "A 10 minutos del Aeropuerto Internacional"
+      },
+      {
+        "en": "Near Plaza Los Cocos and El Encuentro",
+        "es": "Cerca de Plaza Los Cocos y El Encuentro"
+      },
+      {
+        "en": "Flat, easily accessible lots",
+        "es": "Lotes planos y de fácil acceso"
+      },
+      {
+        "en": "Price $40,000 per lot",
+        "es": "Precio $40,000 por lote"
+      }
+    ],
+    "lat": 13.4456,
+    "lng": -89.0556,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Miraflores subdivision, near Plaza Los Cocos, El Salvador",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3207,
+    "tokens_out": 515,
+    "cost_usd": 0.00143239,
+    "finish_reason": "stop",
+    "latency_ms": 3530
+  },
+  "santizo|10335609": {
+    "ts": "2026-09-08T07:55:04.028234+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Luxury House in Boca Raton, Miami",
+      "es": "Casa de Lujo en Boca Raton, Miami"
+    },
+    "short_description_canonical": {
+      "en": "Luxury house in exclusive Boca Raton residential area, Miami, Florida. Features living room, dining room, open kitchen, social bathroom, laundry area, four bedrooms, pool, terrace, and large garden. Priced at $2,000,000.",
+      "es": "Casa de lujo en exclusiva residencial Boca Raton, Miami, Florida. Cuenta con sala, comedor, cocina abierta, baño social, área de lavandería, cuatro habitaciones, piscina, terraza y amplio jardín. Precio: $2,000,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Four bedrooms and pool",
+        "es": "Cuatro habitaciones y piscina"
+      },
+      {
+        "en": "Exclusive Boca Raton residential",
+        "es": "Exclusiva residencial Boca Raton"
+      },
+      {
+        "en": "Large garden and terrace",
+        "es": "Amplio jardín y terraza"
+      },
+      {
+        "en": "Open kitchen and laundry area",
+        "es": "Cocina abierta y área de lavandería"
+      }
+    ],
+    "lat": 13.7942,
+    "lng": -88.8965,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Salvador centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3155,
+    "tokens_out": 446,
+    "cost_usd": 0.00134245,
+    "finish_reason": "stop",
+    "latency_ms": 3064
+  },
+  "remax|002523785004": {
+    "ts": "2026-09-08T07:55:04.117609+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "4.5 Manzanas Flat Land, El Paisnal, North San Salvador",
+      "es": "4.5 Manzanas Terreno Plano, El Paisnal, Norte de San Salvador"
+    },
+    "short_description_canonical": {
+      "en": "Flat 4.5 manzanas (31,723.84 m²) multi-use land in Hacienda La Cabaña, El Paisnal, North San Salvador. Suitable for agricultural, commercial, industrial, or residential subdivision projects. Located 3 minutes from main road and 5 minutes from Troncal del Norte Highway, behind La Cabaña Sugar Mill. Utilities nearby; price negotiable.",
+      "es": "Terreno plano de 4.5 manzanas (31,723.84 m²) de uso múltiple en Hacienda La Cabaña, El Paisnal, Norte de San Salvador. Apto para proyectos agrícolas, comerciales, industriales o subdivisión residencial. Ubicado a 3 minutos de la carretera principal y 5 minutos de la Troncal del Norte, detrás del Ingenio La Cabaña. Servicios cercanos; precio negociable."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "100% flat, ready to build",
+        "es": "100% plano, listo para construir"
+      },
+      {
+        "en": "3 min to main road, 5 to Troncal",
+        "es": "3 min a carretera principal, 5 a Troncal"
+      },
+      {
+        "en": "Behind La Cabaña Sugar Mill",
+        "es": "Detrás del Ingenio La Cabaña"
+      },
+      {
+        "en": "High growth industrial/commercial zone",
+        "es": "Zona industrial/comercial en alto crecimiento"
+      },
+      {
+        "en": "Utilities nearby",
+        "es": "Servicios cercanos"
+      }
+    ],
+    "lat": 13.8333,
+    "lng": -89.1667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Paisnal, San Salvador department",
+    "url_language": "en",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": null,
+      "bathrooms": null,
+      "built_area_m2": null,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3361,
+    "tokens_out": 576,
+    "cost_usd": 0.00154107,
+    "finish_reason": "stop",
+    "latency_ms": 3619
+  },
+  "santizo|10308741": {
+    "ts": "2026-09-08T07:55:04.592014+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Single-Level House for Sale in La Fontana I",
+      "es": "Casa de un Nivel en Venta en La Fontana I"
+    },
+    "short_description_canonical": {
+      "en": "Single-level house for sale in Residencial La Fontana I. It includes living room, dining room, kitchen, terrace, and ample garden. It has four bedrooms, three bathrooms, and two parking spaces.",
+      "es": "Casa de un nivel en venta en Residencial La Fontana I. Incluye sala, comedor, cocina, terraza y jardín amplio. Cuenta con cuatro dormitorios, tres baños y dos estacionamientos."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Single-level layout",
+        "es": "Distribución de un nivel"
+      },
+      {
+        "en": "Four bedrooms, three bathrooms",
+        "es": "Cuatro dormitorios, tres baños"
+      },
+      {
+        "en": "Ample garden and terrace",
+        "es": "Jardín amplio y terraza"
+      },
+      {
+        "en": "Two parking spaces",
+        "es": "Dos estacionamientos"
+      }
+    ],
+    "lat": 13.6929,
+    "lng": -89.2182,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "El Salvador centroid",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 3.0,
+      "built_area_m2": null,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 3132,
+    "tokens_out": 416,
+    "cost_usd": 0.00130324,
+    "finish_reason": "stop",
+    "latency_ms": 3055
+  },
+  "xitios|venta-de-casa-playa-amatecampo-js": {
+    "ts": "2026-09-08T07:55:06.459533+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "House for Sale at Playa Amatecampo, 3 Bedrooms",
+      "es": "Casa en Venta en Playa Amatecampo, 3 Habitaciones"
+    },
+    "short_description_canonical": {
+      "en": "Single-level house on a 256 m² lot (366 varas²) in Playa Amatecampo, La Paz, 45 minutes from San Salvador. Built area of 121 m² with 3 bedrooms (all A/C), 3 full baths, 1 social bath, pool, living/dining, open kitchen, storage, and parking for 2 vehicles. Second row with beach access, priced at $210,000.",
+      "es": "Casa de un nivel en lote de 256 m² (366 varas²) en Playa Amatecampo, La Paz, a 45 minutos de San Salvador. Área construida de 121 m² con 3 habitaciones (todas con A/C), 3 baños completos, 1 baño social, piscina, sala, comedor, bodega, cocina abierta y estacionamiento para 2 vehículos. Segunda fila con acceso al mar, precio de $210,000."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Second row with beach access",
+        "es": "Segunda fila con acceso al mar"
+      },
+      {
+        "en": "3 bedrooms all with A/C",
+        "es": "3 habitaciones todas con A/C"
+      },
+      {
+        "en": "Includes pool and parking for 2",
+        "es": "Incluye piscina y estacionamiento para 2"
+      },
+      {
+        "en": "45 minutes from San Salvador",
+        "es": "45 minutos de San Salvador"
+      }
+    ],
+    "lat": 13.3372,
+    "lng": -88.9892,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Costa del Sol",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 4.0,
+      "built_area_m2": 121.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 3516,
+    "tokens_out": 554,
+    "cost_usd": 0.00155872,
+    "finish_reason": "stop",
+    "latency_ms": 3534
+  },
+  "encuentra24|32655647": {
+    "ts": "2026-09-08T08:38:44.832635+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Ocean-view house in Chumico Redondo, Río Hato",
+      "es": "Casa con vista al mar en Chumico Redondo, Río Hato"
+    },
+    "short_description_canonical": {
+      "en": "House of 882 m² built on a 9,710 m² lot in Chumico Redondo, Río Hato, with direct private beach access. It has 7 bedrooms, 6 bathrooms, pool, terrace, balcony, and two additional guest structures. The gated community has only 6 homes, ensuring privacy and exclusivity.",
+      "es": "Casa de 882 m² construidos en un terreno de 9,710 m² en Chumico Redondo, Río Hato, con acceso directo y privado a la playa. Cuenta con 7 habitaciones, 6 baños, piscina, terraza, balcón y dos estructuras adicionales para invitados. El residencial tiene solo 6 casas, garantizando privacidad y exclusividad."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Direct private beach access",
+        "es": "Acceso directo y privado a la playa"
+      },
+      {
+        "en": "882 m² built, 9,710 m² lot",
+        "es": "882 m² construidos, terreno de 9,710 m²"
+      },
+      {
+        "en": "Only 6 homes in community",
+        "es": "Solo 6 casas en el residencial"
+      },
+      {
+        "en": "7 bedrooms, 6 bathrooms",
+        "es": "7 habitaciones, 6 baños"
+      },
+      {
+        "en": "Two additional guest structures",
+        "es": "Dos estructuras adicionales para invitados"
+      }
+    ],
+    "lat": 8.3833,
+    "lng": -80.1667,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Chumico Redondo, Río Hato",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 7,
+      "bathrooms": 6.0,
+      "built_area_m2": 882.0,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2591,
+    "tokens_out": 555,
+    "cost_usd": 0.00131007,
+    "finish_reason": "stop",
+    "latency_ms": 3640
+  },
+  "encuentra24|32900990": {
+    "ts": "2026-09-08T08:38:44.870886+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Contemporary House in Ancón, 317 m², 3 Bedrooms",
+      "es": "Casa contemporánea en Ancón, 317 m², 3 habitaciones"
+    },
+    "short_description_canonical": {
+      "en": "Contemporary single-family house in the heart of Ancón, blending natural surroundings with central convenience. Built area of 317 m² with 3 bedrooms and 2.5 bathrooms, plus parking for 2 vehicles. The property offers privacy and comfort in a natural setting.",
+      "es": "Casa unifamiliar contemporánea en el corazón de Ancón, que combina entorno natural con conveniencia céntrica. Área construida de 317 m² con 3 habitaciones y 2.5 baños, más estacionamiento para 2 vehículos. La propiedad ofrece privacidad y confort en un entorno natural."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "317 m² built area",
+        "es": "317 m² de área construida"
+      },
+      {
+        "en": "3 bedrooms, 2.5 baths",
+        "es": "3 habitaciones, 2.5 baños"
+      },
+      {
+        "en": "Parking for 2 vehicles",
+        "es": "Estacionamiento para 2 vehículos"
+      },
+      {
+        "en": "Natural surroundings in central Ancón",
+        "es": "Entorno natural en el céntrico Ancón"
+      }
+    ],
+    "lat": 8.9667,
+    "lng": -79.55,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Ancón, Panama City",
+    "url_language": "mixed",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.5,
+      "built_area_m2": 317.0,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2655,
+    "tokens_out": 480,
+    "cost_usd": 0.00124485,
+    "finish_reason": "stop",
+    "latency_ms": 3677
+  },
+  "encuentra24|31744587": {
+    "ts": "2026-09-08T08:38:45.354599+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Furnished 3-Bed Villa in Gated Community near Coronado",
+      "es": "Villa amueblada de 3 dormitorios en comunidad cerrada cerca de Coronado"
+    },
+    "short_description_canonical": {
+      "en": "Furnished 176 m² villa on a 600 m² lot in Villas del María, a gated community 10 minutes from Coronado. It has 3 bedrooms, 2 bathrooms, living room, dining room, terrace, kitchen with breakfast bar, laundry, 2 parking spaces, pool with deck, and high-quality finishes. The community offers green areas, an ecological trail, and security gatehouse.",
+      "es": "Villa amueblada de 176 m² en un terreno de 600 m² en Villas del María, comunidad cerrada a 10 minutos de Coronado. Cuenta con 3 dormitorios, 2 baños, sala, comedor, terraza, cocina con desayunador, lavadero, 2 estacionamientos, piscina con deck y acabados de alta calidad. La comunidad ofrece áreas verdes, sendero ecológico y garita de seguridad."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Fully furnished, turnkey ready",
+        "es": "Totalmente amueblada, lista para estrenar"
+      },
+      {
+        "en": "10 minutes from Coronado",
+        "es": "A 10 minutos de Coronado"
+      },
+      {
+        "en": "Gated community with security",
+        "es": "Comunidad cerrada con seguridad"
+      },
+      {
+        "en": "Private pool with deck",
+        "es": "Piscina privada con deck"
+      },
+      {
+        "en": "Airbnb-friendly community",
+        "es": "Comunidad apta para Airbnb"
+      }
+    ],
+    "lat": 8.6,
+    "lng": -79.87,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Bejuco, Panamá Oeste (near Coronado)",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 3,
+      "bathrooms": 2.0,
+      "built_area_m2": 176.0,
+      "parking_spaces": 2,
+      "furnished": true,
+      "has_pool": true
+    },
+    "tokens_in": 2539,
+    "tokens_out": 569,
+    "cost_usd": 0.00131143,
+    "finish_reason": "stop",
+    "latency_ms": 4161
+  },
+  "encuentra24|32389567": {
+    "ts": "2026-09-08T08:38:45.524149+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lakefront 4-Bedroom House in The Woods, Santa María",
+      "es": "Casa frente al lago de 4 recámaras en The Woods, Santa María"
+    },
+    "short_description_canonical": {
+      "en": "House of 338 m² built on a 362 m² lot, located in the exclusive gated community The Woods, Santa María, with lake views. It features 4 bedrooms each with private bathroom, 4.5 bathrooms, a den, semi-open kitchen, service room and bathroom, and a storage room. The property is in a secure 24/7 community surrounded by nature and the Nicklaus Design golf course, with space to customize areas such as a private pool.",
+      "es": "Casa de 338 m² de construcción en un terreno de 362 m², ubicada en la exclusiva comunidad cerrada The Woods, Santa María, con vista al lago. Cuenta con 4 recámaras cada una con baño privado, 4.5 baños, den, cocina semiabierta, cuarto y baño de servicio, y un depósito. La propiedad se encuentra en una comunidad segura con vigilancia 24/7, rodeada de naturaleza y el campo de golf Nicklaus Design, con espacio para personalizar áreas como una piscina privada."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Lakefront location within The Woods",
+        "es": "Ubicación frente al lago dentro de The Woods"
+      },
+      {
+        "en": "4 bedrooms each with private bath",
+        "es": "4 recámaras cada una con baño privado"
+      },
+      {
+        "en": "Gated community with 24/7 security",
+        "es": "Comunidad cerrada con vigilancia 24/7"
+      },
+      {
+        "en": "Space to add private pool",
+        "es": "Espacio para añadir piscina privada"
+      },
+      {
+        "en": "Nicklaus Design golf course nearby",
+        "es": "Campo de golf Nicklaus Design cercano"
+      }
+    ],
+    "lat": 8.3333,
+    "lng": -80.0,
+    "geocoding_confidence": "low",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Santa María, Usulután, Panama (centroid)",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.5,
+      "built_area_m2": 338.0,
+      "parking_spaces": null,
+      "furnished": null,
+      "has_pool": null
+    },
+    "tokens_in": 2489,
+    "tokens_out": 626,
+    "cost_usd": 0.00136063,
+    "finish_reason": "stop",
+    "latency_ms": 4330
+  },
+  "encuentra24|30368089": {
+    "ts": "2026-09-08T08:38:45.780655+00:00",
+    "model": "deepseek-chat",
+    "schema_version": 4,
+    "prompt_version": 4,
+    "title_canonical": {
+      "en": "Lakefront Villa in Buenaventura, 4 Bedrooms, Pool",
+      "es": "Villa frente al lago en Buenaventura, 4 recámaras, piscina"
+    },
+    "short_description_canonical": {
+      "en": "Lakefront villa of 442.30 m² in Bristol Villas, Buenaventura, Coclé, Panama. It has 4 bedrooms, 4.5 bathrooms, open kitchen, living and dining areas, and a large covered terrace with lake views. The property includes a private pool with outdoor shower, laundry, service quarters, covered parking for 2 cars, and a storage room. It is steps from the Palapa bar-restaurant and the beach, with direct access to the hotel.",
+      "es": "Villa frente al lago de 442.30 m² en Bristol Villas, Buenaventura, Coclé, Panamá. Cuenta con 4 recámaras, 4.5 baños, cocina abierta, sala y comedor, y amplia terraza techada con vistas al lago. La propiedad incluye piscina privada con ducha externa, lavandería, cuarto y baño de servicio, estacionamiento techado para 2 autos y depósito. Está a pasos del bar-restaurante Palapa y de la playa, con acceso directo al hotel."
+    },
+    "reasons_to_buy": [
+      {
+        "en": "Lakefront with direct hotel access",
+        "es": "Frente al lago con acceso directo al hotel"
+      },
+      {
+        "en": "Steps from Palapa and beach",
+        "es": "A pasos de Palapa y la playa"
+      },
+      {
+        "en": "Private pool with outdoor shower",
+        "es": "Piscina privada con ducha externa"
+      },
+      {
+        "en": "442 m², 4 bedrooms, 4.5 baths",
+        "es": "442 m², 4 recámaras, 4.5 baños"
+      },
+      {
+        "en": "Covered parking for 2 cars",
+        "es": "Estacionamiento techado para 2 autos"
+      }
+    ],
+    "lat": 8.25,
+    "lng": -80.0,
+    "geocoding_confidence": "medium",
+    "geocoding_source": "estimated",
+    "geocoding_reference": "Buenaventura, Coclé, Panama",
+    "url_language": "es",
+    "extracted_facts": {
+      "year_built": null,
+      "year_renovated": null,
+      "bedrooms": 4,
+      "bathrooms": 4.5,
+      "built_area_m2": 442.3,
+      "parking_spaces": 2,
+      "furnished": null,
+      "has_pool": true
+    },
+    "tokens_in": 2475,
+    "tokens_out": 644,
+    "cost_usd": 0.00137665,
+    "finish_reason": "stop",
+    "latency_ms": 4587
   }
 }
