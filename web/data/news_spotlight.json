@@ -1,22 +1,22 @@
 {
   "en": {
-    "candidates_seen": 4,
-    "llm_cost_usd": 0.00042486,
-    "paragraph": "El Salvador's tourism is booming, surpassing Cuba and Costa Rica, with record revenues projected at $3.6 billion. This growth, driven by improved safety and infrastructure, signals rising demand for coastal and lake properties. For you as a buyer, this means appreciating values and rental potential. Consider investing now to capitalize on the momentum.",
-    "picked_at": "2026-08-29",
-    "source_date": "28 Aug 2026",
+    "candidates_seen": 2,
+    "llm_cost_usd": 0.00032512000000000003,
+    "paragraph": "A magnitude 7.6 earthquake off Panama briefly triggered a tsunami watch for El Salvador's coast, but authorities cancelled the threat after Pacific warning centre review. If you own or are buying beachfront property, this is a reminder that coastal El Salvador sits in an active seismic zone. Check that any property you're considering has clear evacuation routes and that your insurance covers earthquake and tsunami damage, not just wind and fire.",
+    "picked_at": "2026-10-10",
+    "source_date": "9 Oct 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/politica/el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica/?utm_source=rss&utm_medium=rss&utm_campaign=el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica",
-    "title": "El Salvador's tourism boom boosts coastal property appeal"
+    "source_url": "https://lapagina.com.sv/nacionales/descartan-amenaza-de-tsunami-para-el-salvador-tras-fuerte-sismo-frente-a-panama/?utm_source=rss&utm_medium=rss&utm_campaign=descartan-amenaza-de-tsunami-para-el-salvador-tras-fuerte-sismo-frente-a-panama",
+    "title": "Tsunami Threat Lifted After Panama Earthquake"
   },
   "es": {
-    "candidates_seen": 4,
-    "llm_cost_usd": 0.00047609000000000003,
-    "paragraph": "El turismo en El Salvador está en pleno auge, superando a destinos como Cuba y Costa Rica. Esto significa más visitantes y mayor demanda de alojamiento, lo que puede aumentar el valor de las propiedades costeras y de lago. Si estás pensando en comprar, ahora es un buen momento para invertir, ya que el crecimiento turístico podría traducirse en mejores rendimientos de alquiler y plusvalía a futuro.",
-    "picked_at": "2026-08-29",
-    "source_date": "28 ago 2026",
+    "candidates_seen": 2,
+    "llm_cost_usd": 0.00042475,
+    "paragraph": "La Superintendencia de Regulación Sanitaria y la Defensoría del Consumidor cerraron temporalmente 19 establecimientos, incluyendo hoteles, tras detectar irregularidades durante inspecciones en la Semana Morazánica. Si estás comprando propiedad costera o de lago para alquilar o recibir visitantes, esto te afecta directo: las autoridades están revisando permisos y condiciones sanitarias. Antes de cerrar tu compra, verificá que el inmueble y su operación cumplan normas sanitarias y turísticas, y pedí al vendedor los permisos vigentes. Así evitás sanciones o cierres que arruinen tu inversión.",
+    "picked_at": "2026-10-10",
+    "source_date": "9 oct 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/politica/el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica/?utm_source=rss&utm_medium=rss&utm_campaign=el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica",
-    "title": "El Salvador consolida su auge turístico superando a Cuba y Costa Rica"
+    "source_url": "https://lapagina.com.sv/nacionales/ejecutan-cierre-temporal-de-19-establecimientos-por-incumplir-normas-sanitarias/?utm_source=rss&utm_medium=rss&utm_campaign=ejecutan-cierre-temporal-de-19-establecimientos-por-incumplir-normas-sanitarias",
+    "title": "Ejecutan cierre temporal de 19 establecimientos por incumplir normas sanitarias"
   }
 }
