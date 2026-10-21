@@ -1,0 +1,14 @@
+{
+  "failure_id": "02228a30",
+  "source": "essurf",
+  "ts": "2026-10-15T07:01:21.221172+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 0.78,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
