@@ -1,0 +1,20 @@
+{
+  "width": 1200,
+  "height": 900,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 91.8,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-10-21T08:02:21.909791+00:00",
+  "derivative_width": 1200,
+  "derivative_height": 900,
+  "hero_photo_quality_score": 80,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://assets.easybroker.com/property_images/3988758/65817257/EB-OH8758.jpg?rasterize=true&version=1693966084",
+  "candidate_count": 5,
+  "content_sha1": "5075e9b5f43a63cd",
+  "dhash": 1939988984100351457,
+  "duplicates_dropped": 0
+}
