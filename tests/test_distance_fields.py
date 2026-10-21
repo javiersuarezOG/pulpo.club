@@ -249,9 +249,17 @@ def test_telemetry_write_failure_is_non_fatal(tmp_path):
 
 def test_dist_beach_km_close_to_zero_for_coastal_listing(tmp_path):
     """A listing at El Tunco (a curated coastline point) should be < 1km
-    from the nearest reference point."""
+    from the nearest reference point.
+
+    The coordinate here was 13.487,-89.6133 until Aug 2026 — the displaced
+    value from the named_beaches drift, which put "El Tunco" ~25 km west of
+    the real beach (near Mizata, and offshore). The assertion passed only
+    because the reference table was wrong in exactly the same way, so this
+    test was encoding the bug rather than catching it. 13.4926,-89.3829 is
+    the real Playa El Tunco.
+    """
     from automation.distance_fields import compute_dist_beach_km
-    li = _li(zone="el-tunco", lat=13.487, lng=-89.6133)
+    li = _li(zone="el-tunco", lat=13.4926, lng=-89.3829)
     km = compute_dist_beach_km(li)
     assert km is not None
     assert km < 1.0
