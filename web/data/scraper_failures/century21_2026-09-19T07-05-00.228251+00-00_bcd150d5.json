@@ -1,0 +1,14 @@
+{
+  "failure_id": "bcd150d5",
+  "source": "century21",
+  "ts": "2026-09-19T07:05:00.228251+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 2.99,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
