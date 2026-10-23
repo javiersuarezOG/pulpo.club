@@ -1,1 +1,1 @@
-{"version": 1, "computed_at": "2026-10-23T17:17:53.199050+00:00", "window_days": 60, "source": "website:card.clicked+paywall.shown (intent-weighted)", "n_listings_with_signal": 0, "categories": {}, "zones": {}, "leaders": {"category": null, "zone": null}}
+{"version": 1, "computed_at": "2026-10-23T21:31:17.665815+00:00", "window_days": 60, "source": "website:card.clicked+paywall.shown (intent-weighted)", "n_listings_with_signal": 0, "categories": {}, "zones": {}, "leaders": {"category": null, "zone": null}}
