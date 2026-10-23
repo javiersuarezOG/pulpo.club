@@ -6,12 +6,15 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-07-25T06:16:29.167139+00:00",
+  "computed_at": "2026-10-23T07:56:22.744873+00:00",
   "derivative_width": 940,
   "derivative_height": 776,
   "hero_photo_quality_score": 50,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002473227002/v3/HDPhotos/Sierra%20SE%201.jpeg",
-  "candidate_count": 1
+  "winning_url": "https://images.remax-ccamls.com/002473227002/original/Sierra-SE-1_e7a8b89d8f1583340fb9ad359f4aaf4e.jpg",
+  "candidate_count": 1,
+  "content_sha1": "eb7efcd54b4f4edb",
+  "dhash": 9854041997128153014,
+  "duplicates_dropped": 0
 }
