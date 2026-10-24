@@ -1,0 +1,28 @@
+{
+  "width": 1440,
+  "height": 3120,
+  "aspect_ratio": 2.167,
+  "file_size_kb": 138.9,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-10-24T08:02:14.684407+00:00",
+  "source_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/7U8J59ODFM/hFh7ZRbGtN/556130.jpeg",
+  "original_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/7U8J59ODFM/hFh7ZRbGtN/556130.jpeg",
+  "transform_used": "none",
+  "fetched_at": "2026-10-24T08:02:15.293872+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": 1260,
+  "resdet_detected_height": 2730,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 6.5,
+    "issues": [
+      "low_quality"
+    ],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.334 color_entropy=0.052"
+  }
+}
