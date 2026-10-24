@@ -1,15 +1,15 @@
 {
   "source": "elagente",
-  "drift_state": "ok",
-  "reason": "matches_baseline",
-  "probed_at": "2026-10-24T04:46:15.134438+00:00",
+  "drift_state": "unreachable",
+  "reason": "http_error: ReadTimeout: The read operation timed out",
+  "probed_at": "2026-10-24T11:13:57.341968+00:00",
   "last_probe": {
     "probed_url": "https://www.elagenteinmobiliario.com",
-    "status_code": 200,
-    "final_url": "https://www.elagenteinmobiliario.com",
+    "status_code": null,
+    "final_url": null,
     "response_size_bytes": null,
-    "duration_ms": 309,
-    "error": null
+    "duration_ms": 10099,
+    "error": "ReadTimeout: The read operation timed out"
   },
   "baseline": {
     "source": "elagente",
