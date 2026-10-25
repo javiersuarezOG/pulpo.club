@@ -6,12 +6,15 @@
   "hero_eligible": true,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-07-25T06:16:31.540517+00:00",
+  "computed_at": "2026-10-25T08:17:45.771003+00:00",
   "derivative_width": 1442,
   "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003284460007/v3/HDPhotos/YAGUATIQUE%201.jpg",
-  "candidate_count": 1
+  "winning_url": "https://images.remax-ccamls.com/003284460007/original/YAGUATIQUE-1_e8114f7e78fa66cb66823b26668df864.jpg",
+  "candidate_count": 1,
+  "content_sha1": "946a66c68b86fa03",
+  "dhash": 16259669156486902412,
+  "duplicates_dropped": 0
 }
