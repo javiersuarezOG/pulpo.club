@@ -2,13 +2,13 @@
   "source": "elagente",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-10-25T11:43:48.329388+00:00",
+  "probed_at": "2026-10-25T16:32:24.556976+00:00",
   "last_probe": {
     "probed_url": "https://www.elagenteinmobiliario.com",
     "status_code": 200,
     "final_url": "https://www.elagenteinmobiliario.com",
     "response_size_bytes": null,
-    "duration_ms": 606,
+    "duration_ms": 300,
     "error": null
   },
   "baseline": {
@@ -17,6 +17,6 @@
     "final_url": "https://www.elagenteinmobiliario.com",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-10-25T11:43:48.329417+00:00"
+    "last_ok_at": "2026-10-25T16:32:24.557003+00:00"
   }
 }
