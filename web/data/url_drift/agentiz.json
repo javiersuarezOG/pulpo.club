@@ -1,14 +1,14 @@
 {
   "source": "agentiz",
-  "drift_state": "ok",
-  "reason": "matches_baseline",
-  "probed_at": "2026-10-25T04:53:32.141458+00:00",
+  "drift_state": "unreachable",
+  "reason": "http_status=521",
+  "probed_at": "2026-10-25T11:43:44.141104+00:00",
   "last_probe": {
     "probed_url": "https://sv.agentiz.com/en",
-    "status_code": 200,
+    "status_code": 521,
     "final_url": "https://sv.agentiz.com/en",
-    "response_size_bytes": null,
-    "duration_ms": 1089,
+    "response_size_bytes": 6989,
+    "duration_ms": 285,
     "error": null
   },
   "baseline": {
