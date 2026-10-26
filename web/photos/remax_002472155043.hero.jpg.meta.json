@@ -6,12 +6,15 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-07-25T06:16:42.201314+00:00",
+  "computed_at": "2026-10-26T08:27:07.057066+00:00",
   "derivative_width": 1600,
   "derivative_height": 738,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002472155043/v3/HDPhotos/Terreno%20SAAbad%203%20.jpeg",
-  "candidate_count": 1
+  "winning_url": "https://images.remax-ccamls.com/002472155043/original/Terreno-SAAbad-3_82946fc85e976aae6f679630c61e61f6.jpg",
+  "candidate_count": 1,
+  "content_sha1": "718962bd53005374",
+  "dhash": 11106374677803873460,
+  "duplicates_dropped": 0
 }
