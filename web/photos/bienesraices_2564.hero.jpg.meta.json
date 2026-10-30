@@ -1,0 +1,20 @@
+{
+  "width": 1280,
+  "height": 1169,
+  "aspect_ratio": 1.095,
+  "file_size_kb": 288.4,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-10-30T09:09:33.092252+00:00",
+  "derivative_width": 1183,
+  "derivative_height": 1080,
+  "hero_photo_quality_score": 90,
+  "has_text_overlay": true,
+  "has_marketing_overlay": null,
+  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/ZFTOS84J3J/LUTkZz2RkK/Terreno_en_Venta_a_un_Costado_del_Boulevard_Bazzini__2520_m2__Cercano_a_Lourdes.jpeg",
+  "candidate_count": 2,
+  "content_sha1": "517a7b4777dc7fb3",
+  "dhash": 11303703039581227108,
+  "duplicates_dropped": 1
+}
