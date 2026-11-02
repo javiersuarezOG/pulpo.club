@@ -2,13 +2,13 @@
   "source": "realtyelsalvador",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-11-02T06:22:41.683688+00:00",
+  "probed_at": "2026-11-02T21:46:48.954883+00:00",
   "last_probe": {
     "probed_url": "https://realtyelsalvador.com",
     "status_code": 200,
     "final_url": "https://realtyelsalvador.com",
     "response_size_bytes": null,
-    "duration_ms": 1059,
+    "duration_ms": 778,
     "error": null
   },
   "baseline": {
@@ -17,6 +17,6 @@
     "final_url": "https://realtyelsalvador.com",
     "status_code": 200,
     "response_size_bytes": null,
-    "last_ok_at": "2026-11-02T06:22:41.683717+00:00"
+    "last_ok_at": "2026-11-02T21:46:48.954915+00:00"
   }
 }
