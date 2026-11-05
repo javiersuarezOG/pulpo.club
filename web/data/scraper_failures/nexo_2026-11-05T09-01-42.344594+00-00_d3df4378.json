@@ -1,0 +1,14 @@
+{
+  "failure_id": "d3df4378",
+  "source": "nexo",
+  "ts": "2026-11-05T09:01:42.344594+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 0.76,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
