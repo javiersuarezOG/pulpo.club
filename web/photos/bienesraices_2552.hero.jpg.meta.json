@@ -1,0 +1,20 @@
+{
+  "width": 1280,
+  "height": 859,
+  "aspect_ratio": 1.49,
+  "file_size_kb": 177.0,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-11-10T10:28:22.950207+00:00",
+  "derivative_width": 1280,
+  "derivative_height": 859,
+  "hero_photo_quality_score": 90,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://assets.alterestate.com/fit-in/1280x960/filters:quality(70)/static/properties/78N8EQQ9DP/3YCG4EWA0H/vtHzYC23mU/Terreno_Comercial_e_Industrial_14_Mz__Carretera_Panamericana_San_Miguel_1610000.jpeg",
+  "candidate_count": 2,
+  "content_sha1": "511b3f2de4720fe9",
+  "dhash": 6971157028610283415,
+  "duplicates_dropped": 1
+}

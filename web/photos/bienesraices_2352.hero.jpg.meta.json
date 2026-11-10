@@ -2,16 +2,19 @@
   "width": 1280,
   "height": 960,
   "aspect_ratio": 1.333,
-  "file_size_kb": 304.9,
+  "file_size_kb": 305.1,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-06-08T09:12:44.718877+00:00",
+  "computed_at": "2026-11-10T10:32:58.947545+00:00",
   "derivative_width": 1280,
   "derivative_height": 960,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvU0dFOTU1QjZSRi9YTUQ0TWtEN1BBL1ZlbnRhX2RlX0xvdGVzX0ZyZW50ZV9hbF9NYXJfZW5fUGxheWFfRWxfRXNwaW5vX1VzdWx1dFx1MDBlMW5fX09wb3J0dW5pZGFkX3BhcmFfSW52ZXJzaVx1MDBmM25fVHVyXHUwMGVkc3RpY2FfMS5qcGVnIiwgImVkaXRzIjogeyJyZXNpemUiOiB7IndpZHRoIjogMTI4MCwgImhlaWdodCI6IDk2MCwgImZpdCI6ICJpbnNpZGUifSwgInRvRm9ybWF0IjogImpwZWciLCAianBlZyI6IHsicXVhbGl0eSI6IDcwfX19",
-  "candidate_count": 5
+  "winning_url": "https://assets.alterestate.com/fit-in/1280x960/filters:quality(70)/static/properties/78N8EQQ9DP/SGE955B6RF/XMD4MkD7PA/Venta_de_Lotes_Frente_al_Mar_en_Playa_El_Espino_Usulut%C3%A1n__Oportunidad_para_Inversi%C3%B3n_Tur%C3%ADstica_1.jpeg",
+  "candidate_count": 5,
+  "content_sha1": "edafc10792bc4337",
+  "dhash": 5445788078928506156,
+  "duplicates_dropped": 1
 }
