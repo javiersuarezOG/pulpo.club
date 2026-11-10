@@ -2,13 +2,13 @@
   "source": "realestate_au_sv",
   "drift_state": "ok",
   "reason": "matches_baseline",
-  "probed_at": "2026-11-09T22:29:27.879176+00:00",
+  "probed_at": "2026-11-10T07:28:31.891060+00:00",
   "last_probe": {
     "probed_url": "https://www.realestate.com.au/international/sv?searchtypes=rural+land",
     "status_code": 200,
     "final_url": "https://www.realestate.com.au/international/sv?searchtypes=rural+land",
     "response_size_bytes": 0,
-    "duration_ms": 789,
+    "duration_ms": 754,
     "error": null
   },
   "baseline": {
@@ -17,6 +17,6 @@
     "final_url": "https://www.realestate.com.au/international/sv?searchtypes=rural+land",
     "status_code": 200,
     "response_size_bytes": 0,
-    "last_ok_at": "2026-11-09T22:29:27.879202+00:00"
+    "last_ok_at": "2026-11-10T07:28:31.891088+00:00"
   }
 }
