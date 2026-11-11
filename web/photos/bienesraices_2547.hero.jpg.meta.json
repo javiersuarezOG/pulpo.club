@@ -1,0 +1,20 @@
+{
+  "width": 1280,
+  "height": 720,
+  "aspect_ratio": 1.778,
+  "file_size_kb": 163.5,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-11-11T09:58:17.001985+00:00",
+  "derivative_width": 1280,
+  "derivative_height": 720,
+  "hero_photo_quality_score": 90,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://assets.alterestate.com/fit-in/1280x960/filters:quality(70)/static/properties/78N8EQQ9DP/9WS2H62BBR/i2wzEXrkA9/Terreno_Plano_en_Venta_602_v%C2%B2__Cerca_del_Pueblo_de_Moncagua_San_Miguel_52900_1.jpeg",
+  "candidate_count": 4,
+  "content_sha1": "cdc6dba5c8582e97",
+  "dhash": 2862596926731239295,
+  "duplicates_dropped": 1
+}
