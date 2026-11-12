@@ -1,0 +1,20 @@
+{
+  "width": 1080,
+  "height": 1350,
+  "aspect_ratio": 1.25,
+  "file_size_kb": 2462.7,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-11-12T10:14:54.087187+00:00",
+  "derivative_width": 864,
+  "derivative_height": 1080,
+  "hero_photo_quality_score": 90,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://remaxcentrum.com/storage/604/1-%283%29.png",
+  "candidate_count": 1,
+  "content_sha1": "fd6005747483ce7a",
+  "dhash": 4967670111912450797,
+  "duplicates_dropped": 0
+}

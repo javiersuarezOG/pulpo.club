@@ -1,0 +1,14 @@
+{
+  "failure_id": "cd96a002",
+  "source": "encuentra24",
+  "ts": "2026-11-12T09:22:37.744326+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 69.53,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
