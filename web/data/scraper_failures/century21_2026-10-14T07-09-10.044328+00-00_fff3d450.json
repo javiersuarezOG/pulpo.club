@@ -1,0 +1,14 @@
+{
+  "failure_id": "fff3d450",
+  "source": "century21",
+  "ts": "2026-10-14T07:09:10.044328+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 3.13,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
