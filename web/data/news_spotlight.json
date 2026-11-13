@@ -1,22 +1,22 @@
 {
   "en": {
     "candidates_seen": 4,
-    "llm_cost_usd": 0.00042486,
-    "paragraph": "El Salvador's tourism is booming, surpassing Cuba and Costa Rica, with record revenues projected at $3.6 billion. This growth, driven by improved safety and infrastructure, signals rising demand for coastal and lake properties. For you as a buyer, this means appreciating values and rental potential. Consider investing now to capitalize on the momentum.",
-    "picked_at": "2026-08-29",
+    "llm_cost_usd": 0.00042933000000000007,
+    "paragraph": "The government has closed the Los Chorros stretch of the Pan-American Highway this weekend for roadwork and viaduct construction. If you're traveling to coastal or lake properties, expect delays and plan alternate routes. This closure is part of ongoing infrastructure improvements that may affect your commute, so check updates before heading out.",
+    "picked_at": "2026-08-30",
     "source_date": "28 Aug 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/politica/el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica/?utm_source=rss&utm_medium=rss&utm_campaign=el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica",
-    "title": "El Salvador's tourism boom boosts coastal property appeal"
+    "source_url": "https://lapagina.com.sv/nacionales/gobierno-reitera-paso-cerrado-en-tramo-los-chorros-este-fin-de-semana/?utm_source=rss&utm_medium=rss&utm_campaign=gobierno-reitera-paso-cerrado-en-tramo-los-chorros-este-fin-de-semana",
+    "title": "Los Chorros closed this weekend"
   },
   "es": {
     "candidates_seen": 4,
-    "llm_cost_usd": 0.00047609000000000003,
-    "paragraph": "El turismo en El Salvador está en pleno auge, superando a destinos como Cuba y Costa Rica. Esto significa más visitantes y mayor demanda de alojamiento, lo que puede aumentar el valor de las propiedades costeras y de lago. Si estás pensando en comprar, ahora es un buen momento para invertir, ya que el crecimiento turístico podría traducirse en mejores rendimientos de alquiler y plusvalía a futuro.",
-    "picked_at": "2026-08-29",
+    "llm_cost_usd": 0.00051356,
+    "paragraph": "El tramo Los Chorros en la carretera Panamericana estará cerrado este fin de semana por obras de ampliación y construcción del viaducto Francisco Morazán. Si estás comprando propiedad costera o de lago, esto afecta el acceso a zonas como la costa o el lago, especialmente si planeas visitar o transportar materiales. Planifica rutas alternas y verifica horarios de cierre para evitar retrasos. Las obras son parte de mejoras viales que a largo plazo beneficiarán la conectividad, pero por ahora requieren paciencia y previsión en tus desplazamientos.",
+    "picked_at": "2026-08-30",
     "source_date": "28 ago 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/politica/el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica/?utm_source=rss&utm_medium=rss&utm_campaign=el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica",
-    "title": "El Salvador consolida su auge turístico superando a Cuba y Costa Rica"
+    "source_url": "https://lapagina.com.sv/nacionales/gobierno-reitera-paso-cerrado-en-tramo-los-chorros-este-fin-de-semana/?utm_source=rss&utm_medium=rss&utm_campaign=gobierno-reitera-paso-cerrado-en-tramo-los-chorros-este-fin-de-semana",
+    "title": "Gobierno reitera paso cerrado en tramo Los Chorros este fin de semana"
   }
 }
