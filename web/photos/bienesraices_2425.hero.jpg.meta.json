@@ -2,16 +2,19 @@
   "width": 1280,
   "height": 854,
   "aspect_ratio": 1.499,
-  "file_size_kb": 245.9,
+  "file_size_kb": 261.5,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-07-04T06:46:45.733851+00:00",
+  "computed_at": "2026-11-11T09:58:09.112275+00:00",
   "derivative_width": 1280,
   "derivative_height": 854,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvTlNSNjJXVk9VOC9uQUZEN2VWQkw5L1ZlbnRhX2RlX0dyYW5fVGVycmVub19kZV8yMF9NYW56YW5hc19lbl9BaHVhY2hhcFx1MDBlMW5fX0lkZWFsX3BhcmFfUHJveWVjdG9fQWdyXHUwMGVkY29sYV9vX0Vjb2xcdTAwZjNnaWNvXzEuanBlZyIsICJlZGl0cyI6IHsicmVzaXplIjogeyJ3aWR0aCI6IDEyODAsICJoZWlnaHQiOiA5NjAsICJmaXQiOiAiaW5zaWRlIn0sICJ0b0Zvcm1hdCI6ICJqcGVnIiwgImpwZWciOiB7InF1YWxpdHkiOiA3MH19fQ==",
-  "candidate_count": 4
+  "winning_url": "https://assets.alterestate.com/fit-in/1280x960/filters:quality(70)/static/properties/78N8EQQ9DP/R6FBL8EP4E/SEgr2Q6djz/Venta_de_Gran_Terreno_de_20_Manzanas_en_Ahuachap%C3%A1n__Ideal_para_Proyecto_Agr%C3%ADcola_o_Ecol%C3%B3gico.jpeg",
+  "candidate_count": 4,
+  "content_sha1": "01d79d5766e3035c",
+  "dhash": 6057542574256931769,
+  "duplicates_dropped": 2
 }

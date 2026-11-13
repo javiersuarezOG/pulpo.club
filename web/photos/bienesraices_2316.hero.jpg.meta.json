@@ -2,16 +2,19 @@
   "width": 1280,
   "height": 853,
   "aspect_ratio": 1.501,
-  "file_size_kb": 279.6,
+  "file_size_kb": 278.6,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-06-08T09:11:58.534159+00:00",
+  "computed_at": "2026-11-11T09:58:29.348079+00:00",
   "derivative_width": 1280,
   "derivative_height": 853,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvQUdJTzJDM0YxWi9MY0hwdHg0b0tUL1ZFTlRBX0RFX1RFUlJFTk9fQV9VTl9DT1NUQURPX0RFX0xBU19SQU1CTEFTX1NBTlRBX0FOQV8xLmpwZWciLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiAxMjgwLCAiaGVpZ2h0IjogOTYwLCAiZml0IjogImluc2lkZSJ9LCAidG9Gb3JtYXQiOiAianBlZyIsICJqcGVnIjogeyJxdWFsaXR5IjogNzB9fX0=",
-  "candidate_count": 5
+  "winning_url": "https://assets.alterestate.com/fit-in/1280x960/filters:quality(70)/static/properties/78N8EQQ9DP/AGIO2C3F1Z/LcHptx4oKT/VENTA_DE_TERRENO_A_UN_COSTADO_DE_LAS_RAMBLAS_SANTA_ANA_1.jpeg",
+  "candidate_count": 5,
+  "content_sha1": "d1c4ef740654fe3e",
+  "dhash": 10723304861239141091,
+  "duplicates_dropped": 1
 }
