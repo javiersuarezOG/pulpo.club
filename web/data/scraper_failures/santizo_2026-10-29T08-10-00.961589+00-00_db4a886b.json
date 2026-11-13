@@ -1,0 +1,14 @@
+{
+  "failure_id": "db4a886b",
+  "source": "santizo",
+  "ts": "2026-10-29T08:10:00.961589+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 0.8,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
