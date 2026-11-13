@@ -18,25 +18,25 @@
       "pick_count": 3
     }
   },
-  "picked_at": "2026-08-29T10:30:37.010703+00:00",
-  "expires_at": "2026-08-30T00:00:00+00:00",
+  "picked_at": "2026-09-19T08:32:31.682096+00:00",
+  "expires_at": "2026-09-20T00:00:00+00:00",
   "tier": "fallback",
-  "listing_id": "encuentra24|32850866",
-  "rank_score": 63.83,
-  "hero_photo_quality_score": 30,
+  "listing_id": "encuentra24|30018880",
+  "rank_score": 64.71,
+  "hero_photo_quality_score": 90,
   "fallback": true,
   "pool": [
     {
-      "listing_id": "encuentra24|32850866",
-      "rank_score": 63.83,
-      "hero_photo_quality_score": 30,
-      "photos_count": 11
+      "listing_id": "encuentra24|30018880",
+      "rank_score": 64.71,
+      "hero_photo_quality_score": 90,
+      "photos_count": 21
     }
   ],
   "picks_for_proof_row": [
     {
-      "listing_id": "encuentra24|32850866",
-      "rank_score": 63.83,
+      "listing_id": "encuentra24|30018880",
+      "rank_score": 64.71,
       "master_category": null,
       "subcategory": "homes",
       "star_rating": 3.5,
@@ -44,17 +44,17 @@
       "card_eligible": true
     },
     {
-      "listing_id": "encuentra24|30567032",
-      "rank_score": 58.77,
+      "listing_id": "encuentra24|32786765",
+      "rank_score": 63.83,
       "master_category": "beach",
       "subcategory": "homes",
-      "star_rating": 3.0,
+      "star_rating": 3.5,
       "hero_eligible": false,
       "card_eligible": true
     },
     {
-      "listing_id": "encuentra24|29890987",
-      "rank_score": 62.68,
+      "listing_id": "encuentra24|32991167",
+      "rank_score": 63.83,
       "master_category": null,
       "subcategory": "homes",
       "star_rating": 3.5,
