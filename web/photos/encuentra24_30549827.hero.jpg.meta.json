@@ -1,0 +1,20 @@
+{
+  "width": 555,
+  "height": 416,
+  "aspect_ratio": 1.334,
+  "file_size_kb": 18.7,
+  "hero_eligible": false,
+  "card_eligible": false,
+  "hires_eligible": false,
+  "computed_at": "2026-09-13T09:58:15.984137+00:00",
+  "derivative_width": 555,
+  "derivative_height": 416,
+  "hero_photo_quality_score": 0,
+  "has_text_overlay": null,
+  "has_marketing_overlay": null,
+  "winning_url": "https://photos.encuentra24.com/t_or_fh_m/f_auto/v1/pa/30/54/98/27/30549827_e408e8",
+  "candidate_count": 5,
+  "content_sha1": "a43d8c141d1167b0",
+  "dhash": 2743120876871455521,
+  "duplicates_dropped": 1
+}
