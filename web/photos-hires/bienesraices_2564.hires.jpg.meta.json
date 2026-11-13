@@ -1,0 +1,28 @@
+{
+  "width": 1280,
+  "height": 1169,
+  "aspect_ratio": 1.095,
+  "file_size_kb": 288.4,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-10-30T09:16:06.221639+00:00",
+  "source_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/ZFTOS84J3J/LUTkZz2RkK/Terreno_en_Venta_a_un_Costado_del_Boulevard_Bazzini__2520_m2__Cercano_a_Lourdes.jpeg",
+  "original_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/ZFTOS84J3J/LUTkZz2RkK/Terreno_en_Venta_a_un_Costado_del_Boulevard_Bazzini__2520_m2__Cercano_a_Lourdes.jpeg",
+  "transform_used": "none",
+  "fetched_at": "2026-10-30T09:16:06.840704+00:00",
+  "hires_photo_quality_score": 90,
+  "resdet_detected_width": 1120,
+  "resdet_detected_height": 1023,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 6.3,
+    "issues": [
+      "uninteresting"
+    ],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.139 color_entropy=0.648"
+  }
+}

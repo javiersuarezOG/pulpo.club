@@ -1,0 +1,20 @@
+{
+  "width": 1376,
+  "height": 768,
+  "aspect_ratio": 1.792,
+  "file_size_kb": 2075.7,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-10-30T09:15:39.372336+00:00",
+  "derivative_width": 1376,
+  "derivative_height": 768,
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://images.remax-ccamls.com/003284796001/original/Diseno-sin-titulo---1_2df9a12dff2f470fbce77936fc30c91cce028590.png",
+  "candidate_count": 1,
+  "content_sha1": "27131e628e09f9bf",
+  "dhash": 5174370735152030534,
+  "duplicates_dropped": 0
+}

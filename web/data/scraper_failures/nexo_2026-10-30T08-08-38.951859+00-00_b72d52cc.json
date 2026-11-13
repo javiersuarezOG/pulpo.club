@@ -1,0 +1,14 @@
+{
+  "failure_id": "b72d52cc",
+  "source": "nexo",
+  "ts": "2026-10-30T08:08:38.951859+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 0.78,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
