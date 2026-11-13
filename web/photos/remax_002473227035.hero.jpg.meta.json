@@ -6,12 +6,15 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-07-25T06:16:30.129818+00:00",
+  "computed_at": "2026-10-26T08:26:25.971444+00:00",
   "derivative_width": 1080,
   "derivative_height": 846,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002473227035/v3/HDPhotos/Isla%20San%20Sebastian.jpg",
-  "candidate_count": 1
+  "winning_url": "https://images.remax-ccamls.com/002473227035/original/Isla-San-Sebastian_702718a3579814549e0547b38c32e21b.jpg",
+  "candidate_count": 1,
+  "content_sha1": "c011a488d5156c7f",
+  "dhash": 7021507116911746300,
+  "duplicates_dropped": 0
 }

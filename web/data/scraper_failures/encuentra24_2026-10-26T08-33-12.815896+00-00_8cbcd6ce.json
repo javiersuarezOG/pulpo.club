@@ -1,0 +1,14 @@
+{
+  "failure_id": "8cbcd6ce",
+  "source": "encuentra24",
+  "ts": "2026-10-26T08:33:12.815896+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 68.86,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
