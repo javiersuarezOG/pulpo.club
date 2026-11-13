@@ -1,22 +1,22 @@
 {
   "en": {
-    "candidates_seen": 4,
-    "llm_cost_usd": 0.00042486,
-    "paragraph": "El Salvador's tourism is booming, surpassing Cuba and Costa Rica, with record revenues projected at $3.6 billion. This growth, driven by improved safety and infrastructure, signals rising demand for coastal and lake properties. For you as a buyer, this means appreciating values and rental potential. Consider investing now to capitalize on the momentum.",
-    "picked_at": "2026-08-29",
-    "source_date": "28 Aug 2026",
+    "candidates_seen": 3,
+    "llm_cost_usd": 0.00038257,
+    "paragraph": "The government says it is investing heavily in tourism infrastructure — roads, beaches, and public spaces meant to draw more visitors. For you as a coastal or lake property buyer, this matters because better access and amenities usually support long-term value and rental demand. Watch for which specific areas get upgrades before you commit. Ask your agent whether your target zone is on the list, and factor construction timelines into your plans.",
+    "picked_at": "2026-09-11",
+    "source_date": "10 Sep 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/politica/el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica/?utm_source=rss&utm_medium=rss&utm_campaign=el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica",
-    "title": "El Salvador's tourism boom boosts coastal property appeal"
+    "source_url": "https://lapagina.com.sv/nacionales/gobierno-avanza-en-la-modernizacion-de-infraestructura-turistica/?utm_source=rss&utm_medium=rss&utm_campaign=gobierno-avanza-en-la-modernizacion-de-infraestructura-turistica",
+    "title": "Government Expands Tourism Infrastructure Nationwide"
   },
   "es": {
-    "candidates_seen": 4,
-    "llm_cost_usd": 0.00047609000000000003,
-    "paragraph": "El turismo en El Salvador está en pleno auge, superando a destinos como Cuba y Costa Rica. Esto significa más visitantes y mayor demanda de alojamiento, lo que puede aumentar el valor de las propiedades costeras y de lago. Si estás pensando en comprar, ahora es un buen momento para invertir, ya que el crecimiento turístico podría traducirse en mejores rendimientos de alquiler y plusvalía a futuro.",
-    "picked_at": "2026-08-29",
-    "source_date": "28 ago 2026",
+    "candidates_seen": 3,
+    "llm_cost_usd": 0.0004404,
+    "paragraph": "El Gobierno sigue invirtiendo en mejorar la infraestructura turística del país, con obras pensadas para atraer más visitantes y mejorar el acceso a zonas costeras y de lago. Para vos, que estás pensando comprar propiedad junto al mar o un lago, esto puede significar mejores carreteras, servicios y plusvalía a mediano plazo. Vale la pena revisar qué proyectos específicos tocan la zona que te interesa y preguntar en la alcaldía o el MITUR por los planes locales antes de decidir.",
+    "picked_at": "2026-09-11",
+    "source_date": "10 sep 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/politica/el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica/?utm_source=rss&utm_medium=rss&utm_campaign=el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica",
-    "title": "El Salvador consolida su auge turístico superando a Cuba y Costa Rica"
+    "source_url": "https://lapagina.com.sv/nacionales/gobierno-avanza-en-la-modernizacion-de-infraestructura-turistica/?utm_source=rss&utm_medium=rss&utm_campaign=gobierno-avanza-en-la-modernizacion-de-infraestructura-turistica",
+    "title": "Gobierno avanza en la modernización de infraestructura turística"
   }
 }
