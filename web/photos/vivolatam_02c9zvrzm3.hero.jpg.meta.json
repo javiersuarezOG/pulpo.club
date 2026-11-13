@@ -1,0 +1,20 @@
+{
+  "width": 1600,
+  "height": 1200,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 335.2,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-10-11T09:05:52.643553+00:00",
+  "derivative_width": 1440,
+  "derivative_height": 1080,
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://cdn.vivolatam.com/assets/media/app/el-salvador/real-estate/l/02c9zvrzm3/images/013_2382e2f0-b3c7-4588-bfa6-b49a0ad218de.jpg",
+  "candidate_count": 5,
+  "content_sha1": "1820e22656963a4a",
+  "dhash": 5504771763564770027,
+  "duplicates_dropped": 0
+}
