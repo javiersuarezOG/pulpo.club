@@ -1,0 +1,14 @@
+{
+  "failure_id": "a89f1ba5",
+  "source": "santizo",
+  "ts": "2026-11-10T09:25:19.790793+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 1.24,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
