@@ -1,22 +1,22 @@
 {
   "en": {
-    "candidates_seen": 4,
-    "llm_cost_usd": 0.00042486,
-    "paragraph": "El Salvador's tourism is booming, surpassing Cuba and Costa Rica, with record revenues projected at $3.6 billion. This growth, driven by improved safety and infrastructure, signals rising demand for coastal and lake properties. For you as a buyer, this means appreciating values and rental potential. Consider investing now to capitalize on the momentum.",
-    "picked_at": "2026-08-29",
-    "source_date": "28 Aug 2026",
+    "candidates_seen": 7,
+    "llm_cost_usd": 0.00065478,
+    "paragraph": "El Salvador opened the General Manuel José Arce bridge at the La Hachadura–Pedro de Alvarado border, the country's second-longest at 420 meters. For you, this means faster, easier crossings between El Salvador and Guatemala, boosting trade and tourism in the western Ahuachapán area. If you own or are eyeing coastal property near the western beaches, expect improved access and rising visitor traffic. Check how the new route affects your travel times and any planned trips.",
+    "picked_at": "2026-10-15",
+    "source_date": "15 Oct 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/politica/el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica/?utm_source=rss&utm_medium=rss&utm_campaign=el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica",
-    "title": "El Salvador's tourism boom boosts coastal property appeal"
+    "source_url": "https://lapagina.com.sv/nacionales/presidente-nayib-bukele-inaugura-moderna-infraestructura-fronteriza-para-impulsar-el-comercio-y-el-turismo/?utm_source=rss&utm_medium=rss&utm_campaign=presidente-nayib-bukele-inaugura-moderna-infraestructura-fronteriza-para-impulsar-el-comercio-y-el-turismo",
+    "title": "New Border Bridge Opens at La Hachadura"
   },
   "es": {
-    "candidates_seen": 4,
-    "llm_cost_usd": 0.00047609000000000003,
-    "paragraph": "El turismo en El Salvador está en pleno auge, superando a destinos como Cuba y Costa Rica. Esto significa más visitantes y mayor demanda de alojamiento, lo que puede aumentar el valor de las propiedades costeras y de lago. Si estás pensando en comprar, ahora es un buen momento para invertir, ya que el crecimiento turístico podría traducirse en mejores rendimientos de alquiler y plusvalía a futuro.",
-    "picked_at": "2026-08-29",
-    "source_date": "28 ago 2026",
+    "candidates_seen": 7,
+    "llm_cost_usd": 0.00071811,
+    "paragraph": "El nuevo Puente General Manuel José Arce, sobre el río Paz en La Hachadura, Ahuachapán, ya conecta El Salvador con Guatemala. Es el segundo puente más largo del país y costó $32.6 millones. Para vos, que buscás propiedad costera o de lago, esto mejora el acceso a la zona occidental y a la frontera, y puede atraer más turismo y comercio. Si tenés terrenos cerca de la franja fronteriza o la costa de Ahuachapán, revisá cómo cambia el flujo de visitantes y el valor de la zona.",
+    "picked_at": "2026-10-15",
+    "source_date": "15 oct 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/politica/el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica/?utm_source=rss&utm_medium=rss&utm_campaign=el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica",
-    "title": "El Salvador consolida su auge turístico superando a Cuba y Costa Rica"
+    "source_url": "https://lapagina.com.sv/politica/nuevo-puente-binacional-se-convierte-en-el-segundo-mas-largo-de-el-salvador/?utm_source=rss&utm_medium=rss&utm_campaign=nuevo-puente-binacional-se-convierte-en-el-segundo-mas-largo-de-el-salvador",
+    "title": "Nuevo puente binacional se convierte en el segundo más largo de El Salvador"
   }
 }
