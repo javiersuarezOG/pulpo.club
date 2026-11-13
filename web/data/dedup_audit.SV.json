@@ -1,5 +1,5 @@
 {
-  "computed_at": "2026-08-29T09:39:54.130695+00:00",
+  "computed_at": "2026-08-31T09:12:44.674760+00:00",
   "duplicate_clusters": [
     {
       "count": 6,
@@ -1485,10 +1485,10 @@
   "overlap_matrix": {},
   "per_source": {
     "bienesraices": {
-      "kept_as_unique": 507,
-      "raw": 508,
+      "kept_as_unique": 504,
+      "raw": 505,
       "shared_with_others": 0,
-      "unique_in_source": 507
+      "unique_in_source": 504
     },
     "citymax": {
       "kept_as_unique": 38,
@@ -1545,16 +1545,16 @@
       "unique_in_source": 265
     },
     "remax": {
-      "kept_as_unique": 306,
-      "raw": 321,
+      "kept_as_unique": 310,
+      "raw": 325,
       "shared_with_others": 0,
-      "unique_in_source": 306
+      "unique_in_source": 310
     },
     "santizo": {
-      "kept_as_unique": 86,
-      "raw": 86,
+      "kept_as_unique": 88,
+      "raw": 88,
       "shared_with_others": 0,
-      "unique_in_source": 86
+      "unique_in_source": 88
     },
     "vivolatam": {
       "kept_as_unique": 157,
@@ -1569,6 +1569,6 @@
       "unique_in_source": 29
     }
   },
-  "total_in_dataset": 2025,
-  "total_unique_fingerprints": 1962
+  "total_in_dataset": 2028,
+  "total_unique_fingerprints": 1965
 }
