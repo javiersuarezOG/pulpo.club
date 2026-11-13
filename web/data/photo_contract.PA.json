@@ -1,21 +1,21 @@
 {
-  "ranked_total": 33,
-  "with_local_path": 33,
-  "local_path_exists": 33,
+  "ranked_total": 0,
+  "with_local_path": 0,
+  "local_path_exists": 0,
   "local_path_missing": 0,
   "missing_rate": 0.0,
   "nulled": 0,
   "top_browse": {
-    "n": 33,
-    "present": 33,
+    "n": 50,
+    "present": 0,
     "missing": 0,
-    "coverage": 1.0
+    "coverage": 0.0
   },
   "top_hero": {
     "n": 10,
-    "present": 10,
+    "present": 0,
     "missing": 0,
-    "coverage": 1.0
+    "coverage": 0.0
   },
   "examples_missing": [],
   "thresholds": {
@@ -23,5 +23,5 @@
     "top_browse_coverage": 0.95,
     "top_hero_coverage": 1.0
   },
-  "evaluated_at": "2026-08-29T10:30:36.624336+00:00"
+  "evaluated_at": "2026-09-25T08:02:58.055027+00:00"
 }
