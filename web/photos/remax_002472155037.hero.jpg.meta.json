@@ -2,16 +2,19 @@
   "width": 1600,
   "height": 738,
   "aspect_ratio": 2.168,
-  "file_size_kb": 401.5,
+  "file_size_kb": 388.4,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-07-25T06:16:25.096851+00:00",
+  "computed_at": "2026-09-04T08:00:14.048935+00:00",
   "derivative_width": 1600,
   "derivative_height": 738,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002472155037/v3/HDPhotos/Terreno%20R%20de%20Mora%201.jpeg",
-  "candidate_count": 1
+  "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002472155037/v3/HDPhotos/Terreno%20R.%20de%20Mora%202.jpeg",
+  "candidate_count": 1,
+  "content_sha1": "5b068cc55190b3ae",
+  "dhash": 8946868532488550809,
+  "duplicates_dropped": 0
 }
