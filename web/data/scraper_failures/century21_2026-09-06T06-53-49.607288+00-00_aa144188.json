@@ -1,0 +1,14 @@
+{
+  "failure_id": "aa144188",
+  "source": "century21",
+  "ts": "2026-09-06T06:53:49.607288+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 2.86,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
