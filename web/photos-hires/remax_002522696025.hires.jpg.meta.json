@@ -1,0 +1,28 @@
+{
+  "width": 1450,
+  "height": 1085,
+  "aspect_ratio": 1.336,
+  "file_size_kb": 3074.5,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-10-28T08:53:49.525260+00:00",
+  "source_url": "https://images.remax-ccamls.com/002522696025/original/Terreno-San-Juan-Nonualco-2-3_8f4e805282924f89ae4efd85937d04f68d75c49a.png",
+  "original_url": "https://images.remax-ccamls.com/002522696025/original/Terreno-San-Juan-Nonualco-2-3_8f4e805282924f89ae4efd85937d04f68d75c49a.png",
+  "transform_used": "none",
+  "fetched_at": "2026-10-28T08:53:49.641524+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": null,
+  "resdet_detected_height": null,
+  "resdet_upscaled": null,
+  "quarantined": false,
+  "aesthetic": {
+    "visual_appeal": 5.9,
+    "issues": [
+      "uninteresting"
+    ],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.123 color_entropy=0.574"
+  }
+}
