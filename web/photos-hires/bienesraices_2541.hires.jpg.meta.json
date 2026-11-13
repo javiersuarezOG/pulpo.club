@@ -1,0 +1,26 @@
+{
+  "width": 1600,
+  "height": 1269,
+  "aspect_ratio": 1.261,
+  "file_size_kb": 231.0,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-10-31T08:57:43.786116+00:00",
+  "source_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/Y05MDRYGVT/cMvRE5sQcg/Terreno_con_Vista_Panor%C3%A1mica_en_Venta__Escal%C3%B3n_Norte_El_Carmen_198000.jpeg",
+  "original_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/Y05MDRYGVT/cMvRE5sQcg/Terreno_con_Vista_Panor%C3%A1mica_en_Venta__Escal%C3%B3n_Norte_El_Carmen_198000.jpeg",
+  "transform_used": "none",
+  "fetched_at": "2026-10-31T08:57:44.003888+00:00",
+  "hires_photo_quality_score": 90,
+  "resdet_detected_width": 1400,
+  "resdet_detected_height": 1109,
+  "resdet_upscaled": true,
+  "quarantined": true,
+  "aesthetic": {
+    "visual_appeal": 6.6,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.205 color_entropy=0.492"
+  }
+}

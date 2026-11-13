@@ -1,0 +1,14 @@
+{
+  "failure_id": "fcd72152",
+  "source": "encuentra24",
+  "ts": "2026-10-31T08:59:31.752211+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 68.88,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
