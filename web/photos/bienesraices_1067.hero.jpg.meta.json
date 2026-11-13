@@ -6,12 +6,15 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-06-08T09:12:51.380338+00:00",
+  "computed_at": "2026-09-01T08:37:17.247419+00:00",
   "derivative_width": 764,
   "derivative_height": 1080,
   "hero_photo_quality_score": 100,
   "has_text_overlay": true,
   "has_marketing_overlay": null,
   "winning_url": "https://assets.easybroker.com/property_images/5326729/92230792/EB-TL6729.jpeg?rasterize=true&version=1761424365",
-  "candidate_count": 3
+  "candidate_count": 3,
+  "content_sha1": "6938af7e6248910a",
+  "dhash": 11437280273858085191,
+  "duplicates_dropped": 0
 }
