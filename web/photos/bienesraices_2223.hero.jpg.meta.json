@@ -1,17 +1,20 @@
 {
-  "width": 1600,
-  "height": 900,
+  "width": 1280,
+  "height": 720,
   "aspect_ratio": 1.778,
-  "file_size_kb": 446.8,
+  "file_size_kb": 275.1,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-06-08T09:13:02.945587+00:00",
-  "derivative_width": 1600,
-  "derivative_height": 900,
+  "computed_at": "2026-11-14T09:43:47.964214+00:00",
+  "derivative_width": 1280,
+  "derivative_height": 720,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/VQ3D8T6PO3/TqpkdRZeuS/Terreno_Estrat%C3%A9gico_en_Venta__Ciudad_Delgado__4982_m%C2%B2__Ideal_para_Desarrollo_o_Log%C3%ADstica_1.jpeg",
-  "candidate_count": 3
+  "winning_url": "https://assets.alterestate.com/fit-in/1280x960/filters:quality(70)/static/properties/78N8EQQ9DP/VQ3D8T6PO3/TqpkdRZeuS/Terreno_Estrat%C3%A9gico_en_Venta__Ciudad_Delgado__4982_m%C2%B2__Ideal_para_Desarrollo_o_Log%C3%ADstica_1.jpeg",
+  "candidate_count": 3,
+  "content_sha1": "f7bb0302dbd0431c",
+  "dhash": 5501372279534696560,
+  "duplicates_dropped": 1
 }

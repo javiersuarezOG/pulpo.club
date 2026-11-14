@@ -2,16 +2,19 @@
   "width": 1280,
   "height": 960,
   "aspect_ratio": 1.333,
-  "file_size_kb": 244.3,
+  "file_size_kb": 226.2,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-06-12T13:53:12.532186+00:00",
+  "computed_at": "2026-11-14T09:43:52.351198+00:00",
   "derivative_width": 1280,
   "derivative_height": 960,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvMURRNFdNMEpDNy9xUGlVdlNKejMzL1RlcnJlbm9fZW5fVmVudGFfZW5fQ3VtYnJlc19kZV9sYV9Fc2NhbFx1MDBmM25fU2FuX1NhbHZhZG9yXzYuanBlZyIsICJlZGl0cyI6IHsicmVzaXplIjogeyJ3aWR0aCI6IDEyODAsICJoZWlnaHQiOiA5NjAsICJmaXQiOiAiaW5zaWRlIn0sICJ0b0Zvcm1hdCI6ICJqcGVnIiwgImpwZWciOiB7InF1YWxpdHkiOiA3MH19fQ==",
-  "candidate_count": 5
+  "winning_url": "https://assets.alterestate.com/fit-in/1280x960/filters:quality(70)/static/properties/78N8EQQ9DP/D3W22ED3SK/zfY87rcg9V/Terreno_en_Venta_en_Cumbres_de_la_Escal%C3%B3n_San_Salvador.jpeg",
+  "candidate_count": 5,
+  "content_sha1": "6c53fea6951454eb",
+  "dhash": 10145745959704250083,
+  "duplicates_dropped": 1
 }

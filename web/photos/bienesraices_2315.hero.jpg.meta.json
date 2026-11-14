@@ -2,16 +2,19 @@
   "width": 1280,
   "height": 960,
   "aspect_ratio": 1.333,
-  "file_size_kb": 227.3,
+  "file_size_kb": 217.1,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-06-08T09:09:17.460979+00:00",
+  "computed_at": "2026-11-14T09:33:43.154388+00:00",
   "derivative_width": 1280,
   "derivative_height": 960,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/RVJ66EWBOR/FA4dzWgH99/VENTA_DE_TERRENO_A_ORILLA_DE_CALLE_VINIENDO_DE_SURF_CITY_PARA_SANTA_TECLA.jpeg",
-  "candidate_count": 5
+  "winning_url": "https://assets.alterestate.com/fit-in/1280x960/filters:quality(70)/static/properties/78N8EQQ9DP/RVJ66EWBOR/FA4dzWgH99/VENTA_DE_TERRENO_A_ORILLA_DE_CALLE_VINIENDO_DE_SURF_CITY_PARA_SANTA_TECLA.jpeg",
+  "candidate_count": 5,
+  "content_sha1": "797be5b383873616",
+  "dhash": 5576900899200444286,
+  "duplicates_dropped": 1
 }

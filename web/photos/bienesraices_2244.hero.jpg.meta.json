@@ -2,16 +2,19 @@
   "width": 1024,
   "height": 473,
   "aspect_ratio": 2.165,
-  "file_size_kb": 155.8,
+  "file_size_kb": 156.0,
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-06-08T09:13:04.346628+00:00",
+  "computed_at": "2026-11-14T09:43:49.332516+00:00",
   "derivative_width": 1024,
   "derivative_height": 473,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvSldVRFk4QlI0Mi80djJ2NVpQQ1N1L2V5SmlkV05yWlhRaU9pQWlZV3gwWlhKbGMzUmhkR1VpTENBaWEyVjVJam9nSW5OMFlYUnBZeTl3Y205d1pYSjBhV1Z6THpjNFRqaEZVVkU1UkZBdlFVRXdWVkpCTmpneFJpOW9ZWEF6YjBobGNXSjBMelExTWpBdWFuQmxaeUlzSUNKbFpHbDBjeUk2SUhzaWNtVnphWHBsSWpvZ2V5SjNhV1IwYUNJNklERXdNalFzSUNKb1pXbG5hSFFpT2lBM05qZ3NJQ19kdDRTR1FBLmpwZWciLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiAxMDI0LCAiaGVpZ2h0IjogNzY4LCAiZml0IjogImluc2lkZSJ9LCAidG9Gb3JtYXQiOiAianBlZyIsICJqcGVnIjogeyJxdWFsaXR5IjogNzB9fX0=",
-  "candidate_count": 2
+  "winning_url": "https://assets.alterestate.com/fit-in/1024x768/filters:quality(70)/static/properties/78N8EQQ9DP/JWUDY8BR42/4v2v5ZPCSu/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvQUEwVVJBNjgxRi9oYXAzb0hlcWJ0LzQ1MjAuanBlZyIsICJlZGl0cyI6IHsicmVzaXplIjogeyJ3aWR0aCI6IDEwMjQsICJoZWlnaHQiOiA3NjgsIC_dt4SGQA.jpeg",
+  "candidate_count": 2,
+  "content_sha1": "019808ceb831ea71",
+  "dhash": 4775614633089252653,
+  "duplicates_dropped": 1
 }

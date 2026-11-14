@@ -1,0 +1,20 @@
+{
+  "width": 1600,
+  "height": 900,
+  "aspect_ratio": 1.778,
+  "file_size_kb": 377.8,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-11-14T09:43:47.654373+00:00",
+  "derivative_width": 1600,
+  "derivative_height": 900,
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://images.remax-ccamls.com/003284449031/original/1002074974_af4ff34c37e14806ad364363309928d9a8711e09.jpg",
+  "candidate_count": 1,
+  "content_sha1": "ca239555a6a66c5f",
+  "dhash": 15812926387525441275,
+  "duplicates_dropped": 0
+}
