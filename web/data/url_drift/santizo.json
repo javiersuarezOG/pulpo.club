@@ -2,13 +2,13 @@
   "source": "santizo",
   "drift_state": "redirect_drift",
   "reason": "final_url 'https://santizorealestate.com/s/ventas' \u2192 'https://santizorealestate.com/propiedades?op=venta'",
-  "probed_at": "2026-11-16T06:45:05.609954+00:00",
+  "probed_at": "2026-11-16T22:17:03.039076+00:00",
   "last_probe": {
     "probed_url": "https://santizorealestate.com/s/ventas",
     "status_code": 200,
     "final_url": "https://santizorealestate.com/propiedades?op=venta",
     "response_size_bytes": null,
-    "duration_ms": 574,
+    "duration_ms": 640,
     "error": null
   },
   "baseline": {
