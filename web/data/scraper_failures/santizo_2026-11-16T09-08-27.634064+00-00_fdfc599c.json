@@ -1,0 +1,14 @@
+{
+  "failure_id": "fdfc599c",
+  "source": "santizo",
+  "ts": "2026-11-16T09:08:27.634064+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 0.91,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
