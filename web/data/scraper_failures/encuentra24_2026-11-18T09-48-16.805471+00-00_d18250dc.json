@@ -1,0 +1,14 @@
+{
+  "failure_id": "d18250dc",
+  "source": "encuentra24",
+  "ts": "2026-11-18T09:48:16.805471+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 70.07,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
