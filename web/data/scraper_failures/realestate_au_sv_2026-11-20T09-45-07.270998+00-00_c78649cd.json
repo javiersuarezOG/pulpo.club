@@ -1,0 +1,14 @@
+{
+  "failure_id": "c78649cd",
+  "source": "realestate_au_sv",
+  "ts": "2026-11-20T09:45:07.270998+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 1.4,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
