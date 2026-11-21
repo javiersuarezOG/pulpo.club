@@ -2,25 +2,25 @@
   "width": 4032,
   "height": 3024,
   "aspect_ratio": 1.333,
-  "file_size_kb": 2377.0,
+  "file_size_kb": 4998.4,
   "hero_eligible": true,
   "card_eligible": true,
   "hires_eligible": true,
-  "computed_at": "2026-08-26T04:10:48.146967+00:00",
-  "source_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003113372003/v3/HDPhotos/IMG_3842_0697f407f7be410899b8dc6c8435cc78.jpg",
-  "original_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/003113372003/v3/HDPhotos/IMG_3842_0697f407f7be410899b8dc6c8435cc78.jpg",
+  "computed_at": "2026-11-11T10:00:29.832441+00:00",
+  "source_url": "https://images.remax-ccamls.com/003113372003/original/IMG_3837_bdefde4819064f109cc5e05b0e942a81_da8f9910e09262639f179b9dfdb42f13.jpg",
+  "original_url": "https://images.remax-ccamls.com/003113372003/original/IMG_3837_bdefde4819064f109cc5e05b0e942a81_da8f9910e09262639f179b9dfdb42f13.jpg",
   "transform_used": "none",
-  "fetched_at": "2026-08-26T04:10:48.700364+00:00",
+  "fetched_at": "2026-11-11T10:00:30.486853+00:00",
   "hires_photo_quality_score": 100,
   "resdet_detected_width": null,
   "resdet_detected_height": null,
   "resdet_upscaled": null,
   "quarantined": false,
   "aesthetic": {
-    "visual_appeal": 7.8,
+    "visual_appeal": 6.9,
     "issues": [],
     "provider": "deterministic",
     "prompt_version": "2026-05-15.det-v1.py",
-    "rationale": "edge_gini=0.450 color_entropy=0.484"
+    "rationale": "edge_gini=0.207 color_entropy=0.582"
   }
 }

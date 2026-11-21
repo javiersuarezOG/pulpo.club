@@ -1,0 +1,20 @@
+{
+  "width": 955,
+  "height": 960,
+  "aspect_ratio": 1.005,
+  "file_size_kb": 57.3,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-11-11T09:59:02.855440+00:00",
+  "derivative_width": 955,
+  "derivative_height": 960,
+  "hero_photo_quality_score": 40,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://assets.alterestate.com/fit-in/1280x960/filters:quality(70)/static/properties/78N8EQQ9DP/Z9XMV2YYHL/4rYERPNx5b/559282.jpeg",
+  "candidate_count": 5,
+  "content_sha1": "09e09d0d371c7433",
+  "dhash": 9839535386533704370,
+  "duplicates_dropped": 0
+}

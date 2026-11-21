@@ -1,0 +1,20 @@
+{
+  "width": 1280,
+  "height": 960,
+  "aspect_ratio": 1.333,
+  "file_size_kb": 99.3,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-11-11T09:53:52.163994+00:00",
+  "derivative_width": 1280,
+  "derivative_height": 960,
+  "hero_photo_quality_score": 90,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://assets.alterestate.com/fit-in/1280x960/filters:quality(70)/static/properties/78N8EQQ9DP/00LP0EUHU4/UaJ9E7xBPo/Rancho_en_Venta_Primera_Fila_Lago_de_Coatepeque__Muelle_y_Piscina_350000_1.jpeg",
+  "candidate_count": 5,
+  "content_sha1": "5c2390625d229fe3",
+  "dhash": 13998398217357761056,
+  "duplicates_dropped": 1
+}
