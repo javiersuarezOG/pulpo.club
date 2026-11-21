@@ -2,16 +2,19 @@
   "width": 1280,
   "height": 960,
   "aspect_ratio": 1.333,
-  "file_size_kb": 259.9,
+  "file_size_kb": 249.4,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-06-08T09:12:26.595294+00:00",
+  "computed_at": "2026-11-14T09:43:22.131828+00:00",
   "derivative_width": 1280,
   "derivative_height": 960,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/VMJSZF16V6/ZnSDbmV9go/Venta_casa_Costa_del_Sol.jpeg",
-  "candidate_count": 5
+  "winning_url": "https://assets.alterestate.com/fit-in/1280x960/filters:quality(70)/static/properties/78N8EQQ9DP/VMJSZF16V6/ZnSDbmV9go/Venta_casa_Costa_del_Sol.jpeg",
+  "candidate_count": 5,
+  "content_sha1": "6254920a28b416e3",
+  "dhash": 12593099071971816560,
+  "duplicates_dropped": 1
 }
