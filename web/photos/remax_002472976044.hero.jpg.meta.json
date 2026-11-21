@@ -6,12 +6,15 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-07-25T06:16:38.646989+00:00",
+  "computed_at": "2026-10-27T08:21:17.047162+00:00",
   "derivative_width": 1600,
   "derivative_height": 898,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002472976044/v3/HDPhotos/DELIMITACION%20TERRENO%20.jpg",
-  "candidate_count": 1
+  "winning_url": "https://images.remax-ccamls.com/002472976044/original/DELIMITACION-TERRENO_b3630bbddef7cd05e0896ebc45c5da99.jpg",
+  "candidate_count": 1,
+  "content_sha1": "702f3b398dec7c7b",
+  "dhash": 7610350447964409321,
+  "duplicates_dropped": 0
 }
