@@ -2,16 +2,19 @@
   "width": 1024,
   "height": 651,
   "aspect_ratio": 1.573,
-  "file_size_kb": 105.8,
+  "file_size_kb": 106.1,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-06-08T09:09:17.337421+00:00",
+  "computed_at": "2026-11-10T10:30:52.518765+00:00",
   "derivative_width": 1024,
   "derivative_height": 651,
   "hero_photo_quality_score": 60,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvRzFGUzFORDJJQS9DRmNVWkFzWGt5L1RlcnJlbm9fZW5fdmVudGFfZW5fQ29tcGxlam9fUHJpdmFkb19BdGFtaV8xLmpwZWciLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiAxMDI0LCAiaGVpZ2h0IjogNzY4LCAiZml0IjogImluc2lkZSJ9LCAidG9Gb3JtYXQiOiAianBlZyIsICJqcGVnIjogeyJxdWFsaXR5IjogNzB9fX0=",
-  "candidate_count": 3
+  "winning_url": "https://assets.alterestate.com/fit-in/1024x768/filters:quality(70)/static/properties/78N8EQQ9DP/G1FS1ND2IA/CFcUZAsXky/Terreno_en_venta_en_Complejo_Privado_Atami_1.jpeg",
+  "candidate_count": 3,
+  "content_sha1": "8c10b5653145c8f6",
+  "dhash": 15476238213594232956,
+  "duplicates_dropped": 1
 }

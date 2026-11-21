@@ -2,16 +2,19 @@
   "width": 1280,
   "height": 720,
   "aspect_ratio": 1.778,
-  "file_size_kb": 150.5,
+  "file_size_kb": 143.6,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-06-08T09:13:04.645410+00:00",
+  "computed_at": "2026-11-10T10:37:27.203112+00:00",
   "derivative_width": 1280,
   "derivative_height": 720,
   "hero_photo_quality_score": 90,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/FTXT1HI1Z5/odeWy9tn5q/Oportunidad_Maestra_de_Inversi%C3%B3n_en_Utila__Terreno_Prime_frente_al_Mar__12M_5.jpeg",
-  "candidate_count": 5
+  "winning_url": "https://assets.alterestate.com/fit-in/1280x960/filters:quality(70)/static/properties/78N8EQQ9DP/FTXT1HI1Z5/odeWy9tn5q/Oportunidad_Maestra_de_Inversi%C3%B3n_en_Utila__Terreno_Prime_frente_al_Mar__12M_5.jpeg",
+  "candidate_count": 5,
+  "content_sha1": "50d4061adc66c653",
+  "dhash": 7003713564244468402,
+  "duplicates_dropped": 2
 }

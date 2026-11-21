@@ -1,17 +1,20 @@
 {
   "width": 1280,
-  "height": 853,
-  "aspect_ratio": 1.501,
-  "file_size_kb": 204.8,
+  "height": 880,
+  "aspect_ratio": 1.455,
+  "file_size_kb": 213.2,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-06-08T09:12:27.234890+00:00",
+  "computed_at": "2026-11-10T10:36:56.855810+00:00",
   "derivative_width": 1280,
-  "derivative_height": 853,
+  "derivative_height": 880,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvUVRDRTNOVVE1Qi9ORVBuazRHNktLL1RlcnJlbm9fUGxhbm9fZW5fVmVudGFfTGFzX0x1Y2VzX1phcmFnb3phX19GYXNlX0lJSV9fUGFydGljdWxhcl8yLmpwZWciLCAiZWRpdHMiOiB7InJlc2l6ZSI6IHsid2lkdGgiOiAxMjgwLCAiaGVpZ2h0IjogOTYwLCAiZml0IjogImluc2lkZSJ9LCAidG9Gb3JtYXQiOiAianBlZyIsICJqcGVnIjogeyJxdWFsaXR5IjogNzB9fX0=",
-  "candidate_count": 5
+  "winning_url": "https://assets.alterestate.com/fit-in/1280x960/filters:quality(70)/static/properties/78N8EQQ9DP/8AZFFQ7MX6/2kEwAdD8WW/Terreno_Plano_en_Venta_Las_Luces_Zaragoza__Fase_III__Particular.jpeg",
+  "candidate_count": 5,
+  "content_sha1": "fceaede44cdef6e1",
+  "dhash": 4782889705237680324,
+  "duplicates_dropped": 1
 }
