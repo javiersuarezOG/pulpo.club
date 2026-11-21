@@ -1,0 +1,29 @@
+{
+  "width": 2560,
+  "height": 1807,
+  "aspect_ratio": 1.417,
+  "file_size_kb": 2496.3,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-11-20T10:48:10.950454+00:00",
+  "source_url": "https://i0.wp.com/oceansideelsalvador.com/wp-content/uploads/2026/09/Violet-and-Black-Sold-Real-Estate-Yard-Sign-scaled.png?fit=2560%2C1807&ssl=1",
+  "original_url": "https://i0.wp.com/oceansideelsalvador.com/wp-content/uploads/2026/09/Violet-and-Black-Sold-Real-Estate-Yard-Sign-scaled.png?fit=2560%2C1807&ssl=1",
+  "transform_used": "none",
+  "fetched_at": "2026-11-20T10:48:11.135347+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": null,
+  "resdet_detected_height": null,
+  "resdet_upscaled": null,
+  "quarantined": false,
+  "aesthetic": {
+    "visual_appeal": 4.9,
+    "issues": [
+      "uninteresting",
+      "low_quality"
+    ],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.081 color_entropy=0.384"
+  }
+}
