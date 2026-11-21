@@ -6,12 +6,15 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-07-22T06:21:10.381411+00:00",
+  "computed_at": "2026-10-25T08:17:55.788494+00:00",
   "derivative_width": 1376,
   "derivative_height": 768,
   "hero_photo_quality_score": 100,
   "has_text_overlay": true,
   "has_marketing_overlay": null,
-  "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002284175005/v3/HDPhotos/Gemini_Generated_Image_j6tq6mj6tq6mj6tq.png",
-  "candidate_count": 1
+  "winning_url": "https://images.remax-ccamls.com/002284175005/original/Gemini_Generated_Image_j6tq6mj6tq6mj6tq_b6f253772d898eabd4e4e4ed8aa0a12a.png",
+  "candidate_count": 1,
+  "content_sha1": "1e9e1e50c5ef97c4",
+  "dhash": 3022695473075225824,
+  "duplicates_dropped": 0
 }

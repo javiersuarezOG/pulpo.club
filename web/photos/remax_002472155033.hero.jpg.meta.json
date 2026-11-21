@@ -6,12 +6,15 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-07-25T06:16:39.699601+00:00",
+  "computed_at": "2026-10-25T08:18:06.868516+00:00",
   "derivative_width": 1600,
   "derivative_height": 738,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002472155033/v3/HDPhotos/calle%20hacia%20Suchitoto%20frente%20terrenos.jpeg",
-  "candidate_count": 1
+  "winning_url": "https://images.remax-ccamls.com/002472155033/original/calle-hacia-Suchitoto-frente-terrenos_774b16caca6cee94eb342af373ec2ef1.jpg",
+  "candidate_count": 1,
+  "content_sha1": "35b21b196c8338da",
+  "dhash": 9629878308912543792,
+  "duplicates_dropped": 0
 }

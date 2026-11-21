@@ -1,0 +1,20 @@
+{
+  "width": 853,
+  "height": 1280,
+  "aspect_ratio": 1.501,
+  "file_size_kb": 244.5,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-10-25T08:15:20.058457+00:00",
+  "derivative_width": 720,
+  "derivative_height": 1080,
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": true,
+  "has_marketing_overlay": null,
+  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/QOSEQK2OV6/FGTQimgX2N/Terreno_en_Venta_de_34_Manzana_en_Playa_Las_Hojas__La_Paz_El_Salvador_300000.jpeg",
+  "candidate_count": 3,
+  "content_sha1": "0c4350f60d0cc6eb",
+  "dhash": 13962662178060012666,
+  "duplicates_dropped": 1
+}
