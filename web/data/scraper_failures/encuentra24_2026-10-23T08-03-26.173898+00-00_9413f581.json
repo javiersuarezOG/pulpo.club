@@ -1,0 +1,14 @@
+{
+  "failure_id": "9413f581",
+  "source": "encuentra24",
+  "ts": "2026-10-23T08:03:26.173898+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 68.38,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
