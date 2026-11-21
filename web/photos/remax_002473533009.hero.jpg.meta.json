@@ -1,0 +1,20 @@
+{
+  "width": 1600,
+  "height": 718,
+  "aspect_ratio": 2.228,
+  "file_size_kb": 300.8,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-11-12T10:23:30.367020+00:00",
+  "derivative_width": 1600,
+  "derivative_height": 718,
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://images.remax-ccamls.com/002473533009/original/TERRENO-ILOBASCO-FOTO-3CM_4446f5d72b564200b5ae4a36dc0eac3fb934b362.jpg",
+  "candidate_count": 1,
+  "content_sha1": "6dd146d89600c70e",
+  "dhash": 17180244570155414130,
+  "duplicates_dropped": 0
+}

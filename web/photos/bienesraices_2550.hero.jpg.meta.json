@@ -1,0 +1,20 @@
+{
+  "width": 968,
+  "height": 960,
+  "aspect_ratio": 1.008,
+  "file_size_kb": 231.7,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-11-12T10:23:32.214444+00:00",
+  "derivative_width": 968,
+  "derivative_height": 960,
+  "hero_photo_quality_score": 90,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://assets.alterestate.com/fit-in/1280x960/filters:quality(70)/static/properties/78N8EQQ9DP/R2HNHVIWAT/ZBKmUDJKj9/Terreno_en_Venta_de_804_v%C2%B2__Colonia_Las_Pampas_San_Miguel_87000_1.jpeg",
+  "candidate_count": 4,
+  "content_sha1": "ba2f0105e9323bd9",
+  "dhash": 16195548053128940809,
+  "duplicates_dropped": 1
+}

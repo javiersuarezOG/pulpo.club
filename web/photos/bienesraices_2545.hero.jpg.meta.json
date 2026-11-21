@@ -1,0 +1,20 @@
+{
+  "width": 1280,
+  "height": 731,
+  "aspect_ratio": 1.751,
+  "file_size_kb": 268.9,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-11-12T10:16:10.409324+00:00",
+  "derivative_width": 1280,
+  "derivative_height": 731,
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://assets.alterestate.com/fit-in/1280x960/filters:quality(70)/static/properties/78N8EQQ9DP/THGZQOXNWV/Spai7BMjSE/Finca_de_Caf%C3%A9_en_Producci%C3%B3n_15_Manzanas__Ahuachap%C3%A1n_El_Salvador_270000_1.jpeg",
+  "candidate_count": 4,
+  "content_sha1": "3707a593ab808793",
+  "dhash": 16484375716015223129,
+  "duplicates_dropped": 1
+}

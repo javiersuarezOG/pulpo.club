@@ -1,0 +1,20 @@
+{
+  "width": 1280,
+  "height": 720,
+  "aspect_ratio": 1.778,
+  "file_size_kb": 154.4,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-11-12T10:23:06.200639+00:00",
+  "derivative_width": 1280,
+  "derivative_height": 720,
+  "hero_photo_quality_score": 90,
+  "has_text_overlay": false,
+  "has_marketing_overlay": null,
+  "winning_url": "https://assets.alterestate.com/fit-in/1280x960/filters:quality(70)/static/properties/78N8EQQ9DP/0ZK38TW1LC/VHqB3UB5CM/Lotes_en_Venta_Residencial_Atenea_Costa_del_Sol__Terrenos_de_Playa_El_Salvador_1.jpeg",
+  "candidate_count": 5,
+  "content_sha1": "6e5894b4495a8da6",
+  "dhash": 12838578240285559798,
+  "duplicates_dropped": 1
+}
