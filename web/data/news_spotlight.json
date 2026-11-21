@@ -1,22 +1,22 @@
 {
   "en": {
-    "candidates_seen": 4,
-    "llm_cost_usd": 0.00042486,
-    "paragraph": "El Salvador's tourism is booming, surpassing Cuba and Costa Rica, with record revenues projected at $3.6 billion. This growth, driven by improved safety and infrastructure, signals rising demand for coastal and lake properties. For you as a buyer, this means appreciating values and rental potential. Consider investing now to capitalize on the momentum.",
-    "picked_at": "2026-08-29",
-    "source_date": "28 Aug 2026",
+    "candidates_seen": 2,
+    "llm_cost_usd": 0.00031445,
+    "paragraph": "El Salvador's environment ministry says rain will increase this weekend as low pressure off the Pacific coast pulls in moisture. If you own or are buying coastal or lake property, expect heavier downpours, possible flooding on access roads, and runoff near lakefront lots. Check drainage around any property you're viewing, ask about past flooding, and avoid signing or traveling to remote sites during the worst of it.",
+    "picked_at": "2026-11-06",
+    "source_date": "5 Nov 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/politica/el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica/?utm_source=rss&utm_medium=rss&utm_campaign=el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica",
-    "title": "El Salvador's tourism boom boosts coastal property appeal"
+    "source_url": "https://lapagina.com.sv/nacionales/advierten-sobre-un-posible-aumento-de-lluvias-en-los-proximos-dias/?utm_source=rss&utm_medium=rss&utm_campaign=advierten-sobre-un-posible-aumento-de-lluvias-en-los-proximos-dias",
+    "title": "Heavy Rain Forecast for El Salvador's Pacific Coast"
   },
   "es": {
-    "candidates_seen": 4,
-    "llm_cost_usd": 0.00047609000000000003,
-    "paragraph": "El turismo en El Salvador está en pleno auge, superando a destinos como Cuba y Costa Rica. Esto significa más visitantes y mayor demanda de alojamiento, lo que puede aumentar el valor de las propiedades costeras y de lago. Si estás pensando en comprar, ahora es un buen momento para invertir, ya que el crecimiento turístico podría traducirse en mejores rendimientos de alquiler y plusvalía a futuro.",
-    "picked_at": "2026-08-29",
-    "source_date": "28 ago 2026",
+    "candidates_seen": 2,
+    "llm_cost_usd": 0.00040858,
+    "paragraph": "El MARN advierte que este fin de semana aumentarán las lluvias por una baja presión frente a las costas del Pacífico, lo que traerá más humedad y nubosidad. Si estás comprando cerca de la playa o el lago, esto te importa: más lluvia significa caminos de acceso en mal estado, posibles inundaciones y deslaves, y menos días para visitar o inspeccionar el terreno. Antes de viajar, revisá el pronóstico, confirmá el estado de los accesos con tu vendedor y no te arriesgues a cruzar quebradas o calles anegadas.",
+    "picked_at": "2026-11-06",
+    "source_date": "5 nov 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/politica/el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica/?utm_source=rss&utm_medium=rss&utm_campaign=el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica",
-    "title": "El Salvador consolida su auge turístico superando a Cuba y Costa Rica"
+    "source_url": "https://lapagina.com.sv/nacionales/advierten-sobre-un-posible-aumento-de-lluvias-en-los-proximos-dias/?utm_source=rss&utm_medium=rss&utm_campaign=advierten-sobre-un-posible-aumento-de-lluvias-en-los-proximos-dias",
+    "title": "Advierten sobre un posible aumento de lluvias en los próximos días"
   }
 }
