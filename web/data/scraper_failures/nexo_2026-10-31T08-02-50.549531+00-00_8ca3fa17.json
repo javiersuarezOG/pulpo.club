@@ -1,0 +1,14 @@
+{
+  "failure_id": "8ca3fa17",
+  "source": "nexo",
+  "ts": "2026-10-31T08:02:50.549531+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 0.67,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}

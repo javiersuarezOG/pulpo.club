@@ -1,0 +1,20 @@
+{
+  "width": 1254,
+  "height": 1254,
+  "aspect_ratio": 1.0,
+  "file_size_kb": 360.0,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-10-31T08:49:17.212259+00:00",
+  "derivative_width": 1080,
+  "derivative_height": 1080,
+  "hero_photo_quality_score": 90,
+  "has_text_overlay": true,
+  "has_marketing_overlay": null,
+  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/6YQ6RW16KB/7AbFcHjHC3/Terreno_de_1_Manzana_en_Venta_en_Sonsonate__Dividido_en_4_Parcelas_Cerca_de_Los_C%C3%B3banos.jpeg",
+  "candidate_count": 2,
+  "content_sha1": "cfe431599d2bcb5b",
+  "dhash": 16738555041066519113,
+  "duplicates_dropped": 1
+}

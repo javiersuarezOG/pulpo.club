@@ -1,0 +1,20 @@
+{
+  "width": 843,
+  "height": 1264,
+  "aspect_ratio": 1.499,
+  "file_size_kb": 271.2,
+  "hero_eligible": false,
+  "card_eligible": true,
+  "hires_eligible": false,
+  "computed_at": "2026-10-31T08:53:51.430882+00:00",
+  "derivative_width": 720,
+  "derivative_height": 1080,
+  "hero_photo_quality_score": 100,
+  "has_text_overlay": true,
+  "has_marketing_overlay": null,
+  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/9CRSZH03MA/RaTaetNKn2/Terreno_de_25000_m2_3.jpeg",
+  "candidate_count": 3,
+  "content_sha1": "cac4a8af06e49b90",
+  "dhash": 14418301059970780493,
+  "duplicates_dropped": 1
+}
