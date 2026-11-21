@@ -1,0 +1,14 @@
+{
+  "failure_id": "4ae6adea",
+  "source": "nexo",
+  "ts": "2026-11-16T09:04:39.325608+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 0.7,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
