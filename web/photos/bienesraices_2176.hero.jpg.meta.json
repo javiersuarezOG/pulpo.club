@@ -2,16 +2,19 @@
   "width": 1279,
   "height": 960,
   "aspect_ratio": 1.332,
-  "file_size_kb": 273.3,
+  "file_size_kb": 273.9,
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-06-08T09:12:46.430411+00:00",
+  "computed_at": "2026-11-13T10:20:03.701471+00:00",
   "derivative_width": 1279,
   "derivative_height": 960,
   "hero_photo_quality_score": 100,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvMVk4UVc5QjFRRi9UZVZzWVR3RWhiL1ZlbnRhX2RlX1JhbmNob19kZV9QbGF5YV9BbXVlYmxhZG9fZW5fQ29zdGFfZGVsX1NvbF9fQ29uZG9taW5pb19Db3N0YV9QYXJhXHUwMGVkc29fNC5qcGVnIiwgImVkaXRzIjogeyJyZXNpemUiOiB7IndpZHRoIjogMTI4MCwgImhlaWdodCI6IDk2MCwgImZpdCI6ICJpbnNpZGUifSwgInRvRm9ybWF0IjogImpwZWciLCAianBlZyI6IHsicXVhbGl0eSI6IDcwfX19",
-  "candidate_count": 5
+  "winning_url": "https://assets.alterestate.com/fit-in/1280x960/filters:quality(70)/static/properties/78N8EQQ9DP/1Y8QW9B1QF/TeVsYTwEhb/Venta_de_Rancho_de_Playa_Amueblado_en_Costa_del_Sol__Condominio_Costa_Para%C3%ADso_4.jpeg",
+  "candidate_count": 5,
+  "content_sha1": "c747934f168f89fa",
+  "dhash": 17426876374273579162,
+  "duplicates_dropped": 1
 }

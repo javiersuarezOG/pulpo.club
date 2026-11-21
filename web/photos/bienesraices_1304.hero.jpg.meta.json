@@ -2,16 +2,19 @@
   "width": 1024,
   "height": 473,
   "aspect_ratio": 2.165,
-  "file_size_kb": 152.4,
+  "file_size_kb": 152.6,
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-06-08T09:12:31.270311+00:00",
+  "computed_at": "2026-11-13T10:20:19.847036+00:00",
   "derivative_width": 1024,
   "derivative_height": 473,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://d2kflbb1pmooh4.cloudfront.net/eyJidWNrZXQiOiAiYWx0ZXJlc3RhdGUiLCAia2V5IjogInN0YXRpYy9wcm9wZXJ0aWVzLzc4TjhFUVE5RFAvWVJFMk5MWllJSS9ZcXZtN212UWNqL1RlcnJlbm9fZW5fdmVudGFfZW5fRWxfTWFqYWh1YWwuanBlZyIsICJlZGl0cyI6IHsicmVzaXplIjogeyJ3aWR0aCI6IDEwMjQsICJoZWlnaHQiOiA3NjgsICJmaXQiOiAiaW5zaWRlIn0sICJ0b0Zvcm1hdCI6ICJqcGVnIiwgImpwZWciOiB7InF1YWxpdHkiOiA3MH19fQ==",
-  "candidate_count": 5
+  "winning_url": "https://assets.alterestate.com/fit-in/1024x768/filters:quality(70)/static/properties/78N8EQQ9DP/YRE2NLZYII/Yqvm7mvQcj/Terreno_en_venta_en_El_Majahual.jpeg",
+  "candidate_count": 5,
+  "content_sha1": "fbed11b1cfe3cde7",
+  "dhash": 8551457598945210865,
+  "duplicates_dropped": 1
 }
