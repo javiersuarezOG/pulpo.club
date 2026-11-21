@@ -1,0 +1,14 @@
+{
+  "failure_id": "33d75891",
+  "source": "century21",
+  "ts": "2026-11-18T09:47:09.539687+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 2.81,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
