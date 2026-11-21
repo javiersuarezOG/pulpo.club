@@ -1,0 +1,20 @@
+{
+  "width": 1600,
+  "height": 1269,
+  "aspect_ratio": 1.261,
+  "file_size_kb": 231.0,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-10-29T09:07:07.434962+00:00",
+  "derivative_width": 1362,
+  "derivative_height": 1080,
+  "hero_photo_quality_score": 90,
+  "has_text_overlay": true,
+  "has_marketing_overlay": null,
+  "winning_url": "https://d2p0bx8wfdkjkb.cloudfront.net/static/properties/78N8EQQ9DP/Y05MDRYGVT/cMvRE5sQcg/Terreno_con_Vista_Panor%C3%A1mica_en_Venta__Escal%C3%B3n_Norte_El_Carmen_198000.jpeg",
+  "candidate_count": 5,
+  "content_sha1": "1d851e3deb46daca",
+  "dhash": 7742692935636576521,
+  "duplicates_dropped": 1
+}
