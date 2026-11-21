@@ -6,12 +6,15 @@
   "hero_eligible": false,
   "card_eligible": false,
   "hires_eligible": false,
-  "computed_at": "2026-07-25T06:16:31.775860+00:00",
+  "computed_at": "2026-10-28T08:51:34.956356+00:00",
   "derivative_width": 1280,
   "derivative_height": 590,
   "hero_photo_quality_score": 0,
   "has_text_overlay": false,
   "has_marketing_overlay": null,
-  "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002472155041/v3/HDPhotos/SONSONATE%2014.jpeg",
-  "candidate_count": 1
+  "winning_url": "https://images.remax-ccamls.com/002472155041/original/SONSONATE-14_60c935622d672decf17fca43e8b8699c.jpg",
+  "candidate_count": 1,
+  "content_sha1": "0e879c26515764c9",
+  "dhash": 5228737115446976078,
+  "duplicates_dropped": 0
 }

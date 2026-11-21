@@ -1,22 +1,22 @@
 {
   "en": {
-    "candidates_seen": 4,
-    "llm_cost_usd": 0.00042486,
-    "paragraph": "El Salvador's tourism is booming, surpassing Cuba and Costa Rica, with record revenues projected at $3.6 billion. This growth, driven by improved safety and infrastructure, signals rising demand for coastal and lake properties. For you as a buyer, this means appreciating values and rental potential. Consider investing now to capitalize on the momentum.",
-    "picked_at": "2026-08-29",
-    "source_date": "28 Aug 2026",
+    "candidates_seen": 3,
+    "llm_cost_usd": 0.00038982,
+    "paragraph": "Two Colombian tourists drowned at Costa del Sol after a strong current pulled them out to sea. If you're buying beachfront in La Paz, this is a reminder to check for rip currents before swimming and ask locals where the safe entry points are. When viewing coastal lots, note whether the beach has lifeguards, warning signs, or known dangerous surf, and factor that into how you'll use the property.",
+    "picked_at": "2026-10-28",
+    "source_date": "28 Oct 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/politica/el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica/?utm_source=rss&utm_medium=rss&utm_campaign=el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica",
-    "title": "El Salvador's tourism boom boosts coastal property appeal"
+    "source_url": "https://lapagina.com.sv/nacionales/tragedia-en-la-costa-del-sol-identifican-a-esposos-colombianos-arrastrados-por-una-corriente-marina/?utm_source=rss&utm_medium=rss&utm_campaign=tragedia-en-la-costa-del-sol-identifican-a-esposos-colombianos-arrastrados-por-una-corriente-marina",
+    "title": "Drowning at Costa del Sol Highlights Rip Current Risk"
   },
   "es": {
-    "candidates_seen": 4,
-    "llm_cost_usd": 0.00047609000000000003,
-    "paragraph": "El turismo en El Salvador está en pleno auge, superando a destinos como Cuba y Costa Rica. Esto significa más visitantes y mayor demanda de alojamiento, lo que puede aumentar el valor de las propiedades costeras y de lago. Si estás pensando en comprar, ahora es un buen momento para invertir, ya que el crecimiento turístico podría traducirse en mejores rendimientos de alquiler y plusvalía a futuro.",
-    "picked_at": "2026-08-29",
-    "source_date": "28 ago 2026",
+    "candidates_seen": 3,
+    "llm_cost_usd": 0.00046635000000000003,
+    "paragraph": "Dos turistas colombianos murieron arrastrados por una corriente marina en la playa Costa del Sol, en La Paz. Si estás comprando cerca de ahí, esto te recuerda algo básico: las corrientes de retorno son un riesgo real en varias playas del país, y no siempre hay señalización ni salvavidas. Antes de decidir, visitá la playa en distintas horas, preguntá a locales y alojamientos por las corrientes, y verificá si tu futura propiedad y su acceso tienen planes de seguridad y emergencia.",
+    "picked_at": "2026-10-28",
+    "source_date": "28 oct 2026",
     "source_name": "La Página",
-    "source_url": "https://lapagina.com.sv/politica/el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica/?utm_source=rss&utm_medium=rss&utm_campaign=el-salvador-consolida-su-auge-turistico-superando-a-cuba-y-costa-rica",
-    "title": "El Salvador consolida su auge turístico superando a Cuba y Costa Rica"
+    "source_url": "https://lapagina.com.sv/nacionales/tragedia-en-la-costa-del-sol-identifican-a-esposos-colombianos-arrastrados-por-una-corriente-marina/?utm_source=rss&utm_medium=rss&utm_campaign=tragedia-en-la-costa-del-sol-identifican-a-esposos-colombianos-arrastrados-por-una-corriente-marina",
+    "title": "Tragedia en la Costa del Sol: identifican a esposos colombianos arrastrados por una corriente marina"
   }
 }

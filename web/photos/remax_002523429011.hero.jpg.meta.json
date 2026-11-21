@@ -6,12 +6,15 @@
   "hero_eligible": false,
   "card_eligible": true,
   "hires_eligible": false,
-  "computed_at": "2026-06-08T09:12:30.472024+00:00",
+  "computed_at": "2026-10-28T08:51:36.968232+00:00",
   "derivative_width": 1326,
   "derivative_height": 718,
   "hero_photo_quality_score": 100,
   "has_text_overlay": true,
   "has_marketing_overlay": null,
-  "winning_url": "https://remaxcaribbeanandcentralamerica.azureedge.net/images/002523429011/v3/HDPhotos/canarias.png",
-  "candidate_count": 1
+  "winning_url": "https://images.remax-ccamls.com/002523429011/original/canarias_914f1c17ee44d8f0b00f96f8a5829d6c.png",
+  "candidate_count": 1,
+  "content_sha1": "58914dae76220bc6",
+  "dhash": 1566971295001595454,
+  "duplicates_dropped": 0
 }
