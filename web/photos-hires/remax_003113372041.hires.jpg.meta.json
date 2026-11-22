@@ -1,0 +1,26 @@
+{
+  "width": 2609,
+  "height": 1810,
+  "aspect_ratio": 1.441,
+  "file_size_kb": 1724.7,
+  "hero_eligible": true,
+  "card_eligible": true,
+  "hires_eligible": true,
+  "computed_at": "2026-11-22T10:33:38.947905+00:00",
+  "source_url": "https://images.remax-ccamls.com/003113372041/original/IMG_6157_8b03475191c242f393608121779895ac14e66b78.jpg",
+  "original_url": "https://images.remax-ccamls.com/003113372041/original/IMG_6157_8b03475191c242f393608121779895ac14e66b78.jpg",
+  "transform_used": "none",
+  "fetched_at": "2026-11-22T10:33:39.245569+00:00",
+  "hires_photo_quality_score": 100,
+  "resdet_detected_width": null,
+  "resdet_detected_height": null,
+  "resdet_upscaled": null,
+  "quarantined": false,
+  "aesthetic": {
+    "visual_appeal": 7.9,
+    "issues": [],
+    "provider": "deterministic",
+    "prompt_version": "2026-05-15.det-v1.py",
+    "rationale": "edge_gini=0.446 color_entropy=0.513"
+  }
+}
