@@ -1,0 +1,14 @@
+{
+  "failure_id": "d2c02846",
+  "source": "santizo",
+  "ts": "2026-11-23T10:30:17.677282+00:00",
+  "kind": "empty_yield",
+  "exception": null,
+  "request": null,
+  "response": null,
+  "context": {
+    "duration_s": 1.43,
+    "max_pages_hit": false,
+    "limit_hit": false
+  }
+}
