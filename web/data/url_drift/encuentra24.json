@@ -2,7 +2,7 @@
   "source": "encuentra24",
   "drift_state": "unreachable",
   "reason": "http_status=403",
-  "probed_at": "2026-11-25T08:48:12.715430+00:00",
+  "probed_at": "2026-11-25T21:48:48.674100+00:00",
   "last_probe": {
     "probed_url": "https://www.encuentra24.com/el-salvador-es/bienes-raices",
     "status_code": 403,
